@@ -46,7 +46,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
     const result = contactSchema.safeParse(formData);
     if (!result.success) {
-      const firstError = result.error.errors[0];
+      const firstError = result.error.issues[0];
       if (firstError.path[0] === "name") toast.error(t("errorName"));
       else if (firstError.path[0] === "email") toast.error(t("errorEmail"));
       else if (firstError.path[0] === "phone") toast.error(t("errorPhone"));
