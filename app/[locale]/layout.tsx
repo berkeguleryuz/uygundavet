@@ -5,6 +5,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/app/components/theme-provider";
 import "../globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -55,6 +56,8 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      suppressHydrationWarning
+      style={{ colorScheme: "dark" }}
       className={cn(
         "h-full",
         "antialiased",
@@ -66,11 +69,13 @@ export default async function LocaleLayout({
         "dark"
       )}
     >
-      <body className="min-h-full flex flex-col font-sans">
-        <NextIntlClientProvider messages={messages}>
-          {children}
-          <Toaster position="top-center" theme="dark" richColors />
-        </NextIntlClientProvider>
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+            <Toaster position="top-center" theme="dark" richColors />
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

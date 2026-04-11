@@ -225,12 +225,24 @@ export function SectionMindloopHero() {
                 ))}
             </div>
           </div>
+
+          <div
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-opacity duration-500"
+            style={{ opacity: imageProgress > 0.85 ? 1 : 0 }}
+          >
+            <span className="text-white/40 text-xs font-sans tracking-[0.2em] uppercase">
+              {t("scrollHint")}
+            </span>
+            <div className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center pt-1.5">
+              <div className="w-1 h-2 rounded-full bg-white/50 animate-bounce" />
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="h-[200vh]" />
 
-      <div className="px-6 pt-32 pb-28 md:pt-48 md:px-12 md:pb-36 lg:px-20 lg:pt-56 lg:pb-44 flex flex-col items-center">
+      <div className="px-6 pt-16 pb-16 md:pt-20 md:px-12 md:pb-20 lg:px-20 lg:pt-24 lg:pb-24 flex flex-col items-center">
         <p className="mx-auto max-w-2xl text-center text-2xl leading-relaxed text-muted-foreground md:text-3xl lg:text-[2.5rem] lg:leading-snug font-sans whitespace-pre-line mb-10">
           {t("tagline")}
         </p>

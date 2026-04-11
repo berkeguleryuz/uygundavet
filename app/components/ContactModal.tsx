@@ -121,7 +121,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                   <X className="w-4 h-4 text-white/60" />
                 </button>
 
-                <Logo className="w-9 h-9 mb-5 relative z-10" />
+                <Logo className="w-16 h-16 mb-5 relative z-10" />
 
                 <h3 className="font-merienda text-2xl text-white relative z-10">
                   {t("title")}
