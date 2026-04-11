@@ -1,5 +1,3 @@
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 export type RsvpStatus = "confirmed" | "declined" | "pending";
 
 export type GuestSource = "whatsapp" | "email" | "manual" | "qr-code" | "website";
@@ -37,8 +35,6 @@ export interface Activity {
   action: string;
   time: string;
 }
-
-// ─── Mock Data ───────────────────────────────────────────────────────────────
 
 export const dashboardStats: DashboardStat[] = [
   {

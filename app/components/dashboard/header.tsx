@@ -102,41 +102,44 @@ export function WelcomeSection({ isDemo }: WelcomeSectionProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          className="h-9 gap-1.5 bg-card hover:bg-card/80 border-border/50"
-          disabled={isDemo}
-          asChild={!isDemo}
-        >
-          {isDemo ? (
-            <>
+        {isDemo ? (
+          <Button
+            variant="outline"
+            className="h-9 gap-1.5 bg-card hover:bg-card/80 border-border/50"
+            disabled
+          >
+            <UserPlus className="size-4" />
+            <span className="hidden sm:inline">{t("addGuest")}</span>
+          </Button>
+        ) : (
+          <Link href={`${prefix}/misafirler`}>
+            <Button
+              variant="outline"
+              className="h-9 gap-1.5 bg-card hover:bg-card/80 border-border/50"
+            >
               <UserPlus className="size-4" />
               <span className="hidden sm:inline">{t("addGuest")}</span>
-            </>
-          ) : (
-            <Link href={`${prefix}/misafirler`}>
-              <UserPlus className="size-4" />
-              <span className="hidden sm:inline">{t("addGuest")}</span>
-            </Link>
-          )}
-        </Button>
-        <Button
-          className="h-9 gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-white border border-border/50"
-          disabled={isDemo}
-          asChild={!isDemo}
-        >
-          {isDemo ? (
-            <>
+            </Button>
+          </Link>
+        )}
+        {isDemo ? (
+          <Button
+            className="h-9 gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-white border border-border/50"
+            disabled
+          >
+            <Mail className="size-4" />
+            <span className="hidden sm:inline">{t("editInvitation")}</span>
+          </Button>
+        ) : (
+          <Link href={`${prefix}/davetiyem`}>
+            <Button
+              className="h-9 gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-white border border-border/50"
+            >
               <Mail className="size-4" />
               <span className="hidden sm:inline">{t("editInvitation")}</span>
-            </>
-          ) : (
-            <Link href={`${prefix}/davetiyem`}>
-              <Mail className="size-4" />
-              <span className="hidden sm:inline">{t("editInvitation")}</span>
-            </Link>
-          )}
-        </Button>
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );

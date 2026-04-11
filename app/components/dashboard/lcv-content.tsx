@@ -129,7 +129,6 @@ export function LcvContent({ isDemo }: { isDemo?: boolean }) {
         </div>
       </div>
 
-      {/* 3 stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {rsvpStatDefs.map((stat) => {
           const Icon = stat.icon;
@@ -160,10 +159,8 @@ export function LcvContent({ isDemo }: { isDemo?: boolean }) {
         })}
       </div>
 
-      {/* Chart */}
       <GuestsChart />
 
-      {/* Recent RSVP changes */}
       <div className="bg-card rounded-xl border overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border/50">
           <h3 className="font-medium text-sm sm:text-base">

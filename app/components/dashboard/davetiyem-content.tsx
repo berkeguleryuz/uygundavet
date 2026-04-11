@@ -67,7 +67,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Left: Invitation Preview */}
         <div className="lg:col-span-2">
           <div className="bg-card rounded-2xl border p-6 sm:p-8 relative overflow-hidden">
             {isDemo && (
@@ -80,7 +79,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             )}
 
             <div className="flex flex-col items-center text-center space-y-6 py-8 sm:py-12">
-              {/* Decorative top */}
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
                 <Heart
@@ -90,7 +88,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 <div className="h-px w-12 bg-border" />
               </div>
 
-              {/* Couple names */}
               <div>
                 <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-3">
                   {t("weAreGettingMarried")}
@@ -105,7 +102,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
 
               <Separator className="max-w-[200px]" />
 
-              {/* Date */}
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CalendarHeart className="size-4" />
                 <span className="text-sm font-medium tracking-wider uppercase">
@@ -113,7 +109,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 </span>
               </div>
 
-              {/* Venue */}
               <div className="bg-muted/50 rounded-xl border p-6 max-w-md w-full">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <MapPin
@@ -129,12 +124,10 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 <p className="text-sm text-muted-foreground">{t("time")} 18:00</p>
               </div>
 
-              {/* Message */}
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
                 {t("invitationMessage")}
               </p>
 
-              {/* Decorative bottom */}
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
                 <Heart
@@ -147,9 +140,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
           </div>
         </div>
 
-        {/* Right: Settings Sidebar */}
         <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-          {/* Theme Selection */}
           <div className="bg-card rounded-xl border p-5">
             <h3 className="font-medium text-sm mb-4">{t("themeSelection")}</h3>
             <div className="flex items-center gap-3">
@@ -176,7 +167,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             </div>
           </div>
 
-          {/* Share */}
           <div className="bg-card rounded-xl border p-5">
             <h3 className="font-medium text-sm mb-4">{t("share")}</h3>
             <div className="space-y-4">
@@ -200,7 +190,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                   )}
                 </Button>
               </div>
-              {/* QR Placeholder */}
               <div className="border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2">
                 <div className="size-24 border-2 border-muted-foreground/30 rounded-md flex items-center justify-center">
                   <span className="text-sm font-medium text-muted-foreground">
@@ -214,7 +203,6 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="bg-card rounded-xl border p-5">
             <h3 className="font-medium text-sm mb-4">{t("statistics")}</h3>
             <div className="space-y-3">

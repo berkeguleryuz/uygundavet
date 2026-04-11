@@ -37,7 +37,6 @@ export function AyarlarContent({ isDemo }: { isDemo?: boolean }) {
       </div>
 
       <div className="space-y-6">
-        {/* Card 1: Dugun Bilgileri */}
         <div className="bg-card rounded-xl border p-6 space-y-5">
           <h2 className="font-semibold">{t("weddingInfo")}</h2>
           <Separator />
@@ -89,7 +88,6 @@ export function AyarlarContent({ isDemo }: { isDemo?: boolean }) {
           </div>
         </div>
 
-        {/* Card 2: Cift Bilgileri */}
         <div className="bg-card rounded-xl border p-6 space-y-5">
           <h2 className="font-semibold">{t("coupleInfo")}</h2>
           <Separator />
@@ -145,7 +143,6 @@ export function AyarlarContent({ isDemo }: { isDemo?: boolean }) {
           </div>
         </div>
 
-        {/* Card 3: Aile Bilgileri */}
         <div className="bg-card rounded-xl border p-6 space-y-5">
           <h2 className="font-semibold">{t("familyInfo")}</h2>
           <Separator />
@@ -241,7 +238,6 @@ export function AyarlarContent({ isDemo }: { isDemo?: boolean }) {
           </div>
         </div>
 
-        {/* Save Button */}
         <Button
           disabled={isDemo}
           className="w-full bg-white text-black hover:bg-white/90 rounded-xl py-3 h-auto font-medium"
