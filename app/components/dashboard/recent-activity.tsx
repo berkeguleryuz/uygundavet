@@ -17,7 +17,8 @@ const demoActivity = [
   { _id: "a-008", name: "Derya Aksoy", action: "activity8Action", time: "activity8Time" },
 ];
 
-function getRelativeTime(dateStr: string, t: (key: string, values?: Record<string, unknown>) => string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getRelativeTime(dateStr: string, t: (key: string, values?: any) => string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return t("justNow");
