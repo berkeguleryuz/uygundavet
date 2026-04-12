@@ -12,10 +12,19 @@ import {
   CalendarDays,
   Mail,
   Loader2,
+  Palette,
+  CreditCard,
 } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { useWizardStore } from "@/store/wizard-store";
+import { PricingCard } from "./PricingCard";
+import { THEME_OPTIONS } from "@/lib/themes";
+import { PACKAGES, type PackageKey } from "@/lib/packages";
+import axios from "axios";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -96,14 +105,18 @@ function SidebarStep({
   );
 }
 
-function InputField({
+function WizardInput({
   label,
   placeholder,
   type = "text",
+  value,
+  onChange,
 }: {
   label: string;
   placeholder: string;
   type?: string;
+  value: string;
+  onChange: (v: string) => void;
 }) {
   return (
     <div className="space-y-2 font-sans text-left">
@@ -113,21 +126,32 @@ function InputField({
       <input
         type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="flex h-12 w-full rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/30 backdrop-blur-sm transition-all focus:border-white/60 focus:bg-white/10 focus:outline-hidden"
       />
     </div>
   );
 }
 
-export function WizardForm() {
+interface WizardFormProps {
+  onComplete?: () => void;
+}
+
+export function WizardForm({ onComplete }: WizardFormProps = {}) {
   const t = useTranslations("Wizard");
+  const tPricing = useTranslations("Pricing");
+  const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const wizard = useWizardStore();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [isRegister, setIsRegister] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const isLoggedIn = !isPending && !!session?.user;
 
@@ -137,9 +161,56 @@ export function WizardForm() {
     { id: 3, name: t("step3Name"), description: t("step3Desc"), icon: Package },
   ];
 
+  const packages = [
+    {
+      key: "starter" as PackageKey,
+      name: tPricing("starter.name"),
+      price: tPricing("starter.price"),
+      desc: tPricing("starter.desc"),
+      cta: tPricing("starter.cta"),
+      features: tPricing("starter.features").split(","),
+    },
+    {
+      key: "pro" as PackageKey,
+      name: tPricing("pro.name"),
+      price: tPricing("pro.price"),
+      desc: tPricing("pro.desc"),
+      cta: tPricing("pro.cta"),
+      features: tPricing("pro.features").split(","),
+      badge: tPricing("pro.badge"),
+      highlighted: true,
+    },
+    {
+      key: "business" as PackageKey,
+      name: tPricing("business.name"),
+      price: tPricing("business.price"),
+      desc: tPricing("business.desc"),
+      cta: tPricing("business.cta"),
+      features: tPricing("business.features").split(","),
+    },
+  ];
+
+  const validateStep2 = () => {
+    const required = [
+      wizard.phone,
+      wizard.owner1FirstName, wizard.owner1LastName,
+      wizard.owner2FirstName, wizard.owner2LastName,
+      wizard.family1FatherFirstName, wizard.family1FatherLastName,
+      wizard.family1MotherFirstName, wizard.family1MotherLastName,
+      wizard.family2FatherFirstName, wizard.family2FatherLastName,
+      wizard.family2MotherFirstName, wizard.family2MotherLastName,
+      wizard.weddingDate, wizard.weddingTime,
+    ];
+    return required.every((v) => v.trim().length > 0);
+  };
+
   const handleNext = () => {
     if (currentStep === 1 && !isLoggedIn) {
       toast.error(t("loginRequired"));
+      return;
+    }
+    if (currentStep === 2 && !validateStep2()) {
+      toast.error(t("fillAllFields"));
       return;
     }
     if (currentStep < STEPS.length) setCurrentStep(currentStep + 1);
@@ -185,6 +256,74 @@ export function WizardForm() {
       setAuthLoading(false);
     }
   };
+
+  const handleComplete = async () => {
+    if (!wizard.selectedPackage) {
+      toast.error(t("selectPackageRequired"));
+      return;
+    }
+    if (!wizard.selectedTheme) {
+      toast.error(t("selectThemeRequired"));
+      return;
+    }
+    if (wizard.selectedTheme === "custom" && !wizard.customThemeRequest.trim()) {
+      toast.error(t("customThemeRequired"));
+      return;
+    }
+    if (!wizard.paymentMethod) {
+      toast.error(t("selectPaymentRequired"));
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await axios.post("/api/orders", {
+        phone: wizard.phone,
+        owner1FirstName: wizard.owner1FirstName,
+        owner1LastName: wizard.owner1LastName,
+        owner2FirstName: wizard.owner2FirstName,
+        owner2LastName: wizard.owner2LastName,
+        family1FatherFirstName: wizard.family1FatherFirstName,
+        family1FatherLastName: wizard.family1FatherLastName,
+        family1MotherFirstName: wizard.family1MotherFirstName,
+        family1MotherLastName: wizard.family1MotherLastName,
+        family2FatherFirstName: wizard.family2FatherFirstName,
+        family2FatherLastName: wizard.family2FatherLastName,
+        family2MotherFirstName: wizard.family2MotherFirstName,
+        family2MotherLastName: wizard.family2MotherLastName,
+        weddingDate: wizard.weddingDate,
+        weddingTime: wizard.weddingTime,
+        selectedPackage: wizard.selectedPackage,
+        selectedTheme: wizard.selectedTheme,
+        customThemeRequest: wizard.customThemeRequest,
+        paymentMethod: wizard.paymentMethod,
+      });
+      wizard.reset();
+      if (onComplete) {
+        onComplete();
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
+        toast.error(t("orderExists"));
+        if (onComplete) {
+          onComplete();
+        } else {
+          router.push("/dashboard");
+        }
+      } else {
+        toast.error(t("submitError"));
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const depositAmount = wizard.selectedPackage
+    ? Math.round(PACKAGES[wizard.selectedPackage].price * PACKAGES[wizard.selectedPackage].depositPercent)
+    : 0;
+  const totalAmount = wizard.selectedPackage ? PACKAGES[wizard.selectedPackage].price : 0;
 
   return (
     <div className="relative w-full max-w-6xl mx-auto px-4 py-12">
@@ -242,6 +381,7 @@ export function WizardForm() {
                 </div>
 
                 <div className="min-h-[300px]">
+                  {/* STEP 1: Auth */}
                   {currentStep === 1 && (
                     <div className="flex flex-col gap-4 max-w-sm pt-4">
                       {isLoggedIn ? (
@@ -352,35 +492,209 @@ export function WizardForm() {
                     </div>
                   )}
 
+                  {/* STEP 2: Wedding Details */}
                   {currentStep === 2 && (
                     <div className="space-y-6 pt-2">
+                      <div>
+                        <WizardInput label={t("phoneLabel")} placeholder={t("phonePlaceholder")} type="tel" value={wizard.phone} onChange={(v) => wizard.setField("phone", v)} />
+                      </div>
                       <div className="grid gap-6 md:grid-cols-2">
-                        <InputField label={t("owner1")} placeholder={t("namePlaceholder")} />
-                        <InputField label={t("owner2")} placeholder={t("namePlaceholder")} />
-                        <InputField label={t("family1")} placeholder={t("namesPlaceholder")} />
-                        <InputField label={t("family2")} placeholder={t("namesPlaceholder")} />
-                        <InputField label={t("date")} placeholder={t("datePlaceholder")} type="date" />
-                        <InputField label={t("time")} placeholder={t("timePlaceholder")} type="time" />
+                        <WizardInput label={t("owner1FirstName")} placeholder={t("firstNamePlaceholder")} value={wizard.owner1FirstName} onChange={(v) => wizard.setField("owner1FirstName", v)} />
+                        <WizardInput label={t("owner1LastName")} placeholder={t("lastNamePlaceholder")} value={wizard.owner1LastName} onChange={(v) => wizard.setField("owner1LastName", v)} />
+                        <WizardInput label={t("owner2FirstName")} placeholder={t("firstNamePlaceholder")} value={wizard.owner2FirstName} onChange={(v) => wizard.setField("owner2FirstName", v)} />
+                        <WizardInput label={t("owner2LastName")} placeholder={t("lastNamePlaceholder")} value={wizard.owner2LastName} onChange={(v) => wizard.setField("owner2LastName", v)} />
+                      </div>
+
+                      <div className="border-t border-white/10 pt-6">
+                        <p className="text-sm font-medium text-white/70 font-sans mb-4">{t("familySection1")}</p>
+                        <p className="text-xs text-white/40 font-sans mb-3">{t("fatherLabel")}</p>
+                        <div className="grid gap-4 md:grid-cols-2 mb-4">
+                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family1FatherFirstName} onChange={(v) => wizard.setField("family1FatherFirstName", v)} />
+                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family1FatherLastName} onChange={(v) => wizard.setField("family1FatherLastName", v)} />
+                        </div>
+                        <p className="text-xs text-white/40 font-sans mb-3">{t("motherLabel")}</p>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family1MotherFirstName} onChange={(v) => wizard.setField("family1MotherFirstName", v)} />
+                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family1MotherLastName} onChange={(v) => wizard.setField("family1MotherLastName", v)} />
+                        </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-6">
+                        <p className="text-sm font-medium text-white/70 font-sans mb-4">{t("familySection2")}</p>
+                        <p className="text-xs text-white/40 font-sans mb-3">{t("fatherLabel")}</p>
+                        <div className="grid gap-4 md:grid-cols-2 mb-4">
+                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family2FatherFirstName} onChange={(v) => wizard.setField("family2FatherFirstName", v)} />
+                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family2FatherLastName} onChange={(v) => wizard.setField("family2FatherLastName", v)} />
+                        </div>
+                        <p className="text-xs text-white/40 font-sans mb-3">{t("motherLabel")}</p>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family2MotherFirstName} onChange={(v) => wizard.setField("family2MotherFirstName", v)} />
+                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family2MotherLastName} onChange={(v) => wizard.setField("family2MotherLastName", v)} />
+                        </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-6">
+                        <div className="grid gap-6 md:grid-cols-2">
+                          <WizardInput label={t("date")} placeholder="" type="date" value={wizard.weddingDate} onChange={(v) => wizard.setField("weddingDate", v)} />
+                          <WizardInput label={t("time")} placeholder="" type="time" value={wizard.weddingTime} onChange={(v) => wizard.setField("weddingTime", v)} />
+                        </div>
                       </div>
                     </div>
                   )}
 
+                  {/* STEP 3: Package + Theme + Payment */}
                   {currentStep === 3 && (
-                    <div className="space-y-6 h-full flex flex-col items-center justify-center text-center py-12">
-                      <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center mb-6">
-                        <Package className="w-12 h-12 text-white" />
+                    <div className="space-y-10">
+                      {/* Package Selection */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Package className="w-4 h-4 text-[#d5d1ad]" />
+                          <h3 className="text-sm font-chakra uppercase tracking-[0.15em] text-white/70">
+                            {t("selectPackage")}
+                          </h3>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-4">
+                          {packages.map(({ key, ...rest }) => (
+                            <PricingCard
+                              key={key}
+                              {...rest}
+                              compact
+                              selected={wizard.selectedPackage === key}
+                              onSelect={() => wizard.setPackage(key)}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      <h3 className="text-2xl font-bold font-merienda text-white">
-                        {t("doneHeading")}
-                      </h3>
-                      <p className="text-white/60 font-sans max-w-sm mb-8">
-                        {t("doneText")}
-                      </p>
+
+                      {/* Theme Selection */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Palette className="w-4 h-4 text-[#d5d1ad]" />
+                          <h3 className="text-sm font-chakra uppercase tracking-[0.15em] text-white/70">
+                            {t("selectTheme")}
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                          {THEME_OPTIONS.map((theme) => (
+                            <button
+                              key={theme.key}
+                              type="button"
+                              onClick={() => wizard.setTheme(theme.key)}
+                              className={cn(
+                                "relative rounded-2xl overflow-hidden aspect-[3/4] border-2 transition-all cursor-pointer group",
+                                wizard.selectedTheme === theme.key
+                                  ? "border-[#d5d1ad] ring-1 ring-[#d5d1ad]/50"
+                                  : "border-white/10 hover:border-white/30"
+                              )}
+                            >
+                              <Image
+                                src={theme.image}
+                                alt={theme.key}
+                                fill
+                                sizes="150px"
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-black/30" />
+                              <span className="absolute bottom-2 left-0 right-0 text-center text-xs font-chakra uppercase tracking-wider text-white">
+                                {theme.key}
+                              </span>
+                              {wizard.selectedTheme === theme.key && (
+                                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#d5d1ad] flex items-center justify-center">
+                                  <Check className="w-3 h-3 text-[#252224]" strokeWidth={3} />
+                                </div>
+                              )}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => wizard.setTheme("custom")}
+                            className={cn(
+                              "rounded-2xl aspect-[3/4] border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-2",
+                              wizard.selectedTheme === "custom"
+                                ? "border-[#d5d1ad] ring-1 ring-[#d5d1ad]/50 bg-white/5"
+                                : "border-white/10 hover:border-white/30 bg-white/[0.02]"
+                            )}
+                          >
+                            <Palette className="w-6 h-6 text-white/50" />
+                            <span className="text-xs font-chakra uppercase tracking-wider text-white/50">
+                              {t("customTheme")}
+                            </span>
+                            <span className="text-[10px] text-amber-400/70 font-sans">
+                              {t("customThemeExtra")}
+                            </span>
+                          </button>
+                        </div>
+                        {wizard.selectedTheme === "custom" && (
+                          <div className="mt-3 space-y-2">
+                            <textarea
+                              value={wizard.customThemeRequest}
+                              onChange={(e) => wizard.setField("customThemeRequest", e.target.value)}
+                              placeholder={t("customThemePlaceholder")}
+                              className="w-full h-24 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-white/60 focus:bg-white/10 focus:outline-hidden transition-all font-sans resize-none"
+                            />
+                            <p className="text-xs text-amber-400/60 font-sans">
+                              {t("customThemeWhatsapp")}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Payment Method */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <CreditCard className="w-4 h-4 text-[#d5d1ad]" />
+                          <h3 className="text-sm font-chakra uppercase tracking-[0.15em] text-white/70">
+                            {t("paymentMethod")}
+                          </h3>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => wizard.setPaymentMethod("deposit")}
+                            className={cn(
+                              "rounded-2xl border-2 p-5 text-left transition-all cursor-pointer",
+                              wizard.paymentMethod === "deposit"
+                                ? "border-[#d5d1ad] bg-white/5"
+                                : "border-white/10 hover:border-white/30"
+                            )}
+                          >
+                            <p className="text-sm font-semibold text-white font-sans">{t("depositOption")}</p>
+                            <p className="text-xs text-white/50 font-sans mt-1">
+                              {t("depositDesc", { deposit: depositAmount.toLocaleString("tr-TR"), remaining: (totalAmount - depositAmount).toLocaleString("tr-TR") })}
+                            </p>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => wizard.setPaymentMethod("full")}
+                            className={cn(
+                              "rounded-2xl border-2 p-5 text-left transition-all cursor-pointer",
+                              wizard.paymentMethod === "full"
+                                ? "border-[#d5d1ad] bg-white/5"
+                                : "border-white/10 hover:border-white/30"
+                            )}
+                          >
+                            <p className="text-sm font-semibold text-white font-sans">{t("fullPaymentOption")}</p>
+                            <p className="text-xs text-white/50 font-sans mt-1">
+                              {t("fullPaymentDesc", { total: totalAmount.toLocaleString("tr-TR") })}
+                            </p>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Complete Button */}
                       <button
-                        className="h-14 px-8 rounded-xl bg-white text-black font-chakra uppercase tracking-widest text-sm hover:scale-105 transition-transform"
-                        onClick={() => window.location.href = '/paketlerimiz'}
+                        onClick={handleComplete}
+                        disabled={submitting}
+                        className="w-full h-14 rounded-xl bg-white text-black font-chakra uppercase tracking-widest text-sm font-semibold hover:bg-white/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        {t("doneCta")}
+                        {submitting ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            {t("completeRegistration")}
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
                     </div>
                   )}
@@ -388,17 +702,17 @@ export function WizardForm() {
               </motion.div>
             </div>
 
-            <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-8">
-              <button
-                onClick={handleBack}
-                disabled={currentStep === 1}
-                className="flex items-center gap-2 text-sm text-white/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-chakra uppercase tracking-wider"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                {t("back")}
-              </button>
+            {currentStep < 3 && (
+              <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-8">
+                <button
+                  onClick={handleBack}
+                  disabled={currentStep === 1}
+                  className="flex items-center gap-2 text-sm text-white/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-chakra uppercase tracking-wider"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  {t("back")}
+                </button>
 
-              {currentStep < STEPS.length && (
                 <button
                   onClick={handleNext}
                   disabled={currentStep === 1 && !isLoggedIn}
@@ -407,8 +721,8 @@ export function WizardForm() {
                   {t("next")}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>

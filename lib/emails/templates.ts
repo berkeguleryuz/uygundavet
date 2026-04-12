@@ -92,7 +92,8 @@ function baseLayout(content: string) {
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#1c1a1b;border-radius:16px;overflow:hidden;">
           <tr>
             <td style="padding:32px 32px 0;text-align:center;">
-              <span style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#d5d1ad;">Uygun Davet</span>
+              <img src="https://www.uygundavet.com/logo-gold-transparent.png" alt="Uygun Davet" width="48" height="48" style="display:block;margin:0 auto 12px;" />
+              <span style="font-family:'Merienda',Georgia,serif;font-size:20px;font-weight:bold;color:#d5d1ad;">Uygun Davet</span>
             </td>
           </tr>
           <tr>

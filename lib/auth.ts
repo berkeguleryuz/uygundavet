@@ -1,15 +1,12 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
-import { MongoClient } from "mongodb";
+import { db } from "./db";
 import { resend, FROM_EMAIL } from "./resend";
 import {
   verificationEmail,
   resetPasswordEmail,
 } from "./emails/templates";
-
-const client = new MongoClient(process.env.MONGODB_URI!);
-const db = client.db();
 
 async function getUserLocale(email: string): Promise<"tr" | "en" | "de"> {
   try {
@@ -55,6 +52,8 @@ export const auth = betterAuth({
       });
     },
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    callbackURL: "/verified",
   },
   socialProviders: {
     google: {

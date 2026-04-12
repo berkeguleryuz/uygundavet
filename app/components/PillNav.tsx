@@ -14,7 +14,6 @@ import Link from "next/link";
 import { routing } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
-import { ContactModal } from "./ContactModal";
 import { authClient } from "@/lib/auth-client";
 import axios from "axios";
 
@@ -27,7 +26,6 @@ const springTransition = {
 export function PillNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isContactOpen, setIsContactOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [subEmail, setSubEmail] = useState("");
   const [subStatus, setSubStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -72,7 +70,7 @@ export function PillNav() {
   });
 
   useEffect(() => {
-    if (isOpen || isContactOpen) {
+    if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -80,7 +78,7 @@ export function PillNav() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen, isContactOpen]);
+  }, [isOpen]);
 
   const moreRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -177,14 +175,14 @@ export function PillNav() {
                 </div>
 
                 <div className="relative overflow-hidden h-[18px]">
-                  <span className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full">
-                    {t("more")}
+                  <span className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full whitespace-nowrap">
+                    {session ? (session.user.name || session.user.email.split("@")[0]) : t("more")}
                   </span>
                   <span
-                    className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full"
+                    className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full whitespace-nowrap"
                     aria-hidden="true"
                   >
-                    {t("more")}
+                    {session ? (session.user.name || session.user.email.split("@")[0]) : t("more")}
                   </span>
                 </div>
               </div>
@@ -202,7 +200,7 @@ export function PillNav() {
                   <div className="bg-white rounded-[20px] overflow-hidden shadow-xl">
                     <div className="px-6 py-5">
                       {[
-                        { key: "register", href: "/login?mode=register" },
+                        ...(!session ? [{ key: "register", href: "/login?mode=register" }] : []),
                         { key: "dashboard", href: session ? "/dashboard" : "/login" },
                         { key: "profile", href: session ? "/dashboard/ayarlar" : "/login" },
                       ].map((item, i) => (
@@ -393,10 +391,6 @@ export function PillNav() {
         )}
       </AnimatePresence>
 
-      <ContactModal
-        isOpen={isContactOpen}
-        onClose={() => setIsContactOpen(false)}
-      />
     </>
   );
 }

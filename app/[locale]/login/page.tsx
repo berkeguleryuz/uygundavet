@@ -29,14 +29,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [selectedLocale, setSelectedLocale] = useState<Locale>("tr");
+  const [justRegistered, setJustRegistered] = useState(false);
 
   useEffect(() => {
     if (!isPending && session) {
-      axios.post("/api/user/locale", { locale: selectedLocale }).finally(() => {
+      if (justRegistered) {
+        axios.post("/api/user/locale", { locale: selectedLocale }).finally(() => {
+          router.push("/dashboard");
+        });
+      } else {
         router.push("/dashboard");
-      });
+      }
     }
-  }, [isPending, session, router, selectedLocale]);
+  }, [isPending, session, router, selectedLocale, justRegistered]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +59,7 @@ export default function LoginPage() {
           toast.error(error.message || t("emailExists"));
         } else {
           toast.success(t("registerSuccess"));
+          setJustRegistered(true);
         }
       } else {
         const { error } = await authClient.signIn.email({

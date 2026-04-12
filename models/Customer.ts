@@ -6,14 +6,14 @@ interface PersonName {
 }
 
 interface FamilyInfo {
-  fatherName: string;
-  motherName: string;
-  lastName: string;
+  father: PersonName;
+  mother: PersonName;
 }
 
 export interface ICustomer extends Document {
-  userId: mongoose.Types.ObjectId;
+  userId: string;
   weddingDate: Date;
+  weddingTime: string;
   address: string;
   groom: PersonName;
   bride: PersonName;
@@ -33,18 +33,18 @@ const PersonNameSchema = new Schema<PersonName>(
 
 const FamilyInfoSchema = new Schema<FamilyInfo>(
   {
-    fatherName: { type: String, required: true, trim: true },
-    motherName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
+    father: { type: PersonNameSchema, required: true },
+    mother: { type: PersonNameSchema, required: true },
   },
   { _id: false }
 );
 
 const CustomerSchema = new Schema<ICustomer>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: { type: String, required: true },
     weddingDate: { type: Date, required: true },
-    address: { type: String, required: true, trim: true },
+    weddingTime: { type: String, trim: true, default: "" },
+    address: { type: String, trim: true, default: "" },
     groom: { type: PersonNameSchema, required: true },
     bride: { type: PersonNameSchema, required: true },
     groomFamily: { type: FamilyInfoSchema, required: true },

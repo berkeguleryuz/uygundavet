@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { MongoClient } from "mongodb";
-
-const client = new MongoClient(process.env.MONGODB_URI!);
-const db = client.db();
+import { db } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({

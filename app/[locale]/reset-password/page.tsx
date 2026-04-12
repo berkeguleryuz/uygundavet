@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      await authClient.resetPassword({
+      await authClient.requestPasswordReset({
         email,
         redirectTo: "/reset-password",
       });

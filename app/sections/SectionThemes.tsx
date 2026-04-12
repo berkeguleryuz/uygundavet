@@ -4,29 +4,13 @@ import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { useTranslations } from "next-intl";
 import FlowingMenu from "@/app/components/FlowingMenu";
+import { THEME_OPTIONS } from "@/lib/themes";
 
-const themeItems = [
-  {
-    link: "#",
-    text: "Rose",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
-  },
-  {
-    link: "#",
-    text: "Sunset",
-    image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
-  },
-  {
-    link: "#",
-    text: "Pearl",
-    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80",
-  },
-  {
-    link: "#",
-    text: "Crystal",
-    image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
-  },
-];
+const themeItems = THEME_OPTIONS.map((t) => ({
+  link: "#",
+  text: t.key.charAt(0).toUpperCase() + t.key.slice(1),
+  image: t.image,
+}));
 
 export function SectionThemes() {
   const t = useTranslations("Themes");

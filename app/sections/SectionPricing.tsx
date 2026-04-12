@@ -2,9 +2,8 @@
 
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
-import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { MorphButton } from "@/app/components/MorphButton";
+import { PricingCard } from "@/app/components/PricingCard";
 
 export function SectionPricing() {
   const t = useTranslations("Pricing");
@@ -62,50 +61,9 @@ export function SectionPricing() {
             <motion.div
               key={pkg.name}
               {...fadeUp(0.3 + i * 0.15)}
-              className={`relative rounded-3xl border px-7 py-7 flex flex-col ${
-                pkg.highlighted
-                  ? "border-white/25 scale-[1.03] md:scale-105 z-10 bg-white/[0.08] backdrop-blur-md"
-                  : "liquid-glass border-white/10"
-              }`}
+              className={pkg.highlighted ? "scale-[1.03] md:scale-105" : ""}
             >
-              {pkg.highlighted && pkg.badge && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-[#252224] text-xs font-semibold font-sans px-4 py-1.5 rounded-full tracking-wide uppercase">
-                  {pkg.badge}
-                </div>
-              )}
-
-              <h3 className="font-chakra text-lg uppercase tracking-[0.15em] text-white mb-2">
-                {pkg.name}
-              </h3>
-
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-chakra text-white font-bold">
-                  {pkg.price}
-                </span>
-              </div>
-
-              <p className="font-sans text-white/60 text-sm leading-relaxed mb-8">
-                {pkg.desc}
-              </p>
-
-              <ul className="flex flex-col gap-2.5 mb-8 flex-1">
-                {pkg.features.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-3 text-white/80 font-sans text-sm"
-                  >
-                    <Check className="w-4 h-4 text-[#d5d1ad] mt-0.5 shrink-0" />
-                    <span>{feature.trim()}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <MorphButton
-                variant={pkg.highlighted ? "filled" : "outline"}
-                className="w-full"
-              >
-                {pkg.cta}
-              </MorphButton>
+              <PricingCard {...pkg} />
             </motion.div>
           ))}
         </div>
