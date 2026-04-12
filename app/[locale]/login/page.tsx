@@ -1,32 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, Globe } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { Logo } from "@/app/components/Logo";
+import axios from "axios";
+
+const localeLabels = { tr: "Türkçe", en: "English", de: "Deutsch" } as const;
+type Locale = keyof typeof localeLabels;
 
 export default function LoginPage() {
   const t = useTranslations("Login");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, isPending } = authClient.useSession();
 
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [isRegister, setIsRegister] = useState(false);
+  const mode = searchParams.get("mode");
+  const [showEmailForm, setShowEmailForm] = useState(mode === "register");
+  const [isRegister, setIsRegister] = useState(mode === "register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [selectedLocale, setSelectedLocale] = useState<Locale>("tr");
 
   useEffect(() => {
     if (!isPending && session) {
-      router.push("/dashboard");
+      axios.post("/api/user/locale", { locale: selectedLocale }).finally(() => {
+        router.push("/dashboard");
+      });
     }
-  }, [isPending, session, router]);
+  }, [isPending, session, router, selectedLocale]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,7 +134,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-chakra font-semibold text-white uppercase tracking-tight mb-2">
             {t("heading")}
           </h1>
-          <p className="text-white/50 font-sans text-sm mb-8">
+          <p className="text-white/50 font-sans text-sm mb-6">
             {t("subtitle")}
           </p>
 
@@ -166,6 +176,32 @@ export default function LoginPage() {
                 className="h-12 w-full rounded-xl border border-white/20 bg-white/5 px-4 text-sm text-white placeholder:text-white/30 focus:border-white/60 focus:bg-white/10 focus:outline-hidden transition-all font-sans"
               />
 
+              {isRegister && (
+                <div className="flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5 text-white/40 shrink-0" />
+                  <div className="flex items-center rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                    {(Object.keys(localeLabels) as Locale[]).map((loc) => (
+                      <button
+                        key={loc}
+                        type="button"
+                        onClick={() => setSelectedLocale(loc)}
+                        className={cn(
+                          "px-3 py-1.5 text-[11px] font-sans uppercase font-medium transition-all duration-200 cursor-pointer",
+                          selectedLocale === loc
+                            ? "bg-white text-[#1c1a1b] rounded-full"
+                            : "text-white/40 hover:text-white/70"
+                        )}
+                      >
+                        {loc}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-white/30 text-xs font-sans">
+                    {t("emailLang")}
+                  </span>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={authLoading}
@@ -180,13 +216,23 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => setIsRegister(!isRegister)}
-                className="text-sm text-white/50 hover:text-white transition-colors font-sans text-center cursor-pointer"
-              >
-                {isRegister ? t("hasAccount") : t("noAccount")}
-              </button>
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRegister(!isRegister)}
+                  className="text-sm text-white/50 hover:text-white transition-colors font-sans text-center cursor-pointer"
+                >
+                  {isRegister ? t("hasAccount") : t("noAccount")}
+                </button>
+                {!isRegister && (
+                  <Link
+                    href="/reset-password"
+                    className="text-sm text-white/40 hover:text-white/70 transition-colors font-sans"
+                  >
+                    {t("forgotPassword")}
+                  </Link>
+                )}
+              </div>
             </motion.form>
           ) : (
             <div className="flex flex-col gap-4">

@@ -103,6 +103,26 @@
     "heading": "Themes That Match Your Style",
     "subtitle": "Choose from professional designs that reflect your wedding."
   },
+  "ResetPassword": {
+    "heading": "Forgot Password",
+    "subtitle": "Enter your email address and we'll send you a password reset link.",
+    "emailPlaceholder": "Your email address",
+    "sendBtn": "Send Reset Link",
+    "sentHeading": "Check Your Inbox",
+    "sentInfo": "If this email address is registered, a password reset link will be sent. Please check your inbox and spam folder.",
+    "backToLogin": "Back to login",
+    "newPasswordHeading": "Set New Password",
+    "newPasswordSubtitle": "Choose a new password for your account.",
+    "newPasswordPlaceholder": "New password (min. 6 characters)",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "resetBtn": "Reset Password",
+    "resetSuccess": "Password Changed",
+    "resetSuccessInfo": "Your password has been reset successfully. You can now sign in with your new password.",
+    "goToLogin": "Sign In",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "error": "An error occurred. Please try again."
+  },
   "Login": {
     "heading": "Sign In",
     "subtitle": "Sign in to your account to access your wedding dashboard.",
@@ -121,6 +141,8 @@
     "loginSuccess": "Login successful!",
     "loginError": "Invalid email or password.",
     "emailExists": "This email is already registered.",
+    "emailLang": "Email language",
+    "forgotPassword": "Forgot password?",
     "backToHome": "Home",
     "imageCaption": "Uygun Davet",
     "imageHeading": "Design your dream wedding\non a single platform.",
@@ -233,6 +255,7 @@
     "labs": "LABS",
     "subscribeSuccess": "You're subscribed, thank you!",
     "more": "LOGIN",
+    "register": "Register",
     "dashboard": "Dashboard",
     "profile": "Profile",
     "viewDemo": "View Demo"

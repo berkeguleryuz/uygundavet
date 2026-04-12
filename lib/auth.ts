@@ -2,9 +2,23 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
 import { MongoClient } from "mongodb";
+import { resend, FROM_EMAIL } from "./resend";
+import {
+  verificationEmail,
+  resetPasswordEmail,
+} from "./emails/templates";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db();
+
+async function getUserLocale(email: string): Promise<"tr" | "en" | "de"> {
+  try {
+    const user = await db.collection("user").findOne({ email });
+    const locale = user?.locale;
+    if (locale === "en" || locale === "de") return locale;
+  } catch {}
+  return "tr";
+}
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -17,6 +31,30 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
+    requireEmailVerification: false,
+    sendResetPassword: async ({ user, url }) => {
+      const locale = await getUserLocale(user.email);
+      const { subject, html } = resetPasswordEmail(url, locale);
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: user.email,
+        subject,
+        html,
+      });
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      const locale = await getUserLocale(user.email);
+      const { subject, html } = verificationEmail(url, locale);
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: user.email,
+        subject,
+        html,
+      });
+    },
+    sendOnSignUp: true,
   },
   socialProviders: {
     google: {

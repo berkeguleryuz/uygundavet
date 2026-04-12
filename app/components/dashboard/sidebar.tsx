@@ -178,7 +178,7 @@ export function DashboardSidebar({
               {isDemo ? t("demoUser") : t("user")}
             </span>
             <span className="text-xs text-muted-foreground truncate">
-              {isDemo ? "demo@uygundavet.com" : "kullanici@uygundavet.com"}
+              {isDemo ? "davet@uygundavet.com" : "kullanici@uygundavet.com"}
             </span>
           </div>
           {!isDemo && (

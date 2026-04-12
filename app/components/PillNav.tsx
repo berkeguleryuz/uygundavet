@@ -8,7 +8,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowRight, ArrowUpRight, ChevronRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronRight } from "lucide-react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import Link from "next/link";
 import { routing } from "@/i18n/routing";
@@ -136,70 +136,6 @@ export function PillNav() {
             </span>
           </Link>
 
-          <div ref={moreRef} className="relative hidden md:block">
-            <button
-              onClick={() => setIsMoreOpen((prev) => !prev)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-full backdrop-blur-sm border px-4 py-2 text-xs font-chakra uppercase tracking-[0.12em] font-semibold transition-all duration-200 cursor-pointer",
-                isOverLight
-                  ? "bg-black/8 border-black/10 text-[#252224] hover:bg-black/12"
-                  : "bg-white/10 border-white/10 text-white hover:bg-white/15"
-              )}
-            >
-              {t("more")}
-              <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", isMoreOpen && "rotate-180")} />
-            </button>
-
-            <AnimatePresence>
-              {isMoreOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -5, scale: 0.97 }}
-                  transition={springTransition}
-                  className="absolute top-full left-0 mt-3 w-[280px]"
-                >
-                  <div className="bg-white rounded-[20px] overflow-hidden shadow-xl">
-                    <div className="px-6 py-5">
-                      {[
-                        { key: "dashboard", href: "/dashboard", authRequired: true },
-                        { key: "profile", href: "/dashboard/ayarlar", authRequired: true },
-                      ].map((item, i) => (
-                        <motion.div
-                          key={item.key}
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.03 + i * 0.04 }}
-                        >
-                          <Link
-                            href={item.authRequired && !session ? "/login" : item.href}
-                            className="flex items-center justify-between py-3 group/mlink"
-                            onClick={() => setIsMoreOpen(false)}
-                          >
-                            <span className="font-chakra text-sm uppercase tracking-[0.12em] text-[#1c1a1b] font-semibold group-hover/mlink:translate-x-1.5 transition-transform duration-200">
-                              {t(item.key)}
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-[#1c1a1b]/30 group-hover/mlink:text-[#1c1a1b] transition-colors duration-200" />
-                          </Link>
-                        </motion.div>
-                      ))}
-                    </div>
-                    <div className="border-t border-black/5 px-6 py-4">
-                      <Link
-                        href="/demo"
-                        className="flex items-center gap-2 text-sm font-sans text-[#1c1a1b]/60 hover:text-[#1c1a1b] transition-colors duration-200"
-                        onClick={() => setIsMoreOpen(false)}
-                      >
-                        <span>{t("viewDemo")}</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div className={cn(
             "hidden md:flex items-center rounded-full backdrop-blur-sm border overflow-hidden",
             isOverLight ? "bg-black/8 border-black/10" : "bg-white/10 border-white/10"
@@ -233,25 +169,77 @@ export function PillNav() {
               : "gap-3"
           )}
         >
-          <button onClick={() => { setIsOpen(false); setIsContactOpen(true); }} className="group/talk hidden md:flex rounded-full bg-[#1c1a1b] text-white items-center justify-center h-14 px-10 cursor-pointer overflow-hidden">
-            <div className="flex items-center">
-              <div className="w-0 overflow-hidden opacity-0 group-hover/talk:w-6 group-hover/talk:opacity-100 transition-all duration-500 ease-out">
-                <ChevronRight className="w-5 h-5 shrink-0" />
-              </div>
+          <div ref={moreRef} className="relative hidden md:block">
+            <button onClick={() => { setIsOpen(false); setIsMoreOpen((prev) => !prev); }} className="group/talk flex rounded-full bg-[#1c1a1b]! text-white items-center justify-center h-14 px-10 cursor-pointer overflow-hidden liquid-glass">
+              <div className="flex items-center">
+                <div className="w-0 overflow-hidden opacity-0 group-hover/talk:w-6 group-hover/talk:opacity-100 transition-all duration-500 ease-out">
+                  <ChevronRight className="w-5 h-5 shrink-0" />
+                </div>
 
-              <div className="relative overflow-hidden h-[18px]">
-                <span className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full">
-                  {t("letsTalk")}
-                </span>
-                <span
-                  className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full"
-                  aria-hidden="true"
-                >
-                  {t("letsTalk")}
-                </span>
+                <div className="relative overflow-hidden h-[18px]">
+                  <span className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full">
+                    {t("more")}
+                  </span>
+                  <span
+                    className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] transition-transform duration-500 ease-out group-hover/talk:-translate-y-full"
+                    aria-hidden="true"
+                  >
+                    {t("more")}
+                  </span>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+
+            <AnimatePresence>
+              {isMoreOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -5, scale: 0.97 }}
+                  transition={springTransition}
+                  className="absolute top-full right-0 mt-3 w-[280px]"
+                >
+                  <div className="bg-white rounded-[20px] overflow-hidden shadow-xl">
+                    <div className="px-6 py-5">
+                      {[
+                        { key: "register", href: "/login?mode=register" },
+                        { key: "dashboard", href: session ? "/dashboard" : "/login" },
+                        { key: "profile", href: session ? "/dashboard/ayarlar" : "/login" },
+                      ].map((item, i) => (
+                        <motion.div
+                          key={item.key}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.03 + i * 0.04 }}
+                        >
+                          <Link
+                            href={item.href}
+                            className="flex items-center justify-between py-3 group/mlink"
+                            onClick={() => setIsMoreOpen(false)}
+                          >
+                            <span className="font-chakra text-sm uppercase tracking-[0.12em] text-[#1c1a1b] font-semibold group-hover/mlink:translate-x-1.5 transition-transform duration-200">
+                              {t(item.key)}
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-[#1c1a1b]/30 group-hover/mlink:text-[#1c1a1b] transition-colors duration-200" />
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                    <div className="border-t border-black/5 px-6 py-4">
+                      <Link
+                        href="/demo"
+                        className="flex items-center gap-2 text-sm font-sans text-[#1c1a1b]/60 hover:text-[#1c1a1b] transition-colors duration-200"
+                        onClick={() => setIsMoreOpen(false)}
+                      >
+                        <span>{t("viewDemo")}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.button
             onClick={toggleMenu}

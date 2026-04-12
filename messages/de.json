@@ -103,6 +103,26 @@
     "heading": "Themen passend zu Ihrem Stil",
     "subtitle": "Wählen Sie aus professionellen Designs, die Ihre Hochzeit widerspiegeln."
   },
+  "ResetPassword": {
+    "heading": "Passwort vergessen",
+    "subtitle": "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen.",
+    "emailPlaceholder": "Ihre E-Mail-Adresse",
+    "sendBtn": "Link senden",
+    "sentHeading": "Überprüfen Sie Ihren Posteingang",
+    "sentInfo": "Wenn diese E-Mail-Adresse registriert ist, wird ein Link zum Zurücksetzen gesendet. Bitte überprüfen Sie Ihren Posteingang und Spam-Ordner.",
+    "backToLogin": "Zurück zur Anmeldung",
+    "newPasswordHeading": "Neues Passwort festlegen",
+    "newPasswordSubtitle": "Wählen Sie ein neues Passwort für Ihr Konto.",
+    "newPasswordPlaceholder": "Neues Passwort (min. 6 Zeichen)",
+    "confirmPasswordPlaceholder": "Passwort bestätigen",
+    "resetBtn": "Passwort zurücksetzen",
+    "resetSuccess": "Passwort geändert",
+    "resetSuccessInfo": "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.",
+    "goToLogin": "Anmelden",
+    "passwordMismatch": "Passwörter stimmen nicht überein.",
+    "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
   "Login": {
     "heading": "Anmelden",
     "subtitle": "Melden Sie sich an, um auf Ihr Hochzeits-Dashboard zuzugreifen.",
@@ -121,6 +141,8 @@
     "loginSuccess": "Anmeldung erfolgreich!",
     "loginError": "Ungültige E-Mail oder Passwort.",
     "emailExists": "Diese E-Mail ist bereits registriert.",
+    "emailLang": "E-Mail-Sprache",
+    "forgotPassword": "Passwort vergessen?",
     "backToHome": "Startseite",
     "imageCaption": "Uygun Davet",
     "imageHeading": "Gestalten Sie Ihre Traumhochzeit\nauf einer einzigen Plattform.",
@@ -233,6 +255,7 @@
     "labs": "LABS",
     "subscribeSuccess": "Sie sind abonniert, vielen Dank!",
     "more": "ANMELDEN",
+    "register": "Registrieren",
     "dashboard": "Dashboard",
     "profile": "Profil",
     "viewDemo": "Demo ansehen"

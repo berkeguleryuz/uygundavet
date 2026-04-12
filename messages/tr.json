@@ -103,6 +103,26 @@
     "heading": "Tarzınıza Uygun Temalar",
     "subtitle": "Düğününüzü yansıtan profesyonel tasarımlar arasından seçim yapın."
   },
+  "ResetPassword": {
+    "heading": "Şifremi Unuttum",
+    "subtitle": "E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.",
+    "emailPlaceholder": "E-posta adresiniz",
+    "sendBtn": "Sıfırlama Bağlantısı Gönder",
+    "sentHeading": "Gelen Kutunuzu Kontrol Edin",
+    "sentInfo": "Bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilecektir. Lütfen gelen kutunuzu ve spam klasörünüzü kontrol edin.",
+    "backToLogin": "Giriş sayfasına dön",
+    "newPasswordHeading": "Yeni Şifre Belirle",
+    "newPasswordSubtitle": "Hesabınız için yeni bir şifre belirleyin.",
+    "newPasswordPlaceholder": "Yeni şifre (min. 6 karakter)",
+    "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
+    "resetBtn": "Şifremi Sıfırla",
+    "resetSuccess": "Şifre Değiştirildi",
+    "resetSuccessInfo": "Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.",
+    "goToLogin": "Giriş Yap",
+    "passwordMismatch": "Şifreler eşleşmiyor.",
+    "passwordTooShort": "Şifre en az 6 karakter olmalıdır.",
+    "error": "Bir hata oluştu. Lütfen tekrar deneyin."
+  },
   "Login": {
     "heading": "Giriş Yap",
     "subtitle": "Hesabınıza giriş yaparak düğün panelinize erişin.",
@@ -121,6 +141,8 @@
     "loginSuccess": "Giriş başarılı!",
     "loginError": "E-posta veya şifre hatalı.",
     "emailExists": "Bu e-posta zaten kayıtlı.",
+    "emailLang": "E-posta dili",
+    "forgotPassword": "Şifremi unuttum",
     "backToHome": "Ana Sayfa",
     "imageCaption": "Uygun Davet",
     "imageHeading": "Hayalinizdeki düğünü\ntek bir platformda tasarlayın.",
@@ -233,6 +255,7 @@
     "labs": "LABS",
     "subscribeSuccess": "Aboneliğiniz alındı, teşekkürler!",
     "more": "GİRİŞ",
+    "register": "Kayıt Ol",
     "dashboard": "Dashboard",
     "profile": "Profil",
     "viewDemo": "Demo'yu Gör"
