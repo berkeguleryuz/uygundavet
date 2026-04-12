@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/app/components/dashboard/sidebar";
 import { DashboardHeader } from "@/app/components/dashboard/header";
@@ -9,6 +10,7 @@ export default function DemoLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Dashboard");
   return (
     <SidebarProvider className="bg-sidebar">
       <DashboardSidebar isDemo />
@@ -17,9 +19,9 @@ export default function DemoLayout({
           <div className="bg-amber-500/90 text-black text-center py-2 px-4 text-sm font-semibold font-sans z-20 flex items-center justify-center gap-2 shrink-0">
             <span className="uppercase tracking-wider text-xs font-chakra">DEMO</span>
             <span className="hidden sm:inline">—</span>
-            <span className="hidden sm:inline">Bu panel demo amaçlıdır. Kendi paneliniz için giriş yapın.</span>
+            <span className="hidden sm:inline">{t("demoBanner")}</span>
             <a href="/#wizard" className="ml-2 underline underline-offset-2 hover:no-underline font-bold">
-              Giriş Yap
+              {t("signIn")}
             </a>
           </div>
           <DashboardHeader isDemo />

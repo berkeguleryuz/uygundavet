@@ -3,6 +3,7 @@ import { SectionMindloopHero } from "@/app/sections/SectionMindloopHero";
 import { SectionPlatforms } from "@/app/sections/SectionPlatforms";
 import { SectionMission } from "@/app/sections/SectionMission";
 import { SectionSolution } from "@/app/sections/SectionSolution";
+import { SectionThemes } from "@/app/sections/SectionThemes";
 import { SectionPricing } from "@/app/sections/SectionPricing";
 import { SectionCTA } from "@/app/sections/SectionCTA";
 import { SectionWizard } from "@/app/sections/SectionWizard";
@@ -15,6 +16,7 @@ export default function Home() {
       <SectionMindloopHero />
       <SectionPlatforms />
       <SectionMission />
+      <SectionThemes />
       <SectionSolution />
       <SectionPricing />
       <SectionCTA />

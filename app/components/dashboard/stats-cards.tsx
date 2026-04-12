@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { dashboardStats } from "@/mock-data/dashboard";
 import {
   Users,
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils";
 const icons = [Users, CheckCircle, Calendar, Eye];
 
 export function StatsCards() {
+  const t = useTranslations("Dashboard");
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {dashboardStats.map((stat, index) => {
@@ -24,7 +26,7 @@ export function StatsCards() {
             className="bg-card text-card-foreground rounded-xl border p-4"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium">{stat.title}</span>
+              <span className="text-sm font-medium">{t(stat.title)}</span>
               <Icon className="size-4 text-muted-foreground" />
             </div>
 

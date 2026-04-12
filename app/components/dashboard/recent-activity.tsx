@@ -33,11 +33,11 @@ export function RecentActivity() {
                 <p className="text-sm leading-snug">
                   <span className="font-medium">{activity.name}</span>{" "}
                   <span className="text-muted-foreground">
-                    {activity.action}
+                    {t(activity.action)}
                   </span>
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {activity.time}
+                  {t(activity.time)}
                 </p>
               </div>
             </div>

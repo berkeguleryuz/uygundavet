@@ -12,6 +12,7 @@ export function Logo({ className }: LogoProps) {
         src="/logo-gold-transparent.png"
         alt="Davetiye Logo"
         fill
+        sizes="88px"
         className="object-contain"
         priority
       />

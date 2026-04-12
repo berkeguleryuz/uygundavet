@@ -39,6 +39,7 @@ import {
   Settings,
   ChevronsUpDown,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { Logo } from "@/app/components/Logo";
 import { authClient } from "@/lib/auth-client";
@@ -140,6 +141,23 @@ export function DashboardSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isDemo && (
+          <SidebarGroup className="p-0 mt-auto">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild className="h-7">
+                    <Link href="/">
+                      <ArrowLeft className="size-3.5" />
+                      <span className="text-sm">{t("backToHome")}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="px-2.5 pb-3">
@@ -160,7 +178,7 @@ export function DashboardSidebar({
               {isDemo ? t("demoUser") : t("user")}
             </span>
             <span className="text-xs text-muted-foreground truncate">
-              {isDemo ? "demo@uygun-davet.com" : "kullanici@uygun-davet.com"}
+              {isDemo ? "demo@uygundavet.com" : "kullanici@uygundavet.com"}
             </span>
           </div>
           {!isDemo && (

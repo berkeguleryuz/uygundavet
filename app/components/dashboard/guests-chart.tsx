@@ -102,15 +102,9 @@ export function GuestsChart() {
   const gridColor = theme === "dark" ? "#3f3f46" : "#e2e4e9";
 
   const chartData = useMemo(() => {
-    switch (period) {
-      case "last_week":
-        return chartDataWeek;
-      case "last_month":
-        return chartDataMonth;
-      default:
-        return chartDataMonth;
-    }
-  }, [period]);
+    const raw = period === "last_week" ? chartDataWeek : chartDataMonth;
+    return raw.map((d) => ({ ...d, date: t(d.date) }));
+  }, [period, t]);
 
   const maxValue = useMemo(() => {
     const allValues = chartData.flatMap((d) => [
@@ -220,7 +214,7 @@ export function GuestsChart() {
       </div>
       <div className="p-4">
         <div className="h-[200px] sm:h-[250px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             {chartType === "area" ? (
               <AreaChart
                 data={chartData}

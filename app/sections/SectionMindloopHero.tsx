@@ -183,10 +183,21 @@ export function SectionMindloopHero() {
                   </p>
 
                   <div className="flex items-center gap-4 flex-col sm:flex-row w-full sm:w-auto">
-                    <MorphButton variant="filled" className="w-full sm:w-auto">
+                    <MorphButton
+                      variant="filled"
+                      className="w-full sm:w-auto"
+                      onClick={() => setIsRegisterOpen(true)}
+                    >
                       {t("cta")}
                     </MorphButton>
-                    <MorphButton variant="outline" className="w-full sm:w-auto">
+                    <MorphButton
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        const el = document.getElementById("temalar");
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }}
+                    >
                       {t("ctaSecondary")}
                     </MorphButton>
                   </div>
