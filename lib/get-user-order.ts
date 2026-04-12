@@ -1,7 +1,9 @@
 import { connectDB } from "./mongodb";
-import { Order, type IOrder } from "@/models/Order";
+import { Order, type OrderData } from "@/models/Order";
 
-export async function getUserOrder(userId: string): Promise<IOrder | null> {
+export async function getUserOrder(userId: string): Promise<OrderData | null> {
   await connectDB();
-  return Order.findOne({ userId }).lean();
+  const order = await Order.findOne({ userId }).lean();
+  if (!order) return null;
+  return { ...order, _id: String(order._id) } as OrderData;
 }

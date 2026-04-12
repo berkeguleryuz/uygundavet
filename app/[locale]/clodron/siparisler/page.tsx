@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ChevronRight, Filter } from "lucide-react";
-import type { IOrder } from "@/models/Order";
+import type { OrderData } from "@/models/Order";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "Bekliyor", color: "bg-amber-500/20 text-amber-300" },
@@ -13,7 +13,7 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 };
 
 export default function SiparislerPage() {
-  const [orders, setOrders] = useState<IOrder[]>([]);
+  const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 

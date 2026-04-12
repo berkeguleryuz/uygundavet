@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { IOrder } from "@/models/Order";
+import type { OrderData } from "@/models/Order";
 
 interface OrderStore {
-  order: IOrder | null;
+  order: OrderData | null;
   isLoading: boolean;
   fetchOrder: () => Promise<void>;
 }

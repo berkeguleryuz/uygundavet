@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette } from "lucide-react";
 import { toast } from "sonner";
-import type { IOrder } from "@/models/Order";
+import type { OrderData } from "@/models/Order";
 
 const statusSteps = [
   { key: "pending", label: "Bekliyor" },
@@ -16,7 +16,7 @@ const statusSteps = [
 export default function OrderDetailPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const router = useRouter();
-  const [order, setOrder] = useState<IOrder | null>(null);
+  const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
@@ -43,7 +43,7 @@ export default function OrderDetailPage() {
         body: JSON.stringify({ paymentStatus: newStatus }),
       });
       if (res.ok) {
-        setOrder((prev) => prev ? { ...prev, paymentStatus: newStatus as IOrder["paymentStatus"] } : null);
+        setOrder((prev) => prev ? { ...prev, paymentStatus: newStatus as OrderData["paymentStatus"] } : null);
         toast.success("Durum güncellendi.");
       } else {
         toast.error("Hata oluştu.");

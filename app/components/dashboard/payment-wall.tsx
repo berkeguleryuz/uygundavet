@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl";
 import { Clock, CreditCard, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { PAYMENT_IBAN, PAYMENT_HOLDER } from "@/lib/packages";
-import type { IOrder } from "@/models/Order";
+import type { OrderData } from "@/models/Order";
 
-export function PaymentWall({ order }: { order: IOrder }) {
+export function PaymentWall({ order }: { order: OrderData }) {
   const t = useTranslations("PaymentWall");
   const [copied, setCopied] = useState(false);
 

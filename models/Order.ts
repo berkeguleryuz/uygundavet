@@ -5,6 +5,24 @@ export type PaymentMethod = "deposit" | "full";
 export type SelectedPackage = "starter" | "pro" | "business";
 export type SelectedTheme = "rose" | "sunset" | "pearl" | "crystal" | "custom";
 
+export interface OrderData {
+  _id?: string;
+  userId: string;
+  userEmail: string;
+  userPhone: string;
+  selectedPackage: SelectedPackage;
+  selectedTheme: SelectedTheme;
+  customThemeRequest?: string;
+  paymentStatus: PaymentStatus;
+  paymentMethod: PaymentMethod;
+  depositAmount: number;
+  totalAmount: number;
+  paidAmount: number;
+  adminNotes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IOrder extends Document {
   userId: string;
   userEmail: string;
