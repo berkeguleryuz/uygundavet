@@ -8,12 +8,11 @@ import { z } from "zod";
 const createGuestSchema = z.object({
   name: z.string().min(1).max(200),
   phone: z.string().max(50).default(""),
-  email: z.string().email().or(z.literal("")).default(""),
   rsvpStatus: z.enum(["confirmed", "declined", "pending"]).default("pending"),
   guestCount: z.number().int().min(0).max(50).default(1),
   note: z.string().max(500).default(""),
   source: z
-    .enum(["whatsapp", "email", "manual", "qr-code", "website"])
+    .enum(["whatsapp", "manual", "qr-code"])
     .default("manual"),
 });
 

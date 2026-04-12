@@ -31,11 +31,9 @@ import {
   X,
   Clock,
   Phone,
-  Mail,
   Users,
   MessageCircle,
   QrCode,
-  Globe,
   PenLine,
   ArrowUp,
   ArrowDown,
@@ -143,12 +141,6 @@ function SourceBadge({ source, t }: { source: GuestSource; t: (key: string) => s
       bgClass: "bg-green-500/10",
       textClass: "text-green-400",
     },
-    email: {
-      icon: <Mail className="size-3" />,
-      label: "Email",
-      bgClass: "bg-blue-500/10",
-      textClass: "text-blue-400",
-    },
     manual: {
       icon: <PenLine className="size-3" />,
       label: t("sourceManual"),
@@ -160,12 +152,6 @@ function SourceBadge({ source, t }: { source: GuestSource; t: (key: string) => s
       label: t("sourceQrCode"),
       bgClass: "bg-violet-500/10",
       textClass: "text-violet-400",
-    },
-    website: {
-      icon: <Globe className="size-3" />,
-      label: "Website",
-      bgClass: "bg-cyan-500/10",
-      textClass: "text-cyan-400",
     },
   };
 
@@ -211,7 +197,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
       const matchesSearch =
         searchQuery === "" ||
         guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        guest.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         guest.phone.includes(searchQuery);
 
       const matchesRsvp =
@@ -374,13 +359,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                       WhatsApp
                     </DropdownMenuCheckboxItem>
                     <DropdownMenuCheckboxItem
-                      checked={sourceFilter === "email"}
-                      onCheckedChange={() => setSourceFilter("email")}
-                    >
-                      <Mail className="size-3 mr-1.5 text-blue-400" />
-                      Email
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
                       checked={sourceFilter === "manual"}
                       onCheckedChange={() => setSourceFilter("manual")}
                     >
@@ -393,13 +371,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                     >
                       <QrCode className="size-3 mr-1.5 text-violet-400" />
                       {t("sourceQrCode")}
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={sourceFilter === "website"}
-                      onCheckedChange={() => setSourceFilter("website")}
-                    >
-                      <Globe className="size-3 mr-1.5 text-cyan-400" />
-                      Website
                     </DropdownMenuCheckboxItem>
                   </div>
                 </div>
@@ -539,12 +510,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                   WhatsApp
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                  checked={sourceFilter === "email"}
-                  onCheckedChange={() => setSourceFilter("email")}
-                >
-                  Email
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
                   checked={sourceFilter === "manual"}
                   onCheckedChange={() => setSourceFilter("manual")}
                 >
@@ -555,12 +520,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                   onCheckedChange={() => setSourceFilter("qr-code")}
                 >
                   {t("sourceQrCode")}
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={sourceFilter === "website"}
-                  onCheckedChange={() => setSourceFilter("website")}
-                >
-                  Website
                 </DropdownMenuCheckboxItem>
               </div>
             </div>
@@ -628,12 +587,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                   <span>{t("tablePhone")}</span>
                 </div>
               </TableHead>
-              <TableHead className="w-[180px]">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Mail className="size-3.5" />
-                  <span>Email</span>
-                </div>
-              </TableHead>
               <TableHead className="w-[120px]">
                 <button
                   className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
@@ -656,7 +609,7 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
               </TableHead>
               <TableHead className="w-[100px]">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Globe className="size-3.5" />
+                  <QrCode className="size-3.5" />
                   <span>{t("source")}</span>
                 </div>
               </TableHead>
@@ -691,9 +644,6 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                   <span className="text-sm whitespace-nowrap">
                     {guest.phone}
                   </span>
-                </TableCell>
-                <TableCell className="max-w-[180px]">
-                  <span className="text-sm truncate block">{guest.email}</span>
                 </TableCell>
                 <TableCell>
                   <RsvpBadge status={guest.rsvpStatus} t={t} />

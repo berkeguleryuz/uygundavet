@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink,
+  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useDashboardStore } from "@/store/dashboard-store";
@@ -39,6 +39,9 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
     : inviteCode
       ? `${siteUrl}/rsvp/${inviteCode}`
       : siteUrl;
+  const whatsappShareLink = inviteCode
+    ? `${siteUrl}/rsvp/${inviteCode}?source=whatsapp`
+    : siteUrl;
 
   const coupleName = isDemo
     ? "Ayşe & Mehmet"
@@ -197,6 +200,15 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
               </div>
               {inviteCode && !isDemo ? (
                 <>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(whatsappShareLink)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-[#25D366] hover:bg-[#22c55e] text-white text-sm font-medium transition-colors"
+                  >
+                    <MessageCircle className="size-4" />
+                    {t("shareWhatsApp")}
+                  </a>
                   <QrSticker url={shareLink} coupleName={coupleName} />
                   <Link
                     href={`/rsvp/${inviteCode}`}

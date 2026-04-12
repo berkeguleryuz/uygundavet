@@ -18,6 +18,7 @@ const rsvpSchema = z.object({
     .default([]),
   note: z.string().max(1000).default(""),
   message: z.string().max(2000).optional(),
+  source: z.enum(["whatsapp", "qr-code"]).default("qr-code"),
 });
 
 export async function GET(
@@ -93,7 +94,7 @@ export async function POST(
       );
     }
 
-    const { additionalGuests, ...mainData } = parsed.data;
+    const { additionalGuests, source, ...mainData } = parsed.data;
 
     // Create main guest record (guestCount = 1 for this person only)
     await Guest.create({
@@ -103,7 +104,7 @@ export async function POST(
       rsvpStatus: mainData.rsvpStatus,
       guestCount: 1,
       note: mainData.note,
-      source: "qr-code",
+      source,
     });
 
     // Create separate guest records for each additional guest
@@ -118,7 +119,7 @@ export async function POST(
             rsvpStatus: "guest",
             guestCount: 1,
             note: `${mainData.name} tarafından eklendi`,
-            source: "qr-code",
+            source,
           });
         } catch (err) {
           console.error("Failed to create additional guest:", g.name, err);

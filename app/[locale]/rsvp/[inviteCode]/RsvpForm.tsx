@@ -24,7 +24,7 @@ interface InvitationData {
   hasMemoryBook: boolean;
 }
 
-export function RsvpForm({ inviteCode }: { inviteCode: string }) {
+export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: string }) {
   const t = useTranslations("Rsvp");
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -112,6 +112,7 @@ export function RsvpForm({ inviteCode }: { inviteCode: string }) {
           additionalGuests: additionalGuests.filter((g) => g.name.trim()),
           note: note.trim(),
           message: memoryMessage.trim() || undefined,
+          source: source || undefined,
         }),
       });
       if (!res.ok) throw new Error();

@@ -17,9 +17,12 @@ export async function generateMetadata({
 
 export default async function RsvpPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ inviteCode: string; locale: string }>;
+  searchParams: Promise<{ source?: string }>;
 }) {
   const { inviteCode } = await params;
-  return <RsvpForm inviteCode={inviteCode} />;
+  const { source } = await searchParams;
+  return <RsvpForm inviteCode={inviteCode} source={source} />;
 }

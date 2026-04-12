@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Heart, Trash2, Upload, LayoutGrid, List, ImageIcon, Loader2 } from "lucide-react";
+import { Heart, Trash2, Upload, LayoutGrid, List, ImageIcon, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -84,6 +84,23 @@ export function GaleriContent({ isDemo }: { isDemo?: boolean }) {
     }
   };
 
+  const handleDownload = async (photo: Photo) => {
+    try {
+      const res = await fetch(photo.url);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${photo.name}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(t("downloadError"));
+    }
+  };
+
   const handleLike = async (id: string) => {
     if (isDemo) {
       setPhotos((prev) => prev.map((p) => p._id === id ? { ...p, liked: !p.liked } : p));
@@ -148,6 +165,9 @@ export function GaleriContent({ isDemo }: { isDemo?: boolean }) {
                 <button onClick={() => handleLike(photo._id)} className="absolute top-2 right-2 p-1.5 rounded-full bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
                   <Heart className={`size-4 ${photo.liked ? "fill-red-500 text-red-500" : "text-white"}`} />
                 </button>
+                <button onClick={() => handleDownload(photo)} className="absolute bottom-2 left-2 p-1.5 rounded-full bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Download className="size-4 text-white" />
+                </button>
                 {!isDemo && (
                   <button onClick={() => handleDelete(photo._id)} className="absolute bottom-2 right-2 p-1.5 rounded-full bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
                     <Trash2 className="size-4 text-white" />
@@ -185,6 +205,9 @@ export function GaleriContent({ isDemo }: { isDemo?: boolean }) {
               <span className="text-sm text-muted-foreground hidden sm:block">{formatDate(photo.createdAt)}</span>
               <span className="text-sm text-muted-foreground hidden sm:block">{formatSize(photo.size)}</span>
               <div className="flex items-center gap-1 justify-end">
+                <button onClick={() => handleDownload(photo)} className="p-1.5 rounded-md hover:bg-accent transition-colors opacity-0 group-hover:opacity-100">
+                  <Download className="size-4 text-muted-foreground" />
+                </button>
                 <button onClick={() => handleLike(photo._id)} className="p-1.5 rounded-md hover:bg-accent transition-colors opacity-0 group-hover:opacity-100">
                   <Heart className={`size-4 ${photo.liked ? "fill-red-500 text-red-500 opacity-100" : "text-muted-foreground"}`} />
                 </button>

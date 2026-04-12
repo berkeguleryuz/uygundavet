@@ -1,11 +1,6 @@
 export type RsvpStatus = "confirmed" | "declined" | "pending" | "guest";
 
-export type GuestSource =
-  | "whatsapp"
-  | "email"
-  | "manual"
-  | "qr-code"
-  | "website";
+export type GuestSource = "whatsapp" | "manual" | "qr-code";
 
 export interface DashboardStat {
   title: string;

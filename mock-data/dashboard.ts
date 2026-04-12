@@ -1,6 +1,6 @@
 export type RsvpStatus = "confirmed" | "declined" | "pending";
 
-export type GuestSource = "whatsapp" | "email" | "manual" | "qr-code" | "website";
+export type GuestSource = "whatsapp" | "manual" | "qr-code";
 
 export interface DashboardStat {
   title: string;
@@ -101,7 +101,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 1,
     note: "",
-    source: "email",
+    source: "qr-code",
   },
   {
     id: "g-003",
@@ -112,7 +112,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 3,
     note: "Ailesiyle birlikte gelecek",
-    source: "website",
+    source: "whatsapp",
   },
   {
     id: "g-004",
@@ -134,7 +134,7 @@ export const guests: Guest[] = [
     rsvpStatus: "declined",
     guestCount: 0,
     note: "O tarihte şehir dışında olacak",
-    source: "email",
+    source: "manual",
   },
   {
     id: "g-006",
@@ -178,7 +178,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 1,
     note: "",
-    source: "website",
+    source: "qr-code",
   },
   {
     id: "g-010",
@@ -189,7 +189,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 2,
     note: "Eşiyle gelecek, vejetaryen menü",
-    source: "email",
+    source: "whatsapp",
   },
   {
     id: "g-011",
@@ -222,7 +222,7 @@ export const guests: Guest[] = [
     rsvpStatus: "pending",
     guestCount: 2,
     note: "",
-    source: "website",
+    source: "qr-code",
   },
   {
     id: "g-014",
@@ -255,7 +255,7 @@ export const guests: Guest[] = [
     rsvpStatus: "declined",
     guestCount: 0,
     note: "Başka bir düğünle çakışıyor",
-    source: "email",
+    source: "manual",
   },
   {
     id: "g-017",
@@ -288,7 +288,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 2,
     note: "Nişanlısıyla gelecek",
-    source: "website",
+    source: "whatsapp",
   },
   {
     id: "g-020",
@@ -310,7 +310,7 @@ export const guests: Guest[] = [
     rsvpStatus: "pending",
     guestCount: 3,
     note: "Çocuklarını getirebilir",
-    source: "email",
+    source: "qr-code",
   },
   {
     id: "g-022",
@@ -343,7 +343,7 @@ export const guests: Guest[] = [
     rsvpStatus: "confirmed",
     guestCount: 1,
     note: "Vegan menü tercih ediyor",
-    source: "website",
+    source: "whatsapp",
   },
   {
     id: "g-025",
