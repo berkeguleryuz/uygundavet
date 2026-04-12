@@ -69,13 +69,13 @@ export function PacPasswordInput({
       GHOST_COLORS[GHOST_KEYS[Math.floor(Math.random() * GHOST_KEYS.length)]];
 
     gsap
-      .timeline({ onComplete: () => (animatingRef.current = false) })
+      .timeline({ onComplete: () => { animatingRef.current = false; } })
       /* 1 – darken env */
       .to(input, {
         duration: 0.15,
         letterSpacing: "8px",
         backgroundColor: REVEAL_BG,
-        onStart: () => gsap.set(ghost, { backgroundColor: color }),
+        onStart: () => { gsap.set(ghost, { backgroundColor: color }); },
       })
       .to(cloak, { duration: 0.15, backgroundColor: REVEAL_BG }, 0)
       /* 2 – pac chomps across */
@@ -83,7 +83,7 @@ export function PacPasswordInput({
         duration: 0.8,
         right: "105%",
         ease: "none",
-        onStart: () => pac.classList.add(styles.pacChomping),
+        onStart: () => { pac.classList.add(styles.pacChomping); },
         onComplete: () => {
           pac.classList.remove(styles.pacChomping);
           input.type = "text";
@@ -113,13 +113,13 @@ export function PacPasswordInput({
     const cloak = cloakRef.current!;
 
     gsap
-      .timeline({ onComplete: () => (animatingRef.current = false) })
+      .timeline({ onComplete: () => { animatingRef.current = false; } })
       /* 1 – ghost + cloak sweep left */
       .to(ghost, {
         duration: 0.5,
         right: "105%",
         ease: "none",
-        onStart: () => gsap.set(ghost, { backgroundColor: INPUT_BG }),
+        onStart: () => { gsap.set(ghost, { backgroundColor: INPUT_BG }); },
       })
       .to(
         cloak,
@@ -138,7 +138,7 @@ export function PacPasswordInput({
       .to(cloak, {
         duration: 0.15,
         opacity: 0,
-        onComplete: () => gsap.set(cloak, { left: "100%", opacity: 1 }),
+        onComplete: () => { gsap.set(cloak, { left: "100%", opacity: 1 }); },
       })
       .to(pac, { duration: 0.15, scale: 1 }, 0.5);
   }, []);

@@ -30,11 +30,7 @@ const pageTitleKeys: Record<string, { key: string; icon: typeof LayoutDashboard 
   ayarlar: { key: "settings", icon: Settings },
 };
 
-interface HeaderProps {
-  isDemo?: boolean;
-}
-
-export function DashboardHeader({ isDemo }: HeaderProps) {
+export function DashboardHeader() {
   const t = useTranslations("Dashboard");
   const pathname = usePathname();
   const locale = useLocale();

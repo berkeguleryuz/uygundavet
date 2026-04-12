@@ -400,6 +400,7 @@ export function PillNav() {
                 className="bg-[#1c1a1b] text-white rounded-[24px] mt-2.5 px-7 py-5 flex items-center justify-between group/labs"
               >
                 <div className="flex items-center gap-2.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/clodronlogo.png"
                     alt="Clodron"

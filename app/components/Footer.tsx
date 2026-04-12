@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { Logo } from "./Logo";
 
 export function Footer() {
@@ -23,9 +24,9 @@ export function Footer() {
       </div>
 
       <div className="flex items-center gap-6 text-sm text-muted-foreground">
-        <a href="/privacy" className="hover:text-foreground transition-colors">{t("privacy")}</a>
-        <a href="/terms" className="hover:text-foreground transition-colors">{t("terms")}</a>
-        <a href="/data-deletion" className="hover:text-foreground transition-colors">{t("dataDeletion")}</a>
+        <Link href="/privacy" className="hover:text-foreground transition-colors">{t("privacy")}</Link>
+        <Link href="/terms" className="hover:text-foreground transition-colors">{t("terms")}</Link>
+        <Link href="/data-deletion" className="hover:text-foreground transition-colors">{t("dataDeletion")}</Link>
       </div>
 
     </footer>

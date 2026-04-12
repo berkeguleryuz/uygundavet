@@ -25,7 +25,7 @@ export function DemoLayoutClient({
               {t("signIn")}
             </Link>
           </div>
-          <DashboardHeader isDemo />
+          <DashboardHeader />
           <main className="flex-1 overflow-auto p-4 sm:p-6 space-y-6 bg-background w-full">
             {children}
           </main>
