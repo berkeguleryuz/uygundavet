@@ -1,7 +1,10 @@
 {
   "Metadata": {
-    "title": "Davetiye — Dijital Düğün Davetiyesi Platformu",
-    "description": "Modern, şık ve tamamen kişiselleştirilebilir dijital düğün davetiyeleri. LCV, anı defteri, QR kod ve çok daha fazlası."
+    "title": "Uygun Davet — Dijital Düğün Davetiyesi",
+    "description": "Modern, şık ve tamamen kişiselleştirilebilir dijital düğün davetiyeleri. LCV, anı defteri, QR kod ve çok daha fazlası.",
+    "brandName": "Uygun Davet",
+    "keywords": "dijital davetiye, düğün davetiyesi, online davetiye, LCV, RSVP, düğün web sitesi, dijital düğün, wedding invitation",
+    "ogImageAlt": "Uygun Davet - Dijital Düğün Davetiyesi Platformu"
   },
   "Navbar": {
     "brand": "Uygun Davet",

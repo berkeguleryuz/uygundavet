@@ -10,10 +10,18 @@ import { SectionWizard } from "@/app/sections/SectionWizard";
 import { SectionFAQ } from "@/app/sections/SectionFAQ";
 import { SectionFinalCTA } from "@/app/sections/SectionFinalCTA";
 import { Footer } from "@/app/components/Footer";
+import { HomepageJsonLd } from "@/app/components/HomepageJsonLd";
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
   return (
     <main className="relative min-h-screen flex flex-col bg-[#252224]">
+      <HomepageJsonLd locale={locale} />
       <PillNav />
       <SectionMindloopHero />
       <SectionPlatforms />

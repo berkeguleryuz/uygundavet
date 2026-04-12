@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   AreaChart,
   Area,
 } from "recharts";
@@ -84,13 +83,29 @@ export function GuestsChart() {
   const t = useTranslations("Dashboard");
   const { theme } = useTheme();
   const [chartType, setChartType] = useState<ChartType>("area");
-  const [period, setPeriod] = useState<Period>("last_month");
+  const [period, setPeriod] = useState<Period>("last_week");
   const [showGrid, setShowGrid] = useState(true);
   const [visibleLines, setVisibleLines] = useState({
     confirmed: true,
     declined: true,
     pending: true,
   });
+
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState(0);
+
+  useEffect(() => {
+    const el = chartContainerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      if (width > 0) setChartWidth(Math.floor(width));
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const lineLabels: Record<string, string> = {
     confirmed: t("confirmed"),
@@ -134,7 +149,7 @@ export function GuestsChart() {
   };
 
   return (
-    <div className="bg-card text-card-foreground rounded-lg border flex-1">
+    <div className="bg-card text-card-foreground rounded-lg border flex-1 min-w-0 overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-border/50">
         <h3 className="font-medium text-sm sm:text-base">{t("rsvpStatus")}</h3>
         <div className="flex items-center gap-2">
@@ -213,10 +228,12 @@ export function GuestsChart() {
         </div>
       </div>
       <div className="p-4">
-        <div className="h-[200px] sm:h-[250px] w-full">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-            {chartType === "area" ? (
+        <div ref={chartContainerRef} className="w-full">
+          {chartWidth > 0 ? (
+            chartType === "area" ? (
               <AreaChart
+                width={chartWidth}
+                height={Math.round(chartWidth / 3)}
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
@@ -272,6 +289,8 @@ export function GuestsChart() {
               </AreaChart>
             ) : (
               <RechartsLineChart
+                width={chartWidth}
+                height={Math.round(chartWidth / 3)}
                 data={chartData}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
@@ -310,8 +329,10 @@ export function GuestsChart() {
                     )
                 )}
               </RechartsLineChart>
-            )}
-          </ResponsiveContainer>
+            )
+          ) : (
+            <div className="w-full animate-pulse bg-muted/30 rounded" style={{ aspectRatio: '3' }} />
+          )}
         </div>
       </div>
     </div>

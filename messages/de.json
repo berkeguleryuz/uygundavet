@@ -1,7 +1,10 @@
 {
   "Metadata": {
-    "title": "Davetiye — Digitale Hochzeitseinladungs-Plattform",
-    "description": "Moderne, elegante und vollständig anpassbare digitale Hochzeitseinladungen. RSVP, Erinnerungsbuch, QR-Codes und vieles mehr."
+    "title": "Uygun Davet — Digitale Hochzeitseinladung",
+    "description": "Moderne, elegante und vollständig anpassbare digitale Hochzeitseinladungen. RSVP, Erinnerungsbuch, QR-Codes und vieles mehr.",
+    "brandName": "Uygun Davet",
+    "keywords": "digitale Einladung, Hochzeitseinladung, Online-Einladung, RSVP, Hochzeitswebsite, digitale Hochzeit, Hochzeitsplattform",
+    "ogImageAlt": "Uygun Davet - Digitale Hochzeitseinladungs-Plattform"
   },
   "Navbar": {
     "brand": "Uygun Davet",

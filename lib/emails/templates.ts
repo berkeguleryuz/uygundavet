@@ -146,7 +146,7 @@ function baseLayout(content: string) {
           <tr>
             <td style="padding:32px 32px 0;text-align:center;">
               <img src="https://www.uygundavet.com/logo-gold-transparent.png" alt="Uygun Davet" width="48" height="48" style="display:block;margin:0 auto 12px;" />
-              <img src="https://www.uygundavet.com/email-brand.png" alt="Uygun Davet" width="180" height="36" style="display:block;margin:0 auto;" />
+              <img src="https://www.uygundavet.com/email-brand.png" alt="Uygun Davet" width="180" height="76" style="display:block;margin:0 auto;" />
             </td>
           </tr>
           <tr>
