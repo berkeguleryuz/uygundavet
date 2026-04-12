@@ -7,6 +7,8 @@ import { SectionThemes } from "@/app/sections/SectionThemes";
 import { SectionPricing } from "@/app/sections/SectionPricing";
 import { SectionCTA } from "@/app/sections/SectionCTA";
 import { SectionWizard } from "@/app/sections/SectionWizard";
+import { SectionFAQ } from "@/app/sections/SectionFAQ";
+import { SectionFinalCTA } from "@/app/sections/SectionFinalCTA";
 import { Footer } from "@/app/components/Footer";
 
 export default function Home() {
@@ -21,6 +23,8 @@ export default function Home() {
       <SectionPricing />
       <SectionCTA />
       <SectionWizard />
+      <SectionFAQ />
+      <SectionFinalCTA />
       <Footer />
     </main>
   );

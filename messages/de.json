@@ -98,6 +98,36 @@
     "subscribeNow": "Jetzt Starten",
     "startWriting": "Kontakt"
   },
+  "FAQ": {
+    "label": "HÄUFIG GESTELLTE FRAGEN",
+    "headingPrefix": "Alles was Sie",
+    "headingHighlight": "wissen",
+    "headingSuffix": "müssen",
+    "subtitle": "Alles, was Sie über Zahlungen, Anzahlungen, Lieferung und mehr wissen müssen.",
+    "q1": "Wie funktioniert das Anzahlungssystem?",
+    "a1": "Nach der Auswahl Ihres Pakets zahlen Sie einfach einen Teil des Gesamtbetrags als Anzahlung. Sobald Ihre Anzahlung bestätigt ist, erhalten Sie Zugang zu Ihrem Dashboard und können mit der Erstellung Ihrer Einladung beginnen. Der Restbetrag wird bei Lieferung bezahlt.",
+    "q2": "Welche Zahlungsmethoden akzeptieren Sie?",
+    "a2": "Wir akzeptieren Zahlungen per Banküberweisung (EFT). Nach Ihrer Bestellung werden Ihnen unsere Bankdaten mitgeteilt. Sie können zwischen Anzahlung oder Vollzahlung wählen.",
+    "q3": "Wie lange dauert die Vorbereitung meiner Einladung?",
+    "a3": "Sobald Ihre Zahlung bestätigt und alle Ihre Daten eingegeben sind, ist Ihre Einladung innerhalb von 1-3 Werktagen fertig. Individuelle Designwünsche können etwas länger dauern.",
+    "q4": "Wie funktioniert das RSVP-System?",
+    "a4": "Gäste, die Ihre Einladung erhalten, können ihre Teilnahme mit einem Klick bestätigen. Sie können alle Zusagen, Absagen und ausstehenden Antworten in Echtzeit über Ihr Dashboard verfolgen.",
+    "q5": "Wie ist Ihre Rückerstattungsrichtlinie?",
+    "a5": "Sie können innerhalb von 14 Tagen eine Stornierung für noch nicht aktivierte Pakete beantragen. Nach Lieferung und Aktivierung der Einladung sind keine Rückerstattungen möglich.",
+    "q6": "Kann ich Einladungen in verschiedenen Sprachen erstellen?",
+    "a6": "Ja! Unsere Plattform unterstützt 3 Sprachen: Türkisch, Englisch und Deutsch. Sie können Ihren internationalen Gästen Einladungen in ihrer eigenen Sprache senden.",
+    "q7": "Was sind die gedruckten Einladungen und QR-Aufkleber im Business-Paket?",
+    "a7": "Das Business-Paket enthält zusätzlich zu Ihrer digitalen Einladung 100 gedruckte echte Einladungen und 25 QR-Code-Aufkleber. Gäste können die QR-Codes auf den physischen Einladungen scannen, um auf Ihre digitale Einladung zuzugreifen."
+  },
+  "FinalCTA": {
+    "label": "JETZT HANDELN",
+    "headingPrefix": "Erstellen Sie Ihre",
+    "headingHighlight": "Traum",
+    "headingSuffix": "Einladung heute",
+    "subtitle": "Erhalten Sie kostenlose Informationen oder schließen Sie jetzt Ihre Registrierung ab, um mit der Erstellung Ihrer Hochzeitseinladungen zu beginnen.",
+    "ctaPrimary": "Jetzt Starten",
+    "ctaSecondary": "Kontaktieren Sie uns"
+  },
   "Themes": {
     "label": "THEMEN",
     "heading": "Themen passend zu Ihrem Stil",

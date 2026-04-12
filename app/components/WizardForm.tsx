@@ -374,8 +374,7 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
   return (
     <div className="relative w-full max-w-6xl mx-auto px-4 py-12">
       <div className="mb-12 text-center text-white">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider backdrop-blur font-chakra">
-          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+        <div className="mb-4 inline-flex items-center rounded-full liquid-glass px-4 py-1.5 text-xs font-medium uppercase tracking-[3px] font-chakra text-muted-foreground">
           {t("badge")}
         </div>
         <h1 className="mb-3 text-3xl font-bold tracking-tight md:text-5xl font-merienda">

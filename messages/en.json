@@ -98,6 +98,36 @@
     "subscribeNow": "Get Started",
     "startWriting": "Contact Us"
   },
+  "FAQ": {
+    "label": "FREQUENTLY ASKED QUESTIONS",
+    "headingPrefix": "Everything",
+    "headingHighlight": "you need",
+    "headingSuffix": "to know",
+    "subtitle": "Everything you need to know about payments, deposits, delivery and more.",
+    "q1": "How does the deposit system work?",
+    "a1": "After selecting your package, you simply pay a portion of the total as a deposit. Once your deposit is confirmed, you'll gain access to your dashboard and can start creating your invitation. The remaining balance is paid upon delivery.",
+    "q2": "What payment methods do you accept?",
+    "a2": "We accept payments via bank transfer (EFT). After placing your order, our bank details will be provided to you. You can choose between a deposit or full payment option.",
+    "q3": "How long does it take to prepare my invitation?",
+    "a3": "Once your payment is confirmed and all your details are entered, your invitation will be ready within 1-3 business days. Custom design requests may take slightly longer.",
+    "q4": "How does the RSVP system work?",
+    "a4": "Guests who receive your invitation can confirm their attendance with a single click. You can track all confirmations, declines and pending responses in real-time from your dashboard's RSVP tracking screen.",
+    "q5": "What is your refund policy?",
+    "a5": "You can request a cancellation within 14 days for packages that haven't been activated yet. No refunds are available after the invitation has been delivered and activated.",
+    "q6": "Can I create invitations in different languages?",
+    "a6": "Yes! Our platform supports 3 languages: Turkish, English and German. You can send invitations to your international guests in their own language.",
+    "q7": "What are the printed invitations and QR stickers in the Business package?",
+    "a7": "The Business package includes 100 printed real invitations and 25 QR code stickers in addition to your digital invitation. Guests can scan the QR codes on the physical invitations to access your digital invitation."
+  },
+  "FinalCTA": {
+    "label": "TAKE ACTION",
+    "headingPrefix": "Create your",
+    "headingHighlight": "dream",
+    "headingSuffix": "invitation today",
+    "subtitle": "Get free information or complete your registration now to start creating your wedding invitations.",
+    "ctaPrimary": "Get Started",
+    "ctaSecondary": "Contact Us"
+  },
   "Themes": {
     "label": "THEMES",
     "heading": "Themes That Match Your Style",

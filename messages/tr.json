@@ -98,6 +98,36 @@
     "subscribeNow": "Hemen Başla",
     "startWriting": "Bize Ulaşın"
   },
+  "FAQ": {
+    "label": "SIKÇA SORULAN SORULAR",
+    "headingPrefix": "Merak",
+    "headingHighlight": "ettikleriniz",
+    "headingSuffix": "",
+    "subtitle": "Ödeme, kapora, teslimat ve daha fazlası hakkında bilmeniz gereken her şey.",
+    "q1": "Kapora sistemi nasıl çalışıyor?",
+    "a1": "Paket seçiminizi yaptıktan sonra toplam tutarın belirli bir bölümünü kapora olarak ödemeniz yeterlidir. Kaporanız onaylandıktan sonra panelinize erişim sağlanır ve davetiyenizi oluşturmaya başlayabilirsiniz. Kalan tutar, davetiyenizin tesliminde ödenir.",
+    "q2": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
+    "a2": "Havale/EFT ile ödeme kabul ediyoruz. Sipariş oluşturduktan sonra banka hesap bilgilerimiz size iletilecektir. Kapora veya peşin ödeme seçeneklerinden birini tercih edebilirsiniz.",
+    "q3": "Davetiyem ne kadar sürede hazır olur?",
+    "a3": "Ödemeniz onaylandıktan ve tüm bilgilerinizi girdikten sonra davetiyeniz 1-3 iş günü içerisinde hazırlanır. Özel tasarım talepleri için bu süre biraz daha uzayabilir.",
+    "q4": "LCV (RSVP) sistemi nasıl işliyor?",
+    "a4": "Davetiyenizi alan misafirler tek tıkla katılım durumlarını bildirebilir. Siz de panelinizdeki LCV takip ekranından tüm onayları, retleri ve bekleyenleri gerçek zamanlı görebilirsiniz.",
+    "q5": "İade politikanız nedir?",
+    "a5": "Henüz aktif edilmemiş paketler için 14 gün içinde iptal talebinde bulunabilirsiniz. Davetiye teslim edildikten ve aktif edildikten sonra iade yapılmamaktadır.",
+    "q6": "Farklı dillerde davetiye oluşturabilir miyim?",
+    "a6": "Evet! Platformumuz Türkçe, İngilizce ve Almanca olmak üzere 3 dili desteklemektedir. Yurt dışındaki misafirlerinize kendi dillerinde davetiye gönderebilirsiniz.",
+    "q7": "Business paketteki basılı davetiye ve QR sticker nedir?",
+    "a7": "Business pakette dijital davetiyenize ek olarak 100 adet basılı gerçek davetiye ve 25 adet QR kod sticker gönderilir. QR kodlar sayesinde misafirleriniz fiziksel davetiyeyi tarayarak dijital davetiyenize ulaşabilir."
+  },
+  "FinalCTA": {
+    "label": "HAREKETE GEÇİN",
+    "headingPrefix": "Hayalinizdeki",
+    "headingHighlight": "davetiyeyi",
+    "headingSuffix": "bugün oluşturun",
+    "subtitle": "Ücretsiz bilgi alın veya hemen kaydınızı tamamlayarak düğün davetiyeleri oluşturmaya başlayın.",
+    "ctaPrimary": "Hemen Başla",
+    "ctaSecondary": "Bize Ulaşın"
+  },
   "Themes": {
     "label": "TEMALAR",
     "heading": "Tarzınıza Uygun Temalar",
