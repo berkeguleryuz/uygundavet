@@ -38,7 +38,7 @@ export function PaymentWall({ order }: { order: OrderData }) {
         <div className="bg-card border rounded-2xl p-6 space-y-5">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground font-sans">{t("package")}</span>
-            <span className="text-sm font-semibold font-chakra uppercase">{order.selectedPackage}</span>
+            <span className="text-sm font-semibold font-chakra uppercase">{order.selectedPackage === "starter" ? "Başlangıç" : order.selectedPackage === "pro" ? "Pro" : "Elit"}</span>
           </div>
 
           <div className="flex items-center justify-between">

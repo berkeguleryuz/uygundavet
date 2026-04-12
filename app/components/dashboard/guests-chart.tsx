@@ -26,7 +26,29 @@ import {
   Area,
 } from "recharts";
 import { useTheme } from "next-themes";
-import { chartDataMonth, chartDataWeek } from "@/mock-data/dashboard";
+import { useDashboardStore } from "@/store/dashboard-store";
+
+const demoChartDataWeek = [
+  { date: "dayMon", confirmed: 5, declined: 1, pending: 3 },
+  { date: "dayTue", confirmed: 8, declined: 0, pending: 4 },
+  { date: "dayWed", confirmed: 3, declined: 2, pending: 6 },
+  { date: "dayThu", confirmed: 7, declined: 1, pending: 2 },
+  { date: "dayFri", confirmed: 12, declined: 0, pending: 5 },
+  { date: "daySat", confirmed: 9, declined: 3, pending: 1 },
+  { date: "daySun", confirmed: 4, declined: 1, pending: 7 },
+];
+
+const demoChartDataMonth = [
+  { date: "monthJan", confirmed: 12, declined: 3, pending: 40 },
+  { date: "monthFeb", confirmed: 28, declined: 5, pending: 52 },
+  { date: "monthMar", confirmed: 45, declined: 8, pending: 60 },
+  { date: "monthApr", confirmed: 68, declined: 12, pending: 55 },
+  { date: "monthMay", confirmed: 95, declined: 15, pending: 48 },
+  { date: "monthJun", confirmed: 120, declined: 18, pending: 42 },
+  { date: "monthJul", confirmed: 148, declined: 20, pending: 35 },
+  { date: "monthAug", confirmed: 170, declined: 22, pending: 28 },
+  { date: "monthSep", confirmed: 186, declined: 24, pending: 38 },
+];
 
 type ChartType = "line" | "area";
 type Period = "last_week" | "last_month";
@@ -79,8 +101,9 @@ function CustomTooltip({ active, payload, label, lineLabels = {} }: CustomToolti
   return null;
 }
 
-export function GuestsChart() {
+export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
+  const { guests } = useDashboardStore();
   const { theme } = useTheme();
   const [chartType, setChartType] = useState<ChartType>("area");
   const [period, setPeriod] = useState<Period>("last_week");
@@ -117,9 +140,56 @@ export function GuestsChart() {
   const gridColor = theme === "dark" ? "#3f3f46" : "#e2e4e9";
 
   const chartData = useMemo(() => {
-    const raw = period === "last_week" ? chartDataWeek : chartDataMonth;
-    return raw.map((d) => ({ ...d, date: t(d.date) }));
-  }, [period, t]);
+    if (isDemo) {
+      const raw = period === "last_week" ? demoChartDataWeek : demoChartDataMonth;
+      return raw.map((d) => ({ ...d, date: t(d.date) }));
+    }
+
+    // Derive chart data from real guests
+    const now = new Date();
+    const dayNames = ["daySun", "dayMon", "dayTue", "dayWed", "dayThu", "dayFri", "daySat"];
+    const monthNames = ["monthJan", "monthFeb", "monthMar", "monthApr", "monthMay", "monthJun",
+      "monthJul", "monthAug", "monthSep", "monthOct", "monthNov", "monthDec"];
+
+    if (period === "last_week") {
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now);
+        d.setDate(d.getDate() - (6 - i));
+        return d;
+      });
+      return days.map((day) => {
+        const dayGuests = guests.filter((g) => {
+          const created = new Date(g.createdAt);
+          return created.toDateString() === day.toDateString();
+        });
+        return {
+          date: t(dayNames[day.getDay()]),
+          confirmed: dayGuests.filter((g) => g.rsvpStatus === "confirmed").length,
+          declined: dayGuests.filter((g) => g.rsvpStatus === "declined").length,
+          pending: dayGuests.filter((g) => g.rsvpStatus === "pending").length,
+        };
+      });
+    }
+
+    // last_month - group by month
+    const months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now);
+      d.setMonth(d.getMonth() - (5 - i));
+      return d;
+    });
+    return months.map((month) => {
+      const monthGuests = guests.filter((g) => {
+        const created = new Date(g.createdAt);
+        return created.getMonth() === month.getMonth() && created.getFullYear() === month.getFullYear();
+      });
+      return {
+        date: t(monthNames[month.getMonth()]),
+        confirmed: monthGuests.filter((g) => g.rsvpStatus === "confirmed").length,
+        declined: monthGuests.filter((g) => g.rsvpStatus === "declined").length,
+        pending: monthGuests.filter((g) => g.rsvpStatus === "pending").length,
+      };
+    });
+  }, [period, t, isDemo, guests]);
 
   const maxValue = useMemo(() => {
     const allValues = chartData.flatMap((d) => [

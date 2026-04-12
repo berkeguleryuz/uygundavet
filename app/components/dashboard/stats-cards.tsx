@@ -1,24 +1,66 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { dashboardStats } from "@/mock-data/dashboard";
-import {
-  Users,
-  CheckCircle,
-  Calendar,
-  Eye,
-  TrendingUp,
-} from "lucide-react";
+import { useDashboardStore } from "@/store/dashboard-store";
+import { Users, CheckCircle, Calendar, Eye, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const icons = [Users, CheckCircle, Calendar, Eye];
 
-export function StatsCards() {
+// Mock data for demo mode
+const demoStats = [
+  { title: "statTotalGuests", value: "248", trend: { value: 12, isPositive: true } },
+  { title: "statRsvpConfirmation", value: "186/248", subtitle: "75%" },
+  { title: "statDaysUntilWedding", value: "45" },
+  { title: "statInvitationViews", value: "1,847", trend: { value: 28, isPositive: true } },
+];
+
+export function StatsCards({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
+  const { stats, isLoadingStats } = useDashboardStore();
+
+  const displayStats = isDemo
+    ? demoStats
+    : stats
+      ? [
+          {
+            title: "statTotalGuests",
+            value: String(stats.totalGuestCount),
+          },
+          {
+            title: "statRsvpConfirmation",
+            value: `${stats.confirmed}/${stats.totalGuests}`,
+            subtitle: stats.totalGuests > 0
+              ? `${Math.round((stats.confirmed / stats.totalGuests) * 100)}%`
+              : "0%",
+          },
+          {
+            title: "statDaysUntilWedding",
+            value: String(stats.daysUntilWedding),
+          },
+          {
+            title: "statInvitationViews",
+            value: stats.invitationViews.toLocaleString("tr-TR"),
+          },
+        ]
+      : [];
+
+  if (!isDemo && isLoadingStats) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-card rounded-xl border p-4 h-[120px] animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {dashboardStats.map((stat, index) => {
+      {displayStats.map((stat, index) => {
         const Icon = icons[index];
+        const trend = "trend" in stat ? stat.trend : undefined;
+        const subtitle = "subtitle" in stat ? stat.subtitle : undefined;
 
         return (
           <div
@@ -39,28 +81,26 @@ export function StatsCards() {
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-px bg-border" />
 
-                  {stat.trend ? (
+                  {trend ? (
                     <div
                       className={cn(
                         "flex items-center gap-1.5",
-                        stat.trend.isPositive
-                          ? "text-green-400"
-                          : "text-pink-400"
+                        trend.isPositive ? "text-green-400" : "text-pink-400"
                       )}
                       style={{
-                        textShadow: stat.trend.isPositive
+                        textShadow: trend.isPositive
                           ? "0 1px 6px rgba(68, 255, 118, 0.25)"
                           : "0 1px 6px rgba(255, 68, 193, 0.25)",
                       }}
                     >
                       <TrendingUp className="size-3.5" />
                       <span className="text-sm font-medium">
-                        {stat.trend.value}%
+                        {trend.value}%
                       </span>
                     </div>
-                  ) : stat.subtitle ? (
+                  ) : subtitle ? (
                     <div className="text-sm font-medium">
-                      <span className="text-foreground">{stat.subtitle}</span>
+                      <span className="text-foreground">{subtitle}</span>
                     </div>
                   ) : (
                     <div className="text-sm font-medium text-muted-foreground">

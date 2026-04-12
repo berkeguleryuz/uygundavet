@@ -73,7 +73,7 @@ export default function SiparislerPage() {
                   <div>
                     <p className="text-sm font-medium text-white font-sans">{order.userEmail}</p>
                     <p className="text-xs text-white/40 font-sans">
-                      {order.userPhone} — {order.selectedPackage.toUpperCase()} — {order.selectedTheme}
+                      {order.userPhone} — {order.selectedPackage === "starter" ? "Başlangıç" : order.selectedPackage === "pro" ? "Pro" : "Elit"} — {order.selectedTheme}
                     </p>
                   </div>
                 </div>

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -52,12 +52,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  guests,
-  type RsvpStatus,
-  type GuestSource,
-} from "@/mock-data/dashboard";
+import type { RsvpStatus, GuestSource } from "@/types/dashboard";
 import { useDashboardStore } from "@/store/dashboard-store";
+import { guests as demoGuests } from "@/mock-data/dashboard";
 
 type SortField = "name" | "guestCount" | "rsvpStatus";
 type SortOrder = "asc" | "desc";
@@ -102,6 +99,21 @@ function RsvpBadge({ status, t }: { status: RsvpStatus; t: (key: string) => stri
       >
         <X className="size-3.5 text-rose-400" />
         <span className="text-sm font-medium text-rose-400">{t("declinedStatus")}</span>
+      </div>
+    );
+  }
+
+  if (status === "guest") {
+    return (
+      <div
+        className="flex items-center gap-1 px-2 py-1 rounded-lg border border-blue-500/40 w-fit"
+        style={{
+          backgroundImage:
+            "linear-gradient(90deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 30%, rgba(59, 130, 246, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
+        }}
+      >
+        <Users className="size-3.5 text-blue-400" />
+        <span className="text-sm font-medium text-blue-400">{t("guestStatus")}</span>
       </div>
     );
   }
@@ -174,6 +186,7 @@ function SourceBadge({ source, t }: { source: GuestSource; t: (key: string) => s
 export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
   const {
+    guests: storeGuests,
     searchQuery,
     rsvpFilter,
     sourceFilter,
@@ -182,6 +195,10 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
     setSourceFilter,
     clearFilters,
   } = useDashboardStore();
+
+  const guests = isDemo
+    ? demoGuests.map((g) => ({ ...g, _id: g.id, createdAt: "", updatedAt: "" }))
+    : storeGuests;
 
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
@@ -222,7 +239,7 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
     });
 
     return result;
-  }, [searchQuery, rsvpFilter, sourceFilter, sortField, sortOrder]);
+  }, [guests, searchQuery, rsvpFilter, sourceFilter, sortField, sortOrder]);
 
   const totalPages = Math.ceil(filteredAndSortedGuests.length / itemsPerPage);
   const paginatedGuests = useMemo(() => {
@@ -244,7 +261,7 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
     if (selectedGuests.length === paginatedGuests.length) {
       setSelectedGuests([]);
     } else {
-      setSelectedGuests(paginatedGuests.map((guest) => guest.id));
+      setSelectedGuests(paginatedGuests.map((guest) => guest._id));
     }
   };
 
@@ -653,17 +670,16 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
           </TableHeader>
           <TableBody>
             {paginatedGuests.map((guest) => (
-              <TableRow key={guest.id} className="border-border/50">
+              <TableRow key={guest._id} className="border-border/50">
                 <TableCell>
                   <div className="flex items-center gap-2.5">
                     <Checkbox
-                      checked={selectedGuests.includes(guest.id)}
-                      onCheckedChange={() => toggleSelectGuest(guest.id)}
+                      checked={selectedGuests.includes(guest._id)}
+                      onCheckedChange={() => toggleSelectGuest(guest._id)}
                       disabled={isDemo}
                       className="border-border/50 bg-background/70"
                     />
                     <Avatar className="size-6">
-                      <AvatarImage src={guest.avatar} />
                       <AvatarFallback className="text-xs">
                         {guest.name[0]}
                       </AvatarFallback>
@@ -690,10 +706,17 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                 <TableCell>
                   <SourceBadge source={guest.source} t={t} />
                 </TableCell>
-                <TableCell className="max-w-[160px]">
-                  <span className="text-sm text-muted-foreground truncate block">
-                    {guest.note || "-"}
-                  </span>
+                <TableCell className="max-w-[200px]">
+                  {guest.note ? (
+                    <span
+                      className="text-sm text-muted-foreground truncate block cursor-help"
+                      title={guest.note}
+                    >
+                      {guest.note}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">-</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

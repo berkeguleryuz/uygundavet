@@ -15,6 +15,10 @@ export interface ICustomer extends Document {
   weddingDate: Date;
   weddingTime: string;
   address: string;
+  venueName: string;
+  venueAddress: string;
+  inviteCode: string;
+  invitationViews: number;
   groom: PersonName;
   bride: PersonName;
   groomFamily: FamilyInfo;
@@ -45,6 +49,10 @@ const CustomerSchema = new Schema<ICustomer>(
     weddingDate: { type: Date, required: true },
     weddingTime: { type: String, trim: true, default: "" },
     address: { type: String, trim: true, default: "" },
+    venueName: { type: String, trim: true, default: "" },
+    venueAddress: { type: String, trim: true, default: "" },
+    inviteCode: { type: String, unique: true, sparse: true },
+    invitationViews: { type: Number, default: 0 },
     groom: { type: PersonNameSchema, required: true },
     bride: { type: PersonNameSchema, required: true },
     groomFamily: { type: FamilyInfoSchema, required: true },

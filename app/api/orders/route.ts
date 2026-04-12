@@ -9,6 +9,7 @@ import { PACKAGES, type PackageKey } from "@/lib/packages";
 import { resend, FROM_EMAIL } from "@/lib/resend";
 import { orderConfirmationEmail } from "@/lib/emails/templates";
 import { z } from "zod";
+import { generateInviteCode } from "@/lib/invite-code";
 
 const orderSchema = z.object({
   phone: z.string().min(1),
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
       userId: session.user.id,
       weddingDate: new Date(data.weddingDate),
       weddingTime: data.weddingTime,
+      inviteCode: generateInviteCode(),
       groom: { firstName: data.owner1FirstName, lastName: data.owner1LastName },
       bride: { firstName: data.owner2FirstName, lastName: data.owner2LastName },
       groomFamily: {

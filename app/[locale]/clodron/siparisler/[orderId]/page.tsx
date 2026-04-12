@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette } from "lucide-react";
+import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette, Clock, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { OrderData } from "@/models/Order";
 
@@ -20,6 +20,10 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [cleanupInfo, setCleanupInfo] = useState<{
+    weddingDate: string; cleanupDate: string; daysUntilCleanup: number; isCleaned: boolean;
+  } | null>(null);
+  const [guestCount, setGuestCount] = useState(0);
 
   useEffect(() => {
     fetch(`/api/admin/orders/${orderId}`)
@@ -28,6 +32,8 @@ export default function OrderDetailPage() {
         if (data.order) {
           setOrder(data.order);
           setAdminNotes(data.order.adminNotes || "");
+          if (data.cleanupInfo) setCleanupInfo(data.cleanupInfo);
+          if (data.guestCount) setGuestCount(data.guestCount);
         }
       })
       .catch(() => {})
@@ -169,7 +175,7 @@ export default function OrderDetailPage() {
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-white/50 font-sans">Paket</span>
-            <span className="text-sm text-white font-semibold font-chakra uppercase">{order.selectedPackage}</span>
+            <span className="text-sm text-white font-semibold font-chakra uppercase">{order.selectedPackage === "starter" ? "Başlangıç" : order.selectedPackage === "pro" ? "Pro" : "Elit"}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-white/50 font-sans">Toplam</span>
@@ -213,6 +219,46 @@ export default function OrderDetailPage() {
               <span className="text-sm text-white/50 font-sans">Telefon</span>
               <span className="text-sm text-white font-sans">{order.userPhone}</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cleanup & Guest Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {cleanupInfo && (
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              {cleanupInfo.isCleaned ? <Trash2 className="w-4 h-4 text-red-400" /> : <Clock className="w-4 h-4 text-white/50" />}
+              <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">Veri Temizleme</h3>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-white/50 font-sans">Düğün Tarihi</span>
+              <span className="text-sm text-white font-sans">{new Date(cleanupInfo.weddingDate).toLocaleDateString("tr-TR")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-white/50 font-sans">Temizleme Tarihi</span>
+              <span className="text-sm text-white font-sans">{new Date(cleanupInfo.cleanupDate).toLocaleDateString("tr-TR")}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-white/50 font-sans">Durum</span>
+              {cleanupInfo.isCleaned ? (
+                <span className="text-sm text-red-400 font-sans font-medium">Temizlendi</span>
+              ) : cleanupInfo.daysUntilCleanup > 0 ? (
+                <span className="text-sm text-emerald-400 font-sans font-medium">{cleanupInfo.daysUntilCleanup} gün kaldı</span>
+              ) : (
+                <span className="text-sm text-amber-400 font-sans font-medium">Temizlenecek</span>
+              )}
+            </div>
+          </div>
+        )}
+        <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="w-4 h-4 text-white/50" />
+            <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">Misafir Bilgisi</h3>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sm text-white/50 font-sans">Toplam Misafir</span>
+            <span className="text-sm text-white font-semibold font-sans">{guestCount}</span>
           </div>
         </div>
       </div>

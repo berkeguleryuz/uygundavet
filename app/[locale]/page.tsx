@@ -1,16 +1,36 @@
+import dynamic from "next/dynamic";
 import { PillNav } from "@/app/components/PillNav";
 import { SectionMindloopHero } from "@/app/sections/SectionMindloopHero";
 import { SectionPlatforms } from "@/app/sections/SectionPlatforms";
-import { SectionMission } from "@/app/sections/SectionMission";
-import { SectionSolution } from "@/app/sections/SectionSolution";
-import { SectionThemes } from "@/app/sections/SectionThemes";
-import { SectionPricing } from "@/app/sections/SectionPricing";
-import { SectionCTA } from "@/app/sections/SectionCTA";
-import { SectionWizard } from "@/app/sections/SectionWizard";
-import { SectionFAQ } from "@/app/sections/SectionFAQ";
-import { SectionFinalCTA } from "@/app/sections/SectionFinalCTA";
-import { Footer } from "@/app/components/Footer";
 import { HomepageJsonLd } from "@/app/components/HomepageJsonLd";
+
+const SectionMission = dynamic(() =>
+  import("@/app/sections/SectionMission").then((m) => m.SectionMission)
+);
+const SectionSolution = dynamic(() =>
+  import("@/app/sections/SectionSolution").then((m) => m.SectionSolution)
+);
+const SectionThemes = dynamic(() =>
+  import("@/app/sections/SectionThemes").then((m) => m.SectionThemes)
+);
+const SectionPricing = dynamic(() =>
+  import("@/app/sections/SectionPricing").then((m) => m.SectionPricing)
+);
+const SectionCTA = dynamic(() =>
+  import("@/app/sections/SectionCTA").then((m) => m.SectionCTA)
+);
+const SectionWizard = dynamic(() =>
+  import("@/app/sections/SectionWizard").then((m) => m.SectionWizard)
+);
+const SectionFAQ = dynamic(() =>
+  import("@/app/sections/SectionFAQ").then((m) => m.SectionFAQ)
+);
+const SectionFinalCTA = dynamic(() =>
+  import("@/app/sections/SectionFinalCTA").then((m) => m.SectionFinalCTA)
+);
+const Footer = dynamic(() =>
+  import("@/app/components/Footer").then((m) => m.Footer)
+);
 
 export default async function Home({
   params,

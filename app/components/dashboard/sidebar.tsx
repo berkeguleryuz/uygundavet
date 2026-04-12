@@ -40,18 +40,22 @@ import {
   ChevronsUpDown,
   LogOut,
   ArrowLeft,
+  Lock,
 } from "lucide-react";
 import { Logo } from "@/app/components/Logo";
 import { authClient } from "@/lib/auth-client";
+import { useOrderStore } from "@/store/order-store";
+import { canAccess } from "@/lib/package-gating";
+import type { SelectedPackage } from "@/models/Order";
 
 const navItemDefs = [
-  { key: "overview", icon: LayoutDashboard, href: "" },
-  { key: "myInvitation", icon: Mail, href: "/davetiyem" },
-  { key: "guestList", icon: Users, href: "/misafirler" },
-  { key: "rsvpTracking", icon: ClipboardCheck, href: "/lcv" },
-  { key: "gallery", icon: Image, href: "/galeri" },
-  { key: "memoryBook", icon: BookHeart, href: "/ani-defteri" },
-  { key: "settings", icon: Settings, href: "/ayarlar" },
+  { key: "overview", icon: LayoutDashboard, href: "", feature: null },
+  { key: "myInvitation", icon: Mail, href: "/davetiyem", feature: null },
+  { key: "guestList", icon: Users, href: "/misafirler", feature: null },
+  { key: "rsvpTracking", icon: ClipboardCheck, href: "/lcv", feature: null },
+  { key: "gallery", icon: Image, href: "/galeri", feature: "gallery" },
+  { key: "memoryBook", icon: BookHeart, href: "/ani-defteri", feature: "memoryBook" },
+  { key: "settings", icon: Settings, href: "/ayarlar", feature: null },
 ];
 
 interface DashboardSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -64,8 +68,10 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const t = useTranslations("Dashboard");
   const { data: session } = authClient.useSession();
+  const { order } = useOrderStore();
   const pathname = usePathname();
   const prefix = isDemo ? "/demo" : "/dashboard";
+  const userPackage = (order?.selectedPackage || "starter") as SelectedPackage;
 
   const isActive = (href: string) => {
     const fullPath = `${prefix}${href}`;
@@ -118,27 +124,31 @@ export function DashboardSidebar({
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItemDefs.map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.href)}
-                        className="h-7"
-                      >
-                        <Link href={`${prefix}${item.href}`}>
-                          <item.icon className="size-3.5" />
-                          <span className="text-sm">{t(item.key)}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="group-data-[collapsible=icon]:block hidden">
-                      {t(item.key)}
-                    </TooltipContent>
-                  </Tooltip>
-                </SidebarMenuItem>
-              ))}
+              {navItemDefs.map((item) => {
+                const locked = !isDemo && item.feature && !canAccess(item.feature, userPackage);
+                return (
+                  <SidebarMenuItem key={item.key}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive(item.href)}
+                          className={`h-7 ${locked ? "opacity-40" : ""}`}
+                        >
+                          <Link href={locked ? "#" : `${prefix}${item.href}`}>
+                            <item.icon className="size-3.5" />
+                            <span className="text-sm">{t(item.key)}</span>
+                            {locked && <Lock className="size-3 ml-auto text-muted-foreground" />}
+                          </Link>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="group-data-[collapsible=icon]:block hidden">
+                        {locked ? t("featureLocked") : t(item.key)}
+                      </TooltipContent>
+                    </Tooltip>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

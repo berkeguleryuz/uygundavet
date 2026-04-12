@@ -12,6 +12,7 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/app/components/Logo";
+import { PacPasswordInput } from "@/app/components/PacPasswordInput";
 import axios from "axios";
 
 const localeLabels = { tr: "Türkçe", en: "English", de: "Deutsch" } as const;
@@ -221,14 +222,12 @@ export default function LoginPage() {
                 placeholder={t("emailPlaceholder")}
                 className="h-12 w-full rounded-xl border border-white/20 bg-white/5 px-4 text-sm text-white placeholder:text-white/30 focus:border-white/60 focus:bg-white/10 focus:outline-hidden transition-all font-sans"
               />
-              <input
-                type="password"
+              <PacPasswordInput
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t("passwordPlaceholder")}
-                className="h-12 w-full rounded-xl border border-white/20 bg-white/5 px-4 text-sm text-white placeholder:text-white/30 focus:border-white/60 focus:bg-white/10 focus:outline-hidden transition-all font-sans"
               />
 
               {isRegister && (

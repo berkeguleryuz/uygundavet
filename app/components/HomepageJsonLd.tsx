@@ -6,9 +6,11 @@ type Props = {
 };
 
 export async function HomepageJsonLd({ locale }: Props) {
-  const t = await getTranslations({ locale, namespace: "FAQ" });
-  const tMeta = await getTranslations({ locale, namespace: "Metadata" });
-  const tPricing = await getTranslations({ locale, namespace: "Pricing" });
+  const [t, tMeta, tPricing] = await Promise.all([
+    getTranslations({ locale, namespace: "FAQ" }),
+    getTranslations({ locale, namespace: "Metadata" }),
+    getTranslations({ locale, namespace: "Pricing" }),
+  ]);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";

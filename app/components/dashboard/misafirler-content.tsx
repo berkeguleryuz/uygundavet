@@ -1,44 +1,35 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GuestsTable } from "@/app/components/dashboard/guests-table";
 import { UserPlus, Users, CheckCircle, XCircle, Clock } from "lucide-react";
-
-const summaryStatDefs = [
-  {
-    key: "total",
-    value: 248,
-    icon: Users,
-    color: "text-foreground",
-    bg: "bg-muted/50",
-  },
-  {
-    key: "confirmed",
-    value: 186,
-    icon: CheckCircle,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    key: "declined",
-    value: 24,
-    icon: XCircle,
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
-  },
-  {
-    key: "pending",
-    value: 38,
-    icon: Clock,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-  },
-];
+import { useDashboardStore } from "@/store/dashboard-store";
 
 export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
+  const { guests, fetchGuests, isLoadingGuests } = useDashboardStore();
+
+  useEffect(() => {
+    if (!isDemo && guests.length === 0) {
+      fetchGuests();
+    }
+  }, [isDemo, guests.length, fetchGuests]);
+
+  const confirmed = isDemo ? 186 : guests.filter((g) => g.rsvpStatus === "confirmed").length;
+  const declined = isDemo ? 24 : guests.filter((g) => g.rsvpStatus === "declined").length;
+  const pending = isDemo ? 38 : guests.filter((g) => g.rsvpStatus === "pending").length;
+  const total = isDemo ? 248 : guests.length;
+
+  const summaryStatDefs = [
+    { key: "total", value: total, icon: Users, color: "text-foreground", bg: "bg-muted/50" },
+    { key: "confirmed", value: confirmed, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+    { key: "declined", value: declined, icon: XCircle, color: "text-rose-400", bg: "bg-rose-500/10" },
+    { key: "pending", value: pending, icon: Clock, color: "text-amber-400", bg: "bg-amber-500/10" },
+  ];
+
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -48,10 +39,7 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
               {t("guestList")}
             </h1>
             {isDemo && (
-              <Badge
-                variant="outline"
-                className="text-amber-500 border-amber-500/40"
-              >
+              <Badge variant="outline" className="text-amber-500 border-amber-500/40">
                 Demo
               </Badge>
             )}
@@ -71,29 +59,31 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
 
       <GuestsTable isDemo={isDemo} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {summaryStatDefs.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.key}
-              className="bg-card rounded-xl border p-4 flex items-center gap-3"
-            >
+      {!isLoadingGuests && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {summaryStatDefs.map((stat) => {
+            const Icon = stat.icon;
+            return (
               <div
-                className={`size-10 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
+                key={stat.key}
+                className="bg-card rounded-xl border p-4 flex items-center gap-3"
               >
-                <Icon className={`size-5 ${stat.color}`} />
+                <div
+                  className={`size-10 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
+                >
+                  <Icon className={`size-5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl font-medium tracking-tight">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{t(stat.key)}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl font-medium tracking-tight">
-                  {stat.value}
-                </p>
-                <p className="text-xs text-muted-foreground">{t(stat.key)}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }

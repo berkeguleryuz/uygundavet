@@ -1,21 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  PenLine,
-  Copy,
-  Check,
-  Eye,
-  Share2,
-  Heart,
-  MapPin,
-  CalendarHeart,
+  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
+import { useDashboardStore } from "@/store/dashboard-store";
+import { QrSticker } from "./QrSticker";
 
 const themeColorDefs = [
   { key: "themeGold", color: "#d5d1ad", active: true },
@@ -25,9 +21,43 @@ const themeColorDefs = [
 
 export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
+  const { customer, stats, isLoadingCustomer, fetchCustomer, fetchStats } = useDashboardStore();
   const [copied, setCopied] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState(0);
-  const shareLink = "https://www.uygundavet.com/demo";
+
+  useEffect(() => {
+    if (!isDemo) {
+      if (!customer) fetchCustomer();
+      if (!stats) fetchStats();
+    }
+  }, [isDemo, customer, stats, fetchCustomer, fetchStats]);
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";
+  const inviteCode = customer?.inviteCode;
+  const shareLink = isDemo
+    ? `${siteUrl}/demo`
+    : inviteCode
+      ? `${siteUrl}/rsvp/${inviteCode}`
+      : siteUrl;
+
+  const coupleName = isDemo
+    ? "Ayşe & Mehmet"
+    : customer
+      ? `${customer.bride.firstName} & ${customer.groom.firstName}`
+      : "...";
+
+  const weddingDateStr = isDemo
+    ? "15 Haziran 2026, Cumartesi"
+    : customer?.weddingDate
+      ? new Date(customer.weddingDate).toLocaleDateString("tr-TR", {
+          day: "numeric", month: "long", year: "numeric", weekday: "long",
+        })
+      : "—";
+
+  const venue = isDemo ? "Bosphorus Palace" : customer?.venueName || "—";
+  const venueAddr = isDemo ? "Beylerbeyi, Istanbul" : customer?.venueAddress || "";
+  const weddingTime = isDemo ? "18:00" : customer?.weddingTime || "";
+  const viewCount = isDemo ? "1,847" : (stats?.invitationViews || 0).toLocaleString("tr-TR");
 
   const handleCopy = () => {
     if (isDemo) return;
@@ -35,6 +65,14 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (!isDemo && isLoadingCustomer) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -45,10 +83,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
               {t("myInvitation")}
             </h1>
             {isDemo && (
-              <Badge
-                variant="outline"
-                className="text-amber-500 border-amber-500/40"
-              >
+              <Badge variant="outline" className="text-amber-500 border-amber-500/40">
                 Demo
               </Badge>
             )}
@@ -70,10 +105,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
         <div className="lg:col-span-2">
           <div className="bg-card rounded-2xl border p-6 sm:p-8 relative overflow-hidden">
             {isDemo && (
-              <Badge
-                variant="outline"
-                className="absolute top-4 right-4 text-amber-500 border-amber-500/40 bg-card z-10"
-              >
+              <Badge variant="outline" className="absolute top-4 right-4 text-amber-500 border-amber-500/40 bg-card z-10">
                 Demo
               </Badge>
             )}
@@ -81,10 +113,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             <div className="flex flex-col items-center text-center space-y-6 py-8 sm:py-12">
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
-                <Heart
-                  className="size-5"
-                  style={{ color: themeColorDefs[selectedTheme].color }}
-                />
+                <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
                 <div className="h-px w-12 bg-border" />
               </div>
 
@@ -96,7 +125,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                   className="text-3xl sm:text-4xl lg:text-5xl font-merienda tracking-tight"
                   style={{ color: themeColorDefs[selectedTheme].color }}
                 >
-                  Ayşe & Mehmet
+                  {coupleName}
                 </h2>
               </div>
 
@@ -105,23 +134,18 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CalendarHeart className="size-4" />
                 <span className="text-sm font-medium tracking-wider uppercase">
-                  15 Haziran 2026, Cumartesi
+                  {weddingDateStr}
                 </span>
               </div>
 
               <div className="bg-muted/50 rounded-xl border p-6 max-w-md w-full">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <MapPin
-                    className="size-4"
-                    style={{ color: themeColorDefs[selectedTheme].color }}
-                  />
+                  <MapPin className="size-4" style={{ color: themeColorDefs[selectedTheme].color }} />
                   <span className="font-medium text-sm">{t("venue")}</span>
                 </div>
-                <p className="text-lg font-medium">Bosphorus Palace</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Beylerbeyi, Istanbul
-                </p>
-                <p className="text-sm text-muted-foreground">{t("time")} 18:00</p>
+                <p className="text-lg font-medium">{venue}</p>
+                {venueAddr && <p className="text-sm text-muted-foreground mt-1">{venueAddr}</p>}
+                {weddingTime && <p className="text-sm text-muted-foreground">{t("time")} {weddingTime}</p>}
               </div>
 
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
@@ -130,10 +154,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
 
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
-                <Heart
-                  className="size-5"
-                  style={{ color: themeColorDefs[selectedTheme].color }}
-                />
+                <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
                 <div className="h-px w-12 bg-border" />
               </div>
             </div>
@@ -159,9 +180,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                     }`}
                     style={{ backgroundColor: theme.color }}
                   />
-                  <span className="text-xs text-muted-foreground">
-                    {t(theme.key)}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{t(theme.key)}</span>
                 </button>
               ))}
             </div>
@@ -171,35 +190,31 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             <h3 className="font-medium text-sm mb-4">{t("share")}</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Input
-                  readOnly
-                  value={shareLink}
-                  className="text-sm bg-muted/50 border-border/50 h-9"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 shrink-0"
-                  onClick={handleCopy}
-                  disabled={isDemo}
-                >
-                  {copied ? (
-                    <Check className="size-4 text-green-500" />
-                  ) : (
-                    <Copy className="size-4" />
-                  )}
+                <Input readOnly value={shareLink} className="text-sm bg-muted/50 border-border/50 h-9" />
+                <Button variant="outline" size="icon" className="size-9 shrink-0" onClick={handleCopy} disabled={isDemo}>
+                  {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
                 </Button>
               </div>
-              <div className="border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2">
-                <div className="size-24 border-2 border-muted-foreground/30 rounded-md flex items-center justify-center">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    QR
-                  </span>
+              {inviteCode && !isDemo ? (
+                <>
+                  <QrSticker url={shareLink} coupleName={coupleName} />
+                  <Link
+                    href={`/rsvp/${inviteCode}`}
+                    target="_blank"
+                    className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors font-sans"
+                  >
+                    <ExternalLink className="size-3.5" />
+                    {t("previewRsvpForm")}
+                  </Link>
+                </>
+              ) : (
+                <div className="border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2">
+                  <div className="size-24 border-2 border-muted-foreground/30 rounded-md flex items-center justify-center">
+                    <span className="text-sm font-medium text-muted-foreground">QR</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t("qrDownload")}</p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {t("qrDownload")}
-                </p>
-              </div>
+              )}
             </div>
           </div>
 
@@ -211,7 +226,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                   <Eye className="size-4" />
                   <span>{t("views")}</span>
                 </div>
-                <span className="text-sm font-medium">1,847</span>
+                <span className="text-sm font-medium">{viewCount}</span>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -219,7 +234,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                   <Share2 className="size-4" />
                   <span>{t("shares")}</span>
                 </div>
-                <span className="text-sm font-medium">124</span>
+                <span className="text-sm font-medium">{isDemo ? "124" : "—"}</span>
               </div>
             </div>
           </div>
