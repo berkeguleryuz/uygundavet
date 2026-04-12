@@ -6,7 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Mail, ArrowLeft, Loader2, Globe } from "lucide-react";
+import { Mail, ArrowLeft, Loader2, Globe, CheckCircle, X } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const { data: session, isPending } = authClient.useSession();
 
   const mode = searchParams.get("mode");
+  const verified = searchParams.get("verified") === "true";
   const [showEmailForm, setShowEmailForm] = useState(mode === "register");
   const [isRegister, setIsRegister] = useState(mode === "register");
   const [email, setEmail] = useState("");
@@ -30,6 +32,10 @@ export default function LoginPage() {
   const [authLoading, setAuthLoading] = useState(false);
   const [selectedLocale, setSelectedLocale] = useState<Locale>("tr");
   const [justRegistered, setJustRegistered] = useState(false);
+  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+  const [showResendVerify, setShowResendVerify] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [showVerifiedPopup, setShowVerifiedPopup] = useState(verified);
 
   useEffect(() => {
     if (!isPending && session) {
@@ -54,12 +60,14 @@ export default function LoginPage() {
           email,
           password,
           name: "",
+          callbackURL: "/login?verified=true",
         });
         if (error) {
           toast.error(error.message || t("emailExists"));
         } else {
-          toast.success(t("registerSuccess"));
+          toast.success(t("verifyEmailSent"), { duration: 8000 });
           setJustRegistered(true);
+          setShowVerifyBanner(true);
         }
       } else {
         const { error } = await authClient.signIn.email({
@@ -67,15 +75,42 @@ export default function LoginPage() {
           password,
         });
         if (error) {
-          toast.error(t("loginError"));
+          const msg = error.message || "";
+          if (msg.toLowerCase().includes("verify") || msg.toLowerCase().includes("email")) {
+            toast.error(t("emailNotVerified"), { duration: 8000 });
+            setShowResendVerify(true);
+          } else {
+            toast.error(t("loginError"));
+          }
         } else {
           toast.success(t("loginSuccess"));
+          setShowResendVerify(false);
         }
       }
     } catch {
       toast.error(t("loginError"));
     } finally {
       setAuthLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0 || !email) return;
+    try {
+      await authClient.sendVerificationEmail({
+        email,
+        callbackURL: "/login?verified=true",
+      });
+      toast.success(t("verifyEmailResent"), { duration: 5000 });
+      setResendCooldown(900);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) { clearInterval(interval); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch {
+      toast.error(t("resendError"));
     }
   };
 
@@ -143,6 +178,20 @@ export default function LoginPage() {
           <p className="text-white/50 font-sans text-sm mb-6">
             {t("subtitle")}
           </p>
+
+          {showVerifyBanner && (
+            <div className="p-4 mb-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
+              <Mail className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-amber-300 font-sans">
+                  {t("verifyEmailHeading")}
+                </p>
+                <p className="text-xs text-amber-300/60 font-sans mt-1">
+                  {t("verifyEmailDesc")}
+                </p>
+              </div>
+            </div>
+          )}
 
           {showEmailForm ? (
             <motion.form
@@ -239,6 +288,27 @@ export default function LoginPage() {
                   </Link>
                 )}
               </div>
+
+              {showResendVerify && !isRegister && (
+                <div className="p-4 bg-white/[0.04] border border-white/10 rounded-2xl">
+                  <div className="flex items-start gap-3 mb-3">
+                    <Mail className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <p className="text-sm text-white/60 font-sans">
+                      {t("emailNotVerified")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendCooldown > 0}
+                    className="w-full h-10 rounded-xl bg-white text-black text-sm font-semibold font-sans hover:bg-white/90 transition-colors cursor-pointer disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed"
+                  >
+                    {resendCooldown > 0
+                      ? t("resendCooldown", { minutes: Math.ceil(resendCooldown / 60) })
+                      : t("resendVerification")}
+                  </button>
+                </div>
+              )}
             </motion.form>
           ) : (
             <div className="flex flex-col gap-4">
@@ -292,6 +362,52 @@ export default function LoginPage() {
           </p>
         </motion.div>
       </div>
+
+      {/* Email Verified Popup */}
+      <AnimatePresence>
+        {showVerifiedPopup && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowVerifiedPopup(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="fixed inset-0 z-50 flex items-center justify-center px-6 pointer-events-none"
+            >
+              <div className="bg-[#1c1a1b] border border-white/10 rounded-3xl p-8 max-w-sm w-full text-center pointer-events-auto relative">
+                <button
+                  onClick={() => setShowVerifiedPopup(false)}
+                  className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-5">
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                </div>
+                <h2 className="text-xl font-chakra font-semibold text-white uppercase tracking-tight mb-2">
+                  {t("verifiedHeading")}
+                </h2>
+                <p className="text-sm text-white/50 font-sans mb-6">
+                  {t("verifiedDesc")}
+                </p>
+                <button
+                  onClick={() => setShowVerifiedPopup(false)}
+                  className="h-12 w-full rounded-xl bg-white text-black font-semibold font-sans hover:bg-white/90 transition-colors cursor-pointer"
+                >
+                  {t("verifiedBtn")}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

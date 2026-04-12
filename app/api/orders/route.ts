@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { connectDB } from "@/lib/mongodb";
+import { db } from "@/lib/db";
 import { Order } from "@/models/Order";
 import { Customer } from "@/models/Customer";
 import { PACKAGES, type PackageKey } from "@/lib/packages";
+import { resend, FROM_EMAIL } from "@/lib/resend";
+import { orderConfirmationEmail } from "@/lib/emails/templates";
 import { z } from "zod";
 
 const orderSchema = z.object({
@@ -70,7 +73,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const order = await Order.create({
+    await Order.create({
       userId: session.user.id,
       userEmail: session.user.email,
       userPhone: data.phone,
@@ -84,7 +87,32 @@ export async function POST(req: NextRequest) {
       paidAmount: 0,
     });
 
-    return NextResponse.json({ success: true, orderId: order._id });
+    // Send order confirmation email (non-blocking)
+    const locale = (await db.collection("user").findOne({ email: session.user.email }))?.locale || "tr";
+    const { subject, html } = orderConfirmationEmail({
+      selectedPackage: data.selectedPackage,
+      selectedTheme: data.selectedTheme,
+      customThemeRequest: data.customThemeRequest,
+      paymentMethod: data.paymentMethod,
+      totalAmount,
+      depositAmount,
+      groomName: `${data.owner1FirstName} ${data.owner1LastName}`,
+      brideName: `${data.owner2FirstName} ${data.owner2LastName}`,
+      groomFamily: {
+        fatherName: `${data.family1FatherFirstName} ${data.family1FatherLastName}`,
+        motherName: `${data.family1MotherFirstName} ${data.family1MotherLastName}`,
+      },
+      brideFamily: {
+        fatherName: `${data.family2FatherFirstName} ${data.family2FatherLastName}`,
+        motherName: `${data.family2MotherFirstName} ${data.family2MotherLastName}`,
+      },
+      weddingDate: data.weddingDate,
+      dashboardUrl: `${process.env.BETTER_AUTH_URL || "https://uygundavet.com"}/dashboard`,
+    }, locale as "tr" | "en" | "de");
+
+    resend.emails.send({ from: FROM_EMAIL, to: session.user.email, subject, html }).catch(() => {});
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid data", details: error.errors }, { status: 400 });

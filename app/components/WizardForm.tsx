@@ -147,6 +147,9 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+  const [showResendVerify, setShowResendVerify] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [isRegister, setIsRegister] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -201,7 +204,14 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
       wizard.family2MotherFirstName, wizard.family2MotherLastName,
       wizard.weddingDate, wizard.weddingTime,
     ];
-    return required.every((v) => v.trim().length > 0);
+    if (!required.every((v) => v.trim().length > 0)) return false;
+
+    const selectedDate = new Date(wizard.weddingDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate <= today) return "invalidDate";
+
+    return true;
   };
 
   const handleNext = () => {
@@ -209,9 +219,16 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
       toast.error(t("loginRequired"));
       return;
     }
-    if (currentStep === 2 && !validateStep2()) {
-      toast.error(t("fillAllFields"));
-      return;
+    if (currentStep === 2) {
+      const result = validateStep2();
+      if (result === false) {
+        toast.error(t("fillAllFields"));
+        return;
+      }
+      if (result === "invalidDate") {
+        toast.error(t("invalidDate"));
+        return;
+      }
     }
     if (currentStep < STEPS.length) setCurrentStep(currentStep + 1);
   };
@@ -231,12 +248,14 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
           email,
           password,
           name: "",
+          callbackURL: "/login?verified=true",
         });
         if (error) {
           toast.error(error.message || t("emailExists"));
         } else {
-          toast.success(t("registerSuccess"));
+          toast.success(t("verifyEmailSent"), { duration: 8000 });
           setShowEmailForm(false);
+          setShowVerifyBanner(true);
         }
       } else {
         const { error } = await authClient.signIn.email({
@@ -244,16 +263,43 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
           password,
         });
         if (error) {
-          toast.error(t("loginError"));
+          const msg = error.message || "";
+          if (msg.toLowerCase().includes("verify") || msg.toLowerCase().includes("email")) {
+            toast.error(t("emailNotVerified"), { duration: 8000 });
+            setShowResendVerify(true);
+          } else {
+            toast.error(t("loginError"));
+          }
         } else {
           toast.success(t("loginSuccess"));
           setShowEmailForm(false);
+          setShowResendVerify(false);
         }
       }
     } catch {
       toast.error(t("loginError"));
     } finally {
       setAuthLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0 || !email) return;
+    try {
+      await authClient.sendVerificationEmail({
+        email,
+        callbackURL: "/login?verified=true",
+      });
+      toast.success(t("verifyEmailResent"), { duration: 5000 });
+      setResendCooldown(900);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) { clearInterval(interval); return 0; }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch {
+      toast.error(t("resendError"));
     }
   };
 
@@ -452,6 +498,27 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                           >
                             {isRegister ? t("hasAccount") : t("noAccount")}
                           </button>
+
+                          {showResendVerify && !isRegister && (
+                            <div className="p-3 bg-white/[0.04] border border-white/10 rounded-xl">
+                              <div className="flex items-start gap-3 mb-3">
+                                <Mail className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                <p className="text-sm text-white/60 font-sans">
+                                  {t("emailNotVerified")}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resendCooldown > 0}
+                                className="w-full h-9 rounded-lg bg-white text-black text-xs font-semibold font-sans hover:bg-white/90 transition-colors cursor-pointer disabled:bg-white/10 disabled:text-white/30 disabled:cursor-not-allowed"
+                              >
+                                {resendCooldown > 0
+                                  ? t("resendCooldown", { minutes: Math.ceil(resendCooldown / 60) })
+                                  : t("resendVerification")}
+                              </button>
+                            </div>
+                          )}
                         </form>
                       ) : (
                         <>
@@ -488,6 +555,20 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                             </p>
                           </div>
                         </>
+                      )}
+
+                      {showVerifyBanner && !isLoggedIn && (
+                        <div className="p-4 mt-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-3">
+                          <Mail className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-amber-300 font-sans">
+                              {t("verifyEmailHeading")}
+                            </p>
+                            <p className="text-xs text-amber-300/60 font-sans mt-1">
+                              {t("verifyEmailDesc")}
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}

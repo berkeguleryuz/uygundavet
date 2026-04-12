@@ -63,6 +63,7 @@ export function DashboardSidebar({
   ...props
 }: DashboardSidebarProps) {
   const t = useTranslations("Dashboard");
+  const { data: session } = authClient.useSession();
   const pathname = usePathname();
   const prefix = isDemo ? "/demo" : "/dashboard";
 
@@ -142,22 +143,20 @@ export function DashboardSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isDemo && (
-          <SidebarGroup className="p-0 mt-auto">
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild className="h-7">
-                    <Link href="/">
-                      <ArrowLeft className="size-3.5" />
-                      <span className="text-sm">{t("backToHome")}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        <SidebarGroup className="p-0 mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild className="h-7">
+                  <Link href="/">
+                    <ArrowLeft className="size-3.5" />
+                    <span className="text-sm">{t("backToHome")}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="px-2.5 pb-3">
@@ -175,10 +174,10 @@ export function DashboardSidebar({
           </Avatar>
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-medium truncate">
-              {isDemo ? t("demoUser") : t("user")}
+              {isDemo ? t("demoUser") : (session?.user?.name || session?.user?.email?.split("@")[0] || t("user"))}
             </span>
             <span className="text-xs text-muted-foreground truncate">
-              {isDemo ? "davet@uygundavet.com" : "kullanici@uygundavet.com"}
+              {isDemo ? "davet@uygundavet.com" : (session?.user?.email || "")}
             </span>
           </div>
           {!isDemo && (

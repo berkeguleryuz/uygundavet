@@ -28,7 +28,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       const locale = await getUserLocale(user.email);
       const { subject, html } = resetPasswordEmail(url, locale);
@@ -53,7 +53,7 @@ export const auth = betterAuth({
     },
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
-    callbackURL: "/verified",
+    expiresIn: 86400,
   },
   socialProviders: {
     google: {

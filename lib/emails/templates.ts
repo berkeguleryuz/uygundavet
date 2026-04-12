@@ -76,6 +76,59 @@ const translations = {
       tip: "Bei Fragen erreichen Sie uns unter davet@uygundavet.com.",
     },
   },
+  orderConfirmation: {
+    tr: {
+      subject: "Kaydınız Alındı - Uygun Davet",
+      heading: "Kaydınız Başarıyla Oluşturuldu!",
+      body: "Düğün davetiyeniz için kayıt bilgileriniz aşağıda özetlenmiştir.",
+      packageLabel: "Seçilen Paket",
+      themeLabel: "Seçilen Tema",
+      paymentLabel: "Ödeme Yöntemi",
+      totalLabel: "Toplam Tutar",
+      depositLabel: "Kapora Tutarı",
+      coupleLabel: "Çift Bilgileri",
+      familyLabel: "Aile Bilgileri",
+      dateLabel: "Düğün Tarihi",
+      deposit: "Kapora + Teslimatta Kalan",
+      full: "Peşin Ödeme",
+      footer: "Ödeme bilgileri için panelinize giriş yapabilirsiniz.",
+      button: "Panelime Git",
+    },
+    en: {
+      subject: "Registration Received - Uygun Davet",
+      heading: "Your Registration is Complete!",
+      body: "Here is a summary of your wedding invitation registration details.",
+      packageLabel: "Selected Package",
+      themeLabel: "Selected Theme",
+      paymentLabel: "Payment Method",
+      totalLabel: "Total Amount",
+      depositLabel: "Deposit Amount",
+      coupleLabel: "Couple Information",
+      familyLabel: "Family Information",
+      dateLabel: "Wedding Date",
+      deposit: "Deposit + Remaining on Delivery",
+      full: "Full Payment",
+      footer: "You can sign in to your dashboard for payment details.",
+      button: "Go to Dashboard",
+    },
+    de: {
+      subject: "Registrierung erhalten - Uygun Davet",
+      heading: "Ihre Registrierung ist abgeschlossen!",
+      body: "Hier ist eine Zusammenfassung Ihrer Hochzeitseinladungs-Registrierung.",
+      packageLabel: "Gewähltes Paket",
+      themeLabel: "Gewähltes Thema",
+      paymentLabel: "Zahlungsmethode",
+      totalLabel: "Gesamtbetrag",
+      depositLabel: "Anzahlung",
+      coupleLabel: "Paarinformationen",
+      familyLabel: "Familieninformationen",
+      dateLabel: "Hochzeitsdatum",
+      deposit: "Anzahlung + Rest bei Lieferung",
+      full: "Vollständige Zahlung",
+      footer: "Melden Sie sich in Ihrem Dashboard an, um die Zahlungsdetails zu erhalten.",
+      button: "Zum Dashboard",
+    },
+  },
 };
 
 function baseLayout(content: string) {
@@ -93,7 +146,7 @@ function baseLayout(content: string) {
           <tr>
             <td style="padding:32px 32px 0;text-align:center;">
               <img src="https://www.uygundavet.com/logo-gold-transparent.png" alt="Uygun Davet" width="48" height="48" style="display:block;margin:0 auto 12px;" />
-              <span style="font-family:'Merienda',Georgia,serif;font-size:20px;font-weight:bold;color:#d5d1ad;">Uygun Davet</span>
+              <img src="https://www.uygundavet.com/email-brand.png" alt="Uygun Davet" width="180" height="36" style="display:block;margin:0 auto;" />
             </td>
           </tr>
           <tr>
@@ -158,6 +211,77 @@ export function welcomeEmail(dashboardUrl: string, locale: Locale = "tr") {
         </tr>
       </table>
       <p style="margin:24px 0 0;font-size:13px;color:#f5f6f350;">${tip}</p>
+    `),
+  };
+}
+
+interface OrderEmailData {
+  selectedPackage: string;
+  selectedTheme: string;
+  customThemeRequest?: string;
+  paymentMethod: "deposit" | "full";
+  totalAmount: number;
+  depositAmount: number;
+  groomName: string;
+  brideName: string;
+  groomFamily: { fatherName: string; motherName: string };
+  brideFamily: { fatherName: string; motherName: string };
+  weddingDate: string;
+  dashboardUrl: string;
+}
+
+function infoRow(label: string, value: string) {
+  return `<tr>
+    <td style="padding:6px 0;font-size:13px;color:#f5f6f360;font-family:sans-serif;">${label}</td>
+    <td style="padding:6px 0;font-size:13px;color:#f5f6f3;font-family:sans-serif;text-align:right;font-weight:600;">${value}</td>
+  </tr>`;
+}
+
+export function orderConfirmationEmail(data: OrderEmailData, locale: Locale = "tr") {
+  const t = translations.orderConfirmation[locale] || translations.orderConfirmation.tr;
+  const paymentMethodText = data.paymentMethod === "deposit" ? t.deposit : t.full;
+  const themeText = data.selectedTheme === "custom"
+    ? `Custom: ${data.customThemeRequest || ""}`
+    : data.selectedTheme.charAt(0).toUpperCase() + data.selectedTheme.slice(1);
+
+  return {
+    subject: t.subject,
+    html: baseLayout(`
+      <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;color:#f5f6f3;">${t.heading}</h1>
+      <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#f5f6f370;">${t.body}</p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff08;border-radius:12px;padding:4px 16px;margin-bottom:16px;">
+        ${infoRow(t.packageLabel, data.selectedPackage.toUpperCase())}
+        ${infoRow(t.themeLabel, themeText)}
+        ${infoRow(t.paymentLabel, paymentMethodText)}
+        ${infoRow(t.totalLabel, data.totalAmount.toLocaleString("tr-TR") + "₺")}
+        ${data.paymentMethod === "deposit" ? infoRow(t.depositLabel, data.depositAmount.toLocaleString("tr-TR") + "₺") : ""}
+      </table>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff08;border-radius:12px;padding:4px 16px;margin-bottom:16px;">
+        ${infoRow(t.coupleLabel, "")}
+        ${infoRow("👤", data.groomName)}
+        ${infoRow("👤", data.brideName)}
+        ${infoRow(t.dateLabel, data.weddingDate)}
+      </table>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff08;border-radius:12px;padding:4px 16px;margin-bottom:24px;">
+        ${infoRow(t.familyLabel + " (1)", "")}
+        ${infoRow("Baba", data.groomFamily.fatherName)}
+        ${infoRow("Anne", data.groomFamily.motherName)}
+        ${infoRow(t.familyLabel + " (2)", "")}
+        ${infoRow("Baba", data.brideFamily.fatherName)}
+        ${infoRow("Anne", data.brideFamily.motherName)}
+      </table>
+
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <a href="${data.dashboardUrl}" style="display:inline-block;padding:14px 32px;background-color:#f5f6f3;color:#252224;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;letter-spacing:0.5px;">${t.button}</a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:20px 0 0;font-size:13px;color:#f5f6f350;text-align:center;">${t.footer}</p>
     `),
   };
 }

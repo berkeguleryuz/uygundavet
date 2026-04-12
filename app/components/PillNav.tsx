@@ -8,7 +8,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowRight, ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronRight, LogOut } from "lucide-react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import Link from "next/link";
 import { routing } from "@/i18n/routing";
@@ -200,7 +200,10 @@ export function PillNav() {
                   <div className="bg-white rounded-[20px] overflow-hidden shadow-xl">
                     <div className="px-6 py-5">
                       {[
-                        ...(!session ? [{ key: "register", href: "/login?mode=register" }] : []),
+                        ...(!session ? [
+                          { key: "register", href: "/login?mode=register" },
+                          { key: "loginLink", href: "/login" },
+                        ] : []),
                         { key: "dashboard", href: session ? "/dashboard" : "/login" },
                         { key: "profile", href: session ? "/dashboard/ayarlar" : "/login" },
                       ].map((item, i) => (
@@ -222,6 +225,28 @@ export function PillNav() {
                           </Link>
                         </motion.div>
                       ))}
+                      {session && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.12 }}
+                        >
+                          <button
+                            className="flex items-center gap-2 py-3 w-full cursor-pointer group/mlink"
+                            onClick={() => {
+                              setIsMoreOpen(false);
+                              authClient.signOut().then(() => {
+                                window.location.href = "/";
+                              });
+                            }}
+                          >
+                            <LogOut className="w-4 h-4 text-red-500" />
+                            <span className="font-chakra text-sm uppercase tracking-[0.12em] text-red-500 font-semibold group-hover/mlink:translate-x-1.5 transition-transform duration-200">
+                              {t("logout")}
+                            </span>
+                          </button>
+                        </motion.div>
+                      )}
                     </div>
                     <div className="border-t border-black/5 px-6 py-4">
                       <Link
