@@ -1,0 +1,229 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { useWedding } from "../_lib/context";
+import { t } from "../_lib/i18n";
+import { ChevronDownIcon } from "../_icons/ChevronDownIcon";
+
+const BASE = "/sunset";
+
+const TR_DAYS = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+const TR_MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+
+function formatWeddingDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}, ${TR_DAYS[d.getDay()]}`;
+}
+
+/*
+ Bento grid — 8 items, 3 columns, 4 rows
+ Item 3 (index 2) = VIDEO — sits at row 2-4, col 2 (center, tall)
+ This is the item that fills the screen when Flip expands
+
+ Grid areas (same as GSAP demo):
+ 1: 1/1 → 3/2  (left, 2 rows)
+ 2: 1/2 → 2/3  (top center)
+ 3: 2/2 → 4/3  (center, 2 rows) ← VIDEO
+ 4: 1/3 → 3/3  (right, 2 rows)
+ 5: 3/1 → 3/2  (mid-left)
+ 6: 3/3 → 5/4  (right, 2 rows)
+ 7: 4/1 → 5/2  (bottom-left)
+ 8: 4/2 → 5/3  (bottom-center)
+*/
+const bentoMedia = [
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=85" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=800&q=85" },
+  { type: "video" as const, src: "/crystal/yuzuk.mp4" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=85" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=800&q=85" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=85" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=85" },
+  { type: "image" as const, src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=85" },
+];
+
+export function SectionHero() {
+  const wedding = useWedding();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  const brideFirst = wedding.brideName.split(" ")[0];
+  const groomFirst = wedding.groomName.split(" ")[0];
+  const formattedDate = formatWeddingDate(wedding.weddingDate);
+
+  useEffect(() => {
+    // Dynamic imports to avoid SSR issues with GSAP plugins
+    const init = async () => {
+      const gsapModule = await import("gsap");
+      const gsap = gsapModule.default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { Flip } = require("gsap/dist/Flip");
+
+      gsap.registerPlugin(ScrollTrigger, Flip);
+
+      const galleryEl = galleryRef.current;
+      const wrapEl = wrapRef.current;
+      const textEl = textRef.current;
+      if (!galleryEl || !wrapEl) return;
+
+      const items = galleryEl.querySelectorAll(".bento-item");
+
+      // Remove final class (ensure starting state)
+      galleryEl.classList.remove("bento-final");
+
+      const ctx = gsap.context(() => {
+        // Temporarily add final class to capture expanded state
+        galleryEl.classList.add("bento-final");
+        const flipState = Flip.getState(items);
+        galleryEl.classList.remove("bento-final");
+
+        // Create Flip animation
+        const flip = Flip.to(flipState, {
+          simple: true,
+          ease: "expoScale(1, 5)",
+        });
+
+        // Timeline with ScrollTrigger
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: galleryEl,
+            start: "center center",
+            end: "+=100%",
+            scrub: true,
+            pin: wrapEl,
+          },
+        });
+
+        tl.add(flip);
+
+        // Fade text out as gallery expands
+        if (textEl) {
+          tl.to(textEl, { opacity: 0, scale: 1.05, duration: 0.3 }, 0);
+        }
+
+        return () => gsap.set(items, { clearProps: "all" });
+      });
+
+      return () => ctx.revert();
+    };
+
+    let cleanup: (() => void) | undefined;
+    const timer = setTimeout(() => {
+      init().then(fn => { cleanup = fn; });
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      cleanup?.();
+    };
+  }, []);
+
+  return (
+    <>
+      <div ref={wrapRef} className="gallery-wrap">
+        {/* Text overlay */}
+        <div ref={textRef} className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }} className="text-center px-6">
+            <p className="font-sans text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-[#e8a87c]/80 mb-4 md:mb-6 drop-shadow-md">{t("heroTagline")}</p>
+            <h1 className="font-merienda text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[1.05] drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">{brideFirst}</h1>
+            <div className="flex items-center justify-center gap-4 my-2 md:my-3">
+              <div className="h-px w-8 md:w-12 bg-[#e8a87c]/50" />
+              <span className="bg-gradient-to-r from-[#d4735e] to-[#f0c27f] bg-clip-text text-transparent text-2xl md:text-3xl font-merienda">&</span>
+              <div className="h-px w-8 md:w-12 bg-[#e8a87c]/50" />
+            </div>
+            <h1 className="font-merienda text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[1.05] drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">{groomFirst}</h1>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-6 space-y-1">
+              <p className="font-sans text-xs md:text-sm text-white/70 tracking-[0.15em] uppercase drop-shadow-md">{formattedDate}</p>
+              {wedding.venueName && <p className="font-sans text-xs text-white/40 drop-shadow-md">{wedding.venueName}</p>}
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }} className="mt-8 pointer-events-auto">
+              <Link href={`${BASE}/lcv`} className="inline-flex items-center justify-center font-sans text-[10px] tracking-[0.25em] uppercase text-white bg-gradient-to-r from-[#d4735e] to-[#e8a87c] rounded-full px-8 py-3 hover:shadow-[0_0_30px_rgba(212,115,94,0.3)] transition-all duration-300 shadow-lg">{t("heroCtaButton")}</Link>
+            </motion.div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+            <span className="font-sans text-[9px] tracking-[0.3em] uppercase text-white/30">{t("heroScrollHint")}</span>
+            <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+              <ChevronDownIcon size={16} className="text-white/30" />
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-[#1a0f0a]/35 z-10 pointer-events-none" />
+
+        {/* Bento gallery — exact same structure as GSAP demo */}
+        <div ref={galleryRef} className="bento-gallery">
+          {bentoMedia.map((media, i) => (
+            <div key={i} className="bento-item">
+              {media.type === "video" ? (
+                <video autoPlay muted loop playsInline preload="auto" style={{ objectFit: "cover", width: "100%", height: "100%" }} src={media.src} />
+              ) : (
+                <Image src={media.src} alt={`Gallery ${i + 1}`} fill className="object-cover" sizes="33vw" priority={i < 4} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Exact CSS from the GSAP demo */}
+      <style jsx global>{`
+        .gallery-wrap {
+          position: relative;
+          width: 100%;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          background: #1a0f0a;
+        }
+
+        .bento-gallery {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          flex: none;
+          display: grid;
+          gap: 1vh;
+          grid-template-columns: repeat(3, 32.5vw);
+          grid-template-rows: repeat(4, 23vh);
+          justify-content: center;
+          align-content: center;
+        }
+
+        .bento-final.bento-gallery {
+          grid-template-columns: repeat(3, 100vw);
+          grid-template-rows: repeat(4, 49.5vh);
+          gap: 1vh;
+        }
+
+        .bento-item {
+          background-position: 50% 50%;
+          background-size: cover;
+          flex: none;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .bento-item img {
+          object-fit: cover;
+          width: 100%;
+          height: 100%;
+        }
+
+        .bento-gallery .bento-item:nth-child(1) { grid-area: 1 / 1 / 3 / 2; }
+        .bento-gallery .bento-item:nth-child(2) { grid-area: 1 / 2 / 2 / 3; }
+        .bento-gallery .bento-item:nth-child(3) { grid-area: 2 / 2 / 4 / 3; }
+        .bento-gallery .bento-item:nth-child(4) { grid-area: 1 / 3 / 3 / 3; }
+        .bento-gallery .bento-item:nth-child(5) { grid-area: 3 / 1 / 3 / 2; }
+        .bento-gallery .bento-item:nth-child(6) { grid-area: 3 / 3 / 5 / 4; }
+        .bento-gallery .bento-item:nth-child(7) { grid-area: 4 / 1 / 5 / 2; }
+        .bento-gallery .bento-item:nth-child(8) { grid-area: 4 / 2 / 5 / 3; }
+      `}</style>
+    </>
+  );
+}
