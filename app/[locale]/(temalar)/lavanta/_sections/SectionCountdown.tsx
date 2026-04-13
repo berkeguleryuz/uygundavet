@@ -50,27 +50,24 @@ export function SectionCountdown() {
 
         <ScrollReveal delay={0.15}>
           <div className="mt-14 md:mt-16">
-            <div className="flex items-center justify-center">
-              {/* Each unit in its own glass-like container */}
-              <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full max-w-lg">
-                {[
-                  { value: timeLeft.days, label: "Gün" },
-                  { value: timeLeft.hours, label: "Saat" },
-                  { value: timeLeft.minutes, label: "Dakika" },
-                  { value: timeLeft.seconds, label: "Saniye" },
-                ].map((unit, i) => (
-                  <motion.div
-                    key={unit.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 + i * 0.1, duration: 0.6 }}
-                    className="relative bg-white/[0.03] border border-white/[0.06] rounded-2xl py-5 md:py-7"
-                  >
-                    <CountdownUnit value={unit.value} label={unit.label} />
-                  </motion.div>
-                ))}
-              </div>
+            <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full max-w-lg mx-auto">
+              {[
+                { value: timeLeft.days, label: "Gün" },
+                { value: timeLeft.hours, label: "Saat" },
+                { value: timeLeft.minutes, label: "Dakika" },
+                { value: timeLeft.seconds, label: "Saniye" },
+              ].map((unit, i) => (
+                <motion.div
+                  key={unit.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 + i * 0.1, duration: 0.6 }}
+                  className="relative bg-white/[0.03] border border-white/[0.06] rounded-2xl py-5 md:py-7"
+                >
+                  <CountdownUnit value={unit.value} label={unit.label} />
+                </motion.div>
+              ))}
             </div>
           </div>
         </ScrollReveal>

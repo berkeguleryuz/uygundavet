@@ -7,14 +7,20 @@ interface ScheduleItem {
   label: string;
 }
 
-const schedule: ScheduleItem[] = [
+const defaultSchedule: ScheduleItem[] = [
   { time: "17:00", label: "Karşılama" },
   { time: "18:00", label: "Nikah Töreni" },
   { time: "19:00", label: "Yemek" },
   { time: "21:00", label: "Parti & Dans" },
 ];
 
-export function EventSchedule() {
+interface EventScheduleProps {
+  schedule?: { time: string; label: string }[];
+}
+
+export function EventSchedule({ schedule: propSchedule }: EventScheduleProps) {
+  const schedule =
+    propSchedule && propSchedule.length > 0 ? propSchedule : defaultSchedule;
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="relative">

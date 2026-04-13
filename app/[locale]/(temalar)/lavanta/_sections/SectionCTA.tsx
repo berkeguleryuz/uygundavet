@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ScrollReveal } from "../_components/ScrollReveal";
 import { useWedding } from "../_lib/context";
+import { MorphButton } from "@/app/components/MorphButton";
 
 const BASE = "/lavanta";
 
 export function SectionCTA() {
   const wedding = useWedding();
+  const router = useRouter();
   const brideFirst = wedding.brideName.split(" ")[0];
   const groomFirst = wedding.groomName.split(" ")[0];
 
@@ -16,7 +19,6 @@ export function SectionCTA() {
     <section className="relative py-32 md:py-44 bg-[#252224] overflow-hidden">
       <div className="h-px bg-gradient-to-r from-transparent via-[#d5d1ad]/8 to-transparent absolute top-0 inset-x-0" />
 
-      {/* Background image with heavy overlay for atmosphere */}
       <div className="absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=60"
@@ -27,12 +29,10 @@ export function SectionCTA() {
         />
       </div>
 
-      {/* Radial glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d5d1ad]/[0.02] blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 max-w-xl mx-auto px-6 text-center">
         <ScrollReveal>
-          {/* Monogram */}
           <div className="w-14 h-14 rounded-full border border-[#d5d1ad]/15 flex items-center justify-center mx-auto mb-8">
             <span className="font-merienda text-sm text-[#d5d1ad]/40">
               {brideFirst[0]}&{groomFirst[0]}
@@ -53,12 +53,13 @@ export function SectionCTA() {
         </ScrollReveal>
 
         <ScrollReveal delay={0.3}>
-          <Link
-            href={`${BASE}/lcv`}
-            className="inline-block bg-[#d5d1ad] text-[#1c1a1b] font-sans text-[11px] font-medium tracking-[0.2em] uppercase px-10 py-4 rounded-full hover:bg-[#d5d1ad]/90 transition-all duration-300 shadow-xl shadow-[#d5d1ad]/10"
+          <MorphButton
+            variant="filled"
+            className="text-xs"
+            onClick={() => router.push(`${BASE}/lcv`)}
           >
             Davetiyeyi Yanıtla
-          </Link>
+          </MorphButton>
         </ScrollReveal>
 
         <ScrollReveal delay={0.4}>

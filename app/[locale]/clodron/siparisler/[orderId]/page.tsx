@@ -3,9 +3,38 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette, Clock, Trash2, Users } from "lucide-react";
+import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette, Clock, Trash2, Users, Heart, Calendar, ListChecks, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import type { OrderData } from "@/models/Order";
+import Image from "next/image";
+
+interface CustomerInfo {
+  _id: string;
+  userId: string;
+  weddingDate: string;
+  weddingTime: string;
+  venueName: string;
+  venueAddress: string;
+  groom: { firstName: string; lastName: string };
+  bride: { firstName: string; lastName: string };
+  groomFamily: {
+    father: { firstName: string; lastName: string };
+    mother: { firstName: string; lastName: string };
+  };
+  brideFamily: {
+    father: { firstName: string; lastName: string };
+    mother: { firstName: string; lastName: string };
+  };
+  inviteCode?: string;
+  eventSchedule: { time: string; label: string }[];
+  storyMilestones: {
+    date: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    imagePublicId: string;
+  }[];
+}
 
 const statusSteps = [
   { key: "pending", label: "Bekliyor" },
@@ -24,6 +53,7 @@ export default function OrderDetailPage() {
     weddingDate: string; cleanupDate: string; daysUntilCleanup: number; isCleaned: boolean;
   } | null>(null);
   const [guestCount, setGuestCount] = useState(0);
+  const [customer, setCustomer] = useState<CustomerInfo | null>(null);
 
   useEffect(() => {
     fetch(`/api/admin/orders/${orderId}`)
@@ -34,6 +64,7 @@ export default function OrderDetailPage() {
           setAdminNotes(data.order.adminNotes || "");
           if (data.cleanupInfo) setCleanupInfo(data.cleanupInfo);
           if (data.guestCount) setGuestCount(data.guestCount);
+          if (data.customer) setCustomer(data.customer);
         }
       })
       .catch(() => {})
@@ -262,6 +293,126 @@ export default function OrderDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Customer Info */}
+      {customer && (
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Bride & Groom + Venue + Date */}
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Heart className="w-4 h-4 text-white/50" />
+              <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">Çift & Mekan Bilgisi</h3>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-white/50 font-sans">Gelin</span>
+              <span className="text-sm text-white font-sans">{customer.bride.firstName} {customer.bride.lastName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-white/50 font-sans">Damat</span>
+              <span className="text-sm text-white font-sans">{customer.groom.firstName} {customer.groom.lastName}</span>
+            </div>
+            {customer.venueName && (
+              <div className="flex justify-between">
+                <span className="text-sm text-white/50 font-sans">Mekan</span>
+                <span className="text-sm text-white font-sans">{customer.venueName}</span>
+              </div>
+            )}
+            {customer.venueAddress && (
+              <div className="flex justify-between">
+                <span className="text-sm text-white/50 font-sans">Adres</span>
+                <span className="text-sm text-white font-sans text-right max-w-[60%]">{customer.venueAddress}</span>
+              </div>
+            )}
+            <div className="border-t border-white/10 pt-3 mt-3 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-white/50 font-sans flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Tarih</span>
+                <span className="text-sm text-white font-sans">{new Date(customer.weddingDate).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}</span>
+              </div>
+              {customer.weddingTime && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-white/50 font-sans">Saat</span>
+                  <span className="text-sm text-white font-sans">{customer.weddingTime}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Family + Schedule + Milestones */}
+          <div className="space-y-4">
+            {/* Family */}
+            {(customer.brideFamily || customer.groomFamily) && (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-white/50" />
+                  <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">Aile Bilgileri</h3>
+                </div>
+                {customer.brideFamily && (
+                  <div>
+                    <p className="text-xs text-white/40 font-sans mb-1">Gelin Ailesi</p>
+                    <p className="text-sm text-white/70 font-sans">{customer.brideFamily.father.firstName} {customer.brideFamily.father.lastName} & {customer.brideFamily.mother.firstName} {customer.brideFamily.mother.lastName}</p>
+                  </div>
+                )}
+                {customer.groomFamily && (
+                  <div>
+                    <p className="text-xs text-white/40 font-sans mb-1">Damat Ailesi</p>
+                    <p className="text-sm text-white/70 font-sans">{customer.groomFamily.father.firstName} {customer.groomFamily.father.lastName} & {customer.groomFamily.mother.firstName} {customer.groomFamily.mother.lastName}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Event Schedule */}
+            {customer.eventSchedule && customer.eventSchedule.length > 0 && (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <ListChecks className="w-4 h-4 text-white/50" />
+                  <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">Etkinlik Programı</h3>
+                </div>
+                {customer.eventSchedule.map((item, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span className="text-sm text-white/50 font-sans">{item.time}</span>
+                    <span className="text-sm text-white/70 font-sans">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Story Milestones */}
+            {customer.storyMilestones && customer.storyMilestones.length > 0 && (
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <BookOpen className="w-4 h-4 text-white/50" />
+                  <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">
+                    Hikaye ({customer.storyMilestones.length} aşama)
+                  </h3>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {customer.storyMilestones.map((m, i) => (
+                    <div key={i} className="shrink-0">
+                      {m.imageUrl ? (
+                        <div className="w-16 h-16 rounded-lg overflow-hidden relative">
+                          <Image
+                            src={m.imageUrl}
+                            alt={m.title}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 rounded-lg bg-white/5 flex items-center justify-center">
+                          <span className="text-xs text-white/30 font-sans">{i + 1}</span>
+                        </div>
+                      )}
+                      <p className="text-[10px] text-white/40 font-sans mt-1 truncate max-w-[64px]">{m.title}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Admin Notes */}
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">

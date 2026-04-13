@@ -22,4 +22,12 @@ export interface WeddingData {
   inviteCode: string;
   groomFamily: FamilyInfo | null;
   brideFamily: FamilyInfo | null;
+  eventSchedule: { time: string; label: string }[];
+  storyMilestones: {
+    date: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    imagePublicId: string;
+  }[];
 }

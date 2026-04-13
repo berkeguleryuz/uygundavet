@@ -1,6 +1,6 @@
 export type RsvpStatus = "confirmed" | "declined" | "pending" | "guest";
 
-export type GuestSource = "whatsapp" | "manual" | "qr-code";
+export type GuestSource = "whatsapp" | "manual" | "qr-code" | "website";
 
 export interface DashboardStat {
   title: string;
@@ -55,4 +55,12 @@ export interface CustomerData {
   };
   inviteCode?: string;
   invitationViews: number;
+  eventSchedule: { time: string; label: string }[];
+  storyMilestones: {
+    date: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    imagePublicId: string;
+  }[];
 }

@@ -12,44 +12,47 @@ interface Milestone {
   image?: string;
 }
 
+const fallbackImages = [
+  "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80",
+  "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80",
+  "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
+  "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80",
+  "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80",
+];
+
 function getMilestones(brideFirst: string, groomFirst: string): Milestone[] {
   return [
     {
       date: "İlk Karşılaşma",
       title: "Her Şey Böyle Başladı",
       description: `${brideFirst} ve ${groomFirst} ilk kez karşılaştıklarında, hayatlarının değişeceğini bilmiyorlardı. O an basit bir selamlaşma ile başlayan hikâye, bugünlere uzandı.`,
-      image:
-        "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80",
+      image: fallbackImages[0],
     },
     {
       date: "İlk Buluşma",
       title: "Tanışma",
       description: `Saatlerce süren sohbetler, paylaşılan kahkahalar... ${brideFirst} ve ${groomFirst} birbirlerini keşfetmeye başladılar.`,
-      image:
-        "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80",
+      image: fallbackImages[1],
     },
     {
       date: "Birlikte",
       title: "Aşk Büyüdü",
       description:
         "Her geçen gün birbirlerini daha iyi tanıdılar, birlikte yeni anıların kapısını aralayarak hayatlarını birleştirdiler.",
-      image:
-        "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
+      image: fallbackImages[2],
     },
     {
       date: "Evlilik Teklifi",
       title: "Evet!",
       description: `${groomFirst} diz çöktü ve ${brideFirst}'e hayatının sorusunu sordu. Cevap tabii ki "Evet!" oldu.`,
-      image:
-        "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80",
+      image: fallbackImages[3],
     },
     {
       date: "Düğün Günü",
       title: "Yeni Bir Başlangıç",
       description:
         "Ve şimdi bu mutlu günü sizlerle paylaşmanın heyecanını yaşıyoruz. Sizi de aramızda görmekten mutluluk duyacağız!",
-      image:
-        "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80",
+      image: fallbackImages[4],
     },
   ];
 }
@@ -58,7 +61,16 @@ export default function HikayemizPage() {
   const wedding = useWedding();
   const brideFirst = wedding.brideName.split(" ")[0];
   const groomFirst = wedding.groomName.split(" ")[0];
-  const milestones = getMilestones(brideFirst, groomFirst);
+
+  const milestones: Milestone[] =
+    wedding.storyMilestones && wedding.storyMilestones.length >= 1
+      ? wedding.storyMilestones.map((m, i) => ({
+          date: m.date,
+          title: m.title,
+          description: m.description,
+          image: m.imageUrl || fallbackImages[i % fallbackImages.length],
+        }))
+      : getMilestones(brideFirst, groomFirst);
 
   return (
     <div className="min-h-svh pt-24 pb-12 px-4 sm:px-6">

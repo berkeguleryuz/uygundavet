@@ -41,6 +41,14 @@ async function getWeddingData(): Promise<WeddingData | null> {
       inviteCode: customer.inviteCode,
       groomFamily: customer.groomFamily || null,
       brideFamily: customer.brideFamily || null,
+      eventSchedule: customer.eventSchedule || [],
+      storyMilestones: (customer.storyMilestones || []).map((m: { date?: string; title?: string; description?: string; imageUrl?: string; imagePublicId?: string }) => ({
+        date: m.date || "",
+        title: m.title || "",
+        description: m.description || "",
+        imageUrl: m.imageUrl || "",
+        imagePublicId: m.imagePublicId || "",
+      })),
     };
   } catch (error) {
     console.error("Failed to fetch wedding data:", error);

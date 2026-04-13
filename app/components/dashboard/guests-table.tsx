@@ -153,6 +153,12 @@ function SourceBadge({ source, t }: { source: GuestSource; t: (key: string) => s
       bgClass: "bg-violet-500/10",
       textClass: "text-violet-400",
     },
+    website: {
+      icon: <QrCode className="size-3" />,
+      label: "Website",
+      bgClass: "bg-cyan-500/10",
+      textClass: "text-cyan-400",
+    },
   };
 
   const config = sourceConfig[source];
@@ -372,6 +378,13 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                       <QrCode className="size-3 mr-1.5 text-violet-400" />
                       {t("sourceQrCode")}
                     </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={sourceFilter === "website"}
+                      onCheckedChange={() => setSourceFilter("website")}
+                    >
+                      <QrCode className="size-3 mr-1.5 text-cyan-400" />
+                      Website
+                    </DropdownMenuCheckboxItem>
                   </div>
                 </div>
                 {hasActiveFilters && (
@@ -520,6 +533,12 @@ export function GuestsTable({ isDemo }: { isDemo?: boolean }) {
                   onCheckedChange={() => setSourceFilter("qr-code")}
                 >
                   {t("sourceQrCode")}
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={sourceFilter === "website"}
+                  onCheckedChange={() => setSourceFilter("website")}
+                >
+                  Website
                 </DropdownMenuCheckboxItem>
               </div>
             </div>

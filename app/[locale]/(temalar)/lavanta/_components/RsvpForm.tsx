@@ -79,7 +79,7 @@ export function RsvpForm() {
                 .map((g) => ({ name: g.name.trim() }))
             : [],
         note: note.trim(),
-        source: "qr-code" as const,
+        source: "website" as const,
       };
 
       const res = await fetch(`/api/public/rsvp/${wedding.inviteCode}`, {

@@ -18,7 +18,7 @@ const rsvpSchema = z.object({
     .default([]),
   note: z.string().max(1000).default(""),
   message: z.string().max(2000).optional(),
-  source: z.enum(["whatsapp", "qr-code"]).default("qr-code"),
+  source: z.enum(["whatsapp", "qr-code", "website"]).default("qr-code"),
 });
 
 export async function GET(
@@ -61,6 +61,8 @@ export async function GET(
         inviteCode: customer.inviteCode,
         groomFamily: customer.groomFamily || null,
         brideFamily: customer.brideFamily || null,
+        eventSchedule: customer.eventSchedule || [],
+        storyMilestones: customer.storyMilestones || [],
       },
     });
   } catch (error) {
