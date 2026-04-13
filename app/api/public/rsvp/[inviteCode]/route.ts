@@ -54,9 +54,13 @@ export async function GET(
         weddingTime: customer.weddingTime,
         venueName: customer.venueName || "",
         venueAddress: customer.venueAddress || "",
+        address: customer.address || "",
         hasGallery: canAccess("gallery", pkg),
         hasMemoryBook: canAccess("memoryBook", pkg),
         selectedTheme: order?.selectedTheme || "rose",
+        inviteCode: customer.inviteCode,
+        groomFamily: customer.groomFamily || null,
+        brideFamily: customer.brideFamily || null,
       },
     });
   } catch (error) {

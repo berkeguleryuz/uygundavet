@@ -161,6 +161,7 @@ export function PacPasswordInput({
         type="button"
         onClick={showPassword}
         className={styles.pac}
+        style={{ top: "calc(50% - 12px)", right: 12 }}
         aria-label="Show password"
       />
       <button
