@@ -125,7 +125,7 @@ export default async function LocaleLayout({
       )}
     >
       <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark" disableTransitionOnChange>
           <NextIntlClientProvider messages={messages}>
             {children}
             <Toaster position="top-center" theme="dark" richColors />

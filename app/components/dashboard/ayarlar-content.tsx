@@ -64,15 +64,11 @@ function AyarlarForm({ customer, isDemo, updateCustomer }: {
   const [form, setForm] = useState(() => buildFormFromCustomer(customer));
 
   const [eventSchedule, setEventSchedule] = useState<EventScheduleItem[]>(
-    () => (customer?.eventSchedule as EventScheduleItem[] | undefined)?.length
-      ? (customer.eventSchedule as EventScheduleItem[])
-      : []
+    () => customer?.eventSchedule?.length ? [...customer.eventSchedule] as EventScheduleItem[] : []
   );
 
   const [storyMilestones, setStoryMilestones] = useState<StoryMilestone[]>(
-    () => (customer?.storyMilestones as StoryMilestone[] | undefined)?.length
-      ? (customer.storyMilestones as StoryMilestone[])
-      : []
+    () => customer?.storyMilestones?.length ? [...customer.storyMilestones] as StoryMilestone[] : []
   );
 
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);

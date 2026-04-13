@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useWedding } from "../_lib/context";
 import { ScrollReveal } from "./ScrollReveal";
+import { OrnamentalDivider } from "./OrnamentalDivider";
 
 interface Photo {
   _id: string;
@@ -18,17 +19,17 @@ interface Photo {
   createdAt: string;
 }
 
-const inputClass =
-  "w-full h-12 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-white/20 focus:border-[#d5d1ad]/50 focus:outline-none transition-all font-sans";
-
 export function GalleryGrid() {
   const wedding = useWedding();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const brideFirst = wedding.brideName.split(" ")[0];
+  const groomFirst = wedding.groomName.split(" ")[0];
 
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [uploaderName, setUploaderName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   const fetchPhotos = useCallback(async () => {
@@ -40,7 +41,7 @@ export function GalleryGrid() {
       const data = await res.json();
       setPhotos(data.photos || []);
     } catch {
-      // silently fail on fetch
+      // silently fail
     } finally {
       setIsLoading(false);
     }
@@ -51,51 +52,58 @@ export function GalleryGrid() {
   }, [fetchPhotos]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     if (!uploaderName.trim()) {
       toast.error("Lütfen adınızı girin.");
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Dosya boyutu 10MB'dan küçük olmalıdır.");
+    const fileArray = Array.from(files).slice(0, 25);
+
+    const oversized = fileArray.filter((f) => f.size > 10 * 1024 * 1024);
+    if (oversized.length > 0) {
+      toast.error(`${oversized.length} dosya 10MB sınırını aşıyor.`);
       return;
     }
 
     setIsUploading(true);
+    setUploadProgress({ current: 0, total: fileArray.length });
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("uploader", uploaderName.trim());
+    let successCount = 0;
+    let failCount = 0;
 
-      const res = await fetch(
-        `/api/public/rsvp/${wedding.inviteCode}/gallery`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+    for (let i = 0; i < fileArray.length; i++) {
+      setUploadProgress({ current: i + 1, total: fileArray.length });
+      try {
+        const formData = new FormData();
+        formData.append("file", fileArray[i]);
+        formData.append("uploader", uploaderName.trim());
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "Yükleme başarısız");
-      }
+        const res = await fetch(
+          `/api/public/rsvp/${wedding.inviteCode}/gallery`,
+          { method: "POST", body: formData }
+        );
 
-      toast.success("Fotoğraf başarıyla yüklendi!");
-      await fetchPhotos();
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Yükleme sırasında hata oluştu."
-      );
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        if (!res.ok) throw new Error();
+        successCount++;
+      } catch {
+        failCount++;
       }
     }
+
+    if (successCount > 0) {
+      toast.success(`${successCount} fotoğraf başarıyla yüklendi!`);
+      await fetchPhotos();
+    }
+    if (failCount > 0) {
+      toast.error(`${failCount} fotoğraf yüklenemedi.`);
+    }
+
+    setIsUploading(false);
+    setUploadProgress({ current: 0, total: 0 });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   if (isLoading) {
@@ -108,80 +116,86 @@ export function GalleryGrid() {
 
   return (
     <div className="space-y-8">
-      {/* Upload Section */}
+      {/* Page header */}
+      <ScrollReveal className="text-center">
+        <OrnamentalDivider className="mb-6" />
+        <p className="font-sans text-[10px] tracking-[0.4em] uppercase text-[#d5d1ad]/50 mb-3">
+          Galeri
+        </p>
+        <h1 className="font-merienda text-3xl md:text-4xl text-[#d5d1ad]">
+          {brideFirst} & {groomFirst}
+        </h1>
+      </ScrollReveal>
+
+      {/* Upload — compact inline */}
       {wedding.hasGallery && (
-        <ScrollReveal>
-          <div className="bg-[#1c1a1b] rounded-2xl border border-white/10 p-6 space-y-4">
-            <h3 className="font-chakra text-xs uppercase tracking-wider text-[#d5d1ad]">
-              Fotoğraf Yükle
-            </h3>
+        <ScrollReveal className="max-w-xl mx-auto">
+          <div className="liquid-glass rounded-2xl border border-white/15 p-5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <input
+                type="text"
+                value={uploaderName}
+                onChange={(e) => setUploaderName(e.target.value)}
+                placeholder="Adınız Soyadınız"
+                className="flex-1 h-10 rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/45 focus:border-[#d5d1ad]/50 focus:outline-none transition-all font-sans"
+              />
 
-            <input
-              type="text"
-              value={uploaderName}
-              onChange={(e) => setUploaderName(e.target.value)}
-              placeholder="Adınızı girin"
-              className={inputClass}
-            />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+              />
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
-            <button
-              type="button"
-              onClick={() => {
-                if (!uploaderName.trim()) {
-                  toast.error("Lütfen önce adınızı girin.");
-                  return;
-                }
-                fileInputRef.current?.click();
-              }}
-              disabled={isUploading}
-              className={cn(
-                "w-full h-32 rounded-xl border-2 border-dashed border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-2 transition-all",
-                isUploading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:border-[#d5d1ad]/30 hover:bg-white/[0.04] cursor-pointer"
-              )}
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="size-6 text-[#d5d1ad]/50 animate-spin" />
-                  <span className="font-sans text-xs text-white/30">
-                    Yükleniyor...
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Upload className="size-6 text-white/20" />
-                  <span className="font-sans text-xs text-white/30">
-                    Fotoğraf seçmek için tıklayın
-                  </span>
-                  <span className="font-sans text-[10px] text-white/15">
-                    Maks. 10MB
-                  </span>
-                </>
-              )}
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!uploaderName.trim()) {
+                    toast.error("Lütfen önce adınızı girin.");
+                    return;
+                  }
+                  fileInputRef.current?.click();
+                }}
+                disabled={isUploading}
+                className={cn(
+                  "h-10 px-5 rounded-lg font-sans text-xs font-medium tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
+                  isUploading
+                    ? "bg-[#d5d1ad]/20 text-[#d5d1ad]/50 cursor-not-allowed"
+                    : "bg-[#d5d1ad] text-[#252224] hover:bg-[#d5d1ad]/90 cursor-pointer"
+                )}
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    {uploadProgress.current}/{uploadProgress.total} yükleniyor...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="size-3.5" />
+                    Fotoğraf Yükle
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="font-sans text-[10px] text-white/35 mt-2.5">
+              Tek seferde en fazla 25 fotoğraf · Maks. 10MB · JPG, PNG
+            </p>
           </div>
         </ScrollReveal>
       )}
 
       {/* Photo Grid */}
       {photos.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-2 sm:gap-3">
           {photos.map((photo, index) => (
             <motion.div
               key={photo._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer bg-white/5"
+              className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer border border-white/15 bg-white/5"
               onClick={() => setSelectedPhoto(photo)}
             >
               <Image
@@ -189,11 +203,11 @@ export function GalleryGrid() {
                 alt={photo.name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1536px) 16vw, 12vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <p className="font-sans text-xs text-white/80 truncate">
+              {/* Always-visible uploader name */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pt-6 pb-2.5 px-3">
+                <p className="font-sans text-[11px] text-white/80 truncate">
                   {photo.uploader}
                 </p>
               </div>
@@ -203,11 +217,13 @@ export function GalleryGrid() {
       ) : (
         <ScrollReveal>
           <div className="text-center py-16 space-y-3">
-            <ImagePlus className="size-10 text-white/10 mx-auto" />
-            <p className="font-sans text-sm text-white/30">
+            <div className="w-14 h-14 rounded-full bg-white/[0.04] border border-white/15 flex items-center justify-center mx-auto mb-4">
+              <ImagePlus className="size-6 text-white/20" />
+            </div>
+            <p className="font-sans text-sm text-white/45">
               Henüz fotoğraf yüklenmedi
             </p>
-            <p className="font-sans text-xs text-white/15">
+            <p className="font-sans text-xs text-white/30">
               İlk fotoğrafı yükleyen siz olun!
             </p>
           </div>
@@ -226,7 +242,7 @@ export function GalleryGrid() {
           >
             <button
               onClick={() => setSelectedPhoto(null)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white transition-colors z-10"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10"
             >
               <X className="size-5" />
             </button>
@@ -248,7 +264,7 @@ export function GalleryGrid() {
             </motion.div>
 
             <div className="absolute bottom-6 left-0 right-0 text-center">
-              <p className="font-sans text-sm text-white/60">
+              <p className="font-sans text-sm text-white/70">
                 {selectedPhoto.uploader}
               </p>
             </div>

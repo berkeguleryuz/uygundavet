@@ -38,6 +38,7 @@ export interface ICustomer extends Document {
   brideFamily: FamilyInfo;
   eventSchedule: EventScheduleItem[];
   storyMilestones: StoryMilestone[];
+  customDomain: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -95,6 +96,7 @@ const CustomerSchema = new Schema<ICustomer>(
       ],
       default: [],
     },
+    customDomain: { type: String, trim: true, default: "" },
   },
   {
     timestamps: true,

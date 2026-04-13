@@ -63,4 +63,5 @@ export interface CustomerData {
     imageUrl: string;
     imagePublicId: string;
   }[];
+  customDomain: string;
 }

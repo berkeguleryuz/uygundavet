@@ -7,10 +7,8 @@ export const metadata: Metadata = {
 
 export default function GaleriPage() {
   return (
-    <div className="min-h-svh pt-24 pb-12 px-4 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-        <GalleryGrid />
-      </div>
+    <div className="pt-24 pb-12 px-3 sm:px-5 md:px-8">
+      <GalleryGrid />
     </div>
   );
 }
