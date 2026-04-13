@@ -38,7 +38,7 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
       email: "",
       guestCount: form.guestCount,
       note: form.note.trim(),
-      rsvpStatus: "pending",
+      rsvpStatus: "confirmed",
       source: "manual",
     });
     setSaving(false);
@@ -57,10 +57,10 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
     }
   }, [isDemo, fetchGuests]);
 
-  const confirmed = isDemo ? 186 : guests.filter((g) => g.rsvpStatus === "confirmed").length;
-  const declined = isDemo ? 24 : guests.filter((g) => g.rsvpStatus === "declined").length;
-  const pending = isDemo ? 38 : guests.filter((g) => g.rsvpStatus === "pending").length;
-  const total = isDemo ? 248 : guests.length;
+  const confirmed = isDemo ? 186 : guests.filter((g) => g.rsvpStatus === "confirmed" || g.rsvpStatus === "guest").reduce((sum, g) => sum + (g.guestCount || 1), 0);
+  const declined = isDemo ? 24 : guests.filter((g) => g.rsvpStatus === "declined").reduce((sum, g) => sum + (g.guestCount || 1), 0);
+  const pending = isDemo ? 38 : guests.filter((g) => g.rsvpStatus === "pending").reduce((sum, g) => sum + (g.guestCount || 1), 0);
+  const total = isDemo ? 248 : guests.reduce((sum, g) => sum + (g.guestCount || 1), 0);
 
   const summaryStatDefs = [
     { key: "total", value: total, icon: Users, color: "text-foreground", bg: "bg-muted/50" },

@@ -12,7 +12,7 @@ const createGuestSchema = z.object({
   guestCount: z.number().int().min(0).max(50).default(1),
   note: z.string().max(500).default(""),
   source: z
-    .enum(["whatsapp", "manual", "qr-code"])
+    .enum(["whatsapp", "manual", "qr-code", "website"])
     .default("manual"),
 });
 

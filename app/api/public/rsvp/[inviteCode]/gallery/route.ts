@@ -7,6 +7,48 @@ import { canAccess } from "@/lib/package-gating";
 import { cloudinary, getUserFolder } from "@/lib/cloudinary";
 import type { SelectedPackage } from "@/models/Order";
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ inviteCode: string }> }
+) {
+  try {
+    const { inviteCode } = await params;
+
+    await connectDB();
+    const customer = await Customer.findOne({ inviteCode }).lean();
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: "Invitation not found" },
+        { status: 404 }
+      );
+    }
+
+    const order = await Order.findOne({ userId: customer.userId }).lean();
+    if (
+      !order ||
+      !canAccess("gallery", order.selectedPackage as SelectedPackage)
+    ) {
+      return NextResponse.json(
+        { error: "Feature not available" },
+        { status: 403 }
+      );
+    }
+
+    const photos = await GalleryPhoto.find({ userId: customer.userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return NextResponse.json({ photos });
+  } catch (error) {
+    console.error("Public gallery get error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ inviteCode: string }> }

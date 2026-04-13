@@ -10,6 +10,19 @@ interface FamilyInfo {
   mother: PersonName;
 }
 
+interface EventScheduleItem {
+  time: string;
+  label: string;
+}
+
+interface StoryMilestone {
+  date: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  imagePublicId: string;
+}
+
 export interface ICustomer extends Document {
   userId: string;
   weddingDate: Date;
@@ -23,6 +36,9 @@ export interface ICustomer extends Document {
   bride: PersonName;
   groomFamily: FamilyInfo;
   brideFamily: FamilyInfo;
+  eventSchedule: EventScheduleItem[];
+  storyMilestones: StoryMilestone[];
+  customDomain: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +73,30 @@ const CustomerSchema = new Schema<ICustomer>(
     bride: { type: PersonNameSchema, required: true },
     groomFamily: { type: FamilyInfoSchema, required: true },
     brideFamily: { type: FamilyInfoSchema, required: true },
+    eventSchedule: {
+      type: [
+        {
+          time: { type: String, trim: true },
+          label: { type: String, trim: true },
+          _id: false,
+        },
+      ],
+      default: [],
+    },
+    storyMilestones: {
+      type: [
+        {
+          date: { type: String, trim: true },
+          title: { type: String, trim: true },
+          description: { type: String, trim: true },
+          imageUrl: { type: String, default: "" },
+          imagePublicId: { type: String, default: "" },
+          _id: false,
+        },
+      ],
+      default: [],
+    },
+    customDomain: { type: String, trim: true, default: "" },
   },
   {
     timestamps: true,

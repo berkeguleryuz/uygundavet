@@ -18,7 +18,7 @@ const rsvpSchema = z.object({
     .default([]),
   note: z.string().max(1000).default(""),
   message: z.string().max(2000).optional(),
-  source: z.enum(["whatsapp", "qr-code"]).default("qr-code"),
+  source: z.enum(["whatsapp", "qr-code", "website"]).default("qr-code"),
 });
 
 export async function GET(
@@ -54,9 +54,15 @@ export async function GET(
         weddingTime: customer.weddingTime,
         venueName: customer.venueName || "",
         venueAddress: customer.venueAddress || "",
+        address: customer.address || "",
         hasGallery: canAccess("gallery", pkg),
         hasMemoryBook: canAccess("memoryBook", pkg),
         selectedTheme: order?.selectedTheme || "rose",
+        inviteCode: customer.inviteCode,
+        groomFamily: customer.groomFamily || null,
+        brideFamily: customer.brideFamily || null,
+        eventSchedule: customer.eventSchedule || [],
+        storyMilestones: customer.storyMilestones || [],
       },
     });
   } catch (error) {

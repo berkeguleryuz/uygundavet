@@ -1,7 +1,7 @@
 import mongoose, { Schema, type Document, type Model } from "mongoose";
 
 export type RsvpStatus = "confirmed" | "declined" | "pending" | "guest";
-export type GuestSource = "whatsapp" | "manual" | "qr-code";
+export type GuestSource = "whatsapp" | "manual" | "qr-code" | "website";
 
 export interface IGuest extends Document {
   userId: string;
@@ -31,7 +31,7 @@ const GuestSchema = new Schema<IGuest>(
     note: { type: String, trim: true, default: "" },
     source: {
       type: String,
-      enum: ["whatsapp", "manual", "qr-code"],
+      enum: ["whatsapp", "manual", "qr-code", "website"],
       default: "manual",
     },
   },

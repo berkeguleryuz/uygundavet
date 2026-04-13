@@ -48,6 +48,27 @@ const updateCustomerSchema = z.object({
       }),
     })
     .optional(),
+  eventSchedule: z
+    .array(
+      z.object({
+        time: z.string().max(10),
+        label: z.string().max(200),
+      })
+    )
+    .max(10)
+    .optional(),
+  storyMilestones: z
+    .array(
+      z.object({
+        date: z.string().max(100),
+        title: z.string().max(200),
+        description: z.string().max(2000),
+        imageUrl: z.string().max(500).default(""),
+        imagePublicId: z.string().max(500).default(""),
+      })
+    )
+    .max(10)
+    .optional(),
 });
 
 export async function GET() {
