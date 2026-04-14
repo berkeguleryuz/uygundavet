@@ -105,7 +105,6 @@ export function RsvpForm() {
 
   return (
     <div className="w-full max-w-lg mx-auto">
-      {/* Page header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -172,7 +171,6 @@ export function RsvpForm() {
             onSubmit={handleSubmit}
             className="bg-[#241710] rounded-2xl border border-[#e8a87c]/10 p-6 md:p-8 space-y-6"
           >
-            {/* Name */}
             <div className="space-y-2">
               <label className="font-sans text-xs uppercase tracking-wider text-[#8a7565]">
                 {t("rsvpNamePlaceholder")} *
@@ -187,7 +185,6 @@ export function RsvpForm() {
               />
             </div>
 
-            {/* Phone */}
             <div className="space-y-2">
               <label className="font-sans text-xs uppercase tracking-wider text-[#8a7565]">
                 {t("rsvpPhonePlaceholder")}
@@ -201,7 +198,6 @@ export function RsvpForm() {
               />
             </div>
 
-            {/* RSVP Toggle */}
             <div className="space-y-2">
               <label className="font-sans text-xs uppercase tracking-wider text-[#8a7565]">
                 {t("rsvpAttendanceLabel")}
@@ -234,7 +230,6 @@ export function RsvpForm() {
               </div>
             </div>
 
-            {/* Additional Guests */}
             <AnimatePresence>
               {rsvpStatus === "confirmed" && (
                 <motion.div
@@ -289,7 +284,6 @@ export function RsvpForm() {
               )}
             </AnimatePresence>
 
-            {/* Note */}
             <div className="space-y-2">
               <label className="font-sans text-xs uppercase tracking-wider text-[#8a7565]">
                 {t("rsvpNotePlaceholder")}
@@ -303,7 +297,6 @@ export function RsvpForm() {
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isSubmitting}

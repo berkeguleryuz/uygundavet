@@ -30,7 +30,6 @@ function useIsMounted() {
 function CountdownCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      {/* Gradient border wrapper (1px padding trick) */}
       <div className="bg-gradient-to-br from-[#d4735e]/30 to-[#f0c27f]/10 rounded-2xl p-px">
         <div className="bg-[#241710] rounded-2xl px-5 py-6 sm:px-7 sm:py-8 md:px-8 md:py-10 min-w-[70px] sm:min-w-[90px] md:min-w-[110px] flex flex-col items-center">
           <span className="font-merienda text-4xl sm:text-5xl md:text-5xl text-[#faf0e6] tabular-nums leading-none">
@@ -69,7 +68,6 @@ export function SectionCountdown() {
   return (
     <section className="relative py-20 md:py-28 bg-[#1a0f0a] overflow-hidden">
       <div className="relative z-10 max-w-4xl mx-auto px-6">
-        {/* Label */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,7 +83,6 @@ export function SectionCountdown() {
           </h2>
         </motion.div>
 
-        {/* Countdown cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -141,7 +138,6 @@ export function SectionCountdown() {
           )}
         </motion.div>
 
-        {/* Hashtag */}
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

@@ -31,9 +31,6 @@ interface HeroProps {
   venueName: string;
 }
 
-// ═══════════════════════════════════════════════════
-// A: Fullscreen Video — Light Overlay, Dark Text
-// ═══════════════════════════════════════════════════
 function HeroA({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) {
   return (
     <section className="relative h-svh flex flex-col items-center justify-center overflow-hidden">
@@ -68,10 +65,6 @@ function HeroA({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// B: Layered Depth — Video bg + floating photo + overlapping text
-// Katmanlı derinlik: video arka plan, üzerine binen fotoğraf, metin overlapping
-// ═══════════════════════════════════════════════════
 function HeroB({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) {
   const photoRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -93,10 +86,8 @@ function HeroB({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
 
   return (
     <section className="relative h-svh overflow-hidden bg-[#eee9e2]">
-      {/* Layer 1: Muted video bg */}
       <video autoPlay muted loop playsInline preload="auto" className="absolute inset-0 w-full h-full object-cover opacity-20" src="/crystal/kelebek.mp4" />
 
-      {/* Layer 2: Floating photo — offset, rotated, with shadow */}
       <motion.div
         ref={photoRef}
         initial={{ opacity: 0, y: 60, rotate: 3 }}
@@ -109,7 +100,6 @@ function HeroB({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
         </div>
       </motion.div>
 
-      {/* Layer 3: Text overlapping the photo — bottom-left */}
       <div ref={textRef} className="absolute bottom-[8%] md:bottom-[12%] left-[5%] md:left-[8%] z-20 will-change-transform">
         <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}>
           <p className="font-chakra text-[10px] tracking-[0.5em] uppercase text-[#b49a7c] mb-4">{t("heroTagline")}</p>
@@ -130,7 +120,6 @@ function HeroB({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
         </motion.div>
       </div>
 
-      {/* Grain texture overlay */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-30" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
@@ -138,10 +127,6 @@ function HeroB({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// C: Cinematic Reveal — Video behind text mask + parallax layers
-// Video arka planda, dev isimler mix-blend ile iç içe, GSAP parallax
-// ═══════════════════════════════════════════════════
 function HeroC({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) {
   const containerRef = useRef<HTMLElement>(null);
 
@@ -158,14 +143,11 @@ function HeroC({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
 
   return (
     <section ref={containerRef} className="relative h-svh overflow-hidden bg-[#1a1a2e]">
-      {/* Video — full bleed */}
       <video data-parallax autoPlay muted loop playsInline preload="auto" className="absolute inset-0 w-full h-full object-cover opacity-60 will-change-transform" src="/crystal/yuzuk.mp4" />
 
-      {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/40 via-transparent to-[#1a1a2e]/70" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a2e]/30 via-transparent to-[#1a1a2e]/30" />
 
-      {/* Giant couple names — mix-blend for see-through effect */}
       <div data-parallax className="absolute inset-0 flex items-center justify-center will-change-transform">
         <motion.div initial={{ opacity: 0, scale: 1.1 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="text-center px-4">
@@ -178,7 +160,6 @@ function HeroC({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
         </motion.div>
       </div>
 
-      {/* Info bar at bottom */}
       <motion.div data-parallax initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.7 }}
         className="absolute bottom-0 left-0 right-0 z-20 will-change-transform">
         <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-6 bg-gradient-to-t from-[#1a1a2e] to-transparent">
@@ -194,31 +175,23 @@ function HeroC({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// D: Stacked Cards — 3 overlapping media cards + text interleaved
-// 3 medya kartı üst üste biniyor, metin aralarına giriyor
-// ═══════════════════════════════════════════════════
 function HeroD({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) {
   return (
     <section className="relative min-h-svh bg-[#f6f3ee] flex items-center justify-center overflow-hidden py-20 px-6">
       <div className="relative w-full max-w-5xl mx-auto">
-        {/* Card stack — 3 overlapping cards */}
         <div className="relative h-[500px] md:h-[600px]">
-          {/* Back card — photo, tilted */}
           <motion.div initial={{ opacity: 0, rotate: -6, y: 40 }} animate={{ opacity: 1, rotate: -4, y: 0 }}
             transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="absolute top-4 left-4 md:top-8 md:left-[15%] w-[70%] md:w-[45%] h-[85%] rounded-2xl overflow-hidden shadow-xl border-4 border-white will-change-transform">
             <Image src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=85" alt="" fill className="object-cover" sizes="45vw" />
           </motion.div>
 
-          {/* Middle card — video, slightly tilted opposite */}
           <motion.div initial={{ opacity: 0, rotate: 4, y: 60 }} animate={{ opacity: 1, rotate: 2, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="absolute top-8 right-4 md:top-4 md:right-[10%] w-[75%] md:w-[50%] h-[90%] rounded-2xl overflow-hidden shadow-2xl border-4 border-white z-10 will-change-transform">
             <video autoPlay muted loop playsInline preload="auto" className="absolute inset-0 w-full h-full object-cover" src="/crystal/yuzuk.mp4" />
           </motion.div>
 
-          {/* Front card — small accent photo */}
           <motion.div initial={{ opacity: 0, y: 80 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="absolute bottom-0 left-[5%] md:left-[5%] w-[40%] md:w-[25%] aspect-square rounded-xl overflow-hidden shadow-lg border-4 border-white z-20">
@@ -226,7 +199,6 @@ function HeroD({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
           </motion.div>
         </div>
 
-        {/* Text — overlapping the cards from below */}
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }}
           className="relative z-30 -mt-24 md:-mt-16 text-center md:text-right md:pr-8">
           <p className="font-chakra text-[10px] tracking-[0.5em] uppercase text-[#b49a7c] mb-3">{t("heroTagline")}</p>
@@ -244,25 +216,18 @@ function HeroD({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// E: Immersive Scroll — Fixed video + content scrolls over it
-// Video sabit kalır, içerik üzerinden kayar
-// ═══════════════════════════════════════════════════
 function HeroE({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) {
   return (
     <section className="relative h-svh overflow-hidden">
-      {/* Fixed video */}
       <div className="absolute inset-0">
         <video autoPlay muted loop playsInline preload="auto" className="w-full h-full object-cover" src="/crystal/yuzuk.mp4" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f6f3ee]/30 to-[#f6f3ee]" />
       </div>
 
-      {/* Content — bottom-aligned with frosted glass */}
       <div className="absolute inset-x-0 bottom-0 z-10">
         <div className="bg-[#f6f3ee]/80 backdrop-blur-md border-t border-[#1a1a2e]/[0.06]">
           <div className="max-w-5xl mx-auto px-8 md:px-16 py-10 md:py-14">
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-              {/* Left — names */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }}>
                 <p className="font-chakra text-[10px] tracking-[0.5em] uppercase text-[#b49a7c] mb-3">{t("heroTagline")}</p>
                 <h1 className="font-merienda text-5xl md:text-6xl lg:text-7xl text-[#1a1a2e] leading-[0.92]">
@@ -270,7 +235,6 @@ function HeroE({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
                 </h1>
               </motion.div>
 
-              {/* Right — date + CTA */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }}
                 className="flex flex-col items-start md:items-end gap-3">
                 <p className="font-sans text-sm text-[#6d6a75] tracking-wider">{formattedDate}</p>
@@ -285,9 +249,6 @@ function HeroE({ brideFirst, groomFirst, formattedDate, venueName }: HeroProps) 
   );
 }
 
-// ═══════════════════════════════════════════════════
-// TAB SWITCHER
-// ═══════════════════════════════════════════════════
 const variants = [
   { key: "A", label: "Video Light", component: HeroA },
   { key: "B", label: "Katmanlı Derinlik", component: HeroB },

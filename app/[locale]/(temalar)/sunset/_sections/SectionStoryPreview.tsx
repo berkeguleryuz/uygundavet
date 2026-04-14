@@ -59,9 +59,7 @@ export function SectionStoryPreview() {
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Text content */}
           <div className="order-2 lg:order-1">
-            {/* Label */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -75,7 +73,6 @@ export function SectionStoryPreview() {
               <div className="h-px flex-1 bg-[#e8a87c]/15" />
             </motion.div>
 
-            {/* Heading */}
             <motion.h2
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +83,6 @@ export function SectionStoryPreview() {
               {brideFirst} & {groomFirst}
             </motion.h2>
 
-            {/* Description */}
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -97,7 +93,6 @@ export function SectionStoryPreview() {
               {t("storyText")}
             </motion.p>
 
-            {/* CTA */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -117,9 +112,7 @@ export function SectionStoryPreview() {
             </motion.div>
           </div>
 
-          {/* Right: Overlapping photos */}
           <div className="order-1 lg:order-2 relative h-[400px] md:h-[500px]">
-            {/* Photo 1 — larger, back */}
             <motion.div
               ref={photo1Ref}
               initial={{ opacity: 0, y: 40, rotate: 3 }}
@@ -139,11 +132,9 @@ export function SectionStoryPreview() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 75vw, 35vw"
               />
-              {/* Warm overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a]/30 to-[#d4735e]/10 mix-blend-multiply" />
             </motion.div>
 
-            {/* Photo 2 — smaller, overlapping, front */}
             <motion.div
               ref={photo2Ref}
               initial={{ opacity: 0, y: 60 }}
@@ -163,11 +154,9 @@ export function SectionStoryPreview() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 55vw, 25vw"
               />
-              {/* Warm overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#f0c27f]/10 to-[#1a0f0a]/20 mix-blend-multiply" />
             </motion.div>
 
-            {/* Decorative gradient circle */}
             <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-gradient-to-br from-[#d4735e]/10 to-transparent blur-2xl pointer-events-none" />
           </div>
         </div>

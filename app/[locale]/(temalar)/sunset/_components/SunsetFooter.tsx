@@ -33,11 +33,9 @@ export function SunsetFooter() {
 
   return (
     <footer>
-      {/* Top section — couple name + date */}
       <div className="bg-[#241710]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-16">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-12">
-            {/* Left: Couple name + date */}
             <div>
               <h3 className="font-merienda text-3xl text-[#e8a87c]">
                 {brideFirst} & {groomFirst}
@@ -52,9 +50,7 @@ export function SunsetFooter() {
               )}
             </div>
 
-            {/* Right: Nav columns */}
             <div className="flex gap-16">
-              {/* Pages column */}
               <div>
                 <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#8a7565] mb-4">
                   Sayfalar
@@ -73,7 +69,6 @@ export function SunsetFooter() {
                 </ul>
               </div>
 
-              {/* Contact column */}
               <div>
                 <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#8a7565] mb-4">
                   {t("contactLabel")}
@@ -104,7 +99,6 @@ export function SunsetFooter() {
         </div>
       </div>
 
-      {/* CTA Card */}
       <div className="bg-[#241710]">
         <div className="max-w-5xl mx-auto px-6 md:px-12">
           <div className="bg-gradient-to-r from-[#d4735e]/10 to-[#e8a87c]/10 border border-[#e8a87c]/10 rounded-2xl p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -129,18 +123,15 @@ export function SunsetFooter() {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="bg-[#241710]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 pt-8">
           <div className="border-t border-[#e8a87c]/[0.06]" />
         </div>
       </div>
 
-      {/* Bottom section */}
       <div className="bg-[#241710]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Left: Created with */}
             <div className="flex items-center gap-2">
               <Logo className="w-3.5 h-3.5 opacity-40" />
               <p className="font-sans text-[11px] text-[#8a7565]">
@@ -148,7 +139,6 @@ export function SunsetFooter() {
               </p>
             </div>
 
-            {/* Right: Privacy */}
             <Link
               href="https://uygundavet.com/privacy"
               target="_blank"

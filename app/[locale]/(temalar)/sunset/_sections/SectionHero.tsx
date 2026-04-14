@@ -18,21 +18,6 @@ function formatWeddingDate(dateStr: string): string {
   return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}, ${TR_DAYS[d.getDay()]}`;
 }
 
-/*
- Bento grid — 8 items, 3 columns, 4 rows
- Item 3 (index 2) = VIDEO — sits at row 2-4, col 2 (center, tall)
- This is the item that fills the screen when Flip expands
-
- Grid areas (same as GSAP demo):
- 1: 1/1 → 3/2  (left, 2 rows)
- 2: 1/2 → 2/3  (top center)
- 3: 2/2 → 4/3  (center, 2 rows) ← VIDEO
- 4: 1/3 → 3/3  (right, 2 rows)
- 5: 3/1 → 3/2  (mid-left)
- 6: 3/3 → 5/4  (right, 2 rows)
- 7: 4/1 → 5/2  (bottom-left)
- 8: 4/2 → 5/3  (bottom-center)
-*/
 const bentoMedia = [
   { type: "image" as const, src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=85" },
   { type: "image" as const, src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=800&q=85" },
@@ -55,7 +40,6 @@ export function SectionHero() {
   const formattedDate = formatWeddingDate(wedding.weddingDate);
 
   useEffect(() => {
-    // Dynamic imports to avoid SSR issues with GSAP plugins
     const init = async () => {
       const gsapModule = await import("gsap");
       const gsap = gsapModule.default;
@@ -72,22 +56,18 @@ export function SectionHero() {
 
       const items = galleryEl.querySelectorAll(".bento-item");
 
-      // Remove final class (ensure starting state)
       galleryEl.classList.remove("bento-final");
 
       const ctx = gsap.context(() => {
-        // Temporarily add final class to capture expanded state
         galleryEl.classList.add("bento-final");
         const flipState = Flip.getState(items);
         galleryEl.classList.remove("bento-final");
 
-        // Create Flip animation
         const flip = Flip.to(flipState, {
           simple: true,
           ease: "expoScale(1, 5)",
         });
 
-        // Timeline with ScrollTrigger
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: galleryEl,
@@ -100,7 +80,6 @@ export function SectionHero() {
 
         tl.add(flip);
 
-        // Fade text out as gallery expands
         if (textEl) {
           tl.to(textEl, { opacity: 0, scale: 1.05, duration: 0.3 }, 0);
         }
@@ -125,7 +104,6 @@ export function SectionHero() {
   return (
     <>
       <div ref={wrapRef} className="gallery-wrap">
-        {/* Text overlay */}
         <div ref={textRef} className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }} className="text-center px-6">
             <p className="font-sans text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-[#e8a87c]/80 mb-4 md:mb-6 drop-shadow-md">{t("heroTagline")}</p>
@@ -152,10 +130,8 @@ export function SectionHero() {
           </motion.div>
         </div>
 
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-[#1a0f0a]/35 z-10 pointer-events-none" />
 
-        {/* Bento gallery — exact same structure as GSAP demo */}
         <div ref={galleryRef} className="bento-gallery">
           {bentoMedia.map((media, i) => (
             <div key={i} className="bento-item">
@@ -169,7 +145,6 @@ export function SectionHero() {
         </div>
       </div>
 
-      {/* Exact CSS from the GSAP demo */}
       <style jsx global>{`
         .gallery-wrap {
           position: relative;

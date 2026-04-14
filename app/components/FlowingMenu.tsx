@@ -7,6 +7,8 @@ interface FlowingMenuItem {
   link: string;
   text: string;
   image: string;
+  video?: boolean;
+  target?: "_blank" | "_self";
 }
 
 interface FlowingMenuProps {
@@ -23,6 +25,8 @@ function MenuItem({
   link,
   text,
   image,
+  video,
+  target,
   speed,
   textColor,
   marqueeBgColor,
@@ -146,6 +150,8 @@ function MenuItem({
       <a
         className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-[4vh]"
         href={link}
+        target={target || "_self"}
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{ color: textColor }}
@@ -167,10 +173,21 @@ function MenuItem({
               <span className="whitespace-nowrap uppercase font-normal text-[4vh] leading-[1] px-[1vw]">
                 {text}
               </span>
-              <div
-                className="w-[250px] h-[9vh] my-[2em] mx-[2vw] py-[1em] rounded-[50px] bg-cover bg-center"
-                style={{ backgroundImage: `url(${image})` }}
-              />
+              {video ? (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-[250px] h-[9vh] my-[2em] mx-[2vw] rounded-[50px] object-cover"
+                  src={image}
+                />
+              ) : (
+                <div
+                  className="w-[250px] h-[9vh] my-[2em] mx-[2vw] py-[1em] rounded-[50px] bg-cover bg-center"
+                  style={{ backgroundImage: `url(${image})` }}
+                />
+              )}
             </div>
           ))}
         </div>

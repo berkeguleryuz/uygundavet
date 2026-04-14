@@ -43,7 +43,6 @@ export function MemoryForm() {
         (data.memories || []).map((m: Memory) => ({ ...m, pending: false }))
       );
     } catch {
-      // silently fail
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +107,6 @@ export function MemoryForm() {
 
   return (
     <div className="space-y-10">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -126,7 +124,6 @@ export function MemoryForm() {
         </p>
       </motion.div>
 
-      {/* Form Section */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -154,7 +151,6 @@ export function MemoryForm() {
               className={cn(inputClass, "h-auto py-3 resize-none")}
             />
 
-            {/* Approval notice */}
             <div className="bg-[#e8a87c]/5 border border-[#e8a87c]/10 rounded-xl px-4 py-3">
               <p className="font-sans text-xs text-[#e8a87c] leading-relaxed">
                 {t("memoryApprovalNotice")}
@@ -182,7 +178,6 @@ export function MemoryForm() {
         </div>
       </motion.div>
 
-      {/* Memories List — 2-column grid for cards */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="w-6 h-6 border-2 border-[#e8a87c]/30 border-t-[#e8a87c] rounded-full animate-spin" />

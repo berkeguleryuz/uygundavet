@@ -18,9 +18,7 @@ export function ArrowRightIcon({ className, size = 24 }: ArrowRightIconProps) {
       strokeLinejoin="round"
       className={className}
     >
-      {/* Line */}
       <line x1="4" y1="12" x2="20" y2="12" />
-      {/* Chevron tip */}
       <polyline points="14 6 20 12 14 18" />
     </svg>
   );

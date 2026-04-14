@@ -17,7 +17,6 @@ export default function IletisimPage() {
   return (
     <div className="min-h-svh pt-24 pb-12 px-4 sm:px-6">
       <div className="max-w-xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -58,7 +57,6 @@ export default function IletisimPage() {
 
             <div className="h-px bg-[#e8a87c]/[0.06]" />
 
-            {/* CTA */}
             <Link
               href={`${BASE}/lcv`}
               className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white font-sans font-semibold text-sm hover:opacity-90 transition-opacity"

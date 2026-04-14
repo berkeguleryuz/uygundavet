@@ -276,6 +276,7 @@
     "namePlaceholder": "Name",
     "date": "Hochzeitsdatum",
     "time": "Hochzeitsbeginn",
+    "infoEditable": "Diese Angaben können Sie später ändern. Alle Details verwalten Sie im Einstellungsmenü.",
     "selectPackage": "Paket Wählen",
     "selectTheme": "Thema Wählen",
     "customTheme": "Eigenes Thema",

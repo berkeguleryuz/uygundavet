@@ -44,13 +44,11 @@ export function MemoryCard({
       animate={{ opacity: 1, y: 0 }}
       className="py-5 border-b border-[#1a1a2e]/[0.06] relative"
     >
-      {/* Decorative quote icon */}
       <div className="absolute top-5 right-0 text-[#1a1a2e]/[0.03]">
         <QuoteIcon className="size-8" size={32} />
       </div>
 
       <div className="flex items-start justify-between gap-3 mb-3">
-        {/* Avatar circle + author name */}
         <div className="flex items-center gap-3">
           <div className="size-8 rounded-full bg-[#b49a7c]/10 flex items-center justify-center shrink-0">
             <span className="font-merienda text-xs text-[#b49a7c]">
@@ -68,7 +66,6 @@ export function MemoryCard({
         )}
       </div>
 
-      {/* Message in italic (quotes feel) */}
       <p className="font-sans text-sm text-[#6d6a75] italic leading-[1.8] pl-11">
         &ldquo;{message}&rdquo;
       </p>

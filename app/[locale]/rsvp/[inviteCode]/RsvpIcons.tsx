@@ -9,7 +9,6 @@ export function AttendingIcon({ active }: { active: boolean }) {
       fill="none"
       className={`transition-transform duration-300 ${active ? "scale-110" : ""}`}
     >
-      {/* Circle */}
       <circle
         cx="14"
         cy="14"
@@ -19,7 +18,6 @@ export function AttendingIcon({ active }: { active: boolean }) {
         fill={active ? "#34d39915" : "none"}
         className="transition-all duration-300"
       />
-      {/* Checkmark */}
       <path
         d="M9 14.5L12.5 18L19 10"
         stroke={active ? "#34d399" : "#ffffff40"}
@@ -34,7 +32,6 @@ export function AttendingIcon({ active }: { active: boolean }) {
           transition: "stroke-dashoffset 0.4s ease, stroke 0.3s ease",
         }}
       />
-      {/* Sparkles when active */}
       {active && (
         <>
           <circle cx="6" cy="6" r="1.5" fill="#34d399" opacity="0.6">
@@ -63,7 +60,6 @@ export function DeclineIcon({ active }: { active: boolean }) {
       fill="none"
       className={`transition-transform duration-300 ${active ? "scale-110" : ""}`}
     >
-      {/* Circle */}
       <circle
         cx="14"
         cy="14"
@@ -73,8 +69,6 @@ export function DeclineIcon({ active }: { active: boolean }) {
         fill={active ? "#f8717115" : "none"}
         className="transition-all duration-300"
       />
-      {/* Sad face */}
-      {/* Eyes */}
       <circle
         cx="10.5"
         cy="12"
@@ -89,7 +83,6 @@ export function DeclineIcon({ active }: { active: boolean }) {
         fill={active ? "#f87171" : "#ffffff40"}
         className="transition-all duration-300"
       />
-      {/* Sad mouth */}
       <path
         d="M10 19C11 17 17 17 18 19"
         stroke={active ? "#f87171" : "#ffffff40"}
@@ -98,7 +91,6 @@ export function DeclineIcon({ active }: { active: boolean }) {
         fill="none"
         className="transition-all duration-300"
       />
-      {/* Wave hand when active */}
       {active && (
         <g transform="translate(21, 4)">
           <text
@@ -182,7 +174,6 @@ export function SuccessIcon() {
       >
         <animate attributeName="stroke-dashoffset" from="30" to="0" dur="0.6s" fill="freeze" />
       </path>
-      {/* Celebration particles */}
       {[0, 60, 120, 180, 240, 300].map((angle) => (
         <circle
           key={angle}

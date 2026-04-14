@@ -18,9 +18,7 @@ export function MapPinIcon({ className, size = 24 }: MapPinIconProps) {
       strokeLinejoin="round"
       className={className}
     >
-      {/* Pin body */}
       <path d="M12 2.5C8.13 2.5 5 5.63 5 9.5C5 14.28 12 21.5 12 21.5C12 21.5 19 14.28 19 9.5C19 5.63 15.87 2.5 12 2.5Z" />
-      {/* Inner circle */}
       <circle cx="12" cy="9.5" r="2.5" />
     </svg>
   );

@@ -68,7 +68,6 @@ export function SectionVenuePreview() {
       ref={sectionRef}
       className="relative min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden"
     >
-      {/* Full-bleed background image */}
       <div
         ref={imageRef}
         className="absolute inset-0 will-change-transform"
@@ -82,10 +81,8 @@ export function SectionVenuePreview() {
         />
       </div>
 
-      {/* Light overlay */}
       <div className="absolute inset-0 bg-[#f6f3ee]/60" />
 
-      {/* Floating info card */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -93,7 +90,6 @@ export function SectionVenuePreview() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="relative z-10 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-8 md:p-12 max-w-md mx-6 my-16"
       >
-        {/* Venue name */}
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -104,7 +100,6 @@ export function SectionVenuePreview() {
           {wedding.venueName || t("venueLabel")}
         </motion.h2>
 
-        {/* Info rows */}
         <div className="space-y-5">
           {wedding.venueAddress && (
             <div className="flex items-start gap-4">
@@ -153,10 +148,8 @@ export function SectionVenuePreview() {
           )}
         </div>
 
-        {/* Divider */}
         <div className="h-px bg-[#1a1a2e]/[0.06] my-7" />
 
-        {/* CTA link */}
         <div className="text-center">
           <Link
             href={`${BASE}/etkinlik`}

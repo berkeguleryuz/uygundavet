@@ -198,10 +198,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
       wizard.phone,
       wizard.owner1FirstName, wizard.owner1LastName,
       wizard.owner2FirstName, wizard.owner2LastName,
-      wizard.family1FatherFirstName, wizard.family1FatherLastName,
-      wizard.family1MotherFirstName, wizard.family1MotherLastName,
-      wizard.family2FatherFirstName, wizard.family2FatherLastName,
-      wizard.family2MotherFirstName, wizard.family2MotherLastName,
       wizard.weddingDate, wizard.weddingTime,
     ];
     if (!required.every((v) => v.trim().length > 0)) return false;
@@ -426,7 +422,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                 </div>
 
                 <div className="min-h-[300px]">
-                  {/* STEP 1: Auth */}
                   {currentStep === 1 && (
                     <div className="flex flex-col gap-4 max-w-sm pt-4">
                       {isLoggedIn ? (
@@ -572,7 +567,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                     </div>
                   )}
 
-                  {/* STEP 2: Wedding Details */}
                   {currentStep === 2 && (
                     <div className="space-y-6 pt-2">
                       <div>
@@ -586,46 +580,19 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                       </div>
 
                       <div className="border-t border-white/10 pt-6">
-                        <p className="text-sm font-medium text-white/70 font-sans mb-4">{t("familySection1")}</p>
-                        <p className="text-xs text-white/40 font-sans mb-3">{t("fatherLabel")}</p>
-                        <div className="grid gap-4 md:grid-cols-2 mb-4">
-                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family1FatherFirstName} onChange={(v) => wizard.setField("family1FatherFirstName", v)} />
-                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family1FatherLastName} onChange={(v) => wizard.setField("family1FatherLastName", v)} />
-                        </div>
-                        <p className="text-xs text-white/40 font-sans mb-3">{t("motherLabel")}</p>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family1MotherFirstName} onChange={(v) => wizard.setField("family1MotherFirstName", v)} />
-                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family1MotherLastName} onChange={(v) => wizard.setField("family1MotherLastName", v)} />
-                        </div>
-                      </div>
-
-                      <div className="border-t border-white/10 pt-6">
-                        <p className="text-sm font-medium text-white/70 font-sans mb-4">{t("familySection2")}</p>
-                        <p className="text-xs text-white/40 font-sans mb-3">{t("fatherLabel")}</p>
-                        <div className="grid gap-4 md:grid-cols-2 mb-4">
-                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family2FatherFirstName} onChange={(v) => wizard.setField("family2FatherFirstName", v)} />
-                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family2FatherLastName} onChange={(v) => wizard.setField("family2FatherLastName", v)} />
-                        </div>
-                        <p className="text-xs text-white/40 font-sans mb-3">{t("motherLabel")}</p>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <WizardInput label={t("firstNamePlaceholder")} placeholder={t("firstNamePlaceholder")} value={wizard.family2MotherFirstName} onChange={(v) => wizard.setField("family2MotherFirstName", v)} />
-                          <WizardInput label={t("lastNamePlaceholder")} placeholder={t("lastNamePlaceholder")} value={wizard.family2MotherLastName} onChange={(v) => wizard.setField("family2MotherLastName", v)} />
-                        </div>
-                      </div>
-
-                      <div className="border-t border-white/10 pt-6">
                         <div className="grid gap-6 md:grid-cols-2">
                           <WizardInput label={t("date")} placeholder="" type="date" value={wizard.weddingDate} onChange={(v) => wizard.setField("weddingDate", v)} />
                           <WizardInput label={t("time")} placeholder="" type="time" value={wizard.weddingTime} onChange={(v) => wizard.setField("weddingTime", v)} />
                         </div>
+                        <p className="text-xs text-white/40 font-sans mt-4 text-center leading-relaxed">
+                          {t("infoEditable")}
+                        </p>
                       </div>
                     </div>
                   )}
 
-                  {/* STEP 3: Package + Theme + Payment */}
                   {currentStep === 3 && (
                     <div className="space-y-10">
-                      {/* Package Selection */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <Package className="w-4 h-4 text-[#d5d1ad]" />
@@ -646,7 +613,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         </div>
                       </div>
 
-                      {/* Theme Selection */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <Palette className="w-4 h-4 text-[#d5d1ad]" />
@@ -719,7 +685,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         )}
                       </div>
 
-                      {/* Payment Method */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <CreditCard className="w-4 h-4 text-[#d5d1ad]" />
@@ -761,7 +726,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         </div>
                       </div>
 
-                      {/* Complete Button */}
                       <button
                         onClick={handleComplete}
                         disabled={submitting}

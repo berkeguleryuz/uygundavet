@@ -18,9 +18,7 @@ export function RingsIcon({ className, size = 24 }: RingsIconProps) {
       strokeLinejoin="round"
       className={className}
     >
-      {/* First ring (left) */}
       <circle cx="9" cy="12" r="5.5" />
-      {/* Second ring (right) */}
       <circle cx="15" cy="12" r="5.5" />
     </svg>
   );

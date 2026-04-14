@@ -66,7 +66,6 @@ export function CrystalNav() {
           : "bg-transparent"
       )}
     >
-      {/* Left: Couple initials */}
       <Link
         href={BASE}
         className="shrink-0 font-merienda text-lg text-[#1a1a2e] hover:opacity-70 transition-opacity"
@@ -74,7 +73,6 @@ export function CrystalNav() {
         {brideFirst[0]} & {groomFirst[0]}
       </Link>
 
-      {/* Center: Nav links separated by dots — desktop only */}
       <div className="hidden md:flex items-center justify-center flex-1 gap-1">
         {navItems.map((item, idx) => (
           <div key={item.label} className="flex items-center gap-1">
@@ -96,7 +94,6 @@ export function CrystalNav() {
         ))}
       </div>
 
-      {/* Right: LCV pill + mobile hamburger */}
       <div className="flex items-center gap-3 ml-auto">
         <Link
           href={`${BASE}/lcv`}
@@ -123,7 +120,6 @@ export function CrystalNav() {
         </button>
       </div>
 
-      {/* Mobile slide-down panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

@@ -1,20 +1,27 @@
 export const THEME_OPTIONS = [
   {
-    key: "rose" as const,
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
-  },
-  {
-    key: "sunset" as const,
-    image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
+    key: "grow" as const,
+    image: "/temalar/grow.jpg",
   },
   {
     key: "pearl" as const,
-    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80",
+    image: "/temalar/pearl.mp4",
+    video: true,
+  },
+  {
+    key: "rose" as const,
+    image: "/temalar/rose.mp4",
+    video: true,
+  },
+  {
+    key: "sunset" as const,
+    image: "/temalar/sunset.mp4",
+    video: true,
   },
   {
     key: "crystal" as const,
-    image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
+    image: "/temalar/crystal.png",
   },
 ] as const;
 
-export type ThemeKey = "rose" | "sunset" | "pearl" | "crystal" | "custom";
+export type ThemeKey = "grow" | "pearl" | "rose" | "sunset" | "crystal" | "custom";

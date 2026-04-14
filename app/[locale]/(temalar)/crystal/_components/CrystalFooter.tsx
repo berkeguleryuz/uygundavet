@@ -33,11 +33,9 @@ export function CrystalFooter() {
 
   return (
     <footer>
-      {/* Top section — two columns */}
       <div className="bg-[#eee9e2]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-16">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-12">
-            {/* Left: Couple name + date */}
             <div>
               <h3 className="font-merienda text-3xl text-[#1a1a2e]">
                 {brideFirst} & {groomFirst}
@@ -52,9 +50,7 @@ export function CrystalFooter() {
               )}
             </div>
 
-            {/* Right: Nav columns */}
             <div className="flex gap-16">
-              {/* Pages column */}
               <div>
                 <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#a09ba6] mb-4">
                   Sayfalar
@@ -73,7 +69,6 @@ export function CrystalFooter() {
                 </ul>
               </div>
 
-              {/* Contact column */}
               <div>
                 <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#a09ba6] mb-4">
                   {t("contactLabel")}
@@ -104,18 +99,15 @@ export function CrystalFooter() {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="bg-[#eee9e2]">
         <div className="max-w-5xl mx-auto px-6 md:px-12">
           <div className="border-t border-[#1a1a2e]/[0.06]" />
         </div>
       </div>
 
-      {/* Bottom section */}
       <div className="bg-[#eee9e2]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Left: Created with */}
             <div className="flex items-center gap-2">
               <Logo className="w-3.5 h-3.5 opacity-40" />
               <p className="font-sans text-[11px] text-[#a09ba6]">
@@ -123,7 +115,6 @@ export function CrystalFooter() {
               </p>
             </div>
 
-            {/* Center: CTA text link */}
             <Link
               href="https://uygundavet.com"
               target="_blank"
@@ -134,7 +125,6 @@ export function CrystalFooter() {
               <ArrowRightIcon className="size-3 group-hover:translate-x-0.5 transition-transform" size={12} />
             </Link>
 
-            {/* Right: Privacy */}
             <Link
               href="https://uygundavet.com/privacy"
               target="_blank"

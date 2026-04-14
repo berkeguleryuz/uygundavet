@@ -55,7 +55,6 @@ export function SunsetNav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[60] px-4 md:px-6 pt-4">
-      {/* Pill container */}
       <div
         className={cn(
           "max-w-6xl mx-auto flex items-center justify-between rounded-lg px-4 md:px-6 h-12 transition-all duration-300",
@@ -64,7 +63,6 @@ export function SunsetNav() {
             : "bg-[#1a0f0a]/40 backdrop-blur-sm border border-white/[0.06]"
         )}
       >
-        {/* Left: Couple initials */}
         <Link
           href={BASE}
           className="shrink-0 flex items-center gap-2 font-merienda text-sm text-[#e8a87c] hover:opacity-70 transition-opacity"
@@ -73,7 +71,6 @@ export function SunsetNav() {
           {brideFirst} & {groomFirst}
         </Link>
 
-        {/* Center: Nav links — desktop only */}
         <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
             <Link
@@ -91,7 +88,6 @@ export function SunsetNav() {
           ))}
         </div>
 
-        {/* Right: LCV pill + login + mobile hamburger */}
         <div className="flex items-center gap-2">
           <Link
             href={`${BASE}/lcv`}
@@ -118,7 +114,6 @@ export function SunsetNav() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
       <AnimatePresence>
         {isOpen && (
           <motion.div

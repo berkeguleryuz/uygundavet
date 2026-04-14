@@ -4,12 +4,21 @@ import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { useTranslations } from "next-intl";
 import { PricingCard } from "@/app/components/PricingCard";
+import { useWizardStore } from "@/store/wizard-store";
+import type { PackageKey } from "@/lib/packages";
 
 export function SectionPricing() {
   const t = useTranslations("Pricing");
+  const wizard = useWizardStore();
+
+  const handleSelect = (key: PackageKey) => {
+    wizard.setPackage(key);
+    document.getElementById("wizard")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const packages = [
     {
+      key: "starter" as PackageKey,
       name: t("starter.name"),
       price: t("starter.price"),
       desc: t("starter.desc"),
@@ -18,6 +27,7 @@ export function SectionPricing() {
       highlighted: false,
     },
     {
+      key: "pro" as PackageKey,
       name: t("pro.name"),
       price: t("pro.price"),
       desc: t("pro.desc"),
@@ -27,6 +37,7 @@ export function SectionPricing() {
       highlighted: true,
     },
     {
+      key: "business" as PackageKey,
       name: t("business.name"),
       price: t("business.price"),
       desc: t("business.desc"),
@@ -57,13 +68,13 @@ export function SectionPricing() {
         </motion.h2>
 
         <div className="grid md:grid-cols-3 gap-8 items-stretch">
-          {packages.map((pkg, i) => (
+          {packages.map(({ key, ...rest }, i) => (
             <motion.div
-              key={pkg.name}
+              key={key}
               {...fadeUp(0.3 + i * 0.15)}
-              className={pkg.highlighted ? "scale-[1.03] md:scale-105" : ""}
+              className={rest.highlighted ? "scale-[1.03] md:scale-105" : ""}
             >
-              <PricingCard {...pkg} />
+              <PricingCard {...rest} onSelect={() => handleSelect(key)} />
             </motion.div>
           ))}
         </div>

@@ -39,7 +39,6 @@ export function GalleryGrid() {
       const data = await res.json();
       setPhotos(data.photos || []);
     } catch {
-      // silently fail
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +113,6 @@ export function GalleryGrid() {
 
   return (
     <div className="space-y-8">
-      {/* Left-aligned page header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -129,7 +127,6 @@ export function GalleryGrid() {
         </h1>
       </motion.div>
 
-      {/* Compact inline upload bar */}
       {wedding.hasGallery && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -193,7 +190,6 @@ export function GalleryGrid() {
         </motion.div>
       )}
 
-      {/* Photo Grid — tight gap, sharp edges (editorial magazine style) */}
       {photos.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-1.5">
           {photos.map((photo, index) => (
@@ -212,7 +208,6 @@ export function GalleryGrid() {
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1536px) 16vw, 12vw"
               />
-              {/* Uploader name always visible at bottom */}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent pt-6 pb-2 px-2.5">
                 <p className="font-sans text-[10px] text-white/90 truncate">
                   {photo.uploader}
@@ -241,7 +236,6 @@ export function GalleryGrid() {
         </motion.div>
       )}
 
-      {/* Lightbox — deep ink bg */}
       <AnimatePresence>
         {selectedPhoto && (
           <motion.div

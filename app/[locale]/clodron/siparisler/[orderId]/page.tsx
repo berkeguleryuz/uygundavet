@@ -141,7 +141,6 @@ export default function OrderDetailPage() {
         Sipariş Detayı
       </h2>
 
-      {/* Status Progress */}
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <CreditCard className="w-4 h-4 text-white/50" />
@@ -197,7 +196,6 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      {/* Order Info */}
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
           <div className="flex items-center gap-2 mb-2">
@@ -254,7 +252,6 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      {/* Cleanup & Guest Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {cleanupInfo && (
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
@@ -294,10 +291,8 @@ export default function OrderDetailPage() {
         </div>
       </div>
 
-      {/* Customer Info */}
       {customer && (
         <div className="grid md:grid-cols-2 gap-4">
-          {/* Bride & Groom + Venue + Date */}
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Heart className="w-4 h-4 text-white/50" />
@@ -337,9 +332,7 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Family + Schedule + Milestones */}
           <div className="space-y-4">
-            {/* Family */}
             {(customer.brideFamily || customer.groomFamily) && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -361,7 +354,6 @@ export default function OrderDetailPage() {
               </div>
             )}
 
-            {/* Event Schedule */}
             {customer.eventSchedule && customer.eventSchedule.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -377,7 +369,6 @@ export default function OrderDetailPage() {
               </div>
             )}
 
-            {/* Story Milestones */}
             {customer.storyMilestones && customer.storyMilestones.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -414,7 +405,6 @@ export default function OrderDetailPage() {
         </div>
       )}
 
-      {/* Admin Notes */}
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
         <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70 mb-3">Admin Notları</h3>
         <textarea

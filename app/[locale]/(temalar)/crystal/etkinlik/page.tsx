@@ -21,7 +21,6 @@ export default function EtkinlikPage() {
 
   return (
     <div className="min-h-svh">
-      {/* Full-bleed image header */}
       <div className="relative h-[50vh] min-h-[320px] overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1400&q=80"
@@ -33,7 +32,6 @@ export default function EtkinlikPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#f6f3ee] via-[#1a1a2e]/40 to-transparent" />
 
-        {/* Overlay text */}
         <div className="absolute bottom-8 left-6 md:left-12 z-10">
           <div className="w-12 h-px bg-[#d4c4b0] mb-4" />
           <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/70 mb-2">
@@ -46,7 +44,6 @@ export default function EtkinlikPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 md:px-12 -mt-12 relative z-10 pb-16">
-        {/* Floating white venue card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -93,7 +90,6 @@ export default function EtkinlikPage() {
               )}
             </div>
 
-            {/* Google Maps */}
             {(wedding.venueAddress || wedding.venueName) ? (
               <div className="mt-6 rounded-xl overflow-hidden aspect-[16/9]">
                 <iframe
@@ -120,7 +116,6 @@ export default function EtkinlikPage() {
           </div>
         </motion.div>
 
-        {/* Horizontal Event Schedule */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,7 +129,6 @@ export default function EtkinlikPage() {
           </div>
         </motion.div>
 
-        {/* Family Names */}
         {(wedding.groomFamily || wedding.brideFamily) && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}

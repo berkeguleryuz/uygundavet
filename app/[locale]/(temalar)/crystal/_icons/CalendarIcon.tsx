@@ -18,14 +18,10 @@ export function CalendarIcon({ className, size = 24 }: CalendarIconProps) {
       strokeLinejoin="round"
       className={className}
     >
-      {/* Calendar body - rounded rectangle */}
       <rect x="3" y="6" width="18" height="15" rx="2.5" />
-      {/* Pin lines */}
       <line x1="8" y1="3.5" x2="8" y2="7.5" />
       <line x1="16" y1="3.5" x2="16" y2="7.5" />
-      {/* Separator line */}
       <line x1="3" y1="11" x2="21" y2="11" />
-      {/* Date dots */}
       <circle cx="8" cy="15.5" r="0.8" fill="currentColor" stroke="none" />
       <circle cx="12" cy="15.5" r="0.8" fill="currentColor" stroke="none" />
       <circle cx="16" cy="15.5" r="0.8" fill="currentColor" stroke="none" />
