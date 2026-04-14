@@ -37,10 +37,10 @@ export function PricingCard({
           ? "border-white/25 z-10 bg-white/[0.08] backdrop-blur-md"
           : "liquid-glass border-white/10",
         selected && "ring-2 ring-[#d5d1ad] border-[#d5d1ad]/50",
-        onSelect && "cursor-pointer hover:border-white/30",
+        compact && onSelect && "cursor-pointer hover:border-white/30",
         compact && "px-5 py-5"
       )}
-      onClick={onSelect}
+      onClick={compact ? onSelect : undefined}
     >
       {badge && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-[#252224] text-xs font-semibold font-sans px-4 py-1.5 rounded-full tracking-wide uppercase">
@@ -77,8 +77,12 @@ export function PricingCard({
         ))}
       </ul>
 
-      {!onSelect && (
-        <MorphButton variant={highlighted ? "filled" : "outline"} className="w-full">
+      {!compact && (
+        <MorphButton
+          variant={highlighted ? "filled" : "outline"}
+          className="w-full"
+          onClick={onSelect ? (e: React.MouseEvent) => { e.stopPropagation(); onSelect(); } : undefined}
+        >
           {cta}
         </MorphButton>
       )}
