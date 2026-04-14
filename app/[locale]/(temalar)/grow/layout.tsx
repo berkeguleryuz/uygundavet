@@ -10,7 +10,7 @@ import { LavantaNav } from "./_components/LavantaNav";
 import { LavantaFooter } from "./_components/LavantaFooter";
 import type { WeddingData } from "./_lib/types";
 
-const INVITE_CODE = process.env.LAVANTA_INVITE_CODE || "";
+const INVITE_CODE = process.env.GROW_INVITE_CODE || process.env.LAVANTA_INVITE_CODE || "";
 
 async function getWeddingData(): Promise<WeddingData | null> {
   if (!INVITE_CODE) return null;

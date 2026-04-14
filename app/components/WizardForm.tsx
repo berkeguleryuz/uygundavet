@@ -325,14 +325,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
         owner1LastName: wizard.owner1LastName,
         owner2FirstName: wizard.owner2FirstName,
         owner2LastName: wizard.owner2LastName,
-        family1FatherFirstName: wizard.family1FatherFirstName,
-        family1FatherLastName: wizard.family1FatherLastName,
-        family1MotherFirstName: wizard.family1MotherFirstName,
-        family1MotherLastName: wizard.family1MotherLastName,
-        family2FatherFirstName: wizard.family2FatherFirstName,
-        family2FatherLastName: wizard.family2FatherLastName,
-        family2MotherFirstName: wizard.family2MotherFirstName,
-        family2MotherLastName: wizard.family2MotherLastName,
         weddingDate: wizard.weddingDate,
         weddingTime: wizard.weddingTime,
         selectedPackage: wizard.selectedPackage,
@@ -620,7 +612,7 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                             {t("selectTheme")}
                           </h3>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-6 gap-1">
                           {THEME_OPTIONS.map((theme) => (
                             <button
                               key={theme.key}
@@ -633,13 +625,24 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                                   : "border-white/10 hover:border-white/30"
                               )}
                             >
-                              <Image
-                                src={theme.image}
-                                alt={theme.key}
-                                fill
-                                sizes="150px"
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
+                              {"video" in theme && theme.video ? (
+                                <video
+                                  src={theme.image}
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <Image
+                                  src={theme.image}
+                                  alt={theme.key}
+                                  fill
+                                  sizes="150px"
+                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              )}
                               <div className="absolute inset-0 bg-black/30" />
                               <span className="absolute bottom-2 left-0 right-0 text-center text-xs font-chakra uppercase tracking-wider text-white">
                                 {theme.key}

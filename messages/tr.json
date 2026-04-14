@@ -619,5 +619,10 @@
     "scanMe": "Beni Tara",
     "downloadSticker": "Sticker İndir",
     "previewRsvpForm": "LCV Formunu Önizle"
+  },
+  "NotFound": {
+    "title": "Sayfa Bulunamadı",
+    "description": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
+    "backHome": "Ana Sayfaya Dön"
   }
 }

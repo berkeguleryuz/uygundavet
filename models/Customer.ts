@@ -45,16 +45,16 @@ export interface ICustomer extends Document {
 
 const PersonNameSchema = new Schema<PersonName>(
   {
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
+    firstName: { type: String, trim: true, default: "" },
+    lastName: { type: String, trim: true, default: "" },
   },
   { _id: false }
 );
 
 const FamilyInfoSchema = new Schema<FamilyInfo>(
   {
-    father: { type: PersonNameSchema, required: true },
-    mother: { type: PersonNameSchema, required: true },
+    father: { type: PersonNameSchema, default: () => ({ firstName: "", lastName: "" }) },
+    mother: { type: PersonNameSchema, default: () => ({ firstName: "", lastName: "" }) },
   },
   { _id: false }
 );
@@ -71,8 +71,8 @@ const CustomerSchema = new Schema<ICustomer>(
     invitationViews: { type: Number, default: 0 },
     groom: { type: PersonNameSchema, required: true },
     bride: { type: PersonNameSchema, required: true },
-    groomFamily: { type: FamilyInfoSchema, required: true },
-    brideFamily: { type: FamilyInfoSchema, required: true },
+    groomFamily: { type: FamilyInfoSchema, default: () => ({}) },
+    brideFamily: { type: FamilyInfoSchema, default: () => ({}) },
     eventSchedule: {
       type: [
         {

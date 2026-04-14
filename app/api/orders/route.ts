@@ -17,14 +17,6 @@ const orderSchema = z.object({
   owner1LastName: z.string().min(1),
   owner2FirstName: z.string().min(1),
   owner2LastName: z.string().min(1),
-  family1FatherFirstName: z.string().min(1),
-  family1FatherLastName: z.string().min(1),
-  family1MotherFirstName: z.string().min(1),
-  family1MotherLastName: z.string().min(1),
-  family2FatherFirstName: z.string().min(1),
-  family2FatherLastName: z.string().min(1),
-  family2MotherFirstName: z.string().min(1),
-  family2MotherLastName: z.string().min(1),
   weddingDate: z.string().min(1),
   weddingTime: z.string().min(1),
   selectedPackage: z.enum(["starter", "pro", "business"]),
@@ -65,14 +57,6 @@ export async function POST(req: NextRequest) {
       inviteCode: generateInviteCode(),
       groom: { firstName: data.owner1FirstName, lastName: data.owner1LastName },
       bride: { firstName: data.owner2FirstName, lastName: data.owner2LastName },
-      groomFamily: {
-        father: { firstName: data.family1FatherFirstName, lastName: data.family1FatherLastName },
-        mother: { firstName: data.family1MotherFirstName, lastName: data.family1MotherLastName },
-      },
-      brideFamily: {
-        father: { firstName: data.family2FatherFirstName, lastName: data.family2FatherLastName },
-        mother: { firstName: data.family2MotherFirstName, lastName: data.family2MotherLastName },
-      },
     });
 
     await Order.create({
@@ -100,14 +84,6 @@ export async function POST(req: NextRequest) {
       depositAmount,
       groomName: `${data.owner1FirstName} ${data.owner1LastName}`,
       brideName: `${data.owner2FirstName} ${data.owner2LastName}`,
-      groomFamily: {
-        fatherName: `${data.family1FatherFirstName} ${data.family1FatherLastName}`,
-        motherName: `${data.family1MotherFirstName} ${data.family1MotherLastName}`,
-      },
-      brideFamily: {
-        fatherName: `${data.family2FatherFirstName} ${data.family2FatherLastName}`,
-        motherName: `${data.family2MotherFirstName} ${data.family2MotherLastName}`,
-      },
       weddingDate: data.weddingDate,
       dashboardUrl: `${process.env.BETTER_AUTH_URL || "https://uygundavet.com"}/dashboard`,
     }, locale as "tr" | "en" | "de");

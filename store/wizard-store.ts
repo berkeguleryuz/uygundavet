@@ -8,14 +8,6 @@ interface WizardState {
   owner1LastName: string;
   owner2FirstName: string;
   owner2LastName: string;
-  family1FatherFirstName: string;
-  family1FatherLastName: string;
-  family1MotherFirstName: string;
-  family1MotherLastName: string;
-  family2FatherFirstName: string;
-  family2FatherLastName: string;
-  family2MotherFirstName: string;
-  family2MotherLastName: string;
   weddingDate: string;
   weddingTime: string;
 
@@ -37,14 +29,6 @@ const initialState = {
   owner1LastName: "",
   owner2FirstName: "",
   owner2LastName: "",
-  family1FatherFirstName: "",
-  family1FatherLastName: "",
-  family1MotherFirstName: "",
-  family1MotherLastName: "",
-  family2FatherFirstName: "",
-  family2FatherLastName: "",
-  family2MotherFirstName: "",
-  family2MotherLastName: "",
   weddingDate: "",
   weddingTime: "",
   selectedPackage: null as PackageKey | null,
