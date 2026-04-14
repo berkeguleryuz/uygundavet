@@ -76,8 +76,8 @@ export default function LoginPage() {
           password,
         });
         if (error) {
-          const msg = error.message || "";
-          if (msg.toLowerCase().includes("verify") || msg.toLowerCase().includes("email")) {
+          const code = error.code || "";
+          if (code === "EMAIL_NOT_VERIFIED") {
             toast.error(t("emailNotVerified"), { duration: 8000 });
             setShowResendVerify(true);
           } else {

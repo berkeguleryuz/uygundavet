@@ -224,8 +224,8 @@ interface OrderEmailData {
   depositAmount: number;
   groomName: string;
   brideName: string;
-  groomFamily: { fatherName: string; motherName: string };
-  brideFamily: { fatherName: string; motherName: string };
+  groomFamily?: { fatherName: string; motherName: string };
+  brideFamily?: { fatherName: string; motherName: string };
   weddingDate: string;
   dashboardUrl: string;
 }
@@ -265,14 +265,14 @@ export function orderConfirmationEmail(data: OrderEmailData, locale: Locale = "t
         ${infoRow(t.dateLabel, data.weddingDate)}
       </table>
 
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff08;border-radius:12px;padding:4px 16px;margin-bottom:24px;">
-        ${infoRow(t.familyLabel + " (1)", "")}
+      ${data.groomFamily || data.brideFamily ? `<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff08;border-radius:12px;padding:4px 16px;margin-bottom:24px;">
+        ${data.groomFamily ? `${infoRow(t.familyLabel + " (1)", "")}
         ${infoRow("Baba", data.groomFamily.fatherName)}
-        ${infoRow("Anne", data.groomFamily.motherName)}
-        ${infoRow(t.familyLabel + " (2)", "")}
+        ${infoRow("Anne", data.groomFamily.motherName)}` : ""}
+        ${data.brideFamily ? `${infoRow(t.familyLabel + " (2)", "")}
         ${infoRow("Baba", data.brideFamily.fatherName)}
-        ${infoRow("Anne", data.brideFamily.motherName)}
-      </table>
+        ${infoRow("Anne", data.brideFamily.motherName)}` : ""}
+      </table>` : ""}
 
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>

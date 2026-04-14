@@ -619,5 +619,10 @@
     "scanMe": "Scan Me",
     "downloadSticker": "Download Sticker",
     "previewRsvpForm": "Preview RSVP Form"
+  },
+  "NotFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist or may have been moved.",
+    "backHome": "Back to Home"
   }
 }
