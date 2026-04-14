@@ -276,6 +276,7 @@
     "namePlaceholder": "İsim",
     "date": "Düğün Tarihi",
     "time": "Düğün Başlangıç Saati",
+    "infoEditable": "Bu bilgiler daha sonra değiştirilebilir. Ayarlar menüsünden tüm detayları düzenleyebilirsiniz.",
     "selectPackage": "Paket Seçin",
     "selectTheme": "Tema Seçin",
     "customTheme": "Özel Tema",

@@ -276,6 +276,7 @@
     "namePlaceholder": "Name",
     "date": "Wedding Date",
     "time": "Wedding Start Time",
+    "infoEditable": "You can change these details later. You'll manage everything from the Settings menu.",
     "selectPackage": "Select Package",
     "selectTheme": "Select Theme",
     "customTheme": "Custom Theme",
