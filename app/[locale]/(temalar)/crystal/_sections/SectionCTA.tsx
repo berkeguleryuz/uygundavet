@@ -20,7 +20,6 @@ export function SectionCTA() {
       className="relative bg-[#1a1a2e] py-28 md:py-36 overflow-hidden"
     >
       <div className="relative z-10 max-w-xl mx-auto px-6 text-center">
-        {/* Pulsing heart */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -40,7 +39,6 @@ export function SectionCTA() {
           </motion.div>
         </motion.div>
 
-        {/* Heading */}
         <motion.h2
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -51,7 +49,6 @@ export function SectionCTA() {
           {t("ctaHeading")}
         </motion.h2>
 
-        {/* Body */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +59,6 @@ export function SectionCTA() {
           {t("ctaText")}
         </motion.p>
 
-        {/* CTA button — rose gold pill */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -77,7 +73,6 @@ export function SectionCTA() {
           </Link>
         </motion.div>
 
-        {/* Sub-links */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

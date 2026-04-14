@@ -19,7 +19,6 @@ export function SectionCTA() {
       transition={{ duration: 1, ease: "easeOut" }}
       className="relative bg-gradient-to-br from-[#d4735e] via-[#e8a87c] to-[#f0c27f] py-28 md:py-36 overflow-hidden"
     >
-      {/* Subtle light pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{
@@ -28,7 +27,6 @@ export function SectionCTA() {
       />
 
       <div className="relative z-10 max-w-xl mx-auto px-6 text-center">
-        {/* Pulsing heart */}
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -48,7 +46,6 @@ export function SectionCTA() {
           </motion.div>
         </motion.div>
 
-        {/* Heading */}
         <motion.h2
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -59,7 +56,6 @@ export function SectionCTA() {
           {t("ctaHeading")}
         </motion.h2>
 
-        {/* Body */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,7 +66,6 @@ export function SectionCTA() {
           {t("ctaText")}
         </motion.p>
 
-        {/* CTA button — dark on gradient */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,7 +80,6 @@ export function SectionCTA() {
           </Link>
         </motion.div>
 
-        {/* Sub-links */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

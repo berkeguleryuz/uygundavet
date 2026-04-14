@@ -75,7 +75,6 @@ export default function HikayemizPage() {
   return (
     <div className="min-h-svh pt-24 pb-16 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        {/* Left-aligned header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,7 +93,6 @@ export default function HikayemizPage() {
           </p>
         </motion.div>
 
-        {/* Alternating image + text blocks (editorial style, NOT timeline) */}
         <div className="space-y-24 md:space-y-32">
           {milestones.map((milestone, idx) => (
             <motion.div
@@ -111,7 +109,6 @@ export default function HikayemizPage() {
                     : "md:flex-row-reverse"
                 } md:items-center md:gap-12`}
               >
-                {/* Image side */}
                 {milestone.image && (
                   <div className="md:w-1/2 relative aspect-[4/5] overflow-hidden">
                     <Image
@@ -124,7 +121,6 @@ export default function HikayemizPage() {
                   </div>
                 )}
 
-                {/* Text side */}
                 <div className={`md:w-1/2 ${idx % 2 !== 0 ? "md:text-right" : ""}`}>
                   <span className="inline-block font-sans text-[10px] tracking-[0.2em] uppercase text-[#b49a7c] mb-3">
                     {milestone.date}
@@ -141,7 +137,6 @@ export default function HikayemizPage() {
           ))}
         </div>
 
-        {/* Bottom decoration */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

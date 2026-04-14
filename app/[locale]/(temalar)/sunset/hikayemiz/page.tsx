@@ -75,7 +75,6 @@ export default function HikayemizPage() {
   return (
     <div className="min-h-svh pt-24 pb-16 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,7 +93,6 @@ export default function HikayemizPage() {
           </p>
         </motion.div>
 
-        {/* Alternating image + text blocks */}
         <div className="space-y-24 md:space-y-32">
           {milestones.map((milestone, idx) => (
             <motion.div
@@ -111,7 +109,6 @@ export default function HikayemizPage() {
                     : "md:flex-row-reverse"
                 } md:items-center md:gap-12`}
               >
-                {/* Image side */}
                 {milestone.image && (
                   <div className="md:w-1/2 relative aspect-[4/5] overflow-hidden rounded-2xl border border-[#e8a87c]/10">
                     <Image
@@ -121,12 +118,10 @@ export default function HikayemizPage() {
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
-                    {/* Warm overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a]/30 to-[#d4735e]/5 mix-blend-multiply" />
                   </div>
                 )}
 
-                {/* Text side */}
                 <div
                   className={`md:w-1/2 ${
                     idx % 2 !== 0 ? "md:text-right" : ""
@@ -147,7 +142,6 @@ export default function HikayemizPage() {
           ))}
         </div>
 
-        {/* Bottom decoration */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

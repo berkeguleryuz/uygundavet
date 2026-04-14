@@ -29,7 +29,7 @@ const photos = [
     offset: "mt-0 md:-mt-4",
   },
   {
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=85",
+    url: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=85",
     rotate: "-rotate-1",
     zIndex: "z-30",
     offset: "mt-0 md:mt-12",
@@ -58,7 +58,6 @@ export function SectionGalleryPreview() {
 
     const cards = grid.querySelectorAll("[data-polaroid]");
 
-    // Staggered entrance from varied directions
     cards.forEach((card, i) => {
       const directions = [
         { x: -60, y: 40 },
@@ -94,7 +93,6 @@ export function SectionGalleryPreview() {
       );
     });
 
-    // Subtle float on scroll
     cards.forEach((card, i) => {
       gsap.to(card, {
         y: (i % 2 === 0 ? -1 : 1) * 15,
@@ -115,7 +113,6 @@ export function SectionGalleryPreview() {
       className="relative py-24 md:py-32 bg-[#eee9e2] overflow-hidden"
     >
       <div className="max-w-6xl mx-auto px-6">
-        {/* Heading with SparkleIcon */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -135,7 +132,6 @@ export function SectionGalleryPreview() {
           </h2>
         </motion.div>
 
-        {/* Polaroid grid */}
         <div
           ref={gridRef}
           className="grid grid-cols-2 md:grid-cols-5 gap-4 md:-mx-4 justify-items-center"
@@ -168,7 +164,6 @@ export function SectionGalleryPreview() {
           ))}
         </div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}

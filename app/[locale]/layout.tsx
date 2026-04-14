@@ -18,12 +18,12 @@ const chakraPetch = Chakra_Petch({
 
 const merienda = Merienda({
   variable: "--font-merienda",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 export function generateStaticParams() {

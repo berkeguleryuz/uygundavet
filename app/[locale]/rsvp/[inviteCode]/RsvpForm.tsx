@@ -32,7 +32,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [rsvpStatus, setRsvpStatus] = useState<"confirmed" | "declined" | null>(null);
@@ -43,7 +42,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
   const [photosUploaded, setPhotosUploaded] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Collapsible sections
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [showMemoryMessage, setShowMemoryMessage] = useState(false);
 
@@ -124,7 +122,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
     }
   };
 
-  // Loading
   if (loading) {
     return (
       <div className="min-h-svh flex items-center justify-center bg-[#252224]">
@@ -133,7 +130,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
     );
   }
 
-  // Not found
   if (notFound || !invitation) {
     return (
       <div className="min-h-svh flex items-center justify-center bg-[#252224] px-6">
@@ -145,7 +141,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
     );
   }
 
-  // Success
   if (submitted) {
     return (
       <div className="min-h-svh flex items-center justify-center bg-[#252224] px-6">
@@ -169,7 +164,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
   return (
     <div className="min-h-svh bg-[#252224] py-8 px-4 sm:px-6">
       <div className="max-w-lg mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-10 bg-[#d5d1ad]/30" />
@@ -203,9 +197,7 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
           )}
         </div>
 
-        {/* Form */}
         <div className="bg-[#1c1a1b] rounded-2xl border border-white/10 p-6 space-y-6">
-          {/* Name */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-white/70 font-sans">{t("yourName")}</label>
             <input
@@ -217,7 +209,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             />
           </div>
 
-          {/* Phone */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-white/70 font-sans">{t("phone")}</label>
             <input
@@ -229,7 +220,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             />
           </div>
 
-          {/* RSVP Status */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-white/70 font-sans">{t("subtitle")}</label>
             <div className="grid grid-cols-2 gap-3">
@@ -258,7 +248,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             </div>
           </div>
 
-          {/* Additional Guests */}
           {rsvpStatus === "confirmed" && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -300,7 +289,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             </div>
           )}
 
-          {/* Note */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-white/70 font-sans">{t("noteLabel")}</label>
             <textarea
@@ -312,7 +300,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             />
           </div>
 
-          {/* Extras: Photo Upload & Memory Message */}
           {hasExtras && (
             <>
               <div className="h-px bg-white/[0.06]" />
@@ -351,7 +338,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
                 )}
               </div>
 
-              {/* Photo Upload Area */}
               {showPhotoUpload && invitation.hasGallery && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
                   <p className="text-xs text-white/30 font-sans">{t("uploadPhotosDesc")}</p>
@@ -375,7 +361,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
                 </div>
               )}
 
-              {/* Memory Message Area */}
               {showMemoryMessage && invitation.hasMemoryBook && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
                   <textarea
@@ -390,7 +375,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
             </>
           )}
 
-          {/* Submit */}
           <button
             onClick={handleSubmit}
             disabled={!name.trim() || !rsvpStatus || submitting}
@@ -407,7 +391,6 @@ export function RsvpForm({ inviteCode, source }: { inviteCode: string; source?: 
           </button>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-xs text-white/20 mt-6 font-sans">
           Uygun Davet · uygundavet.com
         </p>

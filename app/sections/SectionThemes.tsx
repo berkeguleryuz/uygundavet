@@ -7,9 +7,11 @@ import FlowingMenu from "@/app/components/FlowingMenu";
 import { THEME_OPTIONS } from "@/lib/themes";
 
 const themeItems = THEME_OPTIONS.map((t) => ({
-  link: "#",
+  link: `/${t.key}`,
   text: t.key.charAt(0).toUpperCase() + t.key.slice(1),
   image: t.image,
+  video: "video" in t && t.video === true,
+  target: "_blank" as const,
 }));
 
 export function SectionThemes() {

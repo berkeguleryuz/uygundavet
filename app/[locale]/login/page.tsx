@@ -127,7 +127,6 @@ export default function LoginPage() {
 
   return (
     <div className="h-svh flex bg-[#252224]">
-      {/* Left - Image */}
       <div className="hidden lg:block relative w-1/2 overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1519741497674-611481863552?w=2000&q=90"
@@ -150,7 +149,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right - Login Form */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-8 sm:px-16 relative">
         <Link
           href="/"
@@ -362,7 +360,6 @@ export default function LoginPage() {
         </motion.div>
       </div>
 
-      {/* Email Verified Popup */}
       <AnimatePresence>
         {showVerifiedPopup && (
           <>

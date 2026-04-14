@@ -21,7 +21,6 @@ export function SectionGalleryPreview() {
   return (
     <section className="relative py-24 md:py-32 bg-[#1a0f0a] overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -37,7 +36,6 @@ export function SectionGalleryPreview() {
           </h2>
         </motion.div>
 
-        {/* Horizontal scroll strip */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -65,7 +63,6 @@ export function SectionGalleryPreview() {
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                     sizes="(max-width: 768px) 260px, 320px"
                   />
-                  {/* Warm tint overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
               </motion.div>
@@ -73,7 +70,6 @@ export function SectionGalleryPreview() {
           </div>
         </motion.div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -254,7 +254,6 @@ function AyarlarForm({ customer, isDemo, updateCustomer }: {
         </div>
       </div>
 
-      {/* Etkinlik Programı */}
       <div className="bg-card rounded-xl border p-6 space-y-5">
         <div>
           <h2 className="font-semibold">Etkinlik Programı</h2>
@@ -308,7 +307,6 @@ function AyarlarForm({ customer, isDemo, updateCustomer }: {
         )}
       </div>
 
-      {/* Hikaye Milestones */}
       <div className="bg-card rounded-xl border p-6 space-y-5">
         <div>
           <h2 className="font-semibold">Hikayeniz</h2>

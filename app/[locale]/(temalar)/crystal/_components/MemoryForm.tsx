@@ -43,7 +43,6 @@ export function MemoryForm() {
         (data.memories || []).map((m: Memory) => ({ ...m, pending: false }))
       );
     } catch {
-      // silently fail
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +107,6 @@ export function MemoryForm() {
 
   return (
     <div className="space-y-10">
-      {/* Left-aligned header with rose-gold line */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -126,7 +124,6 @@ export function MemoryForm() {
         </p>
       </motion.div>
 
-      {/* Form Section */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -154,7 +151,6 @@ export function MemoryForm() {
               className={cn(inputClass, "h-auto py-3 resize-none")}
             />
 
-            {/* Approval notice — rose-gold tinted */}
             <div className="bg-[#b49a7c]/5 border border-[#b49a7c]/10 rounded-lg px-4 py-3">
               <p className="font-sans text-xs text-[#b49a7c] leading-relaxed">
                 {t("memoryApprovalNotice")}
@@ -182,7 +178,6 @@ export function MemoryForm() {
         </div>
       </motion.div>
 
-      {/* Memories List — stacked 1-column, divider style (newspaper feel) */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <div className="w-6 h-6 border-2 border-[#b49a7c]/30 border-t-[#b49a7c] rounded-full animate-spin" />
@@ -196,7 +191,6 @@ export function MemoryForm() {
             <div className="h-px flex-1 bg-[#1a1a2e]/[0.06]" />
           </div>
 
-          {/* Single column, stacked with dividers */}
           <div>
             {memories.map((memory) => (
               <MemoryCard

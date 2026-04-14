@@ -25,7 +25,6 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
     const el = stickerRef.current;
     if (!el) return;
 
-    // Load Merienda font for canvas
     await loadFont(
       "Merienda-Canvas",
       "https://fonts.gstatic.com/s/merienda/v19/gNMHW3x8Qoy5_mf8uVMCOou6_dvg.woff2"
@@ -42,27 +41,23 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
 
     ctx.scale(scale, scale);
 
-    // Background
     ctx.fillStyle = "#1c1a1b";
     ctx.beginPath();
     ctx.roundRect(0, 0, w, h, 20);
     ctx.fill();
 
-    // Outer border
     ctx.strokeStyle = "#d5d1ad";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.roundRect(8, 8, w - 16, h - 16, 14);
     ctx.stroke();
 
-    // Inner decorative border
     ctx.strokeStyle = "#d5d1ad30";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(16, 16, w - 32, h - 32, 10);
     ctx.stroke();
 
-    // Top decorative line + heart
     ctx.fillStyle = "#d5d1ad";
     ctx.font = "14px serif";
     ctx.textAlign = "center";
@@ -79,13 +74,11 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
     ctx.lineTo(w - 60, 38);
     ctx.stroke();
 
-    // "Beni Tara" text with loaded font
     ctx.fillStyle = "#d5d1ad";
     ctx.font = "bold 26px 'Merienda-Canvas', cursive";
     ctx.textAlign = "center";
     ctx.fillText(t("scanMe"), w / 2, 72);
 
-    // QR Code
     const svgEl = el.querySelector("svg");
     if (svgEl) {
       const svgData = new XMLSerializer().serializeToString(svgEl);
@@ -99,7 +92,6 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
           const qrX = (w - qrSize) / 2;
           const qrY = 90;
 
-          // White background for QR
           ctx.fillStyle = "#ffffff";
           ctx.beginPath();
           ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 14);
@@ -113,7 +105,6 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
       });
     }
 
-    // Bottom decorative line
     ctx.strokeStyle = "#d5d1ad30";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -121,18 +112,15 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
     ctx.lineTo(w - 50, 310);
     ctx.stroke();
 
-    // Couple name
     ctx.fillStyle = "#d5d1ad";
     ctx.font = "18px 'Merienda-Canvas', cursive";
     ctx.textAlign = "center";
     ctx.fillText(coupleName, w / 2, 340);
 
-    // Brand
     ctx.fillStyle = "#ffffff25";
     ctx.font = "10px sans-serif";
     ctx.fillText("uygundavet.com", w / 2, 375);
 
-    // Download
     const link = document.createElement("a");
     link.download = `qr-sticker-${coupleName.replace(/\s+/g, "-").toLowerCase()}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -141,12 +129,10 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
 
   return (
     <div className="space-y-3">
-      {/* Sticker Preview */}
       <div
         ref={stickerRef}
         className="bg-[#1c1a1b] rounded-2xl border-2 border-[#d5d1ad] p-6 flex flex-col items-center gap-3 mx-auto max-w-[200px] relative"
       >
-        {/* Top decoration */}
         <div className="flex items-center gap-2 w-full">
           <div className="flex-1 h-px bg-[#d5d1ad]/20" />
           <span className="text-[#d5d1ad] text-xs">♥</span>
@@ -167,12 +153,10 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
           />
         </div>
 
-        {/* Bottom decoration */}
         <div className="h-px w-full bg-[#d5d1ad]/20" />
         <p className="text-[#d5d1ad] text-xs font-merienda text-center">{coupleName}</p>
       </div>
 
-      {/* Download Button */}
       <Button
         onClick={handleDownload}
         variant="outline"

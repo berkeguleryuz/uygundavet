@@ -24,10 +24,8 @@ export function EventSchedule({ schedule: propSchedule }: EventScheduleProps) {
 
   return (
     <div className="w-full">
-      {/* Desktop: Horizontal timeline */}
       <div className="hidden md:block">
         <div className="relative">
-          {/* Horizontal connecting line */}
           <div className="absolute top-3 left-0 right-0 h-px bg-[#d4c4b0]" />
 
           <div className="flex justify-between relative">
@@ -40,14 +38,11 @@ export function EventSchedule({ schedule: propSchedule }: EventScheduleProps) {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 className="flex flex-col items-center text-center"
               >
-                {/* Active dot on the line */}
                 <div className="w-2.5 h-2.5 rounded-full bg-[#b49a7c] border-2 border-[#f6f3ee] relative z-10 mb-4" />
 
-                {/* Time above */}
                 <p className="font-merienda text-sm text-[#b49a7c] mb-1">
                   {item.time}
                 </p>
-                {/* Label below */}
                 <p className="font-sans text-sm text-[#1a1a2e]">
                   {item.label}
                 </p>
@@ -57,7 +52,6 @@ export function EventSchedule({ schedule: propSchedule }: EventScheduleProps) {
         </div>
       </div>
 
-      {/* Mobile: Vertical timeline */}
       <div className="md:hidden">
         <div className="relative">
           {schedule.map((item, index) => (
@@ -69,17 +63,13 @@ export function EventSchedule({ schedule: propSchedule }: EventScheduleProps) {
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
               <div className="flex items-start gap-5 relative">
-                {/* Timeline connector */}
                 <div className="flex flex-col items-center">
-                  {/* Dot */}
                   <div className="w-2.5 h-2.5 rounded-full bg-[#b49a7c] shrink-0 mt-1" />
-                  {/* Line */}
                   {index < schedule.length - 1 && (
                     <div className="w-px h-10 bg-[#d4c4b0]" />
                   )}
                 </div>
 
-                {/* Content */}
                 <div className="pb-6">
                   <p className="font-merienda text-sm text-[#b49a7c]">
                     {item.time}

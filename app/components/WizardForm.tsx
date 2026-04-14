@@ -426,7 +426,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                 </div>
 
                 <div className="min-h-[300px]">
-                  {/* STEP 1: Auth */}
                   {currentStep === 1 && (
                     <div className="flex flex-col gap-4 max-w-sm pt-4">
                       {isLoggedIn ? (
@@ -572,7 +571,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                     </div>
                   )}
 
-                  {/* STEP 2: Wedding Details */}
                   {currentStep === 2 && (
                     <div className="space-y-6 pt-2">
                       <div>
@@ -622,10 +620,8 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                     </div>
                   )}
 
-                  {/* STEP 3: Package + Theme + Payment */}
                   {currentStep === 3 && (
                     <div className="space-y-10">
-                      {/* Package Selection */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <Package className="w-4 h-4 text-[#d5d1ad]" />
@@ -646,7 +642,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         </div>
                       </div>
 
-                      {/* Theme Selection */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <Palette className="w-4 h-4 text-[#d5d1ad]" />
@@ -719,7 +714,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         )}
                       </div>
 
-                      {/* Payment Method */}
                       <div>
                         <div className="flex items-center gap-2 mb-4">
                           <CreditCard className="w-4 h-4 text-[#d5d1ad]" />
@@ -761,7 +755,6 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
                         </div>
                       </div>
 
-                      {/* Complete Button */}
                       <button
                         onClick={handleComplete}
                         disabled={submitting}

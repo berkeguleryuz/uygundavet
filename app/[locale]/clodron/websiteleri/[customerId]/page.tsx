@@ -290,7 +290,6 @@ export default function WebsiteDetailPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Back button */}
       <button
         onClick={() => router.push("/clodron/websiteleri")}
         className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors font-sans cursor-pointer"
@@ -299,12 +298,10 @@ export default function WebsiteDetailPage() {
         Websitelerine Dön
       </button>
 
-      {/* Title */}
       <h2 className="text-2xl font-chakra font-semibold text-white uppercase tracking-tight">
         {customer.bride.firstName} & {customer.groom.firstName}
       </h2>
 
-      {/* Tabs */}
       <div className="flex items-center gap-2">
         {tabs.map((tab) => (
           <button
@@ -322,10 +319,8 @@ export default function WebsiteDetailPage() {
         ))}
       </div>
 
-      {/* Tab Content */}
       {activeTab === "genel" && (
         <div className="space-y-4">
-          {/* Couple & Venue */}
           <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
@@ -430,7 +425,6 @@ export default function WebsiteDetailPage() {
             </div>
           </div>
 
-          {/* Theme */}
           {order && (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
@@ -458,7 +452,6 @@ export default function WebsiteDetailPage() {
             </div>
           )}
 
-          {/* Family */}
           {(customer.brideFamily || customer.groomFamily) && (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
@@ -496,7 +489,6 @@ export default function WebsiteDetailPage() {
             </div>
           )}
 
-          {/* Event Schedule */}
           {customer.eventSchedule && customer.eventSchedule.length > 0 && (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
@@ -518,7 +510,6 @@ export default function WebsiteDetailPage() {
             </div>
           )}
 
-          {/* Custom Domain */}
           <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Globe className="w-4 h-4 text-white/50" />
@@ -549,7 +540,6 @@ export default function WebsiteDetailPage() {
             </div>
           </div>
 
-          {/* Preview Link */}
           <a
             href="/lavanta"
             target="_blank"

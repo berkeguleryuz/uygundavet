@@ -18,13 +18,9 @@ export function ClockIcon({ className, size = 24 }: ClockIconProps) {
       strokeLinejoin="round"
       className={className}
     >
-      {/* Clock face */}
       <circle cx="12" cy="12" r="9.5" />
-      {/* Hour hand */}
       <line x1="12" y1="12" x2="12" y2="7.5" />
-      {/* Minute hand */}
       <line x1="12" y1="12" x2="16" y2="12" />
-      {/* Center dot */}
       <circle cx="12" cy="12" r="0.6" fill="currentColor" stroke="none" />
     </svg>
   );

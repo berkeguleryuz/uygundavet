@@ -21,7 +21,6 @@ export default function OgImage() {
           position: "relative",
         }}
       >
-        {/* Decorative elements */}
         <div
           style={{
             position: "absolute",
@@ -45,7 +44,6 @@ export default function OgImage() {
           }}
         />
 
-        {/* Main content */}
         <div
           style={{
             display: "flex",
@@ -56,7 +54,6 @@ export default function OgImage() {
             padding: "60px",
           }}
         >
-          {/* Brand name */}
           <div
             style={{
               color: "#d5d1ad",
@@ -69,7 +66,6 @@ export default function OgImage() {
             Uygun Davet
           </div>
 
-          {/* Tagline */}
           <div
             style={{
               color: "white",
@@ -82,7 +78,6 @@ export default function OgImage() {
             Dijital Düğün Davetiyesi Platformu
           </div>
 
-          {/* Features */}
           <div
             style={{
               display: "flex",
@@ -101,7 +96,6 @@ export default function OgImage() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div
           style={{
             position: "absolute",

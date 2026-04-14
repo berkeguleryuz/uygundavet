@@ -17,7 +17,6 @@ export default function IletisimPage() {
   return (
     <div className="min-h-svh pt-24 pb-12 px-4 sm:px-6">
       <div className="max-w-xl mx-auto">
-        {/* Left-aligned header with rose-gold accent */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -58,7 +57,6 @@ export default function IletisimPage() {
 
             <div className="h-px bg-[#1a1a2e]/[0.06]" />
 
-            {/* HeartIcon CTA */}
             <Link
               href={`${BASE}/lcv`}
               className="flex items-center justify-center gap-2 w-full h-12 rounded-lg bg-[#1a1a2e] text-white font-sans font-semibold text-sm hover:bg-[#1a1a2e]/90 transition-colors"

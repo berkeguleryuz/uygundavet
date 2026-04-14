@@ -38,7 +38,6 @@ export function SectionStoryPreview() {
   return (
     <section className="relative bg-[#f6f3ee] overflow-hidden">
       <div className="py-24 md:py-32">
-        {/* Top: Label with horizontal line */}
         <div className="px-8 md:px-16 lg:px-24 mb-6">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -54,7 +53,6 @@ export function SectionStoryPreview() {
           </motion.div>
         </div>
 
-        {/* Large heading */}
         <div className="px-8 md:px-16 lg:px-24 mb-14 md:mb-20">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
@@ -67,7 +65,6 @@ export function SectionStoryPreview() {
           </motion.h2>
         </div>
 
-        {/* Horizontal scroll track */}
         <div
           className="flex gap-6 md:gap-8 px-8 md:px-16 lg:px-24 overflow-x-auto snap-x snap-mandatory pb-4 [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -101,7 +98,6 @@ export function SectionStoryPreview() {
                     sizes="(max-width: 768px) 280px, 360px"
                   />
                 )}
-                {/* Text overlay at bottom */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-6 pt-20">
                   <p className="font-merienda text-xl text-white mb-1">
                     {card.title}
@@ -115,7 +111,6 @@ export function SectionStoryPreview() {
           ))}
         </div>
 
-        {/* Bottom CTA */}
         <div className="px-8 md:px-16 lg:px-24 mt-14 md:mt-20">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
