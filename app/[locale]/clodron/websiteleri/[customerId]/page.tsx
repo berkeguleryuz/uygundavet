@@ -11,7 +11,6 @@ import {
   MapPin,
   Eye,
   Hash,
-  Palette,
   Users,
   ListChecks,
   ExternalLink,
@@ -62,6 +61,8 @@ interface CustomerData {
 interface OrderData {
   selectedTheme: string;
   selectedPackage: string;
+  userEmail: string;
+  userPhone: string;
 }
 interface PhotoData {
   _id: string;
@@ -428,26 +429,44 @@ export default function WebsiteDetailPage() {
           {order && (
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
               <div className="flex items-center gap-2 mb-2">
-                <Palette className="w-4 h-4 text-white/50" />
+                <Users className="w-4 h-4 text-white/50" />
                 <h3 className="text-sm font-chakra uppercase tracking-[0.12em] text-white/70">
-                  Tema Bilgisi
+                  Sipariş Veren
                 </h3>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-white/50 font-sans">Tema</span>
-                <span className="text-sm text-white font-sans capitalize">
-                  {order.selectedTheme}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-white/50 font-sans">Paket</span>
-                <span className="text-sm text-white font-sans font-semibold font-chakra uppercase">
-                  {order.selectedPackage === "starter"
-                    ? "Başlangıç"
-                    : order.selectedPackage === "pro"
-                    ? "Pro"
-                    : "Elit"}
-                </span>
+              {order.userEmail && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-white/50 font-sans">E-posta</span>
+                  <span className="text-sm text-white font-sans">
+                    {order.userEmail}
+                  </span>
+                </div>
+              )}
+              {order.userPhone && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-white/50 font-sans">Telefon</span>
+                  <span className="text-sm text-white font-sans">
+                    {order.userPhone}
+                  </span>
+                </div>
+              )}
+              <div className="border-t border-white/10 pt-3 mt-3 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-white/50 font-sans">Tema</span>
+                  <span className="text-sm text-white font-sans capitalize">
+                    {order.selectedTheme}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-white/50 font-sans">Paket</span>
+                  <span className="text-sm text-white font-sans font-semibold font-chakra uppercase">
+                    {order.selectedPackage === "starter"
+                      ? "Başlangıç"
+                      : order.selectedPackage === "pro"
+                      ? "Pro"
+                      : "Elit"}
+                  </span>
+                </div>
               </div>
             </div>
           )}

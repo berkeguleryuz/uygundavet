@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/animations";
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Logo } from "@/app/components/Logo";
 import { MorphButton } from "@/app/components/MorphButton";
 
@@ -52,12 +53,16 @@ export function SectionCTA() {
           {...fadeUp(0.4)}
           className="flex items-center gap-4 flex-col sm:flex-row w-full sm:w-auto"
         >
-          <MorphButton variant="filled" className="w-full sm:w-auto">
-            {t("subscribeNow")}
-          </MorphButton>
-          <MorphButton variant="outline" className="w-full sm:w-auto">
-            {t("startWriting")}
-          </MorphButton>
+          <Link href="/login">
+            <MorphButton variant="filled" className="w-full sm:w-auto">
+              {t("subscribeNow")}
+            </MorphButton>
+          </Link>
+          <Link href="/sunset">
+            <MorphButton variant="outline" className="w-full sm:w-auto">
+              {t("startWriting")}
+            </MorphButton>
+          </Link>
         </motion.div>
 
       </div>

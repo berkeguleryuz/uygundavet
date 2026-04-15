@@ -43,8 +43,5 @@ const GuestSchema = new Schema<IGuest>(
 
 GuestSchema.index({ userId: 1, createdAt: -1 });
 
-// Delete cached model to ensure schema changes are picked up
-if (mongoose.models.Guest) {
-  delete mongoose.models.Guest;
-}
-export const Guest: Model<IGuest> = mongoose.model<IGuest>("Guest", GuestSchema);
+export const Guest: Model<IGuest> =
+  mongoose.models.Guest || mongoose.model<IGuest>("Guest", GuestSchema);

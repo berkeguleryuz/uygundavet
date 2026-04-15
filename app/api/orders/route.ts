@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { connectDB } from "@/lib/mongodb";
@@ -41,37 +42,60 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    const existingOrder = await Order.findOne({ userId: session.user.id });
-    if (existingOrder) {
-      return NextResponse.json({ error: "Order already exists" }, { status: 409 });
-    }
-
     const pkg = PACKAGES[data.selectedPackage as PackageKey];
     const totalAmount = pkg.price;
     const depositAmount = Math.round(totalAmount * pkg.depositPercent);
 
-    await Customer.create({
-      userId: session.user.id,
-      weddingDate: new Date(data.weddingDate),
-      weddingTime: data.weddingTime,
-      inviteCode: generateInviteCode(),
-      groom: { firstName: data.owner1FirstName, lastName: data.owner1LastName },
-      bride: { firstName: data.owner2FirstName, lastName: data.owner2LastName },
-    });
+    const session_db = await mongoose.startSession();
+    try {
+      session_db.startTransaction();
 
-    await Order.create({
-      userId: session.user.id,
-      userEmail: session.user.email,
-      userPhone: data.phone,
-      selectedPackage: data.selectedPackage,
-      selectedTheme: data.selectedTheme,
-      customThemeRequest: data.customThemeRequest,
-      paymentStatus: "pending",
-      paymentMethod: data.paymentMethod,
-      depositAmount,
-      totalAmount,
-      paidAmount: 0,
-    });
+      const existingOrder = await Order.findOne({ userId: session.user.id }).session(session_db);
+      if (existingOrder) {
+        await session_db.abortTransaction();
+        return NextResponse.json({ error: "Order already exists" }, { status: 409 });
+      }
+
+      await Customer.create(
+        [
+          {
+            userId: session.user.id,
+            weddingDate: new Date(data.weddingDate),
+            weddingTime: data.weddingTime,
+            inviteCode: generateInviteCode(),
+            groom: { firstName: data.owner1FirstName, lastName: data.owner1LastName },
+            bride: { firstName: data.owner2FirstName, lastName: data.owner2LastName },
+          },
+        ],
+        { session: session_db }
+      );
+
+      await Order.create(
+        [
+          {
+            userId: session.user.id,
+            userEmail: session.user.email,
+            userPhone: data.phone,
+            selectedPackage: data.selectedPackage,
+            selectedTheme: data.selectedTheme,
+            customThemeRequest: data.customThemeRequest,
+            paymentStatus: "pending",
+            paymentMethod: data.paymentMethod,
+            depositAmount,
+            totalAmount,
+            paidAmount: 0,
+          },
+        ],
+        { session: session_db }
+      );
+
+      await session_db.commitTransaction();
+    } catch (txError) {
+      await session_db.abortTransaction();
+      throw txError;
+    } finally {
+      session_db.endSession();
+    }
 
     // Send order confirmation email (non-blocking)
     const locale = (await db.collection("user").findOne({ email: session.user.email }))?.locale || "tr";

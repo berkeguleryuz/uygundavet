@@ -1,6 +1,5 @@
 import { cache } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import { Customer } from "@/models/Customer";
 import { Order } from "@/models/Order";
@@ -48,7 +47,7 @@ const getWeddingData = cache(async (): Promise<WeddingData | null> => {
     };
   } catch (error) {
     console.error("Failed to fetch wedding data:", error);
-    return null;
+    throw error;
   }
 });
 
@@ -80,7 +79,14 @@ export default async function CrystalLayout({
   children: React.ReactNode;
 }) {
   const data = await getWeddingData();
-  if (!data) notFound();
+  if (!data) {
+    return (
+      <div className="min-h-svh flex flex-col items-center justify-center bg-[#f6f3ee] px-6 text-center">
+        <h2 className="font-merienda text-2xl text-[#1a1a2e] mb-4">Davetiye bulunamadı</h2>
+        <p className="font-sans text-sm text-[#1a1a2e]/50">Bu davetiye artık mevcut değil veya bağlantı geçersiz.</p>
+      </div>
+    );
+  }
 
   Customer.updateOne(
     { inviteCode: INVITE_CODE },

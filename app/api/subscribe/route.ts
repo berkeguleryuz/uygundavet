@@ -24,12 +24,11 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const existing = await Subscriber.findOne({ email: email.toLowerCase() });
-    if (existing) {
-      return NextResponse.json({ success: true });
-    }
-
-    await Subscriber.create({ email });
+    await Subscriber.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { $setOnInsert: { email: email.toLowerCase() } },
+      { upsert: true }
+    );
 
     return NextResponse.json({ success: true });
   } catch {

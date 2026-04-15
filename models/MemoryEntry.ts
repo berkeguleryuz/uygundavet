@@ -10,7 +10,7 @@ export interface IMemoryEntry extends Document {
 
 const MemoryEntrySchema = new Schema<IMemoryEntry>(
   {
-    userId: { type: String, required: true, index: true },
+    userId: { type: String, required: true },
     authorName: { type: String, required: true, trim: true },
     message: { type: String, required: true, trim: true },
     approved: { type: Boolean, default: false },
@@ -20,6 +20,8 @@ const MemoryEntrySchema = new Schema<IMemoryEntry>(
     collection: "memory_entries",
   }
 );
+
+MemoryEntrySchema.index({ userId: 1, approved: 1, createdAt: -1 });
 
 export const MemoryEntry: Model<IMemoryEntry> =
   mongoose.models.MemoryEntry ||
