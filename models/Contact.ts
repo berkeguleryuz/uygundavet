@@ -21,5 +21,7 @@ const ContactSchema = new Schema<IContact>(
   }
 );
 
+ContactSchema.index({ createdAt: -1 });
+
 export const Contact: Model<IContact> =
   mongoose.models.Contact || mongoose.model<IContact>("Contact", ContactSchema);

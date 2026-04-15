@@ -15,7 +15,7 @@ export interface IGalleryPhoto extends Document {
 
 const GalleryPhotoSchema = new Schema<IGalleryPhoto>(
   {
-    userId: { type: String, required: true, index: true },
+    userId: { type: String, required: true },
     name: { type: String, required: true, trim: true },
     url: { type: String, required: true },
     thumbnailUrl: { type: String, default: "" },
@@ -29,6 +29,8 @@ const GalleryPhotoSchema = new Schema<IGalleryPhoto>(
     collection: "gallery_photos",
   }
 );
+
+GalleryPhotoSchema.index({ userId: 1, createdAt: -1 });
 
 export const GalleryPhoto: Model<IGalleryPhoto> =
   mongoose.models.GalleryPhoto ||

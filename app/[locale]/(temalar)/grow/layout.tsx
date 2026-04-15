@@ -1,5 +1,5 @@
+import { cache } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import { Customer } from "@/models/Customer";
 import { Order } from "@/models/Order";
@@ -12,17 +12,12 @@ import type { WeddingData } from "./_lib/types";
 
 const INVITE_CODE = process.env.GROW_INVITE_CODE || process.env.LAVANTA_INVITE_CODE || "";
 
-async function getWeddingData(): Promise<WeddingData | null> {
+const getWeddingData = cache(async (): Promise<WeddingData | null> => {
   if (!INVITE_CODE) return null;
   try {
     await connectDB();
     const customer = await Customer.findOne({ inviteCode: INVITE_CODE }).lean();
     if (!customer) return null;
-
-    Customer.updateOne(
-      { inviteCode: INVITE_CODE },
-      { $inc: { invitationViews: 1 } }
-    ).catch(() => {});
 
     const order = await Order.findOne({ userId: customer.userId }).lean();
     const pkg = (order?.selectedPackage || "starter") as SelectedPackage;
@@ -52,9 +47,9 @@ async function getWeddingData(): Promise<WeddingData | null> {
     };
   } catch (error) {
     console.error("Failed to fetch wedding data:", error);
-    return null;
+    throw error;
   }
-}
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getWeddingData();
@@ -91,8 +86,15 @@ export default async function LavantaLayout({
   const data = await getWeddingData();
 
   if (!data) {
-    notFound();
+    return (
+      <div className="min-h-svh flex flex-col items-center justify-center bg-[#252224] px-6 text-center">
+        <h2 className="font-merienda text-2xl text-white mb-4">Davetiye bulunamadı</h2>
+        <p className="font-sans text-sm text-white/50">Bu davetiye artık mevcut değil veya bağlantı geçersiz.</p>
+      </div>
+    );
   }
+
+  Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
     <WeddingProvider data={data}>

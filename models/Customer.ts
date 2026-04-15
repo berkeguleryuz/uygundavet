@@ -61,8 +61,8 @@ const FamilyInfoSchema = new Schema<FamilyInfo>(
 
 const CustomerSchema = new Schema<ICustomer>(
   {
-    userId: { type: String, required: true },
-    weddingDate: { type: Date, required: true },
+    userId: { type: String, required: true, unique: true, index: true },
+    weddingDate: { type: Date, required: true, index: true },
     weddingTime: { type: String, trim: true, default: "" },
     address: { type: String, trim: true, default: "" },
     venueName: { type: String, trim: true, default: "" },

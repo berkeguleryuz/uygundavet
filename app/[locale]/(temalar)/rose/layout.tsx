@@ -1,6 +1,5 @@
 import { cache } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import { Customer } from "@/models/Customer";
 import { Order } from "@/models/Order";
@@ -42,7 +41,7 @@ const getWeddingData = cache(async (): Promise<WeddingData | null> => {
     };
   } catch (error) {
     console.error("Failed to fetch wedding data:", error);
-    return null;
+    throw error;
   }
 });
 
@@ -60,7 +59,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RoseLayout({ children }: { children: React.ReactNode }) {
   const data = await getWeddingData();
-  if (!data) notFound();
+  if (!data) {
+    return (
+      <div className="min-h-svh flex flex-col items-center justify-center bg-[#0f0b09] px-6 text-center">
+        <h2 className="font-merienda text-2xl text-[#f0e4dc] mb-4">Davetiye bulunamadı</h2>
+        <p className="font-sans text-sm text-[#f0e4dc]/50">Bu davetiye artık mevcut değil veya bağlantı geçersiz.</p>
+      </div>
+    );
+  }
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
   return (
     <WeddingProvider data={data}>
