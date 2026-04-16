@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
 import { motion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import { useWedding } from "../_lib/context";
@@ -29,6 +32,8 @@ const bentoMedia = [
   { type: "image" as const, src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=85" },
 ];
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 export function SectionHero() {
   const wedding = useWedding();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -39,67 +44,55 @@ export function SectionHero() {
   const groomFirst = wedding.groomName.split(" ")[0];
   const formattedDate = formatWeddingDate(wedding.weddingDate);
 
-  useEffect(() => {
-    const init = async () => {
-      const gsapModule = await import("gsap");
-      const gsap = gsapModule.default;
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Flip } = require("gsap/dist/Flip");
+  useGSAP(() => {
+    const galleryEl = galleryRef.current;
+    const wrapEl = wrapRef.current;
+    const textEl = textRef.current;
 
-      gsap.registerPlugin(ScrollTrigger, Flip);
+    if (!galleryEl || !wrapEl) return;
 
-      const galleryEl = galleryRef.current;
-      const wrapEl = wrapRef.current;
-      const textEl = textRef.current;
-      if (!galleryEl || !wrapEl) return;
+    // `gsap/Flip` trips TypeScript path-casing checks in this repo on macOS.
+    // Loading the runtime build here keeps the animation scoped and the build stable.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Flip } = require("gsap/dist/Flip");
+    gsap.registerPlugin(Flip);
 
-      const items = galleryEl.querySelectorAll(".bento-item");
+    const items = Array.from(galleryEl.querySelectorAll<HTMLElement>(".bento-item"));
 
-      galleryEl.classList.remove("bento-final");
+    galleryEl.classList.remove("bento-final");
+    galleryEl.classList.add("bento-final");
+    const flipState = Flip.getState(items);
+    galleryEl.classList.remove("bento-final");
 
-      const ctx = gsap.context(() => {
-        galleryEl.classList.add("bento-final");
-        const flipState = Flip.getState(items);
-        galleryEl.classList.remove("bento-final");
+    const flip = Flip.to(flipState, {
+      simple: true,
+      ease: "expoScale(1, 5)",
+    });
 
-        const flip = Flip.to(flipState, {
-          simple: true,
-          ease: "expoScale(1, 5)",
-        });
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: galleryEl,
+        start: "center center",
+        end: "+=100%",
+        scrub: true,
+        pin: wrapEl,
+      },
+    });
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: galleryEl,
-            start: "center center",
-            end: "+=100%",
-            scrub: true,
-            pin: wrapEl,
-          },
-        });
+    timeline.add(flip);
 
-        tl.add(flip);
-
-        if (textEl) {
-          tl.to(textEl, { opacity: 0, scale: 1.05, duration: 0.3 }, 0);
-        }
-
-        return () => gsap.set(items, { clearProps: "all" });
-      });
-
-      return () => ctx.revert();
-    };
-
-    let cleanup: (() => void) | undefined;
-    const timer = setTimeout(() => {
-      init().then(fn => { cleanup = fn; });
-    }, 100);
+    if (textEl) {
+      timeline.to(textEl, { opacity: 0, scale: 1.05, duration: 0.3 }, 0);
+    }
 
     return () => {
-      clearTimeout(timer);
-      cleanup?.();
+      timeline.scrollTrigger?.kill();
+      timeline.kill();
+      flip.kill();
+      galleryEl.classList.remove("bento-final");
+      gsap.set(items, { clearProps: "all" });
     };
-  }, []);
+  }, { scope: wrapRef });
 
   return (
     <>

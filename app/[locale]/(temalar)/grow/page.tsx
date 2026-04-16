@@ -5,7 +5,7 @@ import { SectionVenuePreview } from "./_sections/SectionVenuePreview";
 import { SectionGalleryPreview } from "./_sections/SectionGalleryPreview";
 import { SectionCTA } from "./_sections/SectionCTA";
 
-export default function LavantaHome() {
+export default function GrowHome() {
   return (
     <>
       <SectionHero />

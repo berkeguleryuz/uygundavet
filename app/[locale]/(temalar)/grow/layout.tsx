@@ -6,11 +6,11 @@ import { Order } from "@/models/Order";
 import { canAccess } from "@/lib/package-gating";
 import type { SelectedPackage } from "@/models/Order";
 import { WeddingProvider } from "./_lib/context";
-import { LavantaNav } from "./_components/LavantaNav";
-import { LavantaFooter } from "./_components/LavantaFooter";
+import { GrowNav } from "./_components/GrowNav";
+import { GrowFooter } from "./_components/GrowFooter";
 import type { WeddingData } from "./_lib/types";
 
-const INVITE_CODE = process.env.GROW_INVITE_CODE || process.env.LAVANTA_INVITE_CODE || "";
+const INVITE_CODE = process.env.GROW_INVITE_CODE || process.env.Grow_INVITE_CODE || "";
 
 const getWeddingData = cache(async (): Promise<WeddingData | null> => {
   if (!INVITE_CODE) return null;
@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function LavantaLayout({
+export default async function GrowLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -113,9 +113,9 @@ export default async function LavantaLayout({
   return (
     <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#252224] text-white overflow-x-hidden">
-        <LavantaNav />
+        <GrowNav />
         <main>{children}</main>
-        <LavantaFooter />
+        <GrowFooter />
       </div>
     </WeddingProvider>
   );

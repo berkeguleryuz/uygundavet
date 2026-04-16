@@ -10,7 +10,7 @@ import { SunsetNav } from "./_components/SunsetNav";
 import { SunsetFooter } from "./_components/SunsetFooter";
 import type { WeddingData } from "./_lib/types";
 
-const INVITE_CODE = process.env.SUNSET_INVITE_CODE || process.env.LAVANTA_INVITE_CODE || "";
+const INVITE_CODE = process.env.SUNSET_INVITE_CODE || process.env.Grow_INVITE_CODE || "";
 
 const getWeddingData = cache(async (): Promise<WeddingData | null> => {
   if (!INVITE_CODE) return null;

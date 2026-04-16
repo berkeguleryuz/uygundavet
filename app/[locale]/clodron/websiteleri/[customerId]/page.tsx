@@ -560,7 +560,7 @@ export default function WebsiteDetailPage() {
           </div>
 
           <a
-            href="/lavanta"
+            href="/grow"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors font-sans"

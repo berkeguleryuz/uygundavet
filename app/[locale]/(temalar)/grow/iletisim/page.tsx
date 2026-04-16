@@ -6,7 +6,7 @@ import { ScrollReveal } from "../_components/ScrollReveal";
 import { MapPin, Heart } from "lucide-react";
 import Link from "next/link";
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 export default function IletisimPage() {
   const wedding = useWedding();

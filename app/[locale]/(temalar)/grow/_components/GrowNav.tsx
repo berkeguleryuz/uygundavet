@@ -14,7 +14,7 @@ import { Menu, X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 interface NavItem {
   label: string;
@@ -22,7 +22,7 @@ interface NavItem {
   accent?: boolean;
 }
 
-export function LavantaNav() {
+export function GrowNav() {
   const wedding = useWedding();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);

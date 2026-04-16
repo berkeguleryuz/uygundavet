@@ -17,7 +17,7 @@ function formatWeddingDate(dateStr: string): string {
   return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}, ${TR_DAYS[d.getDay()]}`;
 }
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 

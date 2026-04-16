@@ -7,7 +7,7 @@ import { ScrollReveal } from "../_components/ScrollReveal";
 import { useWedding } from "../_lib/context";
 import { MorphButton } from "@/app/components/MorphButton";
 
-const BASE = "/lavanta";
+const BASE = "/Grow";
 
 export function SectionCTA() {
   const wedding = useWedding();

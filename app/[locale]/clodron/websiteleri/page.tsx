@@ -180,7 +180,7 @@ export default function WebsiteleriPage() {
                   </button>
                 )}
                 <a
-                  href="/lavanta"
+                  href="/grow"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

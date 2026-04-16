@@ -6,7 +6,7 @@ import { MapPin, Calendar, Clock, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "../_components/ScrollReveal";
 import { useWedding } from "../_lib/context";
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 const TR_MONTHS = [
   "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
