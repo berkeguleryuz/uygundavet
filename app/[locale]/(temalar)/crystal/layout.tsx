@@ -52,7 +52,8 @@ const getWeddingData = cache(async (): Promise<WeddingData | null> => {
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getWeddingData();
+  let data: WeddingData | null = null;
+  try { data = await getWeddingData(); } catch { /* handled in layout */ }
   if (!data) return { title: "Davetiye" };
 
   const brideFirst = data.brideName.split(" ")[0];
@@ -78,7 +79,21 @@ export default async function CrystalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const data = await getWeddingData();
+  let data: WeddingData | null = null;
+  try {
+    data = await getWeddingData();
+  } catch {
+    return (
+      <div className="min-h-svh flex flex-col items-center justify-center bg-[#f6f3ee] px-6 text-center">
+        <h2 className="font-merienda text-2xl text-[#1a1a2e] mb-4">Bir şeyler ters gitti</h2>
+        <p className="font-sans text-sm text-[#1a1a2e]/50 mb-8">Sayfa yüklenirken bir hata oluştu.</p>
+        <a href="" className="font-sans text-sm font-medium tracking-wide bg-[#b49a7c] text-white rounded-full px-8 py-3 hover:opacity-90 transition-opacity">
+          Tekrar Dene
+        </a>
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="min-h-svh flex flex-col items-center justify-center bg-[#f6f3ee] px-6 text-center">

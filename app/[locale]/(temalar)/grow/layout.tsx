@@ -52,7 +52,8 @@ const getWeddingData = cache(async (): Promise<WeddingData | null> => {
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getWeddingData();
+  let data: WeddingData | null = null;
+  try { data = await getWeddingData(); } catch { /* handled in layout */ }
 
   if (!data) {
     return { title: "Davetiye" };
@@ -83,7 +84,20 @@ export default async function LavantaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const data = await getWeddingData();
+  let data: WeddingData | null = null;
+  try {
+    data = await getWeddingData();
+  } catch {
+    return (
+      <div className="min-h-svh flex flex-col items-center justify-center bg-[#252224] px-6 text-center">
+        <h2 className="font-merienda text-2xl text-white mb-4">Bir şeyler ters gitti</h2>
+        <p className="font-sans text-sm text-white/50 mb-8">Sayfa yüklenirken bir hata oluştu.</p>
+        <a href="" className="font-sans text-sm font-medium tracking-wide bg-[#d5d1ad] text-[#252224] rounded-full px-8 py-3 hover:opacity-90 transition-opacity">
+          Tekrar Dene
+        </a>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
