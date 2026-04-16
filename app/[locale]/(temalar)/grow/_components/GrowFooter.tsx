@@ -6,7 +6,7 @@ import { useWedding } from "../_lib/context";
 import { Heart, ExternalLink, Sparkles } from "lucide-react";
 import { MorphButton } from "@/app/components/MorphButton";
 
-export function LavantaFooter() {
+export function GrowFooter() {
   const wedding = useWedding();
   const brideFirst = wedding.brideName.split(" ")[0];
   const groomFirst = wedding.groomName.split(" ")[0];

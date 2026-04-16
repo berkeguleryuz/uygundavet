@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ScrollReveal } from "../_components/ScrollReveal";
 import { useWedding } from "../_lib/context";
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 export function SectionStoryPreview() {
   const wedding = useWedding();

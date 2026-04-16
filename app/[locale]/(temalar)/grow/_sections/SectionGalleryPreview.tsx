@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { ScrollReveal } from "../_components/ScrollReveal";
 
-const BASE = "/lavanta";
+const BASE = "/grow";
 
 const photos = [
   { url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=75", span: "col-span-2 row-span-2" },

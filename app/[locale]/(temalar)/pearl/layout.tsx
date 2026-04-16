@@ -10,7 +10,7 @@ import { PearlNav } from "./_components/PearlNav";
 import { PearlFooter } from "./_components/PearlFooter";
 import type { WeddingData } from "./_lib/types";
 
-const INVITE_CODE = process.env.PEARL_INVITE_CODE || process.env.LAVANTA_INVITE_CODE || "";
+const INVITE_CODE = process.env.PEARL_INVITE_CODE || process.env.Grow_INVITE_CODE || "";
 
 const getWeddingData = cache(async (): Promise<WeddingData | null> => {
   if (!INVITE_CODE) return null;

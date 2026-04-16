@@ -1,6 +1,6 @@
-export type LavantaLocale = "tr" | "en" | "de";
+export type GrowLocale = "tr" | "en" | "de";
 
-interface LavantaTranslations {
+interface GrowTranslations {
   // Nav
   navHome: string;
   navStory: string;
@@ -146,7 +146,7 @@ interface LavantaTranslations {
   storyFallbackMilestone5Desc: string;
 }
 
-const translations: Record<LavantaLocale, LavantaTranslations> = {
+const translations: Record<GrowLocale, GrowTranslations> = {
   tr: {
     navHome: "Ana Sayfa",
     navStory: "Hikayemiz",
@@ -545,16 +545,16 @@ const translations: Record<LavantaLocale, LavantaTranslations> = {
 };
 
 // Default to Turkish for now — will be dynamic based on customer preference
-let currentLocale: LavantaLocale = "tr";
+let currentLocale: GrowLocale = "tr";
 
-export function setLavantaLocale(locale: LavantaLocale) {
+export function setGrowLocale(locale: GrowLocale) {
   currentLocale = locale;
 }
 
-export function t(key: keyof LavantaTranslations): string {
+export function t(key: keyof GrowTranslations): string {
   return translations[currentLocale][key] || translations.tr[key] || key;
 }
 
-export function getTranslations(locale: LavantaLocale): LavantaTranslations {
+export function getTranslations(locale: GrowLocale): GrowTranslations {
   return translations[locale] || translations.tr;
 }
