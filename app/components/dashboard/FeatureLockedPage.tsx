@@ -3,8 +3,9 @@
 import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export function FeatureLockedPage() {
   const t = useTranslations("Dashboard");
@@ -24,9 +25,15 @@ export function FeatureLockedPage() {
               {t("featureLocked")}
             </p>
           </div>
-          <Button asChild className="bg-[#d5d1ad] text-[#252224] hover:bg-[#d5d1ad]/90">
-            <Link href="/#fiyatlar">{t("upgradePackage")}</Link>
-          </Button>
+          <Link
+            href="/#fiyatlar"
+            className={cn(
+              buttonVariants(),
+              "bg-[#d5d1ad] text-[#252224] hover:bg-[#d5d1ad]/90"
+            )}
+          >
+            {t("upgradePackage")}
+          </Link>
         </CardContent>
       </Card>
     </div>
