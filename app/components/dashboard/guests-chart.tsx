@@ -3,6 +3,8 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,7 +147,6 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
       return raw.map((d) => ({ ...d, date: t(d.date) }));
     }
 
-    // Derive chart data from real guests
     const now = new Date();
     const dayNames = ["daySun", "dayMon", "dayTue", "dayWed", "dayThu", "dayFri", "daySat"];
     const monthNames = ["monthJan", "monthFeb", "monthMar", "monthApr", "monthMay", "monthJun",
@@ -171,7 +172,6 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
       });
     }
 
-    // last_month - group by month
     const months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(now);
       d.setMonth(d.getMonth() - (5 - i));
@@ -219,10 +219,10 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
   };
 
   return (
-    <div className="bg-card text-card-foreground rounded-lg border flex-1 min-w-0 overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-border/50">
-        <h3 className="font-medium text-sm sm:text-base">{t("rsvpStatus")}</h3>
-        <div className="flex items-center gap-2">
+    <Card className="flex-1 min-w-0 overflow-hidden rounded-lg py-0 gap-0">
+      <CardHeader className="flex-col sm:flex-row sm:items-center gap-3 p-4 border-b border-border/50">
+        <CardTitle className="text-sm sm:text-base">{t("rsvpStatus")}</CardTitle>
+        <CardAction className="flex items-center gap-2 self-end sm:self-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-7 gap-1.5">
@@ -295,9 +295,9 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      </div>
-      <div className="p-4">
+        </CardAction>
+      </CardHeader>
+      <CardContent className="p-4">
         <div ref={chartContainerRef} className="w-full">
           {chartWidth > 0 ? (
             chartType === "area" ? (
@@ -401,10 +401,10 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
               </RechartsLineChart>
             )
           ) : (
-            <div className="w-full animate-pulse bg-muted/30 rounded" style={{ aspectRatio: '3' }} />
+            <Skeleton className="w-full" style={{ aspectRatio: '3' }} />
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

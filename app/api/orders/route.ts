@@ -21,7 +21,7 @@ const orderSchema = z.object({
   weddingDate: z.string().min(1),
   weddingTime: z.string().min(1),
   selectedPackage: z.enum(["starter", "pro", "business"]),
-  selectedTheme: z.enum(["rose", "sunset", "pearl", "crystal", "custom"]),
+  selectedTheme: z.enum(["rose", "sunset", "pearl", "crystal", "garden", "ocean", "golden", "custom"]),
   customThemeRequest: z.string().optional(),
   paymentMethod: z.enum(["deposit", "full"]),
 });
@@ -97,7 +97,6 @@ export async function POST(req: NextRequest) {
       session_db.endSession();
     }
 
-    // Send order confirmation email (non-blocking)
     const locale = (await db.collection("user").findOne({ email: session.user.email }))?.locale || "tr";
     const { subject, html } = orderConfirmationEmail({
       selectedPackage: data.selectedPackage,

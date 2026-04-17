@@ -128,7 +128,7 @@ export function PillNav() {
       <nav className="fixed top-5 left-0 right-0 z-[60] px-6 md:px-10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 cursor-pointer">
-            <Logo className="w-7 h-7" />
+            <Logo className="w-[42px] h-[42px]" />
             <span className={cn("font-merienda font-bold text-xl hidden sm:block", isOverLight ? "text-[#252224]" : "text-foreground")}>
               {tNav("brand")}
             </span>

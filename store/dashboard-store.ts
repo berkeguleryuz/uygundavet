@@ -17,7 +17,6 @@ interface DashboardStats {
 }
 
 interface DashboardStore {
-  // Guests
   guests: GuestData[];
   isLoadingGuests: boolean;
   fetchGuests: () => Promise<void>;
@@ -30,12 +29,10 @@ interface DashboardStore {
   ) => Promise<GuestData | null>;
   deleteGuest: (id: string) => Promise<boolean>;
 
-  // Stats
   stats: DashboardStats | null;
   isLoadingStats: boolean;
   fetchStats: () => Promise<void>;
 
-  // Customer
   customer: CustomerData | null;
   customerOrder: {
     selectedPackage: string;
@@ -48,7 +45,6 @@ interface DashboardStore {
   fetchCustomer: () => Promise<void>;
   updateCustomer: (data: Partial<CustomerData>) => Promise<boolean>;
 
-  // Filters
   searchQuery: string;
   rsvpFilter: RsvpStatus | "all";
   sourceFilter: GuestSource | "all";
@@ -59,7 +55,6 @@ interface DashboardStore {
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
-  // Guests
   guests: [],
   isLoadingGuests: true,
   fetchGuests: async () => {
@@ -119,7 +114,6 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     }
   },
 
-  // Stats
   stats: null,
   isLoadingStats: true,
   fetchStats: async () => {
@@ -135,7 +129,6 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     }
   },
 
-  // Customer
   customer: null,
   customerOrder: null,
   isLoadingCustomer: true,
@@ -170,7 +163,6 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
     }
   },
 
-  // Filters
   searchQuery: "",
   rsvpFilter: "all",
   sourceFilter: "all",

@@ -1,7 +1,6 @@
 export type GrowLocale = "tr" | "en" | "de";
 
 interface GrowTranslations {
-  // Nav
   navHome: string;
   navStory: string;
   navEvent: string;
@@ -10,12 +9,10 @@ interface GrowTranslations {
   navRsvp: string;
   navLogin: string;
 
-  // Hero
   heroTagline: string;
   heroCtaButton: string;
   heroScrollHint: string;
 
-  // Countdown
   countdownLabel: string;
   countdownHeading: string;
   countdownDays: string;
@@ -23,25 +20,21 @@ interface GrowTranslations {
   countdownMinutes: string;
   countdownSeconds: string;
 
-  // Story preview
   storyLabel: string;
   storyText1: string;
   storyText2: string;
   storyCtaButton: string;
 
-  // Venue preview
   venueLabel: string;
   venueAddress: string;
   venueDate: string;
   venueTime: string;
   venueCtaButton: string;
 
-  // Gallery preview
   galleryLabel: string;
   galleryHeading: string;
   galleryCtaButton: string;
 
-  // CTA
   ctaHeading: string;
   ctaText: string;
   ctaButton: string;
@@ -49,7 +42,6 @@ interface GrowTranslations {
   ctaGalleryLink: string;
   ctaContactLink: string;
 
-  // Memory / Anı Defteri
   memoryPageLabel: string;
   memoryPageHeading: string;
   memoryPageSubtitle: string;
@@ -73,7 +65,6 @@ interface GrowTranslations {
   memoryTimeDays: string;
   memoryTimeWeeks: string;
 
-  // RSVP
   rsvpAttending: string;
   rsvpNotAttending: string;
   rsvpNamePlaceholder: string;
@@ -92,7 +83,6 @@ interface GrowTranslations {
   rsvpSuccessToast: string;
   rsvpErrorToast: string;
 
-  // Gallery page
   galleryPageLabel: string;
   galleryPageHeading: string;
   galleryUploadHeading: string;
@@ -104,7 +94,6 @@ interface GrowTranslations {
   galleryEmpty: string;
   galleryEmptySubtitle: string;
 
-  // Event page
   eventLabel: string;
   eventSubtitle: string;
   eventScheduleHeading: string;
@@ -114,12 +103,10 @@ interface GrowTranslations {
   eventDressCode: string;
   eventMapPlaceholder: string;
 
-  // Contact
   contactLabel: string;
   contactText: string;
   contactCtaButton: string;
 
-  // Footer
   footerCreatedWith: string;
   footerCtaHeading: string;
   footerCtaText: string;
@@ -127,7 +114,6 @@ interface GrowTranslations {
   footerPrivacy: string;
   footerRights: string;
 
-  // Story page (hikayemiz)
   storyPageLabel: string;
   storyFallbackMilestone1Date: string;
   storyFallbackMilestone1Title: string;
@@ -544,7 +530,6 @@ const translations: Record<GrowLocale, GrowTranslations> = {
   },
 };
 
-// Default to Turkish for now — will be dynamic based on customer preference
 let currentLocale: GrowLocale = "tr";
 
 export function setGrowLocale(locale: GrowLocale) {

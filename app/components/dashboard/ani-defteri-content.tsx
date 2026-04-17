@@ -6,6 +6,8 @@ import {
   MoreHorizontal, Check, Trash2, BookHeart, Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -89,46 +91,48 @@ export function AniDefteriContent({ isDemo }: { isDemo?: boolean }) {
           <p className="text-muted-foreground">{t("noMessages")}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {entries.map((entry) => (
-            <div key={entry._id} className="bg-card rounded-xl border p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="size-9">
-                    <AvatarFallback>{entry.authorName.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-semibold">{entry.authorName}</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</p>
+            <Card key={entry._id} className="rounded-xl py-0 gap-0">
+              <CardContent className="px-5 py-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="size-9">
+                      <AvatarFallback>{entry.authorName.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-semibold">{entry.authorName}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(entry.createdAt)}</p>
+                    </div>
                   </div>
+                  {!isDemo && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-7 text-muted-foreground">
+                          <MoreHorizontal className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleApprove(entry._id)}>
+                          <Check className="size-4" />
+                          <span>{entry.approved ? t("unapprove") : t("approve")}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDelete(entry._id)}>
+                          <Trash2 className="size-4" />
+                          <span>{t("delete")}</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
-                {!isDemo && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="p-1.5 rounded-md hover:bg-accent transition-colors text-muted-foreground">
-                        <MoreHorizontal className="size-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleApprove(entry._id)}>
-                        <Check className="size-4" />
-                        <span>{entry.approved ? t("unapprove") : t("approve")}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDelete(entry._id)}>
-                        <Trash2 className="size-4" />
-                        <span>{t("delete")}</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <p className="text-sm leading-relaxed mt-3 text-muted-foreground">{entry.message}</p>
+                {!entry.approved && (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-amber-400 border-amber-500/40 text-xs">{t("pendingApproval")}</Badge>
+                  </div>
                 )}
-              </div>
-              <p className="text-sm leading-relaxed mt-3 text-muted-foreground">{entry.message}</p>
-              {!entry.approved && (
-                <div className="mt-2">
-                  <Badge variant="outline" className="text-amber-400 border-amber-500/40 text-xs">{t("pendingApproval")}</Badge>
-                </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}

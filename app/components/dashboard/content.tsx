@@ -25,7 +25,7 @@ export function DashboardContent({ isDemo }: { isDemo?: boolean }) {
   }, [isDemo, fetchGuests, fetchStats, fetchCustomer]);
 
   return (
-    <main className="flex-1 overflow-auto p-4 sm:p-6 space-y-6 bg-background w-full">
+    <main className="flex-1 overflow-auto p-4 sm:p-6 flex flex-col gap-6 bg-background w-full">
       <WelcomeSection isDemo={isDemo} />
       <StatsCards isDemo={isDemo} />
       <div className="flex flex-col lg:flex-row lg:items-start gap-4 sm:gap-6 min-w-0">

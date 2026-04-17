@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Chakra_Petch, Merienda, Space_Grotesk, Geist } from "next/font/google";
+import { getLocale } from "next-intl/server";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -28,14 +29,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
   return (
     <html
-      lang="tr"
+      lang={locale}
       suppressHydrationWarning
       style={{ colorScheme: "dark" }}
       className={cn(

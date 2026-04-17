@@ -3,6 +3,13 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardAction,
+  CardContent,
+} from "@/components/ui/card";
 import { Clock } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard-store";
 
@@ -52,56 +59,54 @@ export function RecentActivity({ isDemo }: { isDemo?: boolean }) {
       }));
   }, [isDemo, guests, t]);
 
-  if (!isDemo && guests.length === 0) {
-    return (
-      <div className="bg-card text-card-foreground rounded-lg border w-full lg:w-[332px] shrink-0">
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <h3 className="font-medium text-sm sm:text-base">{t("recentActivities")}</h3>
-          <Clock className="size-4 text-muted-foreground" />
-        </div>
-        <div className="p-8 text-center">
-          <p className="text-sm text-muted-foreground">{t("noActivity")}</p>
-        </div>
-      </div>
-    );
-  }
+  const isEmpty = !isDemo && guests.length === 0;
 
   return (
-    <div className="bg-card text-card-foreground rounded-lg border w-full lg:w-[332px] shrink-0">
-      <div className="flex items-center justify-between p-4 border-b border-border/50">
-        <h3 className="font-medium text-sm sm:text-base">{t("recentActivities")}</h3>
-        <Clock className="size-4 text-muted-foreground" />
-      </div>
-      <div className="p-4">
-        <div className="divide-y divide-border/50">
-          {activities.map((activity) => (
-            <div
-              key={activity._id}
-              className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
-            >
-              <Avatar className="size-8 shrink-0">
-                <AvatarFallback>
-                  {activity.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm leading-snug">
-                  <span className="font-medium">{activity.name}</span>{" "}
-                  <span className="text-muted-foreground">
-                    {isDemo ? t(activity.action) : activity.action}
-                  </span>
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {isDemo ? t(activity.time) : activity.time}
-                </p>
+    <Card className="w-full lg:w-[332px] shrink-0 gap-0 py-0">
+      <CardHeader className="flex-row items-center border-b border-border/50 px-4 py-4">
+        <CardTitle className="text-sm sm:text-base">
+          {t("recentActivities")}
+        </CardTitle>
+        <CardAction>
+          <Clock className="size-4 text-muted-foreground" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="px-4 py-4">
+        {isEmpty ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            {t("noActivity")}
+          </p>
+        ) : (
+          <div className="divide-y divide-border/50">
+            {activities.map((activity) => (
+              <div
+                key={activity._id}
+                className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
+              >
+                <Avatar className="size-8 shrink-0">
+                  <AvatarFallback>
+                    {activity.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm leading-snug">
+                    <span className="font-medium">{activity.name}</span>{" "}
+                    <span className="text-muted-foreground">
+                      {isDemo ? t(activity.action) : activity.action}
+                    </span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {isDemo ? t(activity.time) : activity.time}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

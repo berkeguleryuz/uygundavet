@@ -1,7 +1,7 @@
 export const THEME_OPTIONS = [
   {
     key: "grow" as const,
-    image: "/temalar/grow.jpg",
+    image: "/temalar/grow.png",
   },
   {
     key: "pearl" as const,
@@ -22,6 +22,19 @@ export const THEME_OPTIONS = [
     key: "crystal" as const,
     image: "/temalar/crystal.png",
   },
+  {
+    key: "garden" as const,
+    image: "/temalar/garden.png",
+  },
+  {
+    key: "ocean" as const,
+    image: "/temalar/ocean.png",
+  },
+  {
+    key: "golden" as const,
+    image: "/temalar/golden.mp4",
+    video: true,
+  },
 ] as const;
 
-export type ThemeKey = "grow" | "pearl" | "rose" | "sunset" | "crystal" | "custom";
+export type ThemeKey = "grow" | "pearl" | "rose" | "sunset" | "crystal" | "garden" | "ocean" | "golden" | "custom";

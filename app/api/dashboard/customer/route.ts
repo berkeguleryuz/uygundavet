@@ -92,7 +92,6 @@ export async function GET() {
       );
     }
 
-    // Auto-generate inviteCode for existing users who don't have one
     if (!customer.inviteCode) {
       const updated = await Customer.findOneAndUpdate(
         { _id: customer._id, inviteCode: { $in: [null, ""] } },

@@ -90,6 +90,7 @@ export function SectionMindloopHero() {
 
   return (
     <section ref={sectionRef} className="relative bg-[#252224]">
+      <div className="relative">
       <div className="sticky top-0 h-screen overflow-hidden">
         <div className="flex h-full w-full items-center justify-center">
           <div
@@ -252,6 +253,7 @@ export function SectionMindloopHero() {
       </div>
 
       <div className="h-[200vh]" />
+      </div>
 
       <div className="px-6 pt-16 pb-16 md:pt-20 md:px-12 md:pb-20 lg:px-20 lg:pt-24 lg:pb-24 flex flex-col items-center">
         <p className="mx-auto max-w-2xl text-center text-2xl leading-relaxed text-muted-foreground md:text-3xl lg:text-[2.5rem] lg:leading-snug font-sans whitespace-pre-line mb-10">
