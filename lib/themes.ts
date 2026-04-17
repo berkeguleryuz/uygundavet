@@ -24,11 +24,13 @@ export const THEME_OPTIONS = [
   },
   {
     key: "garden" as const,
-    image: "/temalar/garden.png",
+    image: "/temalar/garden.mp4",
+    video: true,
   },
   {
     key: "ocean" as const,
-    image: "/temalar/ocean.png",
+    image: "/temalar/ocean.mp4",
+    video: true,
   },
   {
     key: "golden" as const,
