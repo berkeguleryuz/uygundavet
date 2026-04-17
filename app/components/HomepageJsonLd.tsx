@@ -15,7 +15,6 @@ export async function HomepageJsonLd({ locale }: Props) {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";
 
-  // WebSite Schema
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -26,7 +25,6 @@ export async function HomepageJsonLd({ locale }: Props) {
     inLanguage: ["tr", "en", "de"],
   };
 
-  // Organization Schema
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -51,7 +49,6 @@ export async function HomepageJsonLd({ locale }: Props) {
     },
   };
 
-  // FAQ Schema
   const faqs = [
     { q: t("q1"), a: t("a1") },
     { q: t("q2"), a: t("a2") },
@@ -75,7 +72,6 @@ export async function HomepageJsonLd({ locale }: Props) {
     })),
   };
 
-  // Product Schemas for Pricing Packages
   const packages = [
     {
       name: tPricing("starter.name"),
@@ -117,7 +113,6 @@ export async function HomepageJsonLd({ locale }: Props) {
     },
   }));
 
-  // Service Schema
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",

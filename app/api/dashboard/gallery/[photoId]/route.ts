@@ -59,7 +59,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Photo not found" }, { status: 404 });
     }
 
-    // Delete from Cloudinary
     if (photo.publicId) {
       cloudinary.uploader.destroy(photo.publicId).catch(() => {});
     }

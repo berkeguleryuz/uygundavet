@@ -36,7 +36,6 @@ export function PacPasswordInput({
   const cloakRef = useRef<HTMLDivElement>(null);
   const animatingRef = useRef(false);
 
-  /* ghost eye blink loop */
   useEffect(() => {
     const eyes = eyesRef.current;
     if (!eyes) return;
@@ -56,7 +55,6 @@ export function PacPasswordInput({
     return () => ctx.revert();
   }, []);
 
-  /* pac-man eats dots → reveal password */
   const showPassword = useCallback(() => {
     if (animatingRef.current) return;
     animatingRef.current = true;
@@ -102,7 +100,6 @@ export function PacPasswordInput({
       .to(cloak, { duration: 0.15, backgroundColor: INPUT_BG }, "<");
   }, []);
 
-  /* ghost sweeps → hide password */
   const hidePassword = useCallback(() => {
     if (animatingRef.current) return;
     animatingRef.current = true;

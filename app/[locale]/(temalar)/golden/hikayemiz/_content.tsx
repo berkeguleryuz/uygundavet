@@ -81,9 +81,6 @@ export function HikayemizContent() {
 
   return (
     <div className="min-h-svh bg-[#d4b896]/30 pt-28 pb-16 px-4 sm:px-6 relative overflow-hidden">
-      <div aria-hidden className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.3)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-      <div aria-hidden className="absolute -bottom-20 -left-20 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(193,102,107,0.2)_0%,_rgba(193,102,107,0)_70%)] pointer-events-none" />
-
       <div className="max-w-4xl mx-auto relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

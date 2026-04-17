@@ -53,8 +53,6 @@ export function SectionVenue() {
 
   return (
     <section ref={sectionRef} className="bg-[#faf5ec] py-20 md:py-28 relative overflow-hidden">
-      <div aria-hidden className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.25)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-
       {/* Heading */}
       <div className="max-w-4xl mx-auto px-6 text-center mb-12 md:mb-16 relative">
         <motion.div

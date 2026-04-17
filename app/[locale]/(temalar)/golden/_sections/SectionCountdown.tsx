@@ -64,9 +64,6 @@ export function SectionCountdown() {
 
   return (
     <section className="bg-[#faf5ec] py-28 md:py-36 relative overflow-hidden">
-      {/* Sun glows */}
-      <div aria-hidden className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.2)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-      <div aria-hidden className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(193,102,107,0.18)_0%,_rgba(193,102,107,0)_70%)] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-6 text-center relative">
         <motion.div

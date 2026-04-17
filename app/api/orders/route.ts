@@ -97,7 +97,6 @@ export async function POST(req: NextRequest) {
       session_db.endSession();
     }
 
-    // Send order confirmation email (non-blocking)
     const locale = (await db.collection("user").findOne({ email: session.user.email }))?.locale || "tr";
     const { subject, html } = orderConfirmationEmail({
       selectedPackage: data.selectedPackage,

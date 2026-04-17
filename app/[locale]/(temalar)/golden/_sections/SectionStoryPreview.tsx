@@ -69,10 +69,6 @@ export function SectionStoryPreview() {
       ref={sectionRef}
       className="bg-[#d4b896]/35 py-28 md:py-36 relative overflow-hidden"
     >
-      {/* Sun glow corners */}
-      <div aria-hidden className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.35)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-      <div aria-hidden className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-[radial-gradient(circle,_rgba(193,102,107,0.25)_0%,_rgba(193,102,107,0)_70%)] pointer-events-none" />
-
       <div className="max-w-6xl mx-auto px-6 md:px-12 relative">
         <motion.div
           initial={{ opacity: 0, y: 14 }}

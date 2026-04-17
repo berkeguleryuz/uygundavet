@@ -71,7 +71,6 @@ export function ClodronLayoutClient({
     );
   }
 
-  // Step 1: Password gate
   if (!passwordVerified) {
     return (
       <div className="h-svh flex items-center justify-center bg-[#252224] px-6">
@@ -120,7 +119,6 @@ export function ClodronLayoutClient({
     );
   }
 
-  // Step 2: Must be logged in
   if (!session) {
     return (
       <div className="h-svh flex items-center justify-center bg-[#252224] px-6">
@@ -154,7 +152,6 @@ export function ClodronLayoutClient({
     );
   }
 
-  // Step 3: Server-side email check via API
   if (!accessChecked) {
     return (
       <div className="h-svh flex items-center justify-center bg-[#252224]">
@@ -186,7 +183,6 @@ export function ClodronLayoutClient({
     );
   }
 
-  // All 3 layers passed
   return (
     <div className="flex h-svh bg-[#252224]">
       <AdminSidebar />

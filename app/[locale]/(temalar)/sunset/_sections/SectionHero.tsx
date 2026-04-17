@@ -51,8 +51,6 @@ export function SectionHero() {
 
     if (!galleryEl || !wrapEl) return;
 
-    // `gsap/Flip` trips TypeScript path-casing checks in this repo on macOS.
-    // Loading the runtime build here keeps the animation scoped and the build stable.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Flip } = require("gsap/dist/Flip");
     gsap.registerPlugin(Flip);

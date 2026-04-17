@@ -33,15 +33,6 @@ export function GoldenFooter() {
 
   return (
     <footer className="bg-[#2d2620] relative overflow-hidden">
-      {/* Radial sun glow decoration */}
-      <div
-        aria-hidden
-        className="absolute -top-32 right-0 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.25)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none"
-      />
-      <div
-        aria-hidden
-        className="absolute bottom-0 -left-32 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(193,102,107,0.2)_0%,_rgba(193,102,107,0)_70%)] pointer-events-none"
-      />
 
       <div className="relative max-w-5xl mx-auto px-6 md:px-12 pt-20 pb-8">
         <div className="relative bg-[#4a403a]/60 backdrop-blur-sm border border-[#f4a900]/25 rounded-[2.5rem] p-8 md:p-12 text-center overflow-hidden">

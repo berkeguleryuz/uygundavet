@@ -12,8 +12,6 @@ const BASE = "/golden";
 export function SectionCTA() {
   return (
     <section className="bg-[#faf5ec] py-28 md:py-36 relative overflow-hidden">
-      <div aria-hidden className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.18)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-
       <div className="max-w-3xl mx-auto px-6 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

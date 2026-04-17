@@ -7,7 +7,6 @@ import gsap from "gsap";
 import Link from "next/link";
 import { useWedding } from "../_lib/context";
 import { t } from "../_lib/i18n";
-import { ChevronDownIcon } from "../_icons/ChevronDownIcon";
 import { CompassIcon } from "../_icons/CompassIcon";
 
 gsap.registerPlugin(useGSAP);
@@ -33,11 +32,9 @@ export function SectionHero() {
 
   useGSAP(
     () => {
-      // Parallax wave layers drifting horizontally
       gsap.to("[data-wave-1]", { x: -60, duration: 14, ease: "sine.inOut", repeat: -1, yoyo: true });
       gsap.to("[data-wave-2]", { x: 80, duration: 18, ease: "sine.inOut", repeat: -1, yoyo: true });
       gsap.to("[data-wave-3]", { x: -40, duration: 22, ease: "sine.inOut", repeat: -1, yoyo: true });
-      // Compass rotating slowly
       gsap.to("[data-compass]", { rotation: 360, duration: 80, ease: "none", repeat: -1 });
     },
     { scope: rootRef }
@@ -179,23 +176,6 @@ export function SectionHero() {
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 z-10"
-      >
-        <span className="font-sans text-[10px] tracking-[0.35em] uppercase text-[#a8dadc]/80 font-semibold">
-          {t("heroScrollHint")}
-        </span>
-        <motion.span
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="text-[#a8dadc]/70"
-        >
-          <ChevronDownIcon size={16} />
-        </motion.span>
-      </motion.div>
     </section>
   );
 }

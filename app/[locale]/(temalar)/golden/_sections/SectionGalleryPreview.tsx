@@ -15,7 +15,6 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const BASE = "/golden";
 
-// Vintage print stack with slight tilts
 const photos = [
   { url: "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&q=85", span: "col-span-2 row-span-2", tilt: "-rotate-[3deg]" },
   { url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=85", span: "col-span-1 row-span-1", tilt: "rotate-[4deg]" },

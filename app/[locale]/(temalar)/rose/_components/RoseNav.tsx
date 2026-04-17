@@ -53,7 +53,6 @@ export function RoseNav() {
       : []),
   ];
 
-  /* Detect if we're over a dark section via scroll */
   useEffect(() => {
     if (isOnDarkPage) return;
 

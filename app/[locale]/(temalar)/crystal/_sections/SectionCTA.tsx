@@ -9,7 +9,7 @@ import { HeartIcon } from "../_icons/HeartIcon";
 const BASE = "/crystal";
 
 export function SectionCTA() {
-  useWedding(); // ensure context is available
+  useWedding(); 
 
   return (
     <motion.section

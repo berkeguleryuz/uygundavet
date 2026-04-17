@@ -147,7 +147,6 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
       return raw.map((d) => ({ ...d, date: t(d.date) }));
     }
 
-    // Derive chart data from real guests
     const now = new Date();
     const dayNames = ["daySun", "dayMon", "dayTue", "dayWed", "dayThu", "dayFri", "daySat"];
     const monthNames = ["monthJan", "monthFeb", "monthMar", "monthApr", "monthMay", "monthJun",
@@ -173,7 +172,6 @@ export function GuestsChart({ isDemo }: { isDemo?: boolean }) {
       });
     }
 
-    // last_month - group by month
     const months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(now);
       d.setMonth(d.getMonth() - (5 - i));

@@ -18,7 +18,7 @@ export function SectionThemes() {
   const t = useTranslations("Themes");
 
   return (
-    <section id="temalar" className="w-full py-32 md:py-44 bg-[#252224]">
+    <section id="temalar" className="w-full py-32 md:py-44 bg-[#252224] scroll-mt-24">
       <div className="max-w-6xl mx-auto px-6 mb-16">
         <motion.p
           {...fadeUp(0.1)}
@@ -42,8 +42,7 @@ export function SectionThemes() {
 
       <motion.div
         {...fadeUp(0.4)}
-        className="max-w-7xl md:mx-auto md:px-6"
-        style={{ height: "700px", position: "relative" }}
+        className="relative w-full h-[460px] sm:h-[560px] md:h-[680px] lg:h-[780px] 2xl:h-[880px]"
       >
         <FlowingMenu
           items={themeItems}

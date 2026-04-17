@@ -33,10 +33,8 @@ export function MemoryCard({ authorName, message, createdAt, pending }: MemoryCa
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative bg-[#f5f3ed]/5 rounded-[1.5rem] border border-[#f9a620]/15 p-5 pl-6"
+      className="relative bg-[#f5f3ed]/5 rounded-[1.5rem] border border-[#f9a620]/15 p-5"
     >
-      <div className="absolute left-0 top-6 bottom-6 w-1 rounded-r-full bg-gradient-to-b from-[#f9a620] via-[#4a7c59] to-[#b7472a]" />
-
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3">
           <div className="size-8 rounded-full bg-[#f9a620]/15 border border-[#f9a620]/30 flex items-center justify-center shrink-0">

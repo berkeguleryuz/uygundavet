@@ -18,9 +18,6 @@ export function IletisimContent() {
 
   return (
     <div className="min-h-svh bg-[#d4b896]/30 pt-28 pb-12 px-4 sm:px-6 relative overflow-hidden">
-      <div aria-hidden className="absolute top-10 right-0 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.25)_0%,_rgba(244,169,0,0)_70%)] pointer-events-none" />
-      <div aria-hidden className="absolute -bottom-10 -left-20 w-[300px] h-[300px] rounded-full bg-[radial-gradient(circle,_rgba(193,102,107,0.2)_0%,_rgba(193,102,107,0)_70%)] pointer-events-none" />
-
       <div className="max-w-xl mx-auto relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

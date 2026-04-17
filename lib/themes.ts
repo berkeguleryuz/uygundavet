@@ -1,7 +1,7 @@
 export const THEME_OPTIONS = [
   {
     key: "grow" as const,
-    image: "/temalar/grow.jpg",
+    image: "/temalar/grow.png",
   },
   {
     key: "pearl" as const,
@@ -24,15 +24,16 @@ export const THEME_OPTIONS = [
   },
   {
     key: "garden" as const,
-    image: "/temalar/garden.jpg",
+    image: "/temalar/garden.png",
   },
   {
     key: "ocean" as const,
-    image: "/temalar/ocean.jpg",
+    image: "/temalar/ocean.png",
   },
   {
     key: "golden" as const,
-    image: "/temalar/golden.jpg",
+    image: "/temalar/golden.mp4",
+    video: true,
   },
 ] as const;
 
