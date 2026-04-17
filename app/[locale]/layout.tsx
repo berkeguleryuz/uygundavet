@@ -29,10 +29,6 @@ export async function generateMetadata({
       template: `%s | ${t("brandName")}`,
     },
     description: t("description"),
-    keywords: t("keywords"),
-    authors: [{ name: "Uygun Davet" }],
-    creator: "Uygun Davet",
-    publisher: "Uygun Davet",
     robots: {
       index: true,
       follow: true,
@@ -51,23 +47,11 @@ export async function generateMetadata({
       siteName: t("brandName"),
       title: t("title"),
       description: t("description"),
-      images: [
-        {
-          url: "/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: t("ogImageAlt"),
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
       title: t("title"),
       description: t("description"),
-      images: ["/og-image.png"],
-    },
-    alternates: {
-      canonical: "/",
     },
     manifest: "/manifest.webmanifest",
   };

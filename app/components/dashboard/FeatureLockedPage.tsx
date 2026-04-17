@@ -3,29 +3,32 @@
 import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function FeatureLockedPage() {
   const t = useTranslations("Dashboard");
 
   return (
     <div className="flex-1 flex items-center justify-center p-6">
-      <div className="text-center max-w-sm">
-        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-7 h-7 text-[#d5d1ad]" />
-        </div>
-        <h2 className="text-lg font-chakra font-semibold text-white uppercase tracking-wider mb-2">
-          {t("featureLocked")}
-        </h2>
-        <p className="text-sm text-white/40 font-sans mb-6">
-          {t("featureLocked")}
-        </p>
-        <Link
-          href="/#fiyatlar"
-          className="inline-block px-8 py-3 bg-[#d5d1ad] text-[#252224] font-semibold font-sans rounded-xl hover:bg-[#d5d1ad]/90 transition-colors"
-        >
-          {t("upgradePackage")}
-        </Link>
-      </div>
+      <Card className="max-w-sm w-full">
+        <CardContent className="flex flex-col items-center text-center gap-5">
+          <div className="size-16 rounded-full bg-muted flex items-center justify-center">
+            <Lock className="size-7 text-[#d5d1ad]" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-lg font-chakra font-semibold uppercase tracking-wider">
+              {t("featureLocked")}
+            </h2>
+            <p className="text-sm text-muted-foreground font-sans">
+              {t("featureLocked")}
+            </p>
+          </div>
+          <Button asChild className="bg-[#d5d1ad] text-[#252224] hover:bg-[#d5d1ad]/90">
+            <Link href="/#fiyatlar">{t("upgradePackage")}</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

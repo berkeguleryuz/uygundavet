@@ -24,14 +24,6 @@ export async function HomepageJsonLd({ locale }: Props) {
     url: siteUrl,
     description: tMeta("description"),
     inLanguage: ["tr", "en", "de"],
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/?search={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 
   // Organization Schema

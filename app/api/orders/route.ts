@@ -21,7 +21,7 @@ const orderSchema = z.object({
   weddingDate: z.string().min(1),
   weddingTime: z.string().min(1),
   selectedPackage: z.enum(["starter", "pro", "business"]),
-  selectedTheme: z.enum(["rose", "sunset", "pearl", "crystal", "custom"]),
+  selectedTheme: z.enum(["rose", "sunset", "pearl", "crystal", "garden", "ocean", "golden", "custom"]),
   customThemeRequest: z.string().optional(),
   paymentMethod: z.enum(["deposit", "full"]),
 });

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle,
 } from "lucide-react";
@@ -106,14 +107,14 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
-          <div className="bg-card rounded-2xl border p-6 sm:p-8 relative overflow-hidden">
+          <Card className="rounded-2xl relative overflow-hidden py-0">
             {isDemo && (
               <Badge variant="outline" className="absolute top-4 right-4 text-amber-500 border-amber-500/40 bg-card z-10">
                 Demo
               </Badge>
             )}
 
-            <div className="flex flex-col items-center text-center space-y-6 py-8 sm:py-12">
+            <CardContent className="px-6 sm:px-8 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
                 <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
@@ -160,96 +161,102 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
                 <div className="h-px w-12 bg-border" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-          <div className="bg-card rounded-xl border p-5">
-            <h3 className="font-medium text-sm mb-4">{t("themeSelection")}</h3>
-            <div className="flex items-center gap-3">
-              {themeColorDefs.map((theme, index) => (
-                <button
-                  key={theme.key}
-                  onClick={() => !isDemo && setSelectedTheme(index)}
-                  disabled={isDemo}
-                  className="flex flex-col items-center gap-2 group"
-                >
-                  <div
-                    className={`size-10 rounded-full border-2 transition-all ${
-                      selectedTheme === index
-                        ? "border-foreground scale-110"
-                        : "border-transparent hover:border-muted-foreground/50"
-                    }`}
-                    style={{ backgroundColor: theme.color }}
-                  />
-                  <span className="text-xs text-muted-foreground">{t(theme.key)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-card rounded-xl border p-5">
-            <h3 className="font-medium text-sm mb-4">{t("share")}</h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Input readOnly value={shareLink} className="text-sm bg-muted/50 border-border/50 h-9" />
-                <Button variant="outline" size="icon" className="size-9 shrink-0" onClick={handleCopy} disabled={isDemo}>
-                  {copied ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
-                </Button>
+        <div className="lg:col-span-1 flex flex-col gap-4 sm:gap-6">
+          <Card className="rounded-xl py-0">
+            <CardContent className="px-5 py-5 flex flex-col gap-4">
+              <h3 className="font-medium text-sm">{t("themeSelection")}</h3>
+              <div className="flex items-center gap-3">
+                {themeColorDefs.map((theme, index) => (
+                  <button
+                    key={theme.key}
+                    onClick={() => !isDemo && setSelectedTheme(index)}
+                    disabled={isDemo}
+                    className="flex flex-col items-center gap-2 group"
+                  >
+                    <div
+                      className={`size-10 rounded-full border-2 transition-all ${
+                        selectedTheme === index
+                          ? "border-foreground scale-110"
+                          : "border-transparent hover:border-muted-foreground/50"
+                      }`}
+                      style={{ backgroundColor: theme.color }}
+                    />
+                    <span className="text-xs text-muted-foreground">{t(theme.key)}</span>
+                  </button>
+                ))}
               </div>
-              {inviteCode && !isDemo ? (
-                <>
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(whatsappShareLink)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-[#25D366] hover:bg-[#22c55e] text-white text-sm font-medium transition-colors"
-                  >
-                    <MessageCircle className="size-4" />
-                    {t("shareWhatsApp")}
-                  </a>
-                  <QrSticker url={shareLink} coupleName={coupleName} />
-                  <Link
-                    href={`/rsvp/${inviteCode}`}
-                    target="_blank"
-                    className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors font-sans"
-                  >
-                    <ExternalLink className="size-3.5" />
-                    {t("previewRsvpForm")}
-                  </Link>
-                </>
-              ) : (
-                <div className="border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2">
-                  <div className="size-24 border-2 border-muted-foreground/30 rounded-md flex items-center justify-center">
-                    <span className="text-sm font-medium text-muted-foreground">QR</span>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-xl py-0">
+            <CardContent className="px-5 py-5 flex flex-col gap-4">
+              <h3 className="font-medium text-sm">{t("share")}</h3>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <Input readOnly value={shareLink} className="text-sm bg-muted/50 border-border/50 h-9" />
+                  <Button variant="outline" size="icon" className="size-9 shrink-0" onClick={handleCopy} disabled={isDemo}>
+                    {copied ? <Check className="size-4 text-emerald-500" /> : <Copy className="size-4" />}
+                  </Button>
+                </div>
+                {inviteCode && !isDemo ? (
+                  <>
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(whatsappShareLink)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-[#25D366] hover:bg-[#22c55e] text-white text-sm font-medium transition-colors"
+                    >
+                      <MessageCircle className="size-4" />
+                      {t("shareWhatsApp")}
+                    </a>
+                    <QrSticker url={shareLink} coupleName={coupleName} />
+                    <Link
+                      href={`/rsvp/${inviteCode}`}
+                      target="_blank"
+                      className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors font-sans"
+                    >
+                      <ExternalLink className="size-3.5" />
+                      {t("previewRsvpForm")}
+                    </Link>
+                  </>
+                ) : (
+                  <div className="border border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2">
+                    <div className="size-24 border-2 border-muted-foreground/30 rounded-md flex items-center justify-center">
+                      <span className="text-sm font-medium text-muted-foreground">QR</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{t("qrDownload")}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">{t("qrDownload")}</p>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-xl border p-5">
-            <h3 className="font-medium text-sm mb-4">{t("statistics")}</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Eye className="size-4" />
-                  <span>{t("views")}</span>
+          <Card className="rounded-xl py-0">
+            <CardContent className="px-5 py-5 flex flex-col gap-4">
+              <h3 className="font-medium text-sm">{t("statistics")}</h3>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Eye className="size-4" />
+                    <span>{t("views")}</span>
+                  </div>
+                  <span className="text-sm font-medium">{viewCount}</span>
                 </div>
-                <span className="text-sm font-medium">{viewCount}</span>
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Share2 className="size-4" />
-                  <span>{t("shares")}</span>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Share2 className="size-4" />
+                    <span>{t("shares")}</span>
+                  </div>
+                  <span className="text-sm font-medium">{isDemo ? "124" : "—"}</span>
                 </div>
-                <span className="text-sm font-medium">{isDemo ? "124" : "—"}</span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

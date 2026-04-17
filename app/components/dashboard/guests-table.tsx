@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -70,108 +71,92 @@ function getSortIcon(
   );
 }
 
+const rsvpBadgeStyles: Record<
+  RsvpStatus,
+  { className: string; style?: React.CSSProperties; Icon: React.ComponentType<{ className?: string }>; labelKey: string }
+> = {
+  confirmed: {
+    className: "rounded-lg px-2 py-1 text-sm border-emerald-500/40 text-emerald-400",
+    style: {
+      backgroundImage:
+        "linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.06) 30%, rgba(16, 185, 129, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
+    },
+    Icon: Check,
+    labelKey: "confirmedStatus",
+  },
+  declined: {
+    className: "rounded-lg px-2 py-1 text-sm border-rose-500/40 text-rose-400",
+    style: {
+      backgroundImage:
+        "linear-gradient(90deg, rgba(244, 63, 94, 0.12) 0%, rgba(244, 63, 94, 0.06) 30%, rgba(244, 63, 94, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
+    },
+    Icon: X,
+    labelKey: "declinedStatus",
+  },
+  guest: {
+    className: "rounded-lg px-2 py-1 text-sm border-blue-500/40 text-blue-400",
+    style: {
+      backgroundImage:
+        "linear-gradient(90deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 30%, rgba(59, 130, 246, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
+    },
+    Icon: Users,
+    labelKey: "guestStatus",
+  },
+  pending: {
+    className: "rounded-lg px-2 py-1 text-sm border-amber-500/40 text-amber-400",
+    style: {
+      backgroundImage:
+        "linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.06) 30%, rgba(245, 158, 11, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
+    },
+    Icon: Clock,
+    labelKey: "pendingStatus",
+  },
+};
+
 function RsvpBadge({ status, t }: { status: RsvpStatus; t: (key: string) => string }) {
-  if (status === "confirmed") {
-    return (
-      <div
-        className="flex items-center gap-1 px-2 py-1 rounded-lg border border-emerald-500/40 w-fit"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.06) 30%, rgba(16, 185, 129, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
-        }}
-      >
-        <Check className="size-3.5 text-emerald-400" />
-        <span className="text-sm font-medium text-emerald-400">{t("confirmedStatus")}</span>
-      </div>
-    );
-  }
-
-  if (status === "declined") {
-    return (
-      <div
-        className="flex items-center gap-1 px-2 py-1 rounded-lg border border-rose-500/40 w-fit"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, rgba(244, 63, 94, 0.12) 0%, rgba(244, 63, 94, 0.06) 30%, rgba(244, 63, 94, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
-        }}
-      >
-        <X className="size-3.5 text-rose-400" />
-        <span className="text-sm font-medium text-rose-400">{t("declinedStatus")}</span>
-      </div>
-    );
-  }
-
-  if (status === "guest") {
-    return (
-      <div
-        className="flex items-center gap-1 px-2 py-1 rounded-lg border border-blue-500/40 w-fit"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 30%, rgba(59, 130, 246, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
-        }}
-      >
-        <Users className="size-3.5 text-blue-400" />
-        <span className="text-sm font-medium text-blue-400">{t("guestStatus")}</span>
-      </div>
-    );
-  }
-
+  const { className, style, Icon, labelKey } = rsvpBadgeStyles[status] ?? rsvpBadgeStyles.pending;
   return (
-    <div
-      className="flex items-center gap-1 px-2 py-1 rounded-lg border border-amber-500/40 w-fit"
-      style={{
-        backgroundImage:
-          "linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.06) 30%, rgba(245, 158, 11, 0) 100%), linear-gradient(90deg, hsl(var(--card)) 0%, hsl(var(--card)) 100%)",
-      }}
-    >
-      <Clock className="size-3.5 text-amber-400" />
-      <span className="text-sm font-medium text-amber-400">{t("pendingStatus")}</span>
-    </div>
+    <Badge variant="outline" className={className} style={style}>
+      <Icon className="size-3.5" />
+      <span className="font-medium">{t(labelKey)}</span>
+    </Badge>
   );
 }
 
 function SourceBadge({ source, t }: { source: GuestSource; t: (key: string) => string }) {
   const sourceConfig: Record<
     GuestSource,
-    { icon: React.ReactNode; label: string; bgClass: string; textClass: string }
+    { icon: React.ReactNode; label: string; className: string }
   > = {
     whatsapp: {
       icon: <MessageCircle className="size-3" />,
       label: "WhatsApp",
-      bgClass: "bg-green-500/10",
-      textClass: "text-green-400",
+      className: "rounded-md bg-green-500/10 text-green-400",
     },
     manual: {
       icon: <PenLine className="size-3" />,
       label: t("sourceManual"),
-      bgClass: "bg-gray-500/10",
-      textClass: "text-gray-400",
+      className: "rounded-md bg-gray-500/10 text-gray-400",
     },
     "qr-code": {
       icon: <QrCode className="size-3" />,
       label: t("sourceQrCode"),
-      bgClass: "bg-violet-500/10",
-      textClass: "text-violet-400",
+      className: "rounded-md bg-violet-500/10 text-violet-400",
     },
     website: {
       icon: <QrCode className="size-3" />,
       label: "Website",
-      bgClass: "bg-cyan-500/10",
-      textClass: "text-cyan-400",
+      className: "rounded-md bg-cyan-500/10 text-cyan-400",
     },
   };
 
   const config = sourceConfig[source];
 
   return (
-    <div
-      className={`flex items-center gap-1.5 px-2 py-1 rounded-md w-fit ${config.bgClass}`}
-    >
-      <span className={config.textClass}>{config.icon}</span>
-      <span className={`text-xs font-medium ${config.textClass}`}>
-        {config.label}
-      </span>
-    </div>
+    <Badge variant="outline" className={`border-transparent ${config.className}`}>
+      {config.icon}
+      <span>{config.label}</span>
+    </Badge>
   );
 }
 

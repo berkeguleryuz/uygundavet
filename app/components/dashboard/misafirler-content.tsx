@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Sheet,
   SheetContent,
@@ -102,8 +104,8 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
               <SheetTitle>{t("addGuest")}</SheetTitle>
               <SheetDescription>{t("addGuestDescription")}</SheetDescription>
             </SheetHeader>
-            <div className="space-y-5 px-4 pb-4">
-              <div className="space-y-2">
+            <div className="flex flex-col gap-5 px-4 pb-4">
+              <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">{t("guestNameLabel")} *</label>
                 <Input
                   value={form.name}
@@ -113,7 +115,7 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">{t("sortGuestCount")} *</label>
                 <div className="flex items-center gap-3">
                   <Button
@@ -141,7 +143,7 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">{t("tablePhone")}</label>
                 <Input
                   type="tel"
@@ -152,14 +154,14 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">{t("tableNote")}</label>
-                <textarea
+                <Textarea
                   value={form.note}
                   onChange={(e) => setForm({ ...form, note: e.target.value })}
                   placeholder={t("notePlaceholder")}
                   rows={3}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                  className="resize-none"
                 />
               </div>
 
@@ -169,9 +171,9 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
                 disabled={!form.name.trim() || form.guestCount < 1 || saving}
               >
                 {saving ? (
-                  <Loader2 className="size-4 animate-spin mr-2" />
+                  <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  <UserPlus className="size-4 mr-2" />
+                  <UserPlus className="size-4" />
                 )}
                 {saving ? t("saving") : t("addGuest")}
               </Button>
@@ -187,22 +189,21 @@ export function MisafirlerContent({ isDemo }: { isDemo?: boolean }) {
           {summaryStatDefs.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div
-                key={stat.key}
-                className="bg-card rounded-xl border p-4 flex items-center gap-3"
-              >
-                <div
-                  className={`size-10 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
-                >
-                  <Icon className={`size-5 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-medium tracking-tight">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{t(stat.key)}</p>
-                </div>
-              </div>
+              <Card key={stat.key} className="py-0 gap-0">
+                <CardContent className="px-4 py-4 flex items-center gap-3">
+                  <div
+                    className={`size-10 rounded-lg ${stat.bg} flex items-center justify-center shrink-0`}
+                  >
+                    <Icon className={`size-5 ${stat.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-xl sm:text-2xl font-medium tracking-tight">
+                      {stat.value}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{t(stat.key)}</p>
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

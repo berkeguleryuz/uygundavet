@@ -3,7 +3,7 @@ import mongoose, { Schema, type Document, type Model } from "mongoose";
 export type PaymentStatus = "pending" | "deposit_paid" | "fully_paid";
 export type PaymentMethod = "deposit" | "full";
 export type SelectedPackage = "starter" | "pro" | "business";
-export type SelectedTheme = "rose" | "sunset" | "pearl" | "crystal" | "custom";
+export type SelectedTheme = "rose" | "sunset" | "pearl" | "crystal" | "garden" | "ocean" | "golden" | "custom";
 
 export interface OrderData {
   _id?: string;
@@ -52,7 +52,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     selectedTheme: {
       type: String,
-      enum: ["rose", "sunset", "pearl", "crystal", "custom"],
+      enum: ["rose", "sunset", "pearl", "crystal", "garden", "ocean", "golden", "custom"],
       required: true,
     },
     customThemeRequest: { type: String, trim: true },

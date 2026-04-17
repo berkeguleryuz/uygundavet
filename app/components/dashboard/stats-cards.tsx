@@ -3,11 +3,12 @@
 import { useTranslations } from "next-intl";
 import { useDashboardStore } from "@/store/dashboard-store";
 import { Users, CheckCircle, Calendar, Eye, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const icons = [Users, CheckCircle, Calendar, Eye];
 
-// Mock data for demo mode
 const demoStats = [
   { title: "statTotalGuests", value: "248", trend: { value: 12, isPositive: true } },
   { title: "statRsvpConfirmation", value: "186/248", subtitle: "75%" },
@@ -49,7 +50,7 @@ export function StatsCards({ isDemo }: { isDemo?: boolean }) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-card rounded-xl border p-4 h-[120px] animate-pulse" />
+          <Skeleton key={i} className="h-[120px] rounded-xl" />
         ))}
       </div>
     );
@@ -63,16 +64,13 @@ export function StatsCards({ isDemo }: { isDemo?: boolean }) {
         const subtitle = "subtitle" in stat ? stat.subtitle : undefined;
 
         return (
-          <div
-            key={index}
-            className="bg-card text-card-foreground rounded-xl border p-4"
-          >
-            <div className="flex items-center justify-between mb-3">
+          <Card key={index} className="gap-3 p-4 py-4">
+            <div className="flex items-center justify-between px-0">
               <span className="text-sm font-medium">{t(stat.title)}</span>
               <Icon className="size-4 text-muted-foreground" />
             </div>
 
-            <div className="bg-muted/50 dark:bg-neutral-800/50 border rounded-lg p-4">
+            <div className="bg-muted/50 border rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <span className="text-2xl sm:text-3xl font-medium tracking-tight">
                   {stat.value}
@@ -110,7 +108,7 @@ export function StatsCards({ isDemo }: { isDemo?: boolean }) {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>

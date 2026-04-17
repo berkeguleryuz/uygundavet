@@ -20,13 +20,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
     changeFrequency: page.changeFrequency,
     priority: page.priority,
-    alternates: {
-      languages: {
-        tr: `${baseUrl}${page.path}`,
-        en: `${baseUrl}${page.path}`,
-        de: `${baseUrl}${page.path}`,
-        "x-default": `${baseUrl}${page.path}`,
-      },
-    },
   }));
 }

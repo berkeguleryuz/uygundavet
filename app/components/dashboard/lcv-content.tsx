@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
 import { GuestsChart } from "@/app/components/dashboard/guests-chart";
 import { CheckCircle, XCircle, Clock, ArrowRight } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard-store";
@@ -124,73 +125,80 @@ export function LcvContent({ isDemo }: { isDemo?: boolean }) {
         {rsvpStatDefs.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
+            <Card
               key={stat.key}
-              className={`bg-card rounded-xl border ${stat.borderColor} p-5`}
+              className={`rounded-xl py-0 gap-0 ${stat.borderColor}`}
               style={{ backgroundImage: stat.bgGradient }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className={`size-2 rounded-full ${stat.dotColor}`} />
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {t(stat.key)}
-                  </span>
+              <CardContent className="px-5 py-5 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`size-2 rounded-full ${stat.dotColor}`} />
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {t(stat.key)}
+                    </span>
+                  </div>
+                  <Icon className={`size-4 ${stat.textColor}`} />
                 </div>
-                <Icon className={`size-4 ${stat.textColor}`} />
-              </div>
-              <p className={`text-3xl sm:text-4xl font-medium tracking-tight ${stat.textColor}`}>
-                {stat.value}
-              </p>
-            </div>
+                <p className={`text-3xl sm:text-4xl font-medium tracking-tight ${stat.textColor}`}>
+                  {stat.value}
+                </p>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
 
       <GuestsChart isDemo={isDemo} />
 
-      <div className="bg-card rounded-xl border overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-border/50">
-          <h3 className="font-medium text-sm sm:text-base">
+      <Card className="rounded-xl py-0 gap-0 overflow-hidden">
+        <CardHeader className="flex-row items-center p-4 border-b border-border/50">
+          <CardTitle className="text-sm sm:text-base">
             {t("recentRsvpChanges")}
-          </h3>
-          <Clock className="size-4 text-muted-foreground" />
-        </div>
-        {recentChanges.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">{t("noRsvpChanges")}</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border/50">
-            {recentChanges.map((change) => {
-              const config = statusConfigDefs[change.status as keyof typeof statusConfigDefs] || statusConfigDefs.pending;
-              return (
-                <div
-                  key={change.id}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-sm font-medium truncate">
-                      {change.name}
-                    </span>
-                    <ArrowRight className="size-3.5 text-muted-foreground shrink-0" />
-                    <div
-                      className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border ${config.badgeClass} shrink-0`}
-                      style={{ backgroundImage: config.bgStyle }}
-                    >
-                      <span className={`text-xs font-medium ${config.badgeClass.split(" ")[0]}`}>
-                        {t(config.labelKey)}
+          </CardTitle>
+          <CardAction>
+            <Clock className="size-4 text-muted-foreground" />
+          </CardAction>
+        </CardHeader>
+        <CardContent className="px-0">
+          {recentChanges.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-sm text-muted-foreground">{t("noRsvpChanges")}</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border/50">
+              {recentChanges.map((change) => {
+                const config = statusConfigDefs[change.status as keyof typeof statusConfigDefs] || statusConfigDefs.pending;
+                return (
+                  <div
+                    key={change.id}
+                    className="flex items-center justify-between px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-sm font-medium truncate">
+                        {change.name}
                       </span>
+                      <ArrowRight className="size-3.5 text-muted-foreground shrink-0" />
+                      <Badge
+                        variant="outline"
+                        className={`rounded-lg px-2 py-0.5 shrink-0 ${config.badgeClass}`}
+                        style={{ backgroundImage: config.bgStyle }}
+                      >
+                        <span className="text-xs font-medium">
+                          {t(config.labelKey)}
+                        </span>
+                      </Badge>
                     </div>
+                    <span className="text-xs text-muted-foreground shrink-0 ml-4">
+                      {change.time}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0 ml-4">
-                    {change.time}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 }
