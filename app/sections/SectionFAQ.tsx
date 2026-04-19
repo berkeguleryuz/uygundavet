@@ -115,7 +115,20 @@ export function SectionFAQ() {
           {t("subtitle")}
         </motion.p>
 
-        <div className="grid md:grid-cols-2 gap-x-12 lg:gap-x-20">
+        <div className="md:hidden">
+          <div className="h-px bg-white/[0.06]" />
+          {faqs.map((faq, i) => (
+            <FAQItem
+              key={i}
+              question={faq.q}
+              answer={faq.a}
+              index={i}
+              num={String(i + 1).padStart(2, "0")}
+            />
+          ))}
+        </div>
+
+        <div className="hidden md:grid md:grid-cols-2 gap-x-12 lg:gap-x-20">
           <div>
             <div className="h-px bg-white/[0.06]" />
             {leftCol.map((faq, i) => (

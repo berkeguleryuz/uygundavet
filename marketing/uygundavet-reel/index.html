@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #252224;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: #252224;
+      }
+
+      .scene {
+        position: absolute;
+        top: 0; left: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .bg-light { background: #f5f6f3; color: #252224; }
+      .bg-dark  { background: #252224; color: #d5d1ad; }
+
+      .grain {
+        position: absolute; inset: 0;
+        pointer-events: none;
+        opacity: 0.08;
+        mix-blend-mode: overlay;
+        background:
+          radial-gradient(ellipse at 12% 20%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%),
+          radial-gradient(ellipse at 85% 75%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%),
+          radial-gradient(circle at 55% 40%, rgba(213,209,173,0.4) 0%, rgba(213,209,173,0) 30%);
+        z-index: 30;
+      }
+
+      /* scene stack */
+      #s1  { z-index: 1; background: transparent; }
+      #s2  { z-index: 2;  opacity: 0; }
+      #s3  { z-index: 3;  opacity: 0; }
+      #s4  { z-index: 4;  opacity: 0; }
+      #s5  { z-index: 5;  opacity: 0; }
+      #s6  { z-index: 6;  opacity: 0; }
+      #s7  { z-index: 7;  opacity: 0; }
+      #s8  { z-index: 8;  opacity: 0; }
+      #s9  { z-index: 9;  opacity: 0; }
+      #s10 { z-index: 10; opacity: 0; }
+      #s11 { z-index: 11; opacity: 0; }
+
+      /* root-level media clips (positioned absolutely over scene stack) */
+      #s1-hero {
+        position: absolute;
+        top: 0; left: 0;
+        width: 1920px;
+        height: 1080px;
+        object-fit: cover;
+        z-index: 0;
+        filter: saturate(0.9) brightness(0.85);
+      }
+      .theme-media {
+        position: absolute;
+        right: 100px;
+        top: 309px;         /* (1080 - 462) / 2 */
+        width: 820px;
+        height: 462px;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 40px 90px -25px rgba(0,0,0,0.55);
+        z-index: 20;
+        display: block;
+        background: #000;
+        opacity: 0;         /* shown via GSAP sync with scene */
+      }
+      #s3-media { z-index: 20; }
+      #s4-media { z-index: 21; }
+      #s5-media { z-index: 22; }
+      #s6-media { z-index: 23; }
+      #s7-media { z-index: 24; }
+      #s8-media { z-index: 25; }
+      #s9-media { z-index: 26; }
+      #s10-media { z-index: 27; }
+
+      /* frame outline + chrome */
+      .media-frame {
+        position: absolute;
+        right: 100px;
+        top: 309px;
+        width: 820px;
+        height: 462px;
+        pointer-events: none;
+        z-index: 28;
+        border-radius: 20px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10);
+      }
+      .media-badge {
+        position: absolute;
+        left: 20px; top: 20px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .media-urlbar {
+        position: absolute;
+        left: 20px; right: 20px; bottom: 20px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        display: flex; align-items: center; gap: 10px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .media-urlbar .dot {
+        width: 8px; height: 8px;
+        border-radius: 999px;
+        background: #9fb093;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      /* CTA chip */
+      .cta-chip {
+        position: absolute;
+        bottom: 0; right: 0;
+        background: #000;
+        color: #fff;
+        padding: 28px 44px;
+        border-top-left-radius: 24px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 22px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        display: flex; align-items: center; gap: 14px;
+        z-index: 4;
+      }
+      .cta-chip .arrow { display: inline-block; transform: translateY(-1px); }
+
+      /* ==========================================================
+         SCENE 1 — BRAND OPEN
+         ========================================================== */
+      #s1 .s1-overlay {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 55%, rgba(245,246,243,0.55) 0%, rgba(245,246,243,0.85) 45%, rgba(245,246,243,0.96) 100%);
+        z-index: 1;
+      }
+      #s1 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 120px 160px;
+        z-index: 2;
+      }
+      #s1 .pretag {
+        font-family: "Orbitron", sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.42em;
+        color: #555670;
+        opacity: 0.85;
+        text-transform: uppercase;
+        margin-bottom: 56px;
+      }
+      #s1 .mood-line {
+        font-family: "Merienda", cursive;
+        font-size: 160px;
+        font-weight: 500;
+        color: #555670;
+        line-height: 1;
+        letter-spacing: -0.015em;
+        margin-bottom: 44px;
+        text-align: center;
+      }
+      #s1 .brand-logo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 36px;
+        filter: drop-shadow(0 4px 18px rgba(217,138,90,0.30));
+      }
+      #s1 .brand-text {
+        width: 440px;
+        height: auto;
+        /* parchment on transparent → invert to slate, matches #555670 family */
+        filter: invert(1) saturate(0.75) brightness(0.95);
+      }
+      #s1 .rule {
+        width: 120px; height: 2px;
+        background: #555670;
+        margin-top: 48px;
+        transform-origin: left center;
+      }
+      #s1 .btm-meta {
+        position: absolute;
+        bottom: 44px; right: 64px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        color: #555670;
+        font-variant-numeric: tabular-nums;
+        z-index: 3;
+      }
+
+      /* ==========================================================
+         SCENE 2 — THE PROMISE
+         ========================================================== */
+      #s2 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 120px 120px;
+      }
+      #s2 .ticker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.42em;
+        color: #d5d1ad;
+        text-transform: uppercase;
+        margin-bottom: 96px;
+        opacity: 0.9;
+        text-align: center;
+      }
+      #s2 .ticker .sep { opacity: 0.45; margin: 0 14px; }
+      #s2 .mood-line {
+        font-family: "Merienda", cursive;
+        font-size: 130px;
+        font-weight: 500;
+        color: #d5d1ad;
+        line-height: 1.06;
+        letter-spacing: -0.01em;
+        margin-bottom: 96px;
+        text-align: center;
+        max-width: 1600px;
+      }
+      #s2 .stats { display: flex; gap: 72px; align-items: stretch; }
+      #s2 .stat { padding: 28px 56px; border-left: 2px solid #d5d1ad; }
+      #s2 .stat-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 72px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      #s2 .stat-lbl {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.32em;
+        color: #d5d1ad;
+        opacity: 0.85;
+        text-transform: uppercase;
+        margin-top: 14px;
+      }
+
+      /* ==========================================================
+         THEME SCENE LAYOUT (3-10)
+         ========================================================== */
+      .theme .t-kicker {
+        position: absolute;
+        top: 80px; left: 120px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.38em;
+        text-transform: uppercase;
+        z-index: 3;
+      }
+      .theme .t-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600;
+        margin-right: 18px;
+      }
+      .theme .t-slug {
+        position: absolute;
+        bottom: 60px; left: 120px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: 0.22em;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.8;
+        z-index: 3;
+      }
+      .theme .t-body {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 120px;
+        max-width: 780px;
+        z-index: 3;
+      }
+      .theme .t-mood {
+        font-family: "Merienda", cursive;
+        font-size: 108px;
+        font-weight: 500;
+        line-height: 1.02;
+        letter-spacing: -0.01em;
+      }
+      .theme .t-head {
+        font-family: "Orbitron", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        margin-top: 32px;
+        opacity: 0.75;
+      }
+
+      /* scene color tokens */
+      #s3  { background: #f5f6f3; color: #252224; }
+      #s3  .t-kicker, #s3 .t-mood, #s3 .t-slug { color: #555670; }
+      #s3  .t-num, #s3 .t-head { color: #3a8ba4; }
+
+      #s4  { background: #f5f6f3; color: #252224; }
+      #s4  .t-kicker, #s4 .t-mood, #s4 .t-slug { color: #555670; }
+      #s4  .t-num, #s4 .t-head { color: #4a6e47; }
+
+      #s5  { background: #252224; color: #d5d1ad; }
+      #s5  .t-kicker, #s5 .t-slug { color: #d5d1ad; }
+      #s5  .t-num, #s5 .t-head { color: #e8c872; }
+      #s5  .t-mood   { color: #e8c872; }
+
+      #s6  { background: #f5f6f3; color: #252224; }
+      #s6  .t-kicker, #s6 .t-slug { color: #555670; }
+      #s6  .t-num, #s6 .t-head { color: #3c5a3a; }
+      #s6  .t-mood { color: #2f4a2d; }
+
+      #s7  { background: #1a2838; color: #cad8dc; }
+      #s7  .t-kicker, #s7 .t-mood { color: #e3ecef; }
+      #s7  .t-slug { color: #cad8dc; }
+      #s7  .t-num, #s7 .t-head { color: #8bb0c9; }
+
+      #s8  { background: #f5f1ec; color: #252224; }
+      #s8  .t-kicker, #s8 .t-mood, #s8 .t-slug { color: #555670; }
+      #s8  .t-num, #s8 .t-head { color: #a06c6d; }
+
+      #s9  { background: #f5f6f3; color: #252224; }
+      #s9  .t-kicker, #s9 .t-mood, #s9 .t-slug { color: #555670; }
+      #s9  .t-num, #s9 .t-head { color: #a86364; }
+
+      #s10 { background: #2a1f2a; color: #f3dcc3; }
+      #s10 .t-kicker, #s10 .t-mood, #s10 .t-slug { color: #f3dcc3; }
+      #s10 .t-num, #s10 .t-head { color: #e8a271; }
+
+      /* scene decoratives */
+      #s3 .facet {
+        position: absolute;
+        width: 420px; height: 420px;
+        left: -80px; bottom: -80px;
+        background: conic-gradient(from 20deg, rgba(58,139,164,0.28), rgba(58,139,164,0) 35%, rgba(85,86,112,0.15) 65%, rgba(58,139,164,0.28));
+        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        z-index: 1;
+      }
+      #s5 .foil {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 25% 35%, rgba(232,200,114,0.18) 0%, rgba(232,200,114,0) 45%);
+        pointer-events: none; z-index: 1;
+      }
+      #s7 .wave {
+        position: absolute; inset: auto 0 0 0; height: 420px;
+        background:
+          radial-gradient(ellipse at 30% 100%, rgba(90,126,154,0.40) 0%, rgba(90,126,154,0) 60%),
+          radial-gradient(ellipse at 75% 110%, rgba(139,176,201,0.30) 0%, rgba(139,176,201,0) 60%);
+        pointer-events: none; z-index: 1;
+      }
+      #s8 .iridescent {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(circle at 25% 35%, rgba(215,184,179,0.22) 0%, rgba(215,184,179,0) 45%),
+          radial-gradient(circle at 72% 68%, rgba(239,231,224,0.38) 0%, rgba(239,231,224,0) 55%);
+        pointer-events: none; z-index: 1;
+      }
+      #s9 .petal {
+        position: absolute;
+        border-radius: 60% 40% 70% 30%;
+        background: radial-gradient(circle at 40% 30%, rgba(196,137,138,0.55) 0%, rgba(196,137,138,0) 70%);
+        z-index: 1;
+      }
+      #s9 .p1 { width: 240px; height: 280px; left: 40px; top: 70px; transform: rotate(-20deg); opacity: 0.55; }
+      #s9 .p2 { width: 180px; height: 210px; left: 220px; bottom: 100px; transform: rotate(18deg); opacity: 0.42; }
+      #s10 .horizon {
+        position: absolute; inset: auto 0 0 0; height: 540px;
+        background:
+          radial-gradient(ellipse at 50% 90%, rgba(217,138,90,0.55) 0%, rgba(217,138,90,0) 55%),
+          radial-gradient(ellipse at 60% 100%, rgba(243,220,195,0.35) 0%, rgba(243,220,195,0) 60%);
+        pointer-events: none; z-index: 1;
+      }
+
+      /* ==========================================================
+         SCENE 11 — CLOSING CTA
+         ========================================================== */
+      #s11 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 120px 160px;
+      }
+      #s11 .mood-line {
+        font-family: "Merienda", cursive;
+        font-size: 138px;
+        font-weight: 500;
+        color: #d5d1ad;
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+        text-align: center;
+        margin-bottom: 48px;
+        max-width: 1500px;
+      }
+      #s11 .head-line {
+        font-family: "Orbitron", sans-serif;
+        font-size: 76px;
+        font-weight: 800;
+        letter-spacing: 0.24em;
+        color: #fff;
+        text-transform: uppercase;
+        margin-bottom: 90px;
+      }
+      #s11 .pill-cta {
+        display: flex; align-items: center; gap: 28px;
+        background: #fff;
+        color: #000;
+        padding: 30px 56px 30px 40px;
+        border-radius: 999px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+      #s11 .pill-avatar {
+        width: 52px; height: 52px;
+        background: #252224;
+        border-radius: 999px;
+        display: flex; align-items: center; justify-content: center;
+        color: #d5d1ad;
+        font-size: 22px;
+        overflow: hidden;
+      }
+      #s11 .pill-avatar img {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+      }
+      #s11 .brand-text-footer {
+        display: block;
+        width: 320px;
+        margin: 0 auto 36px;
+        filter: none;
+      }
+      #s11 .locales {
+        position: absolute;
+        bottom: 56px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #d5d1ad;
+        opacity: 0.8;
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums;
+      }
+      #s11 .fade-curtain {
+        position: absolute; inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 99;
+      }
+
+      /* theme media chrome frames — positioned at same coords as media;
+         scene-scoped so they hide when their scene is not active  */
+      .theme .media-chrome {
+        position: absolute;
+        right: 100px;
+        top: 309px;
+        width: 820px;
+        height: 462px;
+        pointer-events: none;
+        z-index: 4;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="60"
+      data-width="1920"
+      data-height="1080"
+    >
+
+      <!-- ========= SCENE 1 · BRAND OPEN ========= -->
+      <div id="s1" class="scene">
+        <div class="s1-overlay"></div>
+        <div class="wrap">
+          <img id="s1-logo" class="brand-logo" src="assets/logo.png" alt="" />
+          <div id="s1-pre" class="pretag">zarif dijital davetiye</div>
+          <div id="s1-mood" class="mood-line">her davet,<br />eşsiz bir hikâye</div>
+          <img id="s1-brand" class="brand-text" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s1-rule" class="rule"></div>
+        </div>
+        <div id="s1-btm" class="btm-meta">uygundavet.com · dijital davetiye platformu</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 2 · THE PROMISE ========= -->
+      <div id="s2" class="scene bg-dark">
+        <div class="wrap">
+          <div id="s2-ticker" class="ticker">
+            <span>DÜĞÜN</span><span class="sep">·</span>
+            <span>NİŞAN</span><span class="sep">·</span>
+            <span>KINA</span><span class="sep">·</span>
+            <span>SÜNNET</span><span class="sep">·</span>
+            <span>DOĞUM&nbsp;GÜNÜ</span><span class="sep">·</span>
+            <span>MEZUNİYET</span>
+          </div>
+          <div id="s2-mood" class="mood-line">
+            dakikalar içinde hazırlanır,<br />sonsuza dek paylaşılır
+          </div>
+          <div class="stats">
+            <div class="stat s2-stat"><div class="stat-num">8</div><div class="stat-lbl">Tema</div></div>
+            <div class="stat s2-stat"><div class="stat-num">3</div><div class="stat-lbl">Dil</div></div>
+            <div class="stat s2-stat"><div class="stat-num">∞</div><div class="stat-lbl">Anı</div></div>
+          </div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 3 · CRYSTAL ========= -->
+      <div id="s3" class="scene theme">
+        <div class="facet"></div>
+        <div class="t-kicker"><span class="t-num">03</span>TEMA · CRYSTAL</div>
+        <div class="t-body">
+          <div class="t-mood" id="s3-mood">kristal berraklığında,<br />zarif bir davet</div>
+          <div class="t-head">berrak · zarif · saf</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 03</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/crystal</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/crystal</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 4 · GARDEN ========= -->
+      <div id="s4" class="scene theme">
+        <div class="t-kicker"><span class="t-num">04</span>TEMA · GARDEN</div>
+        <div class="t-body">
+          <div class="t-mood" id="s4-mood">zarif bir bahçede,<br />unutulmaz bir an</div>
+          <div class="t-head">botanik · taze · romantik</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 04</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/garden</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/garden</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 5 · GOLDEN ========= -->
+      <div id="s5" class="scene theme">
+        <div class="foil"></div>
+        <div class="t-kicker"><span class="t-num">05</span>TEMA · GOLDEN</div>
+        <div class="t-body">
+          <div class="t-mood" id="s5-mood">altın dokunuşlarla,<br />zamansız bir gün</div>
+          <div class="t-head">lüks · sıcak · zamansız</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 05</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/golden</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/golden</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 6 · GROW ========= -->
+      <div id="s6" class="scene theme">
+        <div class="t-kicker"><span class="t-num">06</span>TEMA · GROW</div>
+        <div class="t-body">
+          <div class="t-mood" id="s6-mood">birlikte büyüyen,<br />özel bir hikâye</div>
+          <div class="t-head">organik · samimi · canlı</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 06</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/grow</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/grow</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 7 · OCEAN ========= -->
+      <div id="s7" class="scene theme">
+        <div class="wave"></div>
+        <div class="t-kicker"><span class="t-num">07</span>TEMA · OCEAN</div>
+        <div class="t-body">
+          <div class="t-mood" id="s7-mood">mavinin sonsuzluğunda,<br />zarif bir an</div>
+          <div class="t-head">derin · dingin · sonsuz</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 07</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/ocean</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/ocean</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 8 · PEARL ========= -->
+      <div id="s8" class="scene theme">
+        <div class="iridescent"></div>
+        <div class="t-kicker"><span class="t-num">08</span>TEMA · PEARL</div>
+        <div class="t-body">
+          <div class="t-mood" id="s8-mood">inci zarafetinde,<br />bir davet</div>
+          <div class="t-head">yumuşak · rafine · ışıltılı</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 08</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/pearl</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/pearl</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 9 · ROSE ========= -->
+      <div id="s9" class="scene theme">
+        <div class="petal p1"></div>
+        <div class="petal p2"></div>
+        <div class="t-kicker"><span class="t-num">09</span>TEMA · ROSE</div>
+        <div class="t-body">
+          <div class="t-mood" id="s9-mood">bir gül kadar zarif,<br />bir an kadar özel</div>
+          <div class="t-head">romantik · narin · açan</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 09</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/rose</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/rose</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 10 · SUNSET ========= -->
+      <div id="s10" class="scene theme">
+        <div class="horizon"></div>
+        <div class="t-kicker"><span class="t-num">10</span>TEMA · SUNSET</div>
+        <div class="t-body">
+          <div class="t-mood" id="s10-mood">gün batımında,<br />verilen bir söz</div>
+          <div class="t-head">sıcak · alaca · sinematik</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · 10</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/sunset</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/sunset</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- ========= SCENE 11 · CLOSING CTA ========= -->
+      <div id="s11" class="scene bg-dark">
+        <div class="wrap">
+          <img id="s11-brand" class="brand-text-footer" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s11-mood" class="mood-line">davetinizi hazırlayın,<br />zarafetle paylaşın.</div>
+          <div id="s11-head" class="head-line">ZARAFET.</div>
+          <div id="s11-cta" class="pill-cta">
+            <span class="pill-avatar"><img src="assets/logo.png" alt="" /></span>
+            <span>Davetiyenizi Oluşturun</span>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+        <div id="s11-loc" class="locales">uygundavet.com · TR · EN · DE</div>
+        <div id="s11-curtain" class="fade-curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <!-- ===== Timed media clips (direct children of <body>, AFTER #root) =====
+         Videos first, imgs last (linter treats void <img> as non-self-closing
+         and reports any subsequent <video> as "nested"). -->
+    <video id="s1-hero"  class="clip"             data-start="0"     data-duration="6.3"  data-track-index="20"
+           src="assets/hero.mp4"   muted playsinline></video>
+    <video id="s4-media" class="clip theme-media" data-start="16.95" data-duration="5.85" data-track-index="21"
+           src="assets/garden.mp4" muted playsinline></video>
+    <video id="s5-media" class="clip theme-media" data-start="22.2"  data-duration="5.85" data-track-index="22"
+           src="assets/golden.mp4" muted playsinline></video>
+    <video id="s7-media" class="clip theme-media" data-start="32.7"  data-duration="5.85" data-track-index="23"
+           src="assets/ocean.mp4"  muted playsinline></video>
+    <video id="s8-media" class="clip theme-media" data-start="37.95" data-duration="5.85" data-track-index="24"
+           src="assets/pearl.mp4"  muted playsinline></video>
+    <video id="s9-media" class="clip theme-media" data-start="43.2"  data-duration="5.85" data-track-index="25"
+           src="assets/rose.mp4"   muted playsinline></video>
+    <video id="s10-media" class="clip theme-media" data-start="48.45" data-duration="5.85" data-track-index="26"
+           src="assets/sunset.mp4" muted playsinline></video>
+    <audio id="bgmusic"  class="clip"             data-start="0"     data-duration="60"   data-track-index="27"
+           src="assets/music1.mp3" data-volume="0.5"></audio>
+    <img   id="s3-media" class="clip theme-media" data-start="11.7"  data-duration="5.85" data-track-index="28"
+           src="assets/crystal.png" />
+    <img   id="s6-media" class="clip theme-media" data-start="27.45" data-duration="5.85" data-track-index="29"
+           src="assets/grow.png" />
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* blur crossfade, luxury ~0.6s */
+      function crossfade(outSel, inSel, T) {
+        tl.to(outSel, {
+          opacity: 0,
+          filter: "blur(18px)",
+          scale: 1.02,
+          duration: 0.6,
+          ease: "power2.inOut",
+        }, T - 0.3);
+        tl.fromTo(inSel,
+          { opacity: 0, filter: "blur(18px)", scale: 0.985 },
+          { opacity: 1, filter: "blur(0px)",  scale: 1,
+            duration: 0.6, ease: "power2.inOut" },
+          T - 0.3);
+      }
+
+      /* media fade-in/out (aligned with scene crossfade) */
+      function mediaFadeIn(sel, T)  { tl.to(sel, { opacity: 1, duration: 0.6, ease: "power2.inOut" }, T - 0.3); }
+      function mediaFadeOut(sel, T) { tl.to(sel, { opacity: 0, duration: 0.6, ease: "power2.inOut" }, T - 0.3); }
+
+      /* SCENE 1 entrance */
+      tl.fromTo("#s1-hero", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
+      tl.fromTo("#s1-hero", { scale: 1.06 }, { scale: 1.0, duration: 6.0, ease: "sine.out" }, 0);
+      tl.from("#s1-logo",  { scale: 0.7, opacity: 0, duration: 0.9, ease: "power3.out" }, 0.25);
+      tl.from("#s1-pre",   { y: 24, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.65);
+      tl.from("#s1-mood",  { y: 60, opacity: 0, duration: 1.0, ease: "expo.out" }, 0.9);
+      tl.from("#s1-brand", { y: 24, opacity: 0, scale: 0.92,
+                             duration: 0.9, ease: "power3.out" }, 1.5);
+      tl.from("#s1-rule",  { scaleX: 0, opacity: 0, duration: 0.8,
+                             ease: "power2.inOut", transformOrigin: "left center" }, 1.95);
+      tl.from("#s1-btm",   { y: 16, opacity: 0, duration: 0.7, ease: "sine.inOut" }, 2.2);
+
+      crossfade("#s1", "#s2", 6.0);
+      mediaFadeOut("#s1-hero", 6.0);
+
+      /* SCENE 2 entrance */
+      tl.from("#s2-ticker span", { y: -20, opacity: 0, duration: 0.55, ease: "power3.out", stagger: 0.06 }, 5.85);
+      tl.from("#s2-mood",  { y: 70, opacity: 0, duration: 1.0, ease: "expo.out" }, 6.25);
+      tl.from(".s2-stat",  { y: 40, opacity: 0, duration: 0.7, ease: "power3.out", stagger: 0.12 }, 7.2);
+
+      crossfade("#s2", "#s3", 12.0);
+      mediaFadeIn("#s3-media", 12.0);
+
+      /* Theme scene pattern */
+      function themeEnter(prefix, T) {
+        tl.from(`#${prefix} .t-kicker`,     { x: -30, opacity: 0, duration: 0.6, ease: "power3.out" }, T - 0.15);
+        tl.from(`#${prefix}-mood`,          { y: 50, opacity: 0, duration: 0.85, ease: "expo.out" },   T + 0.05);
+        tl.from(`#${prefix} .t-head`,       { y: 20, opacity: 0, duration: 0.6, ease: "power2.out" }, T + 0.55);
+        tl.from(`#${prefix} .media-chrome`, { opacity: 0, duration: 0.6, ease: "sine.inOut" },         T + 0.45);
+        tl.from(`#${prefix} .t-slug`,       { opacity: 0, duration: 0.5, ease: "sine.inOut" },         T + 1.1);
+        tl.from(`#${prefix} .cta-chip`,     { y: 40, opacity: 0, duration: 0.55, ease: "power3.out" }, T + 1.3);
+      }
+
+      themeEnter("s3", 12.0);
+      tl.from("#s3 .facet", {
+        rotation: -20, opacity: 0, scale: 0.85,
+        transformOrigin: "50% 50%", duration: 1.2, ease: "power2.out"
+      }, 12.1);
+      crossfade("#s3", "#s4", 17.25);
+      mediaFadeOut("#s3-media", 17.25);
+      mediaFadeIn("#s4-media",  17.25);
+
+      themeEnter("s4", 17.25);
+      crossfade("#s4", "#s5", 22.5);
+      mediaFadeOut("#s4-media", 22.5);
+      mediaFadeIn("#s5-media",  22.5);
+
+      themeEnter("s5", 22.5);
+      tl.fromTo("#s5 .foil",
+        { opacity: 0, x: -120 },
+        { opacity: 1, x: 80, duration: 2.2, ease: "sine.inOut" },
+        22.6);
+      crossfade("#s5", "#s6", 27.75);
+      mediaFadeOut("#s5-media", 27.75);
+      mediaFadeIn("#s6-media",  27.75);
+
+      themeEnter("s6", 27.75);
+      crossfade("#s6", "#s7", 33.0);
+      mediaFadeOut("#s6-media", 33.0);
+      mediaFadeIn("#s7-media",  33.0);
+
+      themeEnter("s7", 33.0);
+      tl.fromTo("#s7 .wave",
+        { opacity: 0, y: 80 },
+        { opacity: 1, y: 0, duration: 1.4, ease: "sine.out" },
+        32.85);
+      crossfade("#s7", "#s8", 38.25);
+      mediaFadeOut("#s7-media", 38.25);
+      mediaFadeIn("#s8-media",  38.25);
+
+      themeEnter("s8", 38.25);
+      tl.fromTo("#s8 .iridescent",
+        { opacity: 0, scale: 1.15 },
+        { opacity: 1, scale: 1, duration: 1.4, ease: "power2.out" },
+        38.15);
+      crossfade("#s8", "#s9", 43.5);
+      mediaFadeOut("#s8-media", 43.5);
+      mediaFadeIn("#s9-media",  43.5);
+
+      themeEnter("s9", 43.5);
+      tl.from("#s9 .p1", { y: -60, opacity: 0, rotation: -55, duration: 1.1, ease: "sine.out" }, 43.5);
+      tl.from("#s9 .p2", { y: -40, opacity: 0, rotation: 60,  duration: 1.2, ease: "sine.out" }, 43.9);
+      crossfade("#s9", "#s10", 48.75);
+      mediaFadeOut("#s9-media",  48.75);
+      mediaFadeIn("#s10-media",  48.75);
+
+      themeEnter("s10", 48.75);
+      tl.fromTo("#s10 .horizon",
+        { opacity: 0, y: 120 },
+        { opacity: 1, y: 0, duration: 1.6, ease: "power2.out" },
+        48.65);
+
+      crossfade("#s10", "#s11", 54.0);
+      mediaFadeOut("#s10-media", 54.0);
+
+      /* SCENE 11 — final scene, exits allowed */
+      tl.from("#s11-brand", { y: -30, opacity: 0, duration: 0.8, ease: "power3.out" }, 53.75);
+      tl.from("#s11-mood", { y: 60, opacity: 0, duration: 1.0, ease: "expo.out" }, 54.0);
+      tl.from("#s11-head", { y: 24, opacity: 0, letterSpacing: "0.5em",
+                             duration: 0.9, ease: "power3.out" }, 54.7);
+      tl.from("#s11-cta",  { y: 40, opacity: 0, duration: 0.7, ease: "power3.out" }, 55.3);
+      tl.from("#s11-loc",  { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 55.7);
+
+      tl.to("#s11-cta", { scale: 1.03, duration: 0.9, ease: "sine.inOut",
+                         yoyo: true, repeat: 2 }, 56.4);
+
+      tl.to(["#s11-brand","#s11-mood","#s11-head","#s11-cta","#s11-loc"],
+        { opacity: 0, duration: 0.8, ease: "power2.in" }, 59.2);
+      tl.to("#s11-curtain", { opacity: 1, duration: 0.8, ease: "power2.in" }, 59.2);
+
+      /* music fade in/out */
+      tl.fromTo("#bgmusic", { volume: 0 }, { volume: 0.5, duration: 3, ease: "sine.out" }, 0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

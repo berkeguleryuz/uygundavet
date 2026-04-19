@@ -1,7 +1,7 @@
 export type SunsetLocale = "tr" | "en" | "de";
 
 interface T {
-  navHome: string; navStory: string; navEvent: string; navGallery: string; navMemory: string; navRsvp: string; navLogin: string;
+  navHome: string; navStory: string; navEvent: string; navGallery: string; navMemory: string; navRsvp: string; navLogin: string; bottomMemory: string; bottomRsvp: string;
   heroTagline: string; heroCtaButton: string; heroScrollHint: string;
   countdownLabel: string; countdownHeading: string; countdownDays: string; countdownHours: string; countdownMinutes: string; countdownSeconds: string;
   storyLabel: string; storyText: string; storyCtaButton: string;
@@ -17,7 +17,7 @@ interface T {
 }
 
 const tr: T = {
-  navHome: "Ana Sayfa", navStory: "Hikayemiz", navEvent: "Etkinlik", navGallery: "Galeri", navMemory: "Anı Defteri", navRsvp: "LCV", navLogin: "Giriş Yap",
+  navHome: "Ana Sayfa", navStory: "Hikayemiz", navEvent: "Etkinlik", navGallery: "Galeri", navMemory: "Anı Defteri", navRsvp: "LCV", navLogin: "Giriş Yap", bottomMemory: "Anı Bırak", bottomRsvp: "Katılım Durumu",
   heroTagline: "Evleniyoruz", heroCtaButton: "Davetiyeyi Yanıtla", heroScrollHint: "Keşfet",
   countdownLabel: "Geri Sayım", countdownHeading: "Büyük Gün Yaklaşıyor", countdownDays: "Gün", countdownHours: "Saat", countdownMinutes: "Dakika", countdownSeconds: "Saniye",
   storyLabel: "Hikayemiz", storyText: "Hayatlarımızı birleştirmeye karar verdik. Bu yolculuğun hikâyesini sizinle paylaşmak istiyoruz.", storyCtaButton: "Hikayemizi Okuyun",
@@ -33,7 +33,7 @@ const tr: T = {
 };
 
 const en: T = {
-  navHome: "Home", navStory: "Our Story", navEvent: "Event", navGallery: "Gallery", navMemory: "Guestbook", navRsvp: "RSVP", navLogin: "Sign In",
+  navHome: "Home", navStory: "Our Story", navEvent: "Event", navGallery: "Gallery", navMemory: "Guestbook", navRsvp: "RSVP", navLogin: "Sign In", bottomMemory: "Leave Memory", bottomRsvp: "Attendance",
   heroTagline: "We're Getting Married", heroCtaButton: "RSVP Now", heroScrollHint: "Discover",
   countdownLabel: "Countdown", countdownHeading: "The Big Day Is Coming", countdownDays: "Days", countdownHours: "Hours", countdownMinutes: "Minutes", countdownSeconds: "Seconds",
   storyLabel: "Our Story", storyText: "We decided to spend our lives together. We want to share this journey with you.", storyCtaButton: "Read Our Story",
@@ -49,7 +49,7 @@ const en: T = {
 };
 
 const de: T = {
-  navHome: "Startseite", navStory: "Geschichte", navEvent: "Event", navGallery: "Galerie", navMemory: "Gästebuch", navRsvp: "RSVP", navLogin: "Anmelden",
+  navHome: "Startseite", navStory: "Geschichte", navEvent: "Event", navGallery: "Galerie", navMemory: "Gästebuch", navRsvp: "RSVP", navLogin: "Anmelden", bottomMemory: "Erinnerung", bottomRsvp: "Teilnahme",
   heroTagline: "Wir heiraten", heroCtaButton: "Jetzt antworten", heroScrollHint: "Entdecken",
   countdownLabel: "Countdown", countdownHeading: "Der große Tag naht", countdownDays: "Tage", countdownHours: "Stunden", countdownMinutes: "Minuten", countdownSeconds: "Sekunden",
   storyLabel: "Unsere Geschichte", storyText: "Wir möchten diese Reise mit Ihnen teilen.", storyCtaButton: "Geschichte lesen",

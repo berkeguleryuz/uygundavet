@@ -13,21 +13,34 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/app/components/Logo";
 import { PacPasswordInput } from "@/app/components/PacPasswordInput";
+import { PACKAGES, type PackageKey } from "@/lib/packages";
 import axios from "axios";
+
+const VALID_PACKAGES: readonly PackageKey[] = ["starter", "pro", "business"];
 
 const localeLabels = { tr: "Türkçe", en: "English", de: "Deutsch" } as const;
 type Locale = keyof typeof localeLabels;
 
 export default function LoginPage() {
   const t = useTranslations("Login");
+  const tPricing = useTranslations("Pricing");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isPending } = authClient.useSession();
 
   const mode = searchParams.get("mode");
+  const packageParam = searchParams.get("package");
+  const selectedPackage: PackageKey | null =
+    packageParam && (VALID_PACKAGES as readonly string[]).includes(packageParam)
+      ? (packageParam as PackageKey)
+      : null;
   const verified = searchParams.get("verified") === "true";
-  const [showEmailForm, setShowEmailForm] = useState(mode === "register");
-  const [isRegister, setIsRegister] = useState(mode === "register");
+  const [showEmailForm, setShowEmailForm] = useState(
+    mode === "register" || !!selectedPackage
+  );
+  const [isRegister, setIsRegister] = useState(
+    mode === "register" || !!selectedPackage
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -37,6 +50,14 @@ export default function LoginPage() {
   const [showResendVerify, setShowResendVerify] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [showVerifiedPopup, setShowVerifiedPopup] = useState(verified);
+
+  useEffect(() => {
+    if (selectedPackage) {
+      try {
+        localStorage.setItem("selectedPackage", selectedPackage);
+      } catch {}
+    }
+  }, [selectedPackage]);
 
   useEffect(() => {
     if (!isPending && session) {
@@ -211,6 +232,19 @@ export default function LoginPage() {
                   {isRegister ? t("registerTitle") : t("loginTitle")}
                 </h3>
               </div>
+
+              {isRegister && selectedPackage && (
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-[#d5d1ad]/30 bg-[#d5d1ad]/10 px-4 py-3">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-[0.15em] text-white/50 font-sans">
+                      {t("selectedPackageLabel")}
+                    </span>
+                    <span className="text-sm font-chakra uppercase tracking-wide text-[#d5d1ad]">
+                      {tPricing(`${selectedPackage}.name`)} · {PACKAGES[selectedPackage].price.toLocaleString("tr-TR")}₺
+                    </span>
+                  </div>
+                </div>
+              )}
 
               <input
                 type="email"

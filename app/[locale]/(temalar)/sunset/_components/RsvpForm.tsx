@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
 import { t } from "../_lib/i18n";
 import { HeartIcon } from "../_icons/HeartIcon";
+import { AnimatedCheckMark, AnimatedCrossMark } from "@/app/components/AnimatedRsvpMarks";
 
 type RsvpStatus = "confirmed" | "declined";
 
@@ -207,25 +208,31 @@ export function RsvpForm() {
                   type="button"
                   onClick={() => setRsvpStatus("confirmed")}
                   className={cn(
-                    "h-14 rounded-xl border text-sm font-sans font-medium transition-all",
+                    "rounded-xl border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "confirmed"
                       ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                       : "border-[#e8a87c]/15 bg-[#241710] text-[#8a7565] hover:text-[#c4a88a]"
                   )}
                 >
-                  {t("rsvpAttending")}
+                  <AnimatedCheckMark active={rsvpStatus === "confirmed"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    {t("rsvpAttending")}
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setRsvpStatus("declined")}
                   className={cn(
-                    "h-14 rounded-xl border text-sm font-sans font-medium transition-all",
+                    "rounded-xl border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "declined"
                       ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
                       : "border-[#e8a87c]/15 bg-[#241710] text-[#8a7565] hover:text-[#c4a88a]"
                   )}
                 >
-                  {t("rsvpNotAttending")}
+                  <AnimatedCrossMark active={rsvpStatus === "declined"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    {t("rsvpNotAttending")}
+                  </span>
                 </button>
               </div>
             </div>

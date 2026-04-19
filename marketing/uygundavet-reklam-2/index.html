@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 2160px; height: 3840px;
+        overflow: hidden; background: #252224;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: #252224;
+      }
+      .scene {
+        position: absolute; top: 0; left: 0;
+        width: 2160px; height: 3840px; overflow: hidden;
+      }
+      .bg-light { background: #f5f6f3; color: #252224; }
+      .bg-dark  { background: #252224; color: #d5d1ad; }
+
+      .grain {
+        position: absolute; inset: 0; pointer-events: none;
+        opacity: 0.08; mix-blend-mode: overlay;
+        background:
+          radial-gradient(ellipse at 12% 20%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%),
+          radial-gradient(ellipse at 85% 75%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%),
+          radial-gradient(circle at 55% 40%, rgba(213,209,173,0.4) 0%, rgba(213,209,173,0) 30%);
+        z-index: 50;
+      }
+
+      #s1 { z-index: 1; }
+      #s2 { z-index: 2; opacity: 0; }
+      #s3 { z-index: 3; opacity: 0; }
+      #s4 { z-index: 4; opacity: 0; }
+      #s5 { z-index: 5; opacity: 0; }
+      #s6 { z-index: 6; opacity: 0; }
+      #s7 { z-index: 7; opacity: 0; }
+
+      /* =================================================
+         SCENE 1 — HOOK (provocative question)
+         ================================================= */
+      #s1 { background: #252224; color: #d5d1ad; }
+      #s1 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 440px 160px;
+      }
+      #s1 .kicker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #d5d1ad; opacity: 0.7;
+        margin-bottom: 192px;
+      }
+      #s1 .hook {
+        font-family: "Merienda", cursive;
+        font-size: 264px; font-weight: 500;
+        line-height: 1; letter-spacing: -0.01em;
+        color: #d5d1ad;
+        text-align: center;
+        margin-bottom: 144px;
+      }
+      #s1 .rule {
+        width: 160px; height: 4px;
+        background: #d5d1ad; opacity: 0.55;
+        margin-bottom: 112px;
+      }
+      #s1 .micro {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 56px; font-weight: 500;
+        letter-spacing: 0.38em;
+        color: #d5d1ad; opacity: 0.75;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      #s1 .bg-glow {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 50%, rgba(217,138,90,0.10) 0%, rgba(37,34,36,1) 65%);
+        z-index: 0;
+      }
+
+      /* =================================================
+         SCENE 2 — NO LIST (anti-ritual)
+         ================================================= */
+      #s2 { background: #f5f6f3; color: #252224; }
+      #s2 .s2-top {
+        position: absolute; top: 400px; left: 0; right: 0;
+        text-align: center;
+      }
+      #s2 .s2-kicker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em;
+        color: #a04040; opacity: 0.8;
+        text-transform: uppercase;
+        margin-bottom: 56px;
+      }
+      #s2 .s2-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 176px; font-weight: 800;
+        letter-spacing: 0.28em;
+        color: #252224;
+        text-transform: uppercase;
+      }
+      #s2 .list {
+        position: absolute;
+        top: 1040px; left: 240px; right: 240px;
+        display: flex; flex-direction: column;
+        gap: 84px;
+      }
+      #s2 .row {
+        font-family: "Merienda", cursive;
+        font-size: 148px; font-weight: 500;
+        color: #252224; line-height: 1;
+        letter-spacing: -0.01em;
+        position: relative;
+      }
+      #s2 .row .strike {
+        position: absolute;
+        left: 0; right: -16px;
+        top: 52%;
+        height: 10px; background: #a04040;
+        transform-origin: left center;
+        transform: scaleX(0);
+      }
+      #s2 .beat {
+        position: absolute; bottom: 440px; left: 0; right: 0;
+        text-align: center;
+      }
+      #s2 .beat-mood {
+        font-family: "Merienda", cursive;
+        font-size: 168px; font-weight: 500;
+        color: #555670;
+        letter-spacing: -0.01em;
+      }
+
+      /* =================================================
+         SCENE 3 — SOLUTION REVEAL
+         ================================================= */
+      #s3 { background: #252224; color: #d5d1ad; }
+      #s3 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 440px 160px;
+      }
+      #s3 .logo {
+        width: 400px; height: 400px;
+        object-fit: contain;
+        filter: drop-shadow(0 16px 80px rgba(217,138,90,0.4));
+        margin-bottom: 128px;
+      }
+      #s3 .brand {
+        width: 1120px; height: auto;
+        margin-bottom: 176px;
+      }
+      #s3 .mood {
+        font-family: "Merienda", cursive;
+        font-size: 272px; font-weight: 500;
+        color: #d5d1ad;
+        line-height: 1; letter-spacing: -0.01em;
+        text-align: center; margin-bottom: 144px;
+      }
+      #s3 .url {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 52px; font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #d5d1ad; opacity: 0.75;
+        text-transform: lowercase;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* =================================================
+         SCENE 4 — LIVE DEMO (single theme deep dive)
+         ================================================= */
+      #s4 { background: #0f0d0f; color: #fff; }
+      #s4 .s4-top {
+        position: absolute; top: 240px; left: 0; right: 0;
+        text-align: center;
+        z-index: 30;
+      }
+      #s4 .s4-kicker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 40px; font-weight: 700;
+        letter-spacing: 0.5em;
+        color: #fff; opacity: 0.7;
+        text-transform: uppercase;
+        margin-bottom: 44px;
+      }
+      #s4 .s4-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 108px; font-weight: 800;
+        letter-spacing: 0.22em;
+        color: #fff;
+        text-transform: uppercase;
+      }
+      #s4 .frame-border {
+        position: absolute;
+        inset: 560px 0 840px 0;
+        border-top: 2px solid rgba(255,255,255,0.12);
+        border-bottom: 2px solid rgba(255,255,255,0.12);
+        z-index: 28;
+        pointer-events: none;
+      }
+      #s4 .label-pop {
+        position: absolute;
+        left: 50%;
+        bottom: 760px;
+        transform: translateX(-50%);
+        z-index: 30;
+        background: rgba(0,0,0,0.65);
+        color: #fff;
+        padding: 32px 60px;
+        border-radius: 1998px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 36px; font-weight: 700;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        opacity: 0;
+      }
+      #s4 .url-foot {
+        position: absolute;
+        bottom: 360px; left: 0; right: 0;
+        text-align: center;
+        z-index: 30;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 44px; font-weight: 500;
+        letter-spacing: 0.3em;
+        color: #fff; opacity: 0.78;
+      }
+
+      /* Garden video (timed at root level) */
+      #s4-video {
+        position: absolute;
+        left: 0; top: 640px;
+        width: 2160px; height: 2240px;
+        object-fit: cover;
+        z-index: 20;
+        opacity: 0;
+        background: #0f0d0f;
+      }
+
+      /* =================================================
+         SCENE 5 — 3 BIG BENEFITS
+         ================================================= */
+      #s5 { background: #f5f6f3; color: #252224; }
+      #s5 .s5-top {
+        position: absolute; top: 360px; left: 0; right: 0;
+        text-align: center;
+      }
+      #s5 .s5-kicker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em;
+        color: #555670; opacity: 0.75;
+        text-transform: uppercase;
+        margin-bottom: 52px;
+      }
+      #s5 .s5-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 140px; font-weight: 800;
+        letter-spacing: 0.24em;
+        color: #252224;
+        text-transform: uppercase;
+      }
+      #s5 .big-list {
+        position: absolute;
+        top: 1080px; left: 160px; right: 160px;
+        display: flex; flex-direction: column;
+        gap: 104px;
+      }
+      #s5 .big {
+        font-family: "Merienda", cursive;
+        font-size: 184px; font-weight: 500;
+        color: #252224;
+        line-height: 1;
+        letter-spacing: -0.01em;
+        position: relative;
+        padding-left: 160px;
+      }
+      #s5 .big .num {
+        position: absolute;
+        left: 0; top: 28px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 64px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #c4a962;
+        opacity: 0.85;
+      }
+
+      /* =================================================
+         SCENE 6 — PROMISE (minimal poetry)
+         ================================================= */
+      #s6 { background: #252224; color: #d5d1ad; }
+      #s6 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 400px 160px;
+      }
+      #s6 .promise {
+        font-family: "Merienda", cursive;
+        font-size: 272px; font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.015em;
+        color: #d5d1ad;
+        text-align: center;
+      }
+      #s6 .promise-accent {
+        color: #e8c872;
+      }
+
+      /* =================================================
+         SCENE 7 — CTA
+         ================================================= */
+      #s7 { background: #252224; color: #d5d1ad; }
+      #s7 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 360px 160px;
+      }
+      #s7 .mood {
+        font-family: "Merienda", cursive;
+        font-size: 236px; font-weight: 500;
+        color: #d5d1ad;
+        line-height: 1;
+        letter-spacing: -0.01em;
+        text-align: center;
+        margin-bottom: 144px;
+      }
+      #s7 .power {
+        font-family: "Orbitron", sans-serif;
+        font-size: 216px; font-weight: 900;
+        letter-spacing: 0.3em;
+        color: #fff;
+        text-transform: uppercase;
+        margin-bottom: 200px;
+      }
+      #s7 .power .dot { color: #e8c872; }
+      #s7 .cta-pill {
+        display: flex; align-items: center; gap: 44px;
+        background: #fff; color: #000;
+        padding: 56px 96px 56px 68px;
+        border-radius: 1998px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700; font-size: 44px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+      #s7 .avatar {
+        width: 96px; height: 96px;
+        background: #252224;
+        border-radius: 1998px;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+      }
+      #s7 .avatar img { width: 80px; height: 80px; object-fit: contain; }
+      #s7 .foot {
+        position: absolute;
+        bottom: 200px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 44px; font-weight: 500;
+        letter-spacing: 0.4em;
+        color: #d5d1ad; opacity: 0.78;
+        text-transform: uppercase;
+      }
+      #s7 .curtain {
+        position: absolute; inset: 0;
+        background: #000;
+        opacity: 0; pointer-events: none; z-index: 99;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="60"
+         data-width="2160" data-height="3840">
+
+      <!-- S1 HOOK 0-6s -->
+      <div id="s1" class="scene">
+        <div class="bg-glow"></div>
+        <div class="wrap">
+          <div id="s1-k" class="kicker">uygun davet · davetiyeniz.</div>
+          <div id="s1-hook" class="hook">hâlâ<br />davetiye<br />bastırıyor<br />musunuz?</div>
+          <div id="s1-rule" class="rule"></div>
+          <div id="s1-micro" class="micro">başka bir yol var.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 NO LIST 6-14s -->
+      <div id="s2" class="scene bg-light">
+        <div class="s2-top">
+          <div id="s2-k" class="s2-kicker">01 · artık gereksiz</div>
+          <div id="s2-t" class="s2-title">YAPMAYIN.</div>
+        </div>
+        <div id="s2-list" class="list">
+          <div class="row">kart bastırmayın<span class="strike"></span></div>
+          <div class="row">zarf doldurmayın<span class="strike"></span></div>
+          <div class="row">pul yapıştırmayın<span class="strike"></span></div>
+          <div class="row">adres ezberlemeyin<span class="strike"></span></div>
+          <div class="row">cevap beklemeyin<span class="strike"></span></div>
+        </div>
+        <div class="beat">
+          <div id="s2-beat" class="beat-mood">hiçbirine gerek yok.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 REVEAL 14-22s -->
+      <div id="s3" class="scene">
+        <div class="wrap">
+          <img id="s3-logo" class="logo" src="assets/logo.png" alt="" />
+          <img id="s3-brand" class="brand" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s3-mood" class="mood">yalnızca<br />bir link.</div>
+          <div id="s3-url" class="url">uygundavet.com</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 LIVE DEMO 22-36s -->
+      <div id="s4" class="scene">
+        <div class="s4-top">
+          <div id="s4-k" class="s4-kicker">02 · canlı önizleme</div>
+          <div id="s4-t" class="s4-title">DAVETİYENİZİN HAYATI</div>
+        </div>
+        <div class="frame-border"></div>
+        <div id="s4-l1" class="label-pop">◆ canlı geri sayım</div>
+        <div id="s4-l2" class="label-pop">◆ rsvp yanıtları</div>
+        <div id="s4-l3" class="label-pop">◆ konum &amp; harita</div>
+        <div id="s4-l4" class="label-pop">◆ sınırsız davetli</div>
+        <div id="s4-url" class="url-foot">uygundavet.com/garden</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 BIG BENEFITS 36-46s -->
+      <div id="s5" class="scene bg-light">
+        <div class="s5-top">
+          <div id="s5-k" class="s5-kicker">03 · sadece üç şey</div>
+          <div id="s5-t" class="s5-title">YETİYOR.</div>
+        </div>
+        <div id="s5-list" class="big-list">
+          <div class="big"><span class="num">01</span>dakikalar içinde hazır.</div>
+          <div class="big"><span class="num">02</span>sınırsız davetli, tek link.</div>
+          <div class="big"><span class="num">03</span>kendi web adresiniz.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 PROMISE 46-52s -->
+      <div id="s6" class="scene">
+        <div class="wrap">
+          <div id="s6-p" class="promise">sizin aşkınız,<br />sizin <span class="promise-accent">hikâyeniz</span>.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S7 CTA 52-60s -->
+      <div id="s7" class="scene">
+        <div class="wrap">
+          <div id="s7-mood" class="mood">bir tıkla<br />başlar.</div>
+          <div id="s7-power" class="power">BAŞLAR<span class="dot">.</span></div>
+          <div id="s7-cta" class="cta-pill">
+            <span class="avatar"><img src="assets/logo.png" alt="" /></span>
+            <span>Davetiyenizi Oluşturun</span>
+            <span>→</span>
+          </div>
+        </div>
+        <div id="s7-foot" class="foot">uygundavet.com · tr · en · de</div>
+        <div id="s7-curtain" class="curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <!-- Timed media: Garden showcase + audio -->
+    <video id="s4-video" class="clip" data-start="22" data-duration="13.5" data-track-index="20"
+           src="assets/garden.mp4" muted playsinline></video>
+    <audio id="bgmusic"  class="clip" data-start="0"  data-duration="60"   data-track-index="21"
+           src="assets/music1.mp3" data-volume="0.55"></audio>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function xf(out, inc, T, dur=0.55, blur=18) {
+        tl.to(out, { opacity: 0, filter: `blur(${blur}px)`, scale: 1.02,
+                     duration: dur, ease: "power2.inOut" }, T - dur/2);
+        tl.fromTo(inc,
+          { opacity: 0, filter: `blur(${blur}px)`, scale: 0.985 },
+          { opacity: 1, filter: "blur(0px)",       scale: 1,
+            duration: dur, ease: "power2.inOut" }, T - dur/2);
+      }
+
+      /* ========= S1 HOOK (0-6s) ========= */
+      tl.from("#s1-k",     { y: -20, opacity: 0, duration: 0.6, ease: "power3.out" }, 0.25);
+      tl.from("#s1-hook",  { y: 80, opacity: 0, duration: 1.3, ease: "expo.out" }, 0.55);
+      tl.from("#s1-rule",  { scaleX: 0, opacity: 0, transformOrigin: "center",
+                              duration: 0.7, ease: "power2.inOut" }, 2.2);
+      tl.from("#s1-micro", { y: 16, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 2.7);
+
+      xf("#s1", "#s2", 6.0);
+
+      /* ========= S2 NO LIST (6-14s) ========= */
+      tl.from("#s2-k", { y: -14, opacity: 0, duration: 0.55, ease: "power3.out" }, 6.0);
+      tl.from("#s2-t", { y: 28, opacity: 0, letterSpacing: "0.7em",
+                          duration: 0.8, ease: "power3.out" }, 6.25);
+      tl.from("#s2-list .row", {
+        x: -40, opacity: 0, duration: 0.45, ease: "power3.out",
+        stagger: 0.32,
+      }, 6.85);
+      tl.fromTo("#s2-list .strike",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.4, ease: "power2.inOut", stagger: 0.32 },
+        7.1);
+      tl.from("#s2-beat", { y: 24, opacity: 0, duration: 0.8, ease: "expo.out" }, 12.2);
+
+      xf("#s2", "#s3", 14.0);
+
+      /* ========= S3 REVEAL (14-22s) ========= */
+      tl.from("#s3-logo",  { scale: 0.5, opacity: 0, duration: 1.1, ease: "power3.out" }, 13.9);
+      tl.from("#s3-brand", { y: 26, opacity: 0, scale: 0.9, duration: 0.85, ease: "power3.out" }, 14.7);
+      tl.from("#s3-mood",  { y: 60, opacity: 0, duration: 1.1, ease: "expo.out" }, 15.5);
+      tl.from("#s3-url",   { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 17.0);
+
+      xf("#s3", "#s4", 22.0);
+
+      /* ========= S4 LIVE DEMO (22-36s) ========= */
+      tl.from("#s4-k", { y: -12, opacity: 0, duration: 0.5, ease: "power3.out" }, 22.0);
+      tl.from("#s4-t", { y: 22, opacity: 0, duration: 0.7, ease: "power3.out" }, 22.25);
+      tl.from(".frame-border", { opacity: 0, duration: 0.7, ease: "sine.out" }, 22.4);
+      tl.to("#s4-video", { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 22.5);
+
+      /* floating labels sequence (each appears ~2.5s then fades) */
+      function popLabel(sel, T) {
+        tl.fromTo(sel, { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, T);
+        tl.to(sel, { opacity: 0, y: -14, duration: 0.35, ease: "power2.in" }, T + 2.1);
+      }
+      popLabel("#s4-l1", 23.0);
+      popLabel("#s4-l2", 25.8);
+      popLabel("#s4-l3", 28.6);
+      popLabel("#s4-l4", 31.4);
+
+      tl.from("#s4-url", { y: 12, opacity: 0, duration: 0.5, ease: "sine.inOut" }, 23.5);
+
+      xf("#s4", "#s5", 36.0);
+      tl.to("#s4-video", { opacity: 0, duration: 0.4, ease: "power2.inOut" }, 35.7);
+
+      /* ========= S5 BENEFITS (36-46s) ========= */
+      tl.from("#s5-k", { y: -14, opacity: 0, duration: 0.55, ease: "power3.out" }, 35.9);
+      tl.from("#s5-t", { y: 24, opacity: 0, letterSpacing: "0.5em",
+                          duration: 0.8, ease: "power3.out" }, 36.15);
+      tl.from("#s5-list .big", {
+        x: -30, opacity: 0, duration: 0.6, ease: "power3.out",
+        stagger: 0.42,
+      }, 36.9);
+
+      xf("#s5", "#s6", 46.0);
+
+      /* ========= S6 PROMISE (46-52s) ========= */
+      tl.from("#s6-p", { y: 50, opacity: 0, duration: 1.2, ease: "expo.out" }, 45.85);
+
+      xf("#s6", "#s7", 52.0);
+
+      /* ========= S7 CTA (52-60s) — final, exits allowed ========= */
+      tl.from("#s7-mood",  { y: 40, opacity: 0, duration: 0.9, ease: "expo.out" }, 51.9);
+      tl.from("#s7-power", { y: 28, opacity: 0, letterSpacing: "0.6em",
+                              duration: 0.9, ease: "power3.out" }, 53.2);
+      tl.from("#s7-cta",   { y: 40, opacity: 0, duration: 0.7, ease: "power3.out" }, 54.0);
+      tl.from("#s7-foot",  { y: 14, opacity: 0, duration: 0.55, ease: "sine.inOut" }, 54.5);
+
+      tl.to("#s7-cta", { scale: 1.035, duration: 0.85, ease: "sine.inOut",
+                         yoyo: true, repeat: 3 }, 55.0);
+
+      tl.to(["#s7-mood","#s7-power","#s7-cta","#s7-foot"],
+        { opacity: 0, duration: 0.8, ease: "power2.in" }, 59.0);
+      tl.to("#s7-curtain", { opacity: 1, duration: 0.9, ease: "power2.in" }, 59.0);
+
+      tl.fromTo("#bgmusic", { volume: 0 }, { volume: 0.55, duration: 3, ease: "sine.out" }, 0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

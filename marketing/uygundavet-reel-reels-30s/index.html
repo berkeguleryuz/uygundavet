@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 2160px; height: 3840px;
+        overflow: hidden; background: #252224;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: #252224;
+      }
+      .scene {
+        position: absolute; top: 0; left: 0;
+        width: 2160px; height: 3840px; overflow: hidden;
+      }
+      .bg-light { background: #f5f6f3; color: #252224; }
+      .bg-dark  { background: #252224; color: #d5d1ad; }
+
+      .grain {
+        position: absolute; inset: 0; pointer-events: none;
+        opacity: 0.08; mix-blend-mode: overlay;
+        background:
+          radial-gradient(ellipse at 12% 20%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%),
+          radial-gradient(ellipse at 85% 75%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%),
+          radial-gradient(circle at 55% 40%, rgba(213,209,173,0.4) 0%, rgba(213,209,173,0) 30%);
+        z-index: 30;
+      }
+
+      #s1  { z-index: 1; background: transparent; }
+      #s2  { z-index: 2;  opacity: 0; }
+      #s3  { z-index: 3;  opacity: 0; }
+      #s4  { z-index: 4;  opacity: 0; }
+      #s5  { z-index: 5;  opacity: 0; }
+      #s6  { z-index: 6;  opacity: 0; }
+
+      #s1-hero {
+        position: absolute; top: 0; left: 0;
+        width: 2160px; height: 3840px;
+        object-fit: cover; z-index: 0;
+        filter: saturate(0.9) brightness(0.82);
+      }
+      .theme-media {
+        position: absolute; left: 0; top: 480px;
+        width: 2160px; height: 1440px;
+        object-fit: cover; display: block;
+        z-index: 20; opacity: 0;
+        background: #000;
+        box-shadow: 0 60px 120px -40px rgba(0,0,0,0.5);
+      }
+      #s2-media { z-index: 21; }
+      #s3-media { z-index: 22; }
+      #s4-media { z-index: 23; }
+      #s5-media { z-index: 24; }
+
+      .cta-chip {
+        position: absolute; bottom: 0; right: 0;
+        background: #000; color: #fff;
+        padding: 48px 80px;
+        border-top-left-radius: 48px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600; font-size: 44px;
+        letter-spacing: 0.26em; text-transform: uppercase;
+        display: flex; align-items: center; gap: 28px;
+        z-index: 4;
+      }
+
+      /* SCENE 1 — 0-4s brand intro */
+      #s1 .s1-overlay {
+        position: absolute; inset: 0; z-index: 1;
+        background: radial-gradient(ellipse at 50% 50%, rgba(245,246,243,0.55) 0%, rgba(245,246,243,0.86) 50%, rgba(245,246,243,0.96) 100%);
+      }
+      #s1 .wrap {
+        position: absolute; inset: 0; z-index: 2;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 480px 160px 520px;
+      }
+      #s1 .brand-logo {
+        width: 296px; height: 296px;
+        object-fit: contain; margin-bottom: 96px;
+        filter: drop-shadow(0 12px 44px rgba(217,138,90,0.32));
+      }
+      #s1 .mood-line {
+        font-family: "Merienda", cursive;
+        font-size: 280px; font-weight: 500;
+        color: #555670; line-height: 1;
+        letter-spacing: -0.015em;
+        text-align: center; margin-bottom: 96px;
+      }
+      #s1 .brand-text {
+        width: 1000px; height: auto;
+        filter: invert(1) saturate(0.75) brightness(0.95);
+      }
+      #s1 .btm-meta {
+        position: absolute; bottom: 200px;
+        left: 0; right: 0; text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 40px; font-weight: 500;
+        letter-spacing: 0.32em; color: #555670;
+        text-transform: lowercase; z-index: 3;
+      }
+
+      /* THEME SCENES — shared */
+      .theme .t-kicker {
+        position: absolute; top: 280px; left: 160px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 52px; font-weight: 600;
+        letter-spacing: 0.38em; text-transform: uppercase;
+        z-index: 3;
+      }
+      .theme .t-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 600; margin-right: 36px;
+      }
+      .theme .t-body {
+        position: absolute; top: 2100px;
+        left: 160px; right: 160px; z-index: 3;
+      }
+      .theme .t-mood {
+        font-family: "Merienda", cursive;
+        font-size: 228px; font-weight: 500;
+        line-height: 1.02; letter-spacing: -0.01em;
+      }
+      .theme .t-head {
+        font-family: "Orbitron", sans-serif;
+        font-size: 52px; font-weight: 700;
+        letter-spacing: 0.32em; text-transform: uppercase;
+        margin-top: 80px; opacity: 0.75;
+      }
+      .theme .t-slug {
+        position: absolute; bottom: 200px; left: 160px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 48px; font-weight: 500;
+        letter-spacing: 0.22em;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.8; z-index: 3;
+      }
+      .theme .media-chrome {
+        position: absolute; left: 0; top: 480px;
+        width: 2160px; height: 1440px;
+        pointer-events: none; z-index: 4;
+      }
+      .theme .media-badge {
+        position: absolute; left: 48px; top: 48px;
+        background: rgba(0,0,0,0.55); color: #fff;
+        padding: 20px 40px; border-radius: 1998px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 26px; font-weight: 600;
+        letter-spacing: 0.32em; text-transform: uppercase;
+        backdrop-filter: blur(12px);
+      }
+      .theme .media-urlbar {
+        position: absolute; left: 48px; right: 48px; bottom: 48px;
+        background: rgba(0,0,0,0.55); color: #fff;
+        padding: 24px 36px; border-radius: 28px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 32px; font-weight: 500;
+        letter-spacing: 0.14em;
+        display: flex; align-items: center; gap: 24px;
+        backdrop-filter: blur(12px);
+      }
+      .theme .media-urlbar .dot {
+        width: 20px; height: 20px; border-radius: 1998px;
+        background: #9fb093; display: inline-block;
+        flex-shrink: 0;
+      }
+
+      /* S2 Garden · S3 Golden · S4 Rose · S5 Sunset */
+      #s2  { background: #f5f6f3; color: #252224; }
+      #s2  .t-kicker, #s2 .t-mood, #s2 .t-slug { color: #555670; }
+      #s2  .t-num, #s2 .t-head { color: #4a6e47; }
+
+      #s3  { background: #252224; color: #d5d1ad; }
+      #s3  .t-kicker, #s3 .t-slug { color: #d5d1ad; }
+      #s3  .t-num, #s3 .t-head { color: #e8c872; }
+      #s3  .t-mood { color: #e8c872; }
+
+      #s4  { background: #f5f6f3; color: #252224; }
+      #s4  .t-kicker, #s4 .t-mood, #s4 .t-slug { color: #555670; }
+      #s4  .t-num, #s4 .t-head { color: #a86364; }
+
+      #s5  { background: #2a1f2a; color: #f3dcc3; }
+      #s5  .t-kicker, #s5 .t-mood, #s5 .t-slug { color: #f3dcc3; }
+      #s5  .t-num, #s5 .t-head { color: #e8a271; }
+
+      /* SCENE 6 — CLOSING CTA */
+      #s6 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 440px 160px;
+      }
+      #s6 .brand-text-footer { display: block; width: 840px; margin: 0 auto 96px; }
+      #s6 .mood-line {
+        font-family: "Merienda", cursive;
+        font-size: 240px; font-weight: 500;
+        color: #d5d1ad; line-height: 1.06;
+        letter-spacing: -0.01em; text-align: center;
+        margin-bottom: 96px;
+      }
+      #s6 .head-line {
+        font-family: "Orbitron", sans-serif;
+        font-size: 144px; font-weight: 800;
+        letter-spacing: 0.24em; color: #fff;
+        text-transform: uppercase; margin-bottom: 160px;
+      }
+      #s6 .pill-cta {
+        display: flex; align-items: center; gap: 48px;
+        background: #fff; color: #000;
+        padding: 56px 96px 56px 72px;
+        border-radius: 1998px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700; font-size: 48px;
+        letter-spacing: 0.28em; text-transform: uppercase;
+      }
+      #s6 .pill-avatar {
+        width: 104px; height: 104px; background: #252224;
+        border-radius: 1998px;
+        display: flex; align-items: center; justify-content: center;
+        color: #d5d1ad; overflow: hidden;
+      }
+      #s6 .pill-avatar img { width: 88px; height: 88px; object-fit: contain; }
+      #s6 .locales {
+        position: absolute; bottom: 160px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 44px; font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #d5d1ad; opacity: 0.8;
+        text-transform: uppercase;
+        font-variant-numeric: tabular-nums;
+      }
+      #s6 .fade-curtain {
+        position: absolute; inset: 0; background: #000;
+        opacity: 0; pointer-events: none; z-index: 99;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="30"
+         data-width="2160" data-height="3840">
+
+      <!-- S1 brand 0-4s -->
+      <div id="s1" class="scene">
+        <div class="s1-overlay"></div>
+        <div class="wrap">
+          <img id="s1-logo" class="brand-logo" src="assets/logo.png" alt="" />
+          <div id="s1-mood" class="mood-line">her davet,<br />eşsiz bir hikâye</div>
+          <img id="s1-brand" class="brand-text" src="assets/brand-text.png" alt="Uygun Davet" />
+        </div>
+        <div id="s1-btm" class="btm-meta">uygundavet.com</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 Garden 4-10.5s -->
+      <div id="s2" class="scene theme">
+        <div class="t-kicker"><span class="t-num">01</span>TEMA · GARDEN</div>
+        <div class="t-body">
+          <div class="t-mood" id="s2-mood">zarif bir bahçede,<br />unutulmaz bir an</div>
+          <div class="t-head">botanik · taze · romantik</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · GARDEN</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/garden</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/garden</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 Golden 10.5-16s -->
+      <div id="s3" class="scene theme">
+        <div class="t-kicker"><span class="t-num">02</span>TEMA · GOLDEN</div>
+        <div class="t-body">
+          <div class="t-mood" id="s3-mood">altın dokunuşlarla,<br />zamansız bir gün</div>
+          <div class="t-head">lüks · sıcak · zamansız</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · GOLDEN</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/golden</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/golden</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 Rose 16-21.5s -->
+      <div id="s4" class="scene theme">
+        <div class="t-kicker"><span class="t-num">03</span>TEMA · ROSE</div>
+        <div class="t-body">
+          <div class="t-mood" id="s4-mood">bir gül kadar zarif,<br />bir an kadar özel</div>
+          <div class="t-head">romantik · narin · açan</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · ROSE</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/rose</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/rose</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 Sunset 21.5-27s -->
+      <div id="s5" class="scene theme">
+        <div class="t-kicker"><span class="t-num">04</span>TEMA · SUNSET</div>
+        <div class="t-body">
+          <div class="t-mood" id="s5-mood">gün batımında,<br />verilen bir söz</div>
+          <div class="t-head">sıcak · alaca · sinematik</div>
+        </div>
+        <div class="media-chrome">
+          <div class="media-badge">TEMA · SUNSET</div>
+          <div class="media-urlbar"><span class="dot"></span><span class="path">uygundavet.com/sunset</span></div>
+        </div>
+        <div class="t-slug">uygundavet.com/sunset</div>
+        <div class="cta-chip">İncele <span class="arrow">→</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 Closing 27-30s -->
+      <div id="s6" class="scene bg-dark">
+        <div class="wrap">
+          <img id="s6-brand" class="brand-text-footer" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s6-mood" class="mood-line">davetinizi<br />hazırlayın.</div>
+          <div id="s6-head" class="head-line">ZARAFET.</div>
+          <div id="s6-cta" class="pill-cta">
+            <span class="pill-avatar"><img src="assets/logo.png" alt="" /></span>
+            <span>Oluşturun</span>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+        <div id="s6-loc" class="locales">uygundavet.com</div>
+        <div id="s6-curtain" class="fade-curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <!-- Timed media -->
+    <video id="s1-hero"  class="clip" data-start="0"    data-duration="4.3"  data-track-index="20"
+           src="assets/hero.mp4"   muted playsinline></video>
+    <video id="s2-media" class="clip theme-media" data-start="3.7"  data-duration="7.2" data-track-index="21"
+           src="assets/garden.mp4" muted playsinline></video>
+    <video id="s3-media" class="clip theme-media" data-start="10.2" data-duration="6.2" data-track-index="22"
+           src="assets/golden.mp4" muted playsinline></video>
+    <video id="s4-media" class="clip theme-media" data-start="15.7" data-duration="6.2" data-track-index="23"
+           src="assets/rose.mp4"   muted playsinline></video>
+    <video id="s5-media" class="clip theme-media" data-start="21.2" data-duration="6.2" data-track-index="24"
+           src="assets/sunset.mp4" muted playsinline></video>
+    <audio id="bgmusic"  class="clip" data-start="0"    data-duration="30"   data-track-index="25"
+           src="assets/music1.mp3" data-volume="0.55"></audio>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function crossfade(outSel, inSel, T) {
+        tl.to(outSel, { opacity: 0, filter: "blur(18px)", scale: 1.02,
+                        duration: 0.5, ease: "power2.inOut" }, T - 0.25);
+        tl.fromTo(inSel,
+          { opacity: 0, filter: "blur(18px)", scale: 0.985 },
+          { opacity: 1, filter: "blur(0px)",  scale: 1,
+            duration: 0.5, ease: "power2.inOut" }, T - 0.25);
+      }
+      function mIn(s, T)  { tl.to(s, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, T - 0.25); }
+      function mOut(s, T) { tl.to(s, { opacity: 0, duration: 0.5, ease: "power2.inOut" }, T - 0.25); }
+
+      /* S1 0-4 brand */
+      tl.fromTo("#s1-hero", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power2.out" }, 0);
+      tl.fromTo("#s1-hero", { scale: 1.06 }, { scale: 1.0, duration: 4.0, ease: "sine.out" }, 0);
+      tl.from("#s1-logo",  { scale: 0.7, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.15);
+      tl.from("#s1-mood",  { y: 50, opacity: 0, duration: 0.85, ease: "expo.out" }, 0.45);
+      tl.from("#s1-brand", { y: 20, opacity: 0, scale: 0.92,
+                             duration: 0.8, ease: "power3.out" }, 0.95);
+      tl.from("#s1-btm",   { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 1.35);
+
+      crossfade("#s1", "#s2", 4.0);
+      mOut("#s1-hero", 4.0);
+      mIn("#s2-media", 4.0);
+
+      function themeEnter(p, T) {
+        tl.from(`#${p} .t-kicker`,     { x: -30, opacity: 0, duration: 0.55, ease: "power3.out" }, T - 0.1);
+        tl.from(`#${p}-mood`,          { y: 40, opacity: 0, duration: 0.75, ease: "expo.out" },   T + 0.05);
+        tl.from(`#${p} .t-head`,       { y: 16, opacity: 0, duration: 0.5, ease: "power2.out" }, T + 0.45);
+        tl.from(`#${p} .media-chrome`, { opacity: 0, duration: 0.55, ease: "sine.inOut" },         T + 0.35);
+        tl.from(`#${p} .t-slug`,       { opacity: 0, duration: 0.45, ease: "sine.inOut" },         T + 0.85);
+        tl.from(`#${p} .cta-chip`,     { y: 34, opacity: 0, duration: 0.5, ease: "power3.out" }, T + 1.0);
+      }
+
+      themeEnter("s2", 4.0);
+      crossfade("#s2", "#s3", 10.5);
+      mOut("#s2-media", 10.5);
+      mIn("#s3-media",  10.5);
+
+      themeEnter("s3", 10.5);
+      crossfade("#s3", "#s4", 16.0);
+      mOut("#s3-media", 16.0);
+      mIn("#s4-media",  16.0);
+
+      themeEnter("s4", 16.0);
+      crossfade("#s4", "#s5", 21.5);
+      mOut("#s4-media", 21.5);
+      mIn("#s5-media",  21.5);
+
+      themeEnter("s5", 21.5);
+      crossfade("#s5", "#s6", 27.0);
+      mOut("#s5-media", 27.0);
+
+      /* S6 27-30 closing */
+      tl.from("#s6-brand", { y: -24, opacity: 0, duration: 0.7, ease: "power3.out" }, 26.85);
+      tl.from("#s6-mood", { y: 40, opacity: 0, duration: 0.85, ease: "expo.out" }, 27.1);
+      tl.from("#s6-head", { y: 18, opacity: 0, letterSpacing: "0.5em",
+                             duration: 0.7, ease: "power3.out" }, 27.6);
+      tl.from("#s6-cta",  { y: 28, opacity: 0, duration: 0.6, ease: "power3.out" }, 28.0);
+      tl.from("#s6-loc",  { y: 12, opacity: 0, duration: 0.5, ease: "sine.inOut" }, 28.3);
+
+      tl.to("#s6-cta", { scale: 1.03, duration: 0.7, ease: "sine.inOut",
+                         yoyo: true, repeat: 1 }, 28.6);
+
+      tl.to(["#s6-brand","#s6-mood","#s6-head","#s6-cta","#s6-loc"],
+        { opacity: 0, duration: 0.5, ease: "power2.in" }, 29.4);
+      tl.to("#s6-curtain", { opacity: 1, duration: 0.5, ease: "power2.in" }, 29.4);
+
+      tl.fromTo("#bgmusic", { volume: 0 }, { volume: 0.55, duration: 2, ease: "sine.out" }, 0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

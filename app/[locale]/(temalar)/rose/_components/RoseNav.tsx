@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 import { t } from "../_lib/i18n";
 import { MenuIcon } from "../_icons/MenuIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
@@ -89,6 +90,7 @@ export function RoseNav() {
   const dark = isOnDarkPage || isDarkFromScroll;
 
   return (
+    <>
     <nav aria-label="Ana navigasyon" className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-5xl">
       <motion.div
         initial={{ y: -20, opacity: 0 }}
@@ -206,5 +208,14 @@ export function RoseNav() {
         )}
       </AnimatePresence>
     </nav>
+    <ThemeBottomBar
+      base="/rose"
+      items={[
+        ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/rose/galeri" }] : []),
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/rose/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/rose/lcv" },
+      ]}
+    />
+    </>
   );
 }

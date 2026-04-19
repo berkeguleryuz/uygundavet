@@ -41,7 +41,8 @@
     "features": "Özellikler",
     "howItWorks": "Nasıl Çalışır",
     "themes": "Temalar",
-    "pricing": "Fiyatlar"
+    "pricing": "Fiyatlar",
+    "buyNow": "Satın Al"
   },
   "Hero": {
     "subscriberCount": "5.000+ çift bize güvendi",
@@ -194,6 +195,7 @@
     "or": "veya",
     "registerTitle": "Kayıt Ol",
     "loginTitle": "Giriş Yap",
+    "selectedPackageLabel": "Seçilen Paket",
     "emailPlaceholder": "E-posta adresiniz",
     "passwordPlaceholder": "Şifre (min. 6 karakter)",
     "registerBtn": "Kayıt Ol",
