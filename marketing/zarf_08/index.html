@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      html,body{width:1080px;height:1920px;overflow:hidden;
+        background:#0a0806;font-family:"Space Grotesk",system-ui,sans-serif;color:#f5e9c5}
+      .scene{position:absolute;inset:0;overflow:hidden}
+      .grain{position:absolute;inset:0;pointer-events:none;opacity:0.18;mix-blend-mode:overlay;z-index:60;
+        background:radial-gradient(ellipse at 50% 50%,rgba(240,195,95,0.35),transparent 55%),
+                   radial-gradient(ellipse at 80% 90%,rgba(140,90,30,0.4),transparent 60%)}
+      #stage{background:radial-gradient(ellipse at 50% 42%,#2a1f0f 0%,#0a0806 75%)}
+
+      .spark{position:absolute;width:10px;height:10px;border-radius:50%;opacity:0;z-index:17;
+        background:radial-gradient(circle,#fff5c8 0%,#f2c45a 70%,transparent 100%);
+        box-shadow:0 0 18px rgba(255,210,120,0.85)}
+
+      .env-wrap{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);
+        width:800px;height:520px;perspective:1800px;z-index:20}
+      .env-back{position:absolute;inset:0;border-radius:8px;
+        background:linear-gradient(180deg,#1a140a,#0d0a06);box-shadow:inset 0 20px 40px rgba(0,0,0,0.8);z-index:10}
+      .site{position:absolute;left:50%;top:0;width:720px;height:1080px;transform:translate(-50%,50%);
+        background:#0a0806;border-radius:22px;overflow:hidden;z-index:15;opacity:0;
+        box-shadow:0 40px 120px rgba(140,90,20,0.6),0 0 0 1px rgba(240,195,95,0.3)}
+      .site video{width:100%;height:100%;object-fit:cover}
+      .site .site-top{position:absolute;top:0;left:0;right:0;height:120px;
+        background:linear-gradient(180deg,rgba(10,8,6,0.92),rgba(10,8,6,0));
+        display:flex;align-items:center;padding:0 40px;z-index:3}
+      .site .site-top .logo{width:56px;height:56px;border-radius:999px;background:#f0c35f;
+        display:flex;align-items:center;justify-content:center;overflow:hidden;margin-right:20px}
+      .site .site-top .logo img{width:44px;height:44px;object-fit:contain}
+      .site .site-top .brand{font-family:"Orbitron",sans-serif;font-size:26px;font-weight:800;letter-spacing:0.3em;color:#f5e9c5;text-transform:uppercase}
+      .site .site-btm{position:absolute;bottom:0;left:0;right:0;padding:40px;
+        background:linear-gradient(0deg,rgba(10,8,6,0.95),rgba(10,8,6,0));
+        display:flex;justify-content:space-between;align-items:flex-end;z-index:3}
+      .site .site-btm .title{font-family:"Merienda",cursive;font-size:78px;line-height:0.95;color:#f5e9c5;max-width:420px}
+      .site .site-btm .go{background:linear-gradient(135deg,#f5d980,#b9892e);color:#0a0806;padding:18px 30px;border-top-left-radius:16px;
+        font-family:"Orbitron",sans-serif;font-weight:800;font-size:22px;letter-spacing:0.25em;text-transform:uppercase}
+
+      .env-front{position:absolute;inset:0;border-radius:8px;z-index:30;
+        background:linear-gradient(135deg,#1a140a,#0d0a06 100%);
+        box-shadow:0 50px 120px rgba(140,90,30,0.45),inset 0 0 0 2px rgba(240,195,95,0.55);
+        clip-path:polygon(0 42%,100% 42%,100% 100%,0 100%)}
+      .env-front::after{content:"";position:absolute;left:6%;right:6%;top:50%;bottom:8%;
+        border:1.5px solid rgba(240,195,95,0.55);border-radius:4px}
+      .env-flap{position:absolute;left:0;top:0;width:100%;height:52%;
+        background:linear-gradient(180deg,#2a1f0a,#100c06);
+        clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;z-index:40;
+        box-shadow:0 10px 24px rgba(0,0,0,0.65)}
+      .env-flap-underside{position:absolute;left:0;top:0;width:100%;height:52%;
+        background:linear-gradient(180deg,#f0c35f,#a67220);
+        clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;
+        transform:rotateX(180deg);backface-visibility:hidden;z-index:39}
+      .seal{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+        width:108px;height:108px;border-radius:50%;
+        background:radial-gradient(circle at 35% 30%,#fff5c8,#f0c35f 40%,#a67220 90%);
+        box-shadow:0 10px 30px rgba(140,90,20,0.6),inset 0 0 25px rgba(100,60,10,0.5);z-index:45;
+        display:flex;align-items:center;justify-content:center;
+        font-family:"Orbitron",sans-serif;font-size:44px;color:#1a140a;font-weight:800}
+
+      #cta-wrap{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,#2a1f0f,#0a0806 75%);
+        opacity:0;z-index:80;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:200px 80px;text-align:center}
+      #cta-logo{width:160px;height:160px;border-radius:999px;background:linear-gradient(135deg,#f5d980,#b9892e);
+        display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:60px;box-shadow:0 20px 50px rgba(180,120,30,0.4)}
+      #cta-logo img{width:128px;height:128px;object-fit:contain}
+      #cta-brand{font-family:"Orbitron",sans-serif;font-size:80px;font-weight:800;letter-spacing:0.25em;color:#f5e9c5;text-transform:uppercase;margin-bottom:40px}
+      #cta-url{font-family:"Orbitron",sans-serif;font-size:42px;font-weight:700;letter-spacing:0.3em;color:#f0c35f;text-transform:lowercase}
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12" data-width="1080" data-height="1920">
+
+      <div id="stage" class="scene">
+        <div class="spark" id="sp1" style="left:20%;top:30%"></div>
+        <div class="spark" id="sp2" style="left:78%;top:28%"></div>
+        <div class="spark" id="sp3" style="left:28%;top:72%"></div>
+        <div class="spark" id="sp4" style="left:70%;top:78%"></div>
+        <div class="spark" id="sp5" style="left:50%;top:20%"></div>
+        <div class="spark" id="sp6" style="left:12%;top:55%"></div>
+        <div class="spark" id="sp7" style="left:86%;top:52%"></div>
+        <div class="spark" id="sp8" style="left:35%;top:42%;width:14px;height:14px"></div>
+
+        <div class="env-wrap" id="env">
+          <div class="env-back"></div>
+          <div class="site" id="site">
+            <video src="assets/golden.mp4" muted playsinline></video>
+            <div class="site-top">
+              <span class="logo"><img src="assets/logo.png" alt="" /></span>
+              <span class="brand">Uygundavet</span>
+            </div>
+            <div class="site-btm">
+              <div class="title">Altın bir<br>an.</div>
+              <div class="go">uygundavet.com</div>
+            </div>
+          </div>
+          <div class="env-front"></div>
+          <div class="env-flap-underside"></div>
+          <div class="env-flap" id="flap"></div>
+          <div class="seal" id="seal">U</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <div id="cta-wrap">
+        <div id="cta-logo"><img src="assets/logo.png" alt="" /></div>
+        <div id="cta-brand">Uygundavet</div>
+        <div id="cta-url">uygundavet.com</div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.from("#stage", { opacity: 0, duration: 0.4, ease: "power2.out" }, 0.05);
+      tl.from("#env", { scale: 1.2, opacity: 0, duration: 1.3, ease: "power2.out" }, 0.3);
+      tl.from("#seal", { scale: 0, rotation: -90, duration: 0.7, ease: "back.out(2)" }, 1.2);
+
+      const sparks = ["#sp1","#sp2","#sp3","#sp4","#sp5","#sp6","#sp7","#sp8"];
+      sparks.forEach((s, i) => {
+        tl.fromTo(s, { scale: 0, opacity: 0 }, { scale: 1.6, opacity: 1, duration: 0.45, ease: "sine.out" }, 0.8 + i*0.22);
+        tl.to(s, { scale: 0.3, opacity: 0, duration: 0.5, ease: "sine.in" }, 1.4 + i*0.22);
+        tl.fromTo(s, { scale: 0, opacity: 0 }, { scale: 1.4, opacity: 1, duration: 0.45, ease: "sine.out" }, 7.0 + i*0.2);
+        tl.to(s, { scale: 0.3, opacity: 0, duration: 0.5, ease: "sine.in" }, 7.6 + i*0.2);
+      });
+
+      tl.to("#seal", { scale: 1.08, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 2.8);
+      tl.to("#seal", { scale: 0, rotation: 120, opacity: 0, duration: 0.5, ease: "power3.in" }, 3.9);
+
+      tl.to("#flap", { rotationX: -170, duration: 1.1, ease: "expo.out" }, 4.2);
+
+      tl.to("#site", { opacity: 1, duration: 0.01 }, 5.2);
+      tl.to("#site", { y: -560, scale: 1.08, duration: 1.5, ease: "expo.out" }, 5.2);
+      tl.to("#site", { y: -640, scale: 1.18, duration: 1.3, ease: "sine.inOut" }, 6.7);
+
+      tl.to([".env-back",".env-front","#flap",".env-flap-underside"], { opacity: 0.18, duration: 0.7, ease: "sine.out" }, 6.6);
+
+      tl.to("#cta-wrap", { opacity: 1, duration: 0.6, ease: "power2.out" }, 9.2);
+      tl.from("#cta-logo", { scale: 0, duration: 0.65, ease: "back.out(2)" }, 9.4);
+      tl.from("#cta-brand", { y: 30, opacity: 0, duration: 0.65, ease: "power3.out" }, 9.7);
+      tl.from("#cta-url", { y: 16, opacity: 0, duration: 0.55, ease: "sine.out" }, 10.0);
+      tl.to("#cta-logo", { scale: 1.04, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 10.4);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

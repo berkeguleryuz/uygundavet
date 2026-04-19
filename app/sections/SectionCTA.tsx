@@ -62,7 +62,7 @@ export function SectionCTA() {
               </MorphButton>
             </Link>
           )}
-          <Link href="/sunset">
+          <Link href="/demo">
             <MorphButton variant="outline" className="w-full sm:w-auto">
               {t("startWriting")}
             </MorphButton>
