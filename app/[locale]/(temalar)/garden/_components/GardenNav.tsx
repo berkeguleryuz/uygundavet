@@ -195,8 +195,8 @@ export function GardenNav() {
       base="/garden"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/garden/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/garden/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/garden/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/garden/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/garden/lcv" },
       ]}
     />
     </>

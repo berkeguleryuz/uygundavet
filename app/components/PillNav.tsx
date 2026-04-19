@@ -171,7 +171,7 @@ export function PillNav() {
         <div
           className={cn(
             "flex items-center transition-all duration-500 ease-out",
-            collapsed
+            isMobile || collapsed
               ? "gap-[2px] rounded-full p-[2px]"
               : "gap-3"
           )}
@@ -283,8 +283,9 @@ export function PillNav() {
             )}
             animate={{
               height: 48,
-              paddingLeft: collapsed ? 18 : 28,
-              paddingRight: collapsed ? 18 : 24,
+              width: isMobile || collapsed ? 48 : 140,
+              paddingLeft: isMobile || collapsed ? 0 : 28,
+              paddingRight: isMobile || collapsed ? 0 : 24,
             }}
             transition={springTransition}
             whileHover={{ scale: 1.03 }}
@@ -297,7 +298,13 @@ export function PillNav() {
                 opacity: collapsed ? 0 : 1,
                 marginRight: collapsed ? 0 : 12,
               }}
-              transition={{ duration: 0.3 }}
+              transition={{
+                width: { duration: 0.22, ease: "easeOut" },
+                marginRight: { duration: 0.22, ease: "easeOut" },
+                opacity: collapsed
+                  ? { duration: 0.1, ease: "easeIn" }
+                  : { duration: 0.18, delay: 0.22, ease: "easeOut" },
+              }}
             >
               <div className="relative overflow-hidden h-[18px]">
                 <span className="block font-chakra text-base tracking-[0.1em] uppercase font-semibold leading-[18px] whitespace-nowrap transition-transform duration-500 ease-out group-hover/menu:-translate-y-full">

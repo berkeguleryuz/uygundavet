@@ -188,8 +188,8 @@ export function GoldenNav() {
       base="/golden"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/golden/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/golden/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/golden/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/golden/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/golden/lcv" },
       ]}
     />
     </>

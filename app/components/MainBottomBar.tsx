@@ -26,18 +26,18 @@ export function MainBottomBar() {
   }, [isThemesOpen]);
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[55] px-3">
-      <div className="flex items-center gap-1.5 rounded-full bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]">
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[55] px-3">
+      <div className="flex items-center gap-2 rounded-full bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-2 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]">
         <Link
           href="/"
           aria-label="Uygun Davet"
-          className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
+          className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
         >
           <Image
             src="/logo-gold-transparent.png"
             alt=""
-            width={28}
-            height={28}
+            width={36}
+            height={36}
             className="object-contain"
           />
         </Link>
@@ -45,13 +45,13 @@ export function MainBottomBar() {
         <div ref={popRef} className="relative">
           <button
             onClick={() => setIsThemesOpen((v) => !v)}
-            className="flex items-center gap-1.5 rounded-full h-11 px-4 sm:px-5 text-white/85 font-chakra text-[11px] sm:text-xs tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-2 rounded-full h-14 px-6 sm:px-7 text-white/85 font-chakra text-sm tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors cursor-pointer whitespace-nowrap"
             aria-expanded={isThemesOpen}
           >
             {t("themes")}
             <ChevronUp
               className={cn(
-                "w-3.5 h-3.5 transition-transform",
+                "w-4 h-4 transition-transform",
                 isThemesOpen ? "rotate-0" : "rotate-180"
               )}
             />
@@ -64,7 +64,7 @@ export function MainBottomBar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.97 }}
                 transition={{ duration: 0.2 }}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[220px] bg-[#1c1a1b] rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[240px] bg-[#1c1a1b] rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
               >
                 <div className="py-2">
                   {THEME_OPTIONS.map((theme) => (
@@ -74,7 +74,7 @@ export function MainBottomBar() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsThemesOpen(false)}
-                      className="flex items-center px-5 py-2.5 text-white/80 hover:text-white hover:bg-white/5 transition-colors font-sans text-sm capitalize"
+                      className="flex items-center px-5 py-3 text-white/80 hover:text-white hover:bg-white/5 transition-colors font-sans text-sm capitalize"
                     >
                       {theme.key}
                     </Link>
@@ -87,7 +87,7 @@ export function MainBottomBar() {
 
         <Link
           href="/#fiyatlar"
-          className="flex items-center rounded-full h-11 px-4 sm:px-5 bg-white text-[#1c1a1b] font-chakra text-[11px] sm:text-xs tracking-[0.15em] uppercase font-semibold hover:bg-white/90 transition-colors"
+          className="flex items-center rounded-full h-14 px-6 sm:px-7 bg-white text-[#1c1a1b] font-chakra text-sm tracking-[0.15em] uppercase font-semibold hover:bg-white/90 transition-colors whitespace-nowrap"
         >
           {t("buyNow")}
         </Link>

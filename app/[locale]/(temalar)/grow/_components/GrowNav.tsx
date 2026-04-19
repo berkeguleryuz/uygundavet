@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { t } from "../_lib/i18n";
 import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 
 const BASE = "/grow";
@@ -168,8 +169,8 @@ export function GrowNav() {
       base="/grow"
       items={[
         ...(wedding.hasGallery ? [{ label: "Galeri", href: "/grow/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: "Anı Defteri", href: "/grow/ani-defteri" }] : []),
-        { label: "LCV", href: "/grow/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/grow/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/grow/lcv" },
       ]}
     />
     </>

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
 import { OrnamentalDivider } from "./OrnamentalDivider";
 import { ScrollReveal } from "./ScrollReveal";
+import { AnimatedCheckMark, AnimatedCrossMark } from "@/app/components/AnimatedRsvpMarks";
 
 type RsvpStatus = "confirmed" | "declined";
 
@@ -202,25 +203,31 @@ export function RsvpForm() {
                   type="button"
                   onClick={() => setRsvpStatus("confirmed")}
                   className={cn(
-                    "h-12 rounded-xl border text-sm font-sans font-medium transition-all",
+                    "rounded-xl border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "confirmed"
                       ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
                       : "border-white/10 bg-white/5 text-white/40 hover:text-white/60"
                   )}
                 >
-                  Katılacağım
+                  <AnimatedCheckMark active={rsvpStatus === "confirmed"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    Katılacağım
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setRsvpStatus("declined")}
                   className={cn(
-                    "h-12 rounded-xl border text-sm font-sans font-medium transition-all",
+                    "rounded-xl border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "declined"
                       ? "bg-rose-500/15 border-rose-500/40 text-rose-400"
                       : "border-white/10 bg-white/5 text-white/40 hover:text-white/60"
                   )}
                 >
-                  Katılamayacağım
+                  <AnimatedCrossMark active={rsvpStatus === "declined"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    Katılamayacağım
+                  </span>
                 </button>
               </div>
             </div>

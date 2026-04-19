@@ -1,6 +1,6 @@
 export type GardenLocale = "tr" | "en" | "de";
 interface T {
-  navHome: string; navStory: string; navEvent: string; navGallery: string; navMemory: string; navRsvp: string; navLogin: string;
+  navHome: string; navStory: string; navEvent: string; navGallery: string; navMemory: string; navRsvp: string; navLogin: string; bottomMemory: string; bottomRsvp: string;
   heroTagline: string; heroCtaButton: string; heroScrollHint: string;
   countdownLabel: string; countdownHeading: string; countdownDays: string; countdownHours: string; countdownMinutes: string; countdownSeconds: string;
   storyLabel: string; storyText: string; storyCtaButton: string;
@@ -15,7 +15,7 @@ interface T {
   footerCreatedWith: string; footerCtaHeading: string; footerCtaText: string; footerCtaButton: string; footerPrivacy: string; footerRights: string;
 }
 const tr: T = {
-  navHome:"Ana Sayfa",navStory:"Hikayemiz",navEvent:"Etkinlik",navGallery:"Galeri",navMemory:"Anı Defteri",navRsvp:"LCV",navLogin:"Giriş Yap",
+  navHome:"Ana Sayfa",navStory:"Hikayemiz",navEvent:"Etkinlik",navGallery:"Galeri",navMemory:"Anı Defteri",navRsvp:"LCV",navLogin:"Giriş Yap",bottomMemory:"Anı Bırak",bottomRsvp:"Katılım Durumu",
   heroTagline:"Sevgi Filizleniyor",heroCtaButton:"Davetiyeyi Yanıtla",heroScrollHint:"Keşfet",
   countdownLabel:"Geri Sayım",countdownHeading:"Mevsimimiz Yaklaşıyor",countdownDays:"Gün",countdownHours:"Saat",countdownMinutes:"Dakika",countdownSeconds:"Saniye",
   storyLabel:"Büyüyen Hikâye",storyText:"İki kalbin bahçesinde filizlenen bu sevda, şimdi sizinle paylaşılmaya hazır.",storyCtaButton:"Hikayemizi Okuyun",
@@ -30,7 +30,7 @@ const tr: T = {
   footerCreatedWith:"ile oluşturuldu",footerCtaHeading:"Siz de böyle bir davetiye ister misiniz?",footerCtaText:"Kendi düğün web sitenizi dakikalar içinde oluşturun.",footerCtaButton:"Hemen Başla",footerPrivacy:"Gizlilik",footerRights:"Tüm hakları saklıdır.",
 };
 const en: T = {
-  navHome:"Home",navStory:"Our Story",navEvent:"Event",navGallery:"Gallery",navMemory:"Guestbook",navRsvp:"RSVP",navLogin:"Sign In",
+  navHome:"Home",navStory:"Our Story",navEvent:"Event",navGallery:"Gallery",navMemory:"Guestbook",navRsvp:"RSVP",navLogin:"Sign In",bottomMemory:"Leave Memory",bottomRsvp:"Attendance",
   heroTagline:"Love in Full Bloom",heroCtaButton:"RSVP Now",heroScrollHint:"Explore",
   countdownLabel:"Countdown",countdownHeading:"Our Season Approaches",countdownDays:"Days",countdownHours:"Hours",countdownMinutes:"Minutes",countdownSeconds:"Seconds",
   storyLabel:"How It Grew",storyText:"A love that sprouted in the garden of two hearts, now ready to bloom with you.",storyCtaButton:"Read Our Story",
@@ -45,7 +45,7 @@ const en: T = {
   footerCreatedWith:"created with",footerCtaHeading:"Want an invitation like this?",footerCtaText:"Create your wedding website in minutes.",footerCtaButton:"Get Started",footerPrivacy:"Privacy",footerRights:"All rights reserved.",
 };
 const de: T = {
-  navHome:"Startseite",navStory:"Geschichte",navEvent:"Event",navGallery:"Galerie",navMemory:"Gästebuch",navRsvp:"RSVP",navLogin:"Anmelden",
+  navHome:"Startseite",navStory:"Geschichte",navEvent:"Event",navGallery:"Galerie",navMemory:"Gästebuch",navRsvp:"RSVP",navLogin:"Anmelden",bottomMemory:"Erinnerung",bottomRsvp:"Teilnahme",
   heroTagline:"Liebe in voller Blüte",heroCtaButton:"Jetzt antworten",heroScrollHint:"Entdecken",
   countdownLabel:"Countdown",countdownHeading:"Unsere Jahreszeit naht",countdownDays:"Tage",countdownHours:"Stunden",countdownMinutes:"Minuten",countdownSeconds:"Sekunden",
   storyLabel:"Unsere Geschichte",storyText:"Eine Liebe, die im Garten zweier Herzen aufblüht.",storyCtaButton:"Geschichte lesen",

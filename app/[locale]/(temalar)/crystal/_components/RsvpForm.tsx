@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
 import { t } from "../_lib/i18n";
 import { HeartIcon } from "../_icons/HeartIcon";
+import { AnimatedCheckMark, AnimatedCrossMark } from "@/app/components/AnimatedRsvpMarks";
 
 type RsvpStatus = "confirmed" | "declined";
 
@@ -207,25 +208,31 @@ export function RsvpForm() {
                   type="button"
                   onClick={() => setRsvpStatus("confirmed")}
                   className={cn(
-                    "h-14 rounded-lg border text-sm font-sans font-medium transition-all",
+                    "rounded-lg border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "confirmed"
                       ? "bg-[#f0fdf4] border-emerald-200 text-emerald-700"
                       : "border-[#1a1a2e]/10 bg-white text-[#a09ba6] hover:text-[#6d6a75]"
                   )}
                 >
-                  {t("rsvpAttending")}
+                  <AnimatedCheckMark active={rsvpStatus === "confirmed"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    {t("rsvpAttending")}
+                  </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setRsvpStatus("declined")}
                   className={cn(
-                    "h-14 rounded-lg border text-sm font-sans font-medium transition-all",
+                    "rounded-lg border flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 transition-all",
                     rsvpStatus === "declined"
                       ? "bg-[#fff1f2] border-rose-200 text-rose-700"
                       : "border-[#1a1a2e]/10 bg-white text-[#a09ba6] hover:text-[#6d6a75]"
                   )}
                 >
-                  {t("rsvpNotAttending")}
+                  <AnimatedCrossMark active={rsvpStatus === "declined"} />
+                  <span className="font-sans text-[13px] font-medium tracking-wide">
+                    {t("rsvpNotAttending")}
+                  </span>
                 </button>
               </div>
             </div>

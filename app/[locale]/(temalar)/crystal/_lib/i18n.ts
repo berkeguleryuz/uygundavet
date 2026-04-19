@@ -8,6 +8,8 @@ interface CrystalTranslations {
   navMemory: string;
   navRsvp: string;
   navLogin: string;
+  bottomMemory: string;
+  bottomRsvp: string;
   heroTagline: string;
   heroCtaButton: string;
   heroScrollHint: string;
@@ -103,6 +105,8 @@ const translations: Record<CrystalLocale, CrystalTranslations> = {
     navMemory: "Anı Defteri",
     navRsvp: "LCV",
     navLogin: "Giriş Yap",
+    bottomMemory: "Anı Bırak",
+    bottomRsvp: "Katılım Durumu",
     heroTagline: "Evleniyoruz",
     heroCtaButton: "Davetiyeyi Yanıtla",
     heroScrollHint: "Keşfet",
@@ -196,6 +200,8 @@ const translations: Record<CrystalLocale, CrystalTranslations> = {
     navMemory: "Guestbook",
     navRsvp: "RSVP",
     navLogin: "Sign In",
+    bottomMemory: "Leave Memory",
+    bottomRsvp: "Attendance",
     heroTagline: "We're Getting Married",
     heroCtaButton: "RSVP Now",
     heroScrollHint: "Discover",
@@ -289,6 +295,8 @@ const translations: Record<CrystalLocale, CrystalTranslations> = {
     navMemory: "Gästebuch",
     navRsvp: "RSVP",
     navLogin: "Anmelden",
+    bottomMemory: "Erinnerung",
+    bottomRsvp: "Teilnahme",
     heroTagline: "Wir heiraten",
     heroCtaButton: "Jetzt antworten",
     heroScrollHint: "Entdecken",

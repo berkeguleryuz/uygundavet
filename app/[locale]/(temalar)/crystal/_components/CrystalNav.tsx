@@ -164,8 +164,8 @@ export function CrystalNav() {
       base="/crystal"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/crystal/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/crystal/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/crystal/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/crystal/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/crystal/lcv" },
       ]}
     />
     </>

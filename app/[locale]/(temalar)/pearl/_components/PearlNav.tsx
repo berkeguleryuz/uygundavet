@@ -212,8 +212,8 @@ export function PearlNav() {
       base="/pearl"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/pearl/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/pearl/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/pearl/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/pearl/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/pearl/lcv" },
       ]}
     />
     </>

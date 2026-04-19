@@ -158,8 +158,8 @@ export function SunsetNav() {
       base="/sunset"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/sunset/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/sunset/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/sunset/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/sunset/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/sunset/lcv" },
       ]}
     />
     </>

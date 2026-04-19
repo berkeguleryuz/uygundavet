@@ -212,8 +212,8 @@ export function RoseNav() {
       base="/rose"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/rose/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/rose/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/rose/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/rose/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/rose/lcv" },
       ]}
     />
     </>

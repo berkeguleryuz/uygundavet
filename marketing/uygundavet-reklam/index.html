@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 2160px; height: 3840px;
+        overflow: hidden; background: #252224;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        color: #252224;
+      }
+      .scene {
+        position: absolute; top: 0; left: 0;
+        width: 2160px; height: 3840px; overflow: hidden;
+      }
+      .bg-light { background: #f5f6f3; color: #252224; }
+      .bg-dark  { background: #252224; color: #d5d1ad; }
+
+      .grain {
+        position: absolute; inset: 0; pointer-events: none;
+        opacity: 0.08; mix-blend-mode: overlay;
+        background:
+          radial-gradient(ellipse at 12% 20%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 35%),
+          radial-gradient(ellipse at 85% 75%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%),
+          radial-gradient(circle at 55% 40%, rgba(213,209,173,0.4) 0%, rgba(213,209,173,0) 30%);
+        z-index: 50;
+      }
+
+      /* scene stack */
+      #s1 { z-index: 1; }
+      #s2 { z-index: 2; opacity: 0; }
+      #s3 { z-index: 3; opacity: 0; }
+      #s4 { z-index: 4; opacity: 0; }
+      #s5 { z-index: 5; opacity: 0; }
+      #s6 { z-index: 6; opacity: 0; }
+      #s7 { z-index: 7; opacity: 0; }
+
+      /* root-level timed media */
+      .demo-media {
+        position: absolute;
+        left: 0;
+        top: 640px;
+        width: 2160px;
+        height: 2560px;
+        object-fit: cover;
+        display: block;
+        z-index: 20;
+        opacity: 0;
+        background: #000;
+      }
+      #m-garden { z-index: 20; }
+      #m-golden { z-index: 21; }
+      #m-rose   { z-index: 22; }
+      #m-sunset { z-index: 23; }
+
+      .cta-chip {
+        position: absolute; bottom: 0; right: 0;
+        background: #000; color: #fff;
+        padding: 56px 88px;
+        border-top-left-radius: 48px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600; font-size: 44px;
+        letter-spacing: 0.26em; text-transform: uppercase;
+        display: flex; align-items: center; gap: 28px;
+        z-index: 4;
+      }
+
+      /* ========================================================
+         SCENE 1 — HOOK
+         ======================================================== */
+      #s1 { background: #252224; color: #d5d1ad; }
+      #s1 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 400px 160px;
+      }
+      #s1 .kicker {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #d5d1ad; opacity: 0.75;
+        margin-bottom: 144px;
+      }
+      #s1 .hook {
+        font-family: "Merienda", cursive;
+        font-size: 320px; font-weight: 500;
+        line-height: 0.98; letter-spacing: -0.02em;
+        color: #d5d1ad;
+        text-align: center;
+        margin-bottom: 128px;
+      }
+      #s1 .sub {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 48px; font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #d5d1ad; opacity: 0.7;
+        text-transform: uppercase;
+      }
+      #s1 .rule {
+        width: 160px; height: 4px;
+        background: #d5d1ad;
+        margin-top: 96px; opacity: 0.5;
+      }
+      #s1 .s1-bg-hero {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 50%, rgba(213,209,173,0.08) 0%, rgba(37,34,36,1) 70%);
+        z-index: 0;
+      }
+
+      /* ========================================================
+         SCENE 2 — PROBLEM (kağıt davet dertleri)
+         ======================================================== */
+      #s2 { background: #f5f6f3; color: #252224; }
+      #s2 .s2-top {
+        position: absolute; top: 320px; left: 160px; right: 160px;
+        text-align: center;
+      }
+      #s2 .s2-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #a04040; opacity: 0.85;
+        margin-bottom: 48px;
+      }
+      #s2 .s2-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 132px; font-weight: 800;
+        letter-spacing: 0.28em; text-transform: uppercase;
+        color: #252224;
+      }
+      #s2 .list {
+        position: absolute;
+        top: 900px; left: 240px; right: 240px;
+        display: flex; flex-direction: column;
+        gap: 56px;
+      }
+      #s2 .item {
+        font-family: "Merienda", cursive;
+        font-size: 152px; font-weight: 500;
+        color: #252224; line-height: 1;
+        letter-spacing: -0.01em;
+        position: relative; display: inline-block;
+        padding-left: 128px;
+      }
+      #s2 .item::before {
+        content: "×";
+        position: absolute; left: 0; top: 8px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 96px; font-weight: 800;
+        color: #a04040;
+      }
+      #s2 .item .strike {
+        position: absolute; left: 128px; right: 0; top: 50%;
+        height: 8px; background: #a04040;
+        transform-origin: left center;
+        transform: scaleX(0);
+      }
+      #s2 .bottom-beat {
+        position: absolute; bottom: 360px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Merienda", cursive;
+        font-size: 144px; font-weight: 500;
+        color: #555670; letter-spacing: -0.01em;
+      }
+
+      /* ========================================================
+         SCENE 3 — SOLUTION REVEAL
+         ======================================================== */
+      #s3 { background: #252224; color: #d5d1ad; }
+      #s3 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 440px 160px;
+      }
+      #s3 .logo {
+        width: 360px; height: 360px;
+        object-fit: contain;
+        filter: drop-shadow(0 16px 72px rgba(217,138,90,0.35));
+        margin-bottom: 112px;
+      }
+      #s3 .brand-text {
+        width: 1120px; height: auto;
+        margin-bottom: 128px;
+      }
+      #s3 .mood {
+        font-family: "Merienda", cursive;
+        font-size: 240px; font-weight: 500;
+        color: #d5d1ad;
+        line-height: 1.02; letter-spacing: -0.01em;
+        text-align: center; margin-bottom: 112px;
+      }
+      #s3 .url-line {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 52px; font-weight: 500;
+        letter-spacing: 0.34em;
+        color: #d5d1ad; opacity: 0.8;
+        text-transform: lowercase;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ========================================================
+         SCENE 4 — 8 TEMA GRID
+         ======================================================== */
+      #s4 { background: #f5f6f3; color: #252224; }
+      #s4 .s4-top {
+        position: absolute; top: 280px; left: 160px; right: 160px;
+        text-align: center;
+      }
+      #s4 .s4-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #555670; opacity: 0.75;
+        margin-bottom: 48px;
+      }
+      #s4 .s4-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 140px; font-weight: 800;
+        letter-spacing: 0.24em; text-transform: uppercase;
+        color: #252224;
+      }
+      #s4 .s4-sub {
+        margin-top: 44px;
+        font-family: "Merienda", cursive;
+        font-size: 80px; font-weight: 500;
+        color: #555670; line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+      #s4 .grid {
+        position: absolute;
+        top: 1000px; left: 160px; right: 160px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+      }
+      #s4 .tile {
+        height: 360px;
+        border-radius: 40px;
+        padding: 48px;
+        display: flex; flex-direction: column;
+        justify-content: space-between;
+        font-family: "Orbitron", sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
+      #s4 .tile-num {
+        font-size: 32px;
+        letter-spacing: 0.34em;
+        font-weight: 600;
+        opacity: 0.7;
+      }
+      #s4 .tile-name {
+        font-size: 68px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      #s4 .t1  { background: linear-gradient(135deg,#cad8dc,#8bb0c9); color: #1b3a4a; }
+      #s4 .t2  { background: linear-gradient(135deg,#dde5d4,#9fb093); color: #2a4026; }
+      #s4 .t3  { background: linear-gradient(135deg,#3a332e,#c4a962); color: #f3e6b4; }
+      #s4 .t4  { background: linear-gradient(135deg,#dee5d7,#3c5a3a); color: #f4f7ef; }
+      #s4 .t5  { background: linear-gradient(135deg,#2a4457,#8bb0c9); color: #e3ecef; }
+      #s4 .t6  { background: linear-gradient(135deg,#efe7e0,#d7b8b3); color: #55383a; }
+      #s4 .t7  { background: linear-gradient(135deg,#e8d7d2,#c4898a); color: #6b2e30; }
+      #s4 .t8  { background: linear-gradient(135deg,#3a2638,#d98a5a); color: #fff2e0; }
+
+      /* ========================================================
+         SCENE 5 — FEATURES
+         ======================================================== */
+      #s5 { background: #252224; color: #d5d1ad; }
+      #s5 .s5-top {
+        position: absolute; top: 320px; left: 160px; right: 160px;
+        text-align: center;
+      }
+      #s5 .s5-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #e8c872; opacity: 0.85;
+        margin-bottom: 48px;
+      }
+      #s5 .s5-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 124px; font-weight: 800;
+        letter-spacing: 0.22em; text-transform: uppercase;
+        color: #fff;
+      }
+      #s5 .features {
+        position: absolute;
+        top: 880px; left: 160px; right: 160px;
+        display: flex; flex-direction: column; gap: 64px;
+      }
+      #s5 .feat {
+        font-family: "Merienda", cursive;
+        font-size: 124px; font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.005em;
+        color: #d5d1ad;
+        position: relative;
+        padding-left: 136px;
+      }
+      #s5 .feat::before {
+        content: "◈";
+        position: absolute; left: 0; top: 12px;
+        font-size: 76px;
+        color: #e8c872;
+      }
+      #s5 .micro {
+        position: absolute;
+        bottom: 320px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 48px; font-weight: 500;
+        letter-spacing: 0.4em;
+        color: #e8c872; opacity: 0.85;
+        text-transform: uppercase;
+      }
+
+      /* ========================================================
+         SCENE 6 — DEMO MONTAGE
+         ======================================================== */
+      #s6 { background: #0e0d0e; color: #fff; }
+      #s6 .s6-top {
+        position: absolute; top: 280px; left: 160px; right: 160px;
+        text-align: center;
+        z-index: 30;
+      }
+      #s6 .s6-num {
+        font-family: "Orbitron", sans-serif;
+        font-size: 44px; font-weight: 700;
+        letter-spacing: 0.5em; text-transform: uppercase;
+        color: #fff; opacity: 0.7;
+        margin-bottom: 48px;
+      }
+      #s6 .s6-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 116px; font-weight: 800;
+        letter-spacing: 0.22em; text-transform: uppercase;
+        color: #fff;
+      }
+      #s6 .media-label {
+        position: absolute;
+        bottom: 400px; left: 0; right: 0;
+        text-align: center;
+        z-index: 30;
+        font-family: "Orbitron", sans-serif;
+        font-size: 56px;
+        font-weight: 700;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: #fff;
+      }
+      #s6 .media-url {
+        position: absolute;
+        bottom: 300px; left: 0; right: 0;
+        text-align: center;
+        z-index: 30;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 40px;
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        color: #fff;
+        opacity: 0.75;
+      }
+      #s6 .frame-border {
+        position: absolute; inset: 560px 0 560px 0;
+        pointer-events: none;
+        z-index: 28;
+        border-top: 2px solid rgba(255,255,255,0.12);
+        border-bottom: 2px solid rgba(255,255,255,0.12);
+      }
+
+      /* ========================================================
+         SCENE 7 — CTA CLOSE
+         ======================================================== */
+      #s7 { background: #252224; color: #d5d1ad; }
+      #s7 .wrap {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        padding: 360px 160px;
+      }
+      #s7 .brand {
+        width: 880px; height: auto;
+        margin-bottom: 128px;
+      }
+      #s7 .mood {
+        font-family: "Merienda", cursive;
+        font-size: 248px; font-weight: 500;
+        line-height: 1.02; letter-spacing: -0.01em;
+        color: #d5d1ad;
+        text-align: center;
+        margin-bottom: 112px;
+      }
+      #s7 .power {
+        font-family: "Orbitron", sans-serif;
+        font-size: 136px; font-weight: 800;
+        letter-spacing: 0.28em;
+        color: #fff;
+        text-transform: uppercase;
+        margin-bottom: 192px;
+      }
+      #s7 .cta-pill {
+        display: flex; align-items: center; gap: 48px;
+        background: #fff; color: #000;
+        padding: 60px 104px 60px 72px;
+        border-radius: 1998px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700; font-size: 48px;
+        letter-spacing: 0.28em; text-transform: uppercase;
+      }
+      #s7 .cta-pill .dot {
+        width: 104px; height: 104px;
+        background: #252224;
+        border-radius: 1998px;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+      }
+      #s7 .cta-pill .dot img {
+        width: 84px; height: 84px; object-fit: contain;
+      }
+      #s7 .footer {
+        position: absolute; bottom: 180px; left: 0; right: 0;
+        text-align: center;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 48px; font-weight: 500;
+        letter-spacing: 0.4em;
+        color: #d5d1ad; opacity: 0.8;
+        text-transform: uppercase;
+      }
+      #s7 .curtain {
+        position: absolute; inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 99;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="60"
+         data-width="2160" data-height="3840">
+
+      <!-- S1 HOOK 0-5s -->
+      <div id="s1" class="scene">
+        <div class="s1-bg-hero"></div>
+        <div class="wrap">
+          <div id="s1-k" class="kicker">uygundavet.com</div>
+          <div id="s1-hook" class="hook">aşkınız,<br />kâğıda<br />sığmaz.</div>
+          <div id="s1-rule" class="rule"></div>
+          <div id="s1-sub" class="sub" style="margin-top:48px">dijital düğün daveti</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 PROBLEM 5-11s -->
+      <div id="s2" class="scene bg-light">
+        <div class="s2-top">
+          <div id="s2-num" class="s2-num">01 · ESKİ YÖNTEM</div>
+          <div id="s2-title" class="s2-title">KAĞIT DAVET</div>
+        </div>
+        <div id="s2-list" class="list">
+          <div class="item">kaybolur<span class="strike"></span></div>
+          <div class="item">güncellenemez<span class="strike"></span></div>
+          <div class="item">fotoğraf eklenmez<span class="strike"></span></div>
+          <div class="item">cevap gecikir<span class="strike"></span></div>
+          <div class="item">ulaşmaz<span class="strike"></span></div>
+        </div>
+        <div id="s2-beat" class="bottom-beat">daha iyisi var.</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 SOLUTION 11-19s -->
+      <div id="s3" class="scene">
+        <div class="wrap">
+          <img id="s3-logo" class="logo" src="assets/logo.png" alt="" />
+          <img id="s3-brand" class="brand-text" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s3-mood" class="mood">davetiniz<br />artık bir<br />web sitesi.</div>
+          <div id="s3-url" class="url-line">uygundavet.com</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 8 TEMA 19-26s -->
+      <div id="s4" class="scene bg-light">
+        <div class="s4-top">
+          <div id="s4-num" class="s4-num">02 · seçim sizin</div>
+          <div id="s4-title" class="s4-title">8 ZARİF TEMA</div>
+          <div id="s4-sub" class="s4-sub">sizin stiliniz,<br />sizin daveti.</div>
+        </div>
+        <div id="s4-grid" class="grid">
+          <div class="tile t1"><span class="tile-num">01</span><span class="tile-name">Crystal</span></div>
+          <div class="tile t2"><span class="tile-num">02</span><span class="tile-name">Garden</span></div>
+          <div class="tile t3"><span class="tile-num">03</span><span class="tile-name">Golden</span></div>
+          <div class="tile t4"><span class="tile-num">04</span><span class="tile-name">Grow</span></div>
+          <div class="tile t5"><span class="tile-num">05</span><span class="tile-name">Ocean</span></div>
+          <div class="tile t6"><span class="tile-num">06</span><span class="tile-name">Pearl</span></div>
+          <div class="tile t7"><span class="tile-num">07</span><span class="tile-name">Rose</span></div>
+          <div class="tile t8"><span class="tile-num">08</span><span class="tile-name">Sunset</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 FEATURES 26-34s -->
+      <div id="s5" class="scene">
+        <div class="s5-top">
+          <div id="s5-num" class="s5-num">03 · her şey tek adreste</div>
+          <div id="s5-title" class="s5-title">Özel Düğün Siteniz</div>
+        </div>
+        <div id="s5-features" class="features">
+          <div class="feat">rsvp yanıtları</div>
+          <div class="feat">canlı geri sayım</div>
+          <div class="feat">fotoğraf galerisi</div>
+          <div class="feat">konum &amp; harita</div>
+          <div class="feat">sınırsız davetli</div>
+        </div>
+        <div id="s5-micro" class="micro">tr · en · de desteği</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 DEMO MONTAGE 34-48s -->
+      <div id="s6" class="scene">
+        <div class="s6-top">
+          <div id="s6-num" class="s6-num">04 · gerçek davetiyeler</div>
+          <div id="s6-title" class="s6-title">Canlı Örnekler</div>
+        </div>
+        <div class="frame-border"></div>
+        <div id="s6-label" class="media-label">GARDEN</div>
+        <div id="s6-url" class="media-url">uygundavet.com/garden</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S7 CTA 48-60s -->
+      <div id="s7" class="scene">
+        <div class="wrap">
+          <img id="s7-brand" class="brand" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="s7-mood" class="mood">davetinizi<br />zarafetle<br />hazırlayın.</div>
+          <div id="s7-power" class="power">ZARAFET.</div>
+          <div id="s7-cta" class="cta-pill">
+            <span class="dot"><img src="assets/logo.png" alt="" /></span>
+            <span>Davetiyenizi Oluşturun</span>
+            <span>→</span>
+          </div>
+        </div>
+        <div id="s7-foot" class="footer">uygundavet.com · tr · en · de</div>
+        <div id="s7-curtain" class="curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <!-- Timed media: Demo montage videos (only s6 needs videos inside) -->
+    <video id="m-garden" class="clip demo-media" data-start="34"   data-duration="3.6" data-track-index="20"
+           src="assets/garden.mp4" muted playsinline></video>
+    <video id="m-golden" class="clip demo-media" data-start="37.5" data-duration="3.6" data-track-index="21"
+           src="assets/golden.mp4" muted playsinline></video>
+    <video id="m-rose"   class="clip demo-media" data-start="41"   data-duration="3.6" data-track-index="22"
+           src="assets/rose.mp4"   muted playsinline></video>
+    <video id="m-sunset" class="clip demo-media" data-start="44.5" data-duration="3.6" data-track-index="23"
+           src="assets/sunset.mp4" muted playsinline></video>
+    <audio id="bgmusic"  class="clip" data-start="0"    data-duration="60"  data-track-index="29"
+           src="assets/music1.mp3" data-volume="0.55"></audio>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function xf(out, inc, T, blur) {
+        blur = blur || 18;
+        tl.to(out, { opacity: 0, filter: `blur(${blur}px)`, scale: 1.02,
+                     duration: 0.55, ease: "power2.inOut" }, T - 0.25);
+        tl.fromTo(inc,
+          { opacity: 0, filter: `blur(${blur}px)`, scale: 0.985 },
+          { opacity: 1, filter: "blur(0px)",       scale: 1,
+            duration: 0.55, ease: "power2.inOut" }, T - 0.25);
+      }
+      function mIn(s, T)  { tl.to(s, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, T - 0.2); }
+      function mOut(s, T) { tl.to(s, { opacity: 0, duration: 0.5, ease: "power2.inOut" }, T - 0.2); }
+
+      /* S1 HOOK (0-5s) */
+      tl.from("#s1-k",    { y: -20, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.25);
+      tl.from("#s1-hook", { y: 80, opacity: 0, duration: 1.2, ease: "expo.out" },  0.6);
+      tl.from("#s1-rule", { scaleX: 0, opacity: 0, transformOrigin: "center",
+                            duration: 0.7, ease: "power2.inOut" }, 2.0);
+      tl.from("#s1-sub",  { y: 16, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 2.4);
+
+      xf("#s1", "#s2", 5.0);
+
+      /* S2 PROBLEM (5-11s) */
+      tl.from("#s2-num",   { y: -20, opacity: 0, duration: 0.55, ease: "power3.out" }, 5.0);
+      tl.from("#s2-title", { y: 30, opacity: 0, letterSpacing: "0.7em",
+                             duration: 0.85, ease: "power3.out" }, 5.3);
+      tl.from("#s2-list .item", {
+        x: -40, opacity: 0,
+        duration: 0.5, ease: "power3.out",
+        stagger: 0.28,
+      }, 5.9);
+      tl.fromTo("#s2-list .strike",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.35, ease: "power2.inOut", stagger: 0.28 },
+        6.1);
+      tl.from("#s2-beat", { y: 24, opacity: 0, duration: 0.8, ease: "expo.out" }, 9.5);
+
+      xf("#s2", "#s3", 11.0);
+
+      /* S3 SOLUTION (11-19s) */
+      tl.from("#s3-logo",  { scale: 0.5, opacity: 0, duration: 1.0, ease: "power3.out" }, 10.85);
+      tl.from("#s3-brand", { y: 24, opacity: 0, scale: 0.9, duration: 0.8, ease: "power3.out" }, 11.5);
+      tl.from("#s3-mood",  { y: 60, opacity: 0, duration: 1.1, ease: "expo.out" }, 12.3);
+      tl.from("#s3-url",   { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 13.8);
+
+      xf("#s3", "#s4", 19.0);
+
+      /* S4 8 TEMA (19-26s) */
+      tl.from("#s4-num",   { y: -14, opacity: 0, duration: 0.55, ease: "power3.out" }, 18.9);
+      tl.from("#s4-title", { y: 24, opacity: 0, letterSpacing: "0.5em",
+                             duration: 0.75, ease: "power3.out" }, 19.2);
+      tl.from("#s4-sub",   { y: 20, opacity: 0, duration: 0.6, ease: "sine.out" }, 19.8);
+      tl.from("#s4-grid .tile", {
+        y: 40, opacity: 0, scale: 0.92,
+        duration: 0.45, ease: "power3.out",
+        stagger: { each: 0.08, from: "start" },
+      }, 20.2);
+
+      xf("#s4", "#s5", 26.0);
+
+      /* S5 FEATURES (26-34s) */
+      tl.from("#s5-num",   { y: -14, opacity: 0, duration: 0.55, ease: "power3.out" }, 25.9);
+      tl.from("#s5-title", { y: 24, opacity: 0, duration: 0.75, ease: "power3.out" }, 26.2);
+      tl.from("#s5-features .feat", {
+        x: -40, opacity: 0,
+        duration: 0.5, ease: "power3.out",
+        stagger: 0.22,
+      }, 26.9);
+      tl.from("#s5-micro", { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 32.5);
+
+      xf("#s5", "#s6", 34.0);
+
+      /* S6 DEMO montage (34-48s) */
+      tl.from("#s6-num",   { y: -14, opacity: 0, duration: 0.5, ease: "power3.out" }, 33.9);
+      tl.from("#s6-title", { y: 24, opacity: 0, duration: 0.7, ease: "power3.out" }, 34.1);
+      tl.from(".frame-border", { opacity: 0, duration: 0.7, ease: "sine.out" }, 34.3);
+
+      // Media sequence with label swaps
+      mIn("#m-garden", 34.3);
+      tl.set("#s6-label", { innerText: "GARDEN" }, 34.3);
+      tl.set("#s6-url",   { innerText: "uygundavet.com/garden" }, 34.3);
+      tl.fromTo(["#s6-label","#s6-url"], { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 34.6);
+
+      mOut("#m-garden", 37.7);
+      mIn("#m-golden",  37.7);
+      tl.to(["#s6-label","#s6-url"], { opacity: 0, duration: 0.25, ease: "power2.in" }, 37.4);
+      tl.set("#s6-label", { innerText: "GOLDEN" }, 37.7);
+      tl.set("#s6-url",   { innerText: "uygundavet.com/golden" }, 37.7);
+      tl.to(["#s6-label","#s6-url"], { opacity: 1, duration: 0.3, ease: "power2.out" }, 37.9);
+
+      mOut("#m-golden", 41.2);
+      mIn("#m-rose",    41.2);
+      tl.to(["#s6-label","#s6-url"], { opacity: 0, duration: 0.25, ease: "power2.in" }, 40.9);
+      tl.set("#s6-label", { innerText: "ROSE" }, 41.2);
+      tl.set("#s6-url",   { innerText: "uygundavet.com/rose" }, 41.2);
+      tl.to(["#s6-label","#s6-url"], { opacity: 1, duration: 0.3, ease: "power2.out" }, 41.4);
+
+      mOut("#m-rose",   44.7);
+      mIn("#m-sunset",  44.7);
+      tl.to(["#s6-label","#s6-url"], { opacity: 0, duration: 0.25, ease: "power2.in" }, 44.4);
+      tl.set("#s6-label", { innerText: "SUNSET" }, 44.7);
+      tl.set("#s6-url",   { innerText: "uygundavet.com/sunset" }, 44.7);
+      tl.to(["#s6-label","#s6-url"], { opacity: 1, duration: 0.3, ease: "power2.out" }, 44.9);
+
+      xf("#s6", "#s7", 48.0);
+      mOut("#m-sunset", 48.0);
+
+      /* S7 CTA (48-60s) — final scene, exits allowed */
+      tl.from("#s7-brand", { y: -26, opacity: 0, duration: 0.8, ease: "power3.out" }, 47.85);
+      tl.from("#s7-mood",  { y: 70, opacity: 0, duration: 1.1, ease: "expo.out" }, 48.3);
+      tl.from("#s7-power", { y: 24, opacity: 0, letterSpacing: "0.6em",
+                              duration: 0.8, ease: "power3.out" }, 50.0);
+      tl.from("#s7-cta",   { y: 40, opacity: 0, duration: 0.7, ease: "power3.out" }, 50.9);
+      tl.from("#s7-foot",  { y: 14, opacity: 0, duration: 0.6, ease: "sine.inOut" }, 51.4);
+
+      tl.to("#s7-cta", { scale: 1.03, duration: 0.85, ease: "sine.inOut",
+                         yoyo: true, repeat: 3 }, 52.2);
+
+      tl.to(["#s7-brand","#s7-mood","#s7-power","#s7-cta","#s7-foot"],
+        { opacity: 0, duration: 0.8, ease: "power2.in" }, 59.0);
+      tl.to("#s7-curtain", { opacity: 1, duration: 0.9, ease: "power2.in" }, 59.0);
+
+      tl.fromTo("#bgmusic", { volume: 0 }, { volume: 0.55, duration: 3, ease: "sine.out" }, 0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

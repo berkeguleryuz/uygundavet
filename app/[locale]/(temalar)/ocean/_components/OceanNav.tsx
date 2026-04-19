@@ -188,8 +188,8 @@ export function OceanNav() {
       base="/ocean"
       items={[
         ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/ocean/galeri" }] : []),
-        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/ocean/ani-defteri" }] : []),
-        { label: t("navRsvp"), href: "/ocean/lcv" },
+        ...(wedding.hasMemoryBook ? [{ label: t("bottomMemory"), href: "/ocean/ani-defteri" }] : []),
+        { label: t("bottomRsvp"), href: "/ocean/lcv" },
       ]}
     />
     </>
