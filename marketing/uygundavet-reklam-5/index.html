@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html,body{ margin:0; width:2160px; height:3840px; overflow:hidden; background:#000;
+        font-family:"Space Grotesk",system-ui,sans-serif; color:#d5d1ad; }
+      .scene{ position:absolute; top:0; left:0; width:2160px; height:3840px; overflow:hidden; }
+      .grain{ position:absolute; inset:0; pointer-events:none; opacity:0.10; mix-blend-mode:overlay;
+        background: radial-gradient(ellipse at 12% 20%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 35%),
+          radial-gradient(ellipse at 85% 75%, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 40%);
+        z-index:50; }
+
+      #s1{z-index:1}#s2{z-index:2;opacity:0}#s3{z-index:3;opacity:0}#s4{z-index:4;opacity:0}
+      #s5{z-index:5;opacity:0}#s6{z-index:6;opacity:0}#s7{z-index:7;opacity:0}
+
+      /* Soft romantic overlay used on S1-S4 */
+      .soft-overlay{ position:absolute; inset:0; z-index:5;
+        background: linear-gradient(180deg,
+          rgba(37,34,36,0.40) 0%,
+          rgba(37,34,36,0.60) 40%,
+          rgba(37,34,36,0.85) 80%,
+          rgba(37,34,36,0.95) 100%); }
+
+      /* Hero video on S1-S4 as romantic bg */
+      #hero-video-1, #hero-video-2 {
+        position:absolute; top:0; left:0; width:2160px; height:3840px;
+        object-fit:cover; z-index:0;
+        filter: saturate(0.8) brightness(0.85);
+      }
+
+      .narr-wrap{
+        position:absolute; inset:0;
+        display:flex; flex-direction:column;
+        justify-content:center; align-items:center;
+        padding:480px 200px;
+        z-index:10; text-align:center;
+      }
+      .line{
+        font-family:"Merienda",cursive;
+        font-weight:500;
+        color:#d5d1ad; line-height:1.1;
+        letter-spacing:-0.01em;
+      }
+      .l-large { font-size:272px; }
+      .l-huge  { font-size:360px; }
+      .accent  { color:#e8c872; }
+      .chapter {
+        font-family:"Orbitron",sans-serif;
+        font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase;
+        color:#d5d1ad; opacity:0.7;
+        margin-bottom:168px;
+      }
+
+      /* S5 solution demo */
+      #s5{ background:#0f0d0f; }
+      #s5 .top{ position:absolute; top:360px; left:0; right:0; text-align:center; z-index:30; }
+      #s5 .top .k{ font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; color:#fff; opacity:0.7; text-transform:uppercase;
+        margin-bottom:48px; }
+      #s5 .top .t{ font-family:"Merienda",cursive; font-size:176px; font-weight:500;
+        color:#fff; letter-spacing:-0.01em; line-height:1; }
+      #s5 .top .t .g{ color:#e8c872; }
+      #s5-video{ position:absolute; left:0; top:800px; width:2160px; height:2240px;
+        object-fit:cover; z-index:20; opacity:0; background:#0f0d0f; }
+      #s5 .url{ position:absolute; bottom:400px; left:0; right:0; text-align:center; z-index:30;
+        font-family:"Space Grotesk",sans-serif; font-size:44px; font-weight:500;
+        letter-spacing:0.3em; color:#fff; opacity:0.8; }
+
+      /* S6 promise minimal */
+      #s6{ background:#252224; color:#d5d1ad; }
+      #s6 .wrap{ position:absolute; inset:0; display:flex; flex-direction:column;
+        justify-content:center; align-items:center; padding:400px 160px; text-align:center; }
+
+      /* S7 CTA */
+      #s7{ background:#252224; color:#d5d1ad; }
+      #s7 .wrap{ position:absolute; inset:0; display:flex; flex-direction:column;
+        justify-content:center; align-items:center; padding:400px 160px; }
+      #s7 .tag{ font-family:"Merienda",cursive; font-size:208px; font-weight:500;
+        color:#d5d1ad; line-height:1.05; letter-spacing:-0.01em; text-align:center;
+        margin-bottom:128px; }
+      #s7 .power{ font-family:"Orbitron",sans-serif; font-size:264px; font-weight:900;
+        letter-spacing:0.24em; color:#fff; text-transform:uppercase; margin-bottom:192px; }
+      #s7 .power .d{ color:#e8c872; }
+      #s7 .cta{ display:flex; align-items:center; gap:44px; background:#fff; color:#000;
+        padding:56px 96px 56px 72px; border-radius:1998px;
+        font-family:"Orbitron",sans-serif; font-weight:700; font-size:44px;
+        letter-spacing:0.28em; text-transform:uppercase; }
+      #s7 .cta .a{ width:96px; height:96px; background:#252224; border-radius:1998px;
+        display:flex; align-items:center; justify-content:center; overflow:hidden; }
+      #s7 .cta .a img{ width:80px; height:80px; object-fit:contain; }
+      #s7 .foot{ position:absolute; bottom:200px; left:0; right:0; text-align:center;
+        font-family:"Space Grotesk",sans-serif; font-size:44px; font-weight:500;
+        letter-spacing:0.4em; color:#d5d1ad; opacity:0.78; text-transform:uppercase; }
+      #s7 .curtain{ position:absolute; inset:0; background:#000; opacity:0;
+        pointer-events:none; z-index:99; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="60"
+         data-width="2160" data-height="3840">
+
+      <!-- S1 0-7s: "bir tanışma" -->
+      <div id="s1" class="scene">
+        <div class="soft-overlay"></div>
+        <div class="narr-wrap">
+          <div id="s1-c" class="chapter">bölüm 01</div>
+          <div id="s1-l" class="line l-huge">bir<br /><span class="accent">tanışma.</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 7-14s: "bir söz" -->
+      <div id="s2" class="scene">
+        <div class="soft-overlay"></div>
+        <div class="narr-wrap">
+          <div id="s2-c" class="chapter">bölüm 02</div>
+          <div id="s2-l" class="line l-huge">bir<br /><span class="accent">söz.</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 14-21s: "binlerce misafir" -->
+      <div id="s3" class="scene">
+        <div class="soft-overlay"></div>
+        <div class="narr-wrap">
+          <div id="s3-c" class="chapter">bölüm 03</div>
+          <div id="s3-l" class="line l-large">binlerce<br /><span class="accent">misafir.</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 21-28s: problem moment "peki nasıl?" -->
+      <div id="s4" class="scene">
+        <div class="soft-overlay"></div>
+        <div class="narr-wrap">
+          <div id="s4-c" class="chapter">bölüm 04</div>
+          <div id="s4-l" class="line l-huge">peki<br /><span class="accent">nasıl?</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 28-42s: solution reveal with rose.mp4 -->
+      <div id="s5" class="scene">
+        <div class="top">
+          <div id="s5-k" class="k">uygun davet</div>
+          <div id="s5-t" class="t">hepsi <span class="g">tek bir sayfada.</span></div>
+        </div>
+        <div id="s5-url" class="url">uygundavet.com</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 42-51s: promise -->
+      <div id="s6" class="scene">
+        <div class="wrap">
+          <div id="s6-p" class="line l-huge">her aşkın<br /><span class="accent">kendi sitesi.</span></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S7 51-60s: CTA -->
+      <div id="s7" class="scene">
+        <div class="wrap">
+          <div id="s7-tag" class="tag">davetiyenizde<br />bir <span style="color:#e8c872">hayat</span> var.</div>
+          <div id="s7-power" class="power">HAYAT<span class="d">.</span></div>
+          <div id="s7-cta" class="cta">
+            <span class="a"><img src="assets/logo.png" alt="" /></span>
+            <span>Davetiyenizi Oluşturun</span>
+            <span>→</span>
+          </div>
+        </div>
+        <div id="s7-foot" class="foot">uygundavet.com · tr · en · de</div>
+        <div id="s7-curtain" class="curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <!-- Hero video plays through romantic scenes 0-28 (looped via 2 instances) -->
+    <video id="hero-video-1" class="clip" data-start="0"   data-duration="14"  data-track-index="20"
+           src="assets/hero.mp4" muted playsinline></video>
+    <video id="hero-video-2" class="clip" data-start="14"  data-duration="14.5" data-track-index="21"
+           src="assets/hero.mp4" muted playsinline></video>
+    <video id="s5-video"     class="clip" data-start="28"  data-duration="13.5" data-track-index="22"
+           src="assets/rose.mp4"   muted playsinline></video>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function xf(out, inc, T, dur=0.65){
+        tl.to(out, {opacity:0, filter:"blur(22px)", scale:1.025, duration:dur, ease:"power2.inOut"}, T-dur/2);
+        tl.fromTo(inc, {opacity:0, filter:"blur(22px)", scale:0.98},
+          {opacity:1, filter:"blur(0px)", scale:1, duration:dur, ease:"power2.inOut"}, T-dur/2);
+      }
+
+      /* Hero slow kenburns for romantic feel */
+      tl.fromTo("#hero-video-1", { scale:1.0 }, { scale:1.08, duration:14, ease:"sine.out" }, 0);
+      tl.fromTo("#hero-video-2", { scale:1.08 }, { scale:1.0, duration:14.5, ease:"sine.out" }, 14);
+
+      /* S1 */
+      tl.from("#s1-c", {y:-14, opacity:0, duration:0.7, ease:"power3.out"}, 0.6);
+      tl.from("#s1-l", {y:50, opacity:0, duration:1.3, ease:"expo.out"}, 1.2);
+      xf("#s1","#s2", 7.0);
+
+      /* S2 */
+      tl.from("#s2-c", {y:-14, opacity:0, duration:0.7, ease:"power3.out"}, 7.0);
+      tl.from("#s2-l", {y:50, opacity:0, duration:1.2, ease:"expo.out"}, 7.4);
+      xf("#s2","#s3", 14.0);
+
+      /* S3 */
+      tl.from("#s3-c", {y:-14, opacity:0, duration:0.7, ease:"power3.out"}, 14.0);
+      tl.from("#s3-l", {y:50, opacity:0, duration:1.2, ease:"expo.out"}, 14.4);
+      xf("#s3","#s4", 21.0);
+
+      /* S4 */
+      tl.from("#s4-c", {y:-14, opacity:0, duration:0.7, ease:"power3.out"}, 21.0);
+      tl.from("#s4-l", {y:50, opacity:0, duration:1.2, ease:"expo.out"}, 21.4);
+      xf("#s4","#s5", 28.0);
+
+      /* S5 solution */
+      tl.from("#s5-k", {y:-14, opacity:0, duration:0.7, ease:"power3.out"}, 28.0);
+      tl.from("#s5-t", {y:24, opacity:0, duration:1.0, ease:"expo.out"}, 28.3);
+      tl.to("#s5-video", {opacity:1, duration:0.6, ease:"power2.inOut"}, 29.0);
+      tl.from("#s5-url", {y:12, opacity:0, duration:0.5, ease:"sine.inOut"}, 29.3);
+
+      xf("#s5","#s6", 42.0);
+      tl.to("#s5-video", {opacity:0, duration:0.4, ease:"power2.inOut"}, 41.7);
+
+      /* S6 promise */
+      tl.from("#s6-p", {y:60, opacity:0, duration:1.3, ease:"expo.out"}, 41.9);
+
+      xf("#s6","#s7", 51.0);
+
+      /* S7 CTA */
+      tl.from("#s7-tag",   {y:40, opacity:0, duration:1.0, ease:"expo.out"}, 50.9);
+      tl.from("#s7-power", {y:30, opacity:0, letterSpacing:"0.5em", duration:0.85, ease:"power3.out"}, 52.2);
+      tl.from("#s7-cta",   {y:40, opacity:0, duration:0.7, ease:"power3.out"}, 53.0);
+      tl.from("#s7-foot",  {y:14, opacity:0, duration:0.55, ease:"sine.inOut"}, 53.5);
+      tl.to("#s7-cta", {scale:1.035, duration:0.85, ease:"sine.inOut", yoyo:true, repeat:3}, 54.0);
+      tl.to(["#s7-tag","#s7-power","#s7-cta","#s7-foot"],
+        {opacity:0, duration:0.8, ease:"power2.in"}, 59.0);
+      tl.to("#s7-curtain", {opacity:1, duration:0.9, ease:"power2.in"}, 59.0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

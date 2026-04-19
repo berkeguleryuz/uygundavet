@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html,body{ margin:0; width:2160px; height:3840px; overflow:hidden; background:#1a0d0d;
+        font-family:"Space Grotesk",system-ui,sans-serif; color:#f0e4d4; }
+      .scene{ position:absolute; top:0; left:0; width:2160px; height:3840px; overflow:hidden; }
+      .grain{ position:absolute; inset:0; pointer-events:none; opacity:0.08; mix-blend-mode:overlay;
+        background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 40%),
+          radial-gradient(ellipse at 70% 80%, rgba(160,64,64,0.25) 0%, rgba(0,0,0,0) 50%);
+        z-index:50; }
+      #s1{z-index:1}#s2{z-index:2;opacity:0}#s3{z-index:3;opacity:0}#s4{z-index:4;opacity:0}
+      #s5{z-index:5;opacity:0}#s6{z-index:6;opacity:0}
+
+      .urg-bar{
+        position:absolute;
+        left:0; right:0; top:0;
+        height:20px;
+        background:linear-gradient(90deg,#a04040,#d96060,#a04040);
+        z-index:40;
+        transform-origin:left center;
+      }
+      .urg-bar-bottom{
+        position:absolute;
+        left:0; right:0; bottom:0;
+        height:20px;
+        background:linear-gradient(90deg,#a04040,#d96060,#a04040);
+        z-index:40;
+        transform-origin:right center;
+      }
+
+      /* S1 HOOK: question + big number pulse */
+      #s1{ background:#1a0d0d; color:#f0e4d4; }
+      #s1 .wrap{ position:absolute; inset:0;
+        display:flex; flex-direction:column; justify-content:center; align-items:center;
+        padding:400px 160px; text-align:center; }
+      #s1 .tag{
+        font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase;
+        color:#d96060; margin-bottom:128px;
+      }
+      #s1 .q{
+        font-family:"Merienda",cursive; font-size:260px; font-weight:500;
+        color:#f0e4d4; line-height:1; letter-spacing:-0.01em;
+        margin-bottom:144px;
+      }
+      #s1 .q .r{ color:#d96060; }
+      #s1 .mini{
+        font-family:"Space Grotesk",sans-serif; font-size:56px; font-weight:500;
+        letter-spacing:0.38em; color:#f0e4d4; opacity:0.7;
+        text-transform:uppercase;
+      }
+
+      /* S2 COUNTDOWN NUMBERS FLASHING */
+      #s2{ background:#1a0d0d; color:#f0e4d4; }
+      #s2 .wrap{ position:absolute; inset:0;
+        display:flex; flex-direction:column; justify-content:center; align-items:center;
+        padding:400px 160px; text-align:center; }
+      #s2 .label{ font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase; color:#d96060;
+        margin-bottom:96px; }
+      #s2 .num{ font-family:"Orbitron",sans-serif; font-size:720px; font-weight:900;
+        letter-spacing:0.02em; color:#f0e4d4; line-height:0.95;
+        font-variant-numeric: tabular-nums; margin-bottom:72px; }
+      #s2 .u{ font-family:"Merienda",cursive; font-size:184px; font-weight:500;
+        color:#d96060; letter-spacing:-0.01em; line-height:1; }
+
+      /* S3 PROBLEM: strike list */
+      #s3{ background:#f5f6f3; color:#1a0d0d; }
+      #s3 .top{ position:absolute; top:400px; left:0; right:0; text-align:center; }
+      #s3 .top .k{ font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase; color:#a04040;
+        margin-bottom:56px; }
+      #s3 .top .t{ font-family:"Orbitron",sans-serif; font-size:184px; font-weight:800;
+        letter-spacing:0.24em; text-transform:uppercase; color:#1a0d0d; }
+      #s3 .list{ position:absolute; top:1120px; left:200px; right:200px;
+        display:flex; flex-direction:column; gap:72px; }
+      #s3 .row{ font-family:"Merienda",cursive; font-size:148px; font-weight:500;
+        color:#1a0d0d; line-height:1; letter-spacing:-0.01em; position:relative; }
+      #s3 .row .strike{ position:absolute; left:0; right:-16px; top:52%; height:10px;
+        background:#a04040; transform-origin:left center; transform:scaleX(0); }
+      #s3 .nope{ position:absolute; bottom:480px; left:0; right:0; text-align:center;
+        font-family:"Orbitron",sans-serif; font-size:176px; font-weight:900;
+        letter-spacing:0.24em; color:#a04040; }
+
+      /* S4 SOLUTION: "bugün başla" */
+      #s4{ background:#1a0d0d; color:#f0e4d4; }
+      #s4 .wrap{ position:absolute; inset:0;
+        display:flex; flex-direction:column; justify-content:center; align-items:center;
+        padding:440px 160px; text-align:center; }
+      #s4 .l{ font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase; color:#d96060;
+        margin-bottom:120px; }
+      #s4 .h{ font-family:"Merienda",cursive; font-size:336px; font-weight:500;
+        color:#f0e4d4; line-height:1; letter-spacing:-0.01em; margin-bottom:96px; }
+      #s4 .h .r{ color:#d96060; }
+      #s4 .s{ font-family:"Merienda",cursive; font-size:144px; font-weight:500;
+        color:#d96060; letter-spacing:-0.01em; line-height:1.1; }
+
+      /* S5 LIVE DEMO */
+      #s5{ background:#0f0d0f; color:#fff; }
+      #s5 .top{ position:absolute; top:360px; left:0; right:0; text-align:center; z-index:30; }
+      #s5 .top .k{ font-family:"Orbitron",sans-serif; font-size:44px; font-weight:700;
+        letter-spacing:0.5em; color:#d96060; text-transform:uppercase;
+        margin-bottom:48px; }
+      #s5 .top .t{ font-family:"Orbitron",sans-serif; font-size:128px; font-weight:800;
+        letter-spacing:0.22em; text-transform:uppercase; color:#fff; }
+      #s5-video{ position:absolute; left:0; top:840px; width:2160px; height:2160px;
+        object-fit:cover; z-index:20; opacity:0; background:#0f0d0f; }
+      #s5 .pills{ position:absolute; left:0; right:0; top:3120px;
+        display:flex; justify-content:center; gap:32px; z-index:30; flex-wrap:wrap; padding:0 80px; }
+      #s5 .pill{ background:rgba(160,64,64,0.85); color:#fff;
+        padding:24px 44px; border-radius:1998px;
+        font-family:"Orbitron",sans-serif; font-size:28px; font-weight:700;
+        letter-spacing:0.3em; text-transform:uppercase; opacity:0; }
+
+      /* S6 CTA */
+      #s6{ background:#1a0d0d; color:#f0e4d4; }
+      #s6 .wrap{ position:absolute; inset:0;
+        display:flex; flex-direction:column; justify-content:center; align-items:center;
+        padding:400px 160px; text-align:center; }
+      #s6 .line{ font-family:"Merienda",cursive; font-size:256px; font-weight:500;
+        color:#f0e4d4; line-height:1.02; letter-spacing:-0.01em; margin-bottom:128px; }
+      #s6 .line .r{ color:#d96060; }
+      #s6 .power{ font-family:"Orbitron",sans-serif; font-size:360px; font-weight:900;
+        letter-spacing:0.22em; color:#fff; text-transform:uppercase;
+        margin-bottom:176px; }
+      #s6 .power .d{ color:#d96060; }
+      #s6 .cta{ display:flex; align-items:center; gap:44px; background:#fff; color:#000;
+        padding:56px 96px 56px 72px; border-radius:1998px;
+        font-family:"Orbitron",sans-serif; font-weight:700; font-size:44px;
+        letter-spacing:0.28em; text-transform:uppercase; }
+      #s6 .cta .a{ width:96px; height:96px; background:#1a0d0d; border-radius:1998px;
+        display:flex; align-items:center; justify-content:center; overflow:hidden; }
+      #s6 .cta .a img{ width:80px; height:80px; object-fit:contain; }
+      #s6 .foot{ position:absolute; bottom:200px; left:0; right:0; text-align:center;
+        font-family:"Space Grotesk",sans-serif; font-size:44px; font-weight:500;
+        letter-spacing:0.4em; color:#f0e4d4; opacity:0.78; text-transform:uppercase; }
+      #s6 .curtain{ position:absolute; inset:0; background:#000; opacity:0;
+        pointer-events:none; z-index:99; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="60"
+         data-width="2160" data-height="3840">
+
+      <!-- Global urgency bars -->
+      <div id="urg-top" class="urg-bar"></div>
+      <div id="urg-bottom" class="urg-bar-bottom"></div>
+
+      <!-- S1 HOOK 0-6s -->
+      <div id="s1" class="scene">
+        <div class="wrap">
+          <div id="s1-tag" class="tag">uygun davet · acil</div>
+          <div id="s1-q" class="q">düğününüze<br /><span class="r">kaç gün</span> kaldı?</div>
+          <div id="s1-m" class="mini">vakit daralıyor.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 COUNTDOWN 6-16s -->
+      <div id="s2" class="scene">
+        <div class="wrap">
+          <div id="s2-l" class="label">geri sayım</div>
+          <div id="s2-n" class="num">000</div>
+          <div id="s2-u" class="u">gün kaldı.<br />ve hâlâ davet hazır değil.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 PROBLEM 16-26s -->
+      <div id="s3" class="scene">
+        <div class="top">
+          <div id="s3-k" class="k">eski yöntem · yavaş</div>
+          <div id="s3-t" class="t">HÂLÂ BEKLİYOR MUSUNUZ?</div>
+        </div>
+        <div id="s3-list" class="list">
+          <div class="row">matbaa sırası<span class="strike"></span></div>
+          <div class="row">teslim tarihi<span class="strike"></span></div>
+          <div class="row">yeniden baskı<span class="strike"></span></div>
+          <div class="row">geç kalmış davetli<span class="strike"></span></div>
+        </div>
+        <div id="s3-nope" class="nope">VAKİT&nbsp;YOK<span style="color:#a04040">.</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 SOLUTION 26-34s -->
+      <div id="s4" class="scene">
+        <div class="wrap">
+          <div id="s4-l" class="l">03 · hemen</div>
+          <div id="s4-h" class="h">bugün<br /><span class="r">hazır.</span></div>
+          <div id="s4-s" class="s">dakikalar içinde<br />davet yayında.</div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 LIVE DEMO 34-48s -->
+      <div id="s5" class="scene">
+        <div class="top">
+          <div id="s5-k" class="k">canlı örnek</div>
+          <div id="s5-t" class="t">YAYINLANMIŞ</div>
+        </div>
+        <div id="s5-pills" class="pills">
+          <span id="s5-p1" class="pill">canlı</span>
+          <span id="s5-p2" class="pill">bugün aktif</span>
+          <span id="s5-p3" class="pill">hemen paylaşılır</span>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 CTA 48-60s -->
+      <div id="s6" class="scene">
+        <div class="wrap">
+          <div id="s6-line" class="line">yarın değil.<br /><span class="r">bugün.</span></div>
+          <div id="s6-power" class="power">BUGÜN<span class="d">.</span></div>
+          <div id="s6-cta" class="cta">
+            <span class="a"><img src="assets/logo.png" alt="" /></span>
+            <span>Hemen Başlayın</span>
+            <span>→</span>
+          </div>
+        </div>
+        <div id="s6-foot" class="foot">uygundavet.com · tr · en · de</div>
+        <div id="s6-curtain" class="curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <video id="s5-video" class="clip" data-start="34" data-duration="13.5" data-track-index="20"
+           src="assets/garden.mp4" muted playsinline></video>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function xf(out, inc, T, dur=0.45){
+        tl.to(out, {opacity:0, filter:"blur(14px)", scale:1.02, duration:dur, ease:"power2.inOut"}, T-dur/2);
+        tl.fromTo(inc, {opacity:0, filter:"blur(14px)", scale:0.985},
+          {opacity:1, filter:"blur(0px)", scale:1, duration:dur, ease:"power2.inOut"}, T-dur/2);
+      }
+
+      /* Urgency bars: pulse opacity throughout */
+      tl.fromTo(["#urg-top","#urg-bottom"], { opacity:0 }, { opacity:0.9, duration:0.6, ease:"power2.out" }, 0);
+      tl.to(["#urg-top","#urg-bottom"], {
+        opacity:0.4, duration:0.8, ease:"sine.inOut",
+        yoyo:true, repeat:38
+      }, 0.6);
+
+      /* S1 */
+      tl.from("#s1-tag", {y:-14, opacity:0, duration:0.55, ease:"power3.out"}, 0.3);
+      tl.from("#s1-q",   {y:50, opacity:0, duration:1.0, ease:"expo.out"}, 0.55);
+      tl.from("#s1-m",   {y:14, opacity:0, duration:0.6, ease:"sine.inOut"}, 2.0);
+      xf("#s1","#s2", 6.0);
+
+      /* S2 countdown flash — 3 ticks different random-like stable numbers */
+      tl.from("#s2-l", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 6.1);
+      tl.from("#s2-u", {y:24, opacity:0, duration:0.65, ease:"sine.out"}, 6.3);
+      /* Number swap: 270 → 180 → 90 → 60 (sense of time running out) */
+      tl.set("#s2-n", { innerText: "270" }, 6.2);
+      tl.from("#s2-n", { scale:1.2, opacity:0, duration:0.45, ease:"power3.out" }, 6.3);
+      tl.set("#s2-n", { innerText: "180" }, 8.4);
+      tl.fromTo("#s2-n", { scale:1.15, opacity:0.3 }, { scale:1, opacity:1, duration:0.35, ease:"power3.out" }, 8.4);
+      tl.set("#s2-n", { innerText: "90" }, 10.6);
+      tl.fromTo("#s2-n", { scale:1.15, opacity:0.3 }, { scale:1, opacity:1, duration:0.35, ease:"power3.out" }, 10.6);
+      tl.set("#s2-n", { innerText: "60" }, 12.8);
+      tl.fromTo("#s2-n", { scale:1.3, opacity:0.2, color:"#d96060" }, { scale:1, opacity:1, color:"#d96060", duration:0.4, ease:"power3.out" }, 12.8);
+      tl.to("#s2-n", { color:"#d96060", duration: 0.1 }, 12.8);
+
+      xf("#s2","#s3", 16.0);
+
+      /* S3 problem */
+      tl.from("#s3-k", {y:-14, opacity:0, duration:0.55, ease:"power3.out"}, 16.1);
+      tl.from("#s3-t", {y:26, opacity:0, letterSpacing:"0.5em", duration:0.8, ease:"power3.out"}, 16.3);
+      tl.from("#s3-list .row", {
+        x:-40, opacity:0, duration:0.5, ease:"power3.out", stagger:0.35
+      }, 17.0);
+      tl.fromTo("#s3-list .strike", { scaleX:0 },
+        { scaleX:1, duration:0.35, ease:"power2.inOut", stagger:0.35 }, 17.2);
+      tl.from("#s3-nope", {scale:1.3, opacity:0, duration:0.5, ease:"power4.out"}, 23.8);
+
+      xf("#s3","#s4", 26.0);
+
+      /* S4 solution */
+      tl.from("#s4-l", {y:-14, opacity:0, duration:0.55, ease:"power3.out"}, 26.1);
+      tl.from("#s4-h", {y:60, opacity:0, duration:1.0, ease:"expo.out"}, 26.4);
+      tl.from("#s4-s", {y:20, opacity:0, duration:0.7, ease:"sine.out"}, 27.7);
+
+      xf("#s4","#s5", 34.0);
+
+      /* S5 live demo */
+      tl.from("#s5-k", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 34.1);
+      tl.from("#s5-t", {y:22, opacity:0, duration:0.7, ease:"power3.out"}, 34.3);
+      tl.to("#s5-video", {opacity:1, duration:0.6, ease:"power2.inOut"}, 34.6);
+      tl.from("#s5-pills .pill", {
+        y:20, opacity:0, duration:0.45, ease:"power3.out", stagger:0.2
+      }, 35.4);
+
+      xf("#s5","#s6", 48.0);
+      tl.to("#s5-video", {opacity:0, duration:0.4, ease:"power2.inOut"}, 47.7);
+
+      /* S6 CTA */
+      tl.from("#s6-line",  {y:40, opacity:0, duration:1.0, ease:"expo.out"}, 47.9);
+      tl.from("#s6-power", {scale:1.2, opacity:0, letterSpacing:"0.5em", duration:0.85, ease:"power3.out"}, 49.2);
+      tl.from("#s6-cta",   {y:40, opacity:0, duration:0.7, ease:"power3.out"}, 50.0);
+      tl.from("#s6-foot",  {y:14, opacity:0, duration:0.55, ease:"sine.inOut"}, 50.5);
+      tl.to("#s6-cta", {scale:1.04, duration:0.6, ease:"sine.inOut", yoyo:true, repeat:5}, 51.0);
+      tl.to(["#s6-line","#s6-power","#s6-cta","#s6-foot","#urg-top","#urg-bottom"],
+        {opacity:0, duration:0.8, ease:"power2.in"}, 59.0);
+      tl.to("#s6-curtain", {opacity:1, duration:0.9, ease:"power2.in"}, 59.0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

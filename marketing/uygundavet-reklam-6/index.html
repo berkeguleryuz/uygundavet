@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=2160, height=3840" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html,body{ margin:0; width:2160px; height:3840px; overflow:hidden; background:#252224;
+        font-family:"Space Grotesk",system-ui,sans-serif; color:#d5d1ad; }
+      .scene{ position:absolute; top:0; left:0; width:2160px; height:3840px; overflow:hidden;
+        background:#252224; color:#d5d1ad; padding:320px 160px;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        text-align:center; }
+      .grain{ position:absolute; inset:0; pointer-events:none; opacity:0.08; mix-blend-mode:overlay;
+        background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 40%),
+          radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%);
+        z-index:50; }
+      #s1{z-index:1}#s2{z-index:2;opacity:0}#s3{z-index:3;opacity:0}#s4{z-index:4;opacity:0}
+      #s5{z-index:5;opacity:0}#s6{z-index:6;opacity:0}#s7{z-index:7;opacity:0}
+
+      .label{
+        font-family:"Orbitron",sans-serif;
+        font-size:44px; font-weight:700;
+        letter-spacing:0.5em; text-transform:uppercase;
+        color:#c4a962; opacity:0.9; margin-bottom:96px;
+      }
+      .big-num{
+        font-family:"Orbitron",sans-serif;
+        font-size:680px; font-weight:900;
+        line-height:0.9; letter-spacing:0.02em;
+        color:#fff;
+        font-variant-numeric: tabular-nums;
+        margin-bottom:80px;
+      }
+      .big-num .plus { color:#e8c872; font-size:400px; vertical-align:super; }
+      .unit{
+        font-family:"Merienda",cursive;
+        font-size:192px; font-weight:500;
+        color:#d5d1ad; line-height:1; letter-spacing:-0.01em;
+      }
+      .unit .accent{ color:#e8c872; }
+
+      /* Scene 1 HOOK */
+      #s1 .hook{
+        font-family:"Merienda",cursive; font-size:300px; font-weight:500;
+        line-height:1; letter-spacing:-0.01em; color:#d5d1ad;
+        margin-bottom:96px;
+      }
+      #s1 .hook .g{ color:#e8c872; }
+      #s1 .sub{
+        font-family:"Space Grotesk",sans-serif; font-size:60px; font-weight:500;
+        letter-spacing:0.38em; color:#d5d1ad; opacity:0.75;
+        text-transform:uppercase;
+      }
+
+      /* Scene 6 combined */
+      #s6 .grid{ display:grid; grid-template-columns:1fr 1fr; gap:72px 120px;
+        max-width:1920px; margin:0 auto; }
+      #s6 .tile{
+        background:rgba(213,209,173,0.06);
+        border:2px solid rgba(213,209,173,0.18);
+        border-radius:40px;
+        padding:88px 64px;
+        text-align:center;
+      }
+      #s6 .tile .n{
+        font-family:"Orbitron",sans-serif;
+        font-size:192px; font-weight:900;
+        color:#fff; line-height:1; letter-spacing:0.02em;
+        font-variant-numeric:tabular-nums;
+      }
+      #s6 .tile .u{
+        font-family:"Space Grotesk",sans-serif;
+        font-size:48px; font-weight:500;
+        letter-spacing:0.32em; text-transform:uppercase;
+        color:#e8c872; opacity:0.85; margin-top:36px;
+      }
+      #s6 .tile .n .p{ color:#e8c872; }
+      #s6 .title{
+        font-family:"Orbitron",sans-serif;
+        font-size:100px; font-weight:800;
+        letter-spacing:0.24em; text-transform:uppercase;
+        color:#fff; margin-bottom:88px;
+      }
+
+      /* Scene 7 CTA */
+      #s7 .question{
+        font-family:"Merienda",cursive; font-size:204px; font-weight:500;
+        color:#d5d1ad; line-height:1.05; letter-spacing:-0.01em;
+        margin-bottom:128px;
+      }
+      #s7 .power{
+        font-family:"Orbitron",sans-serif; font-size:280px; font-weight:900;
+        letter-spacing:0.24em; color:#fff; text-transform:uppercase;
+        margin-bottom:176px;
+      }
+      #s7 .power .d{ color:#e8c872; }
+      #s7 .cta{ display:flex; align-items:center; gap:44px; background:#fff; color:#000;
+        padding:56px 96px 56px 72px; border-radius:1998px;
+        font-family:"Orbitron",sans-serif; font-weight:700; font-size:44px;
+        letter-spacing:0.28em; text-transform:uppercase; }
+      #s7 .cta .a{ width:96px; height:96px; background:#252224; border-radius:1998px;
+        display:flex; align-items:center; justify-content:center; overflow:hidden; }
+      #s7 .cta .a img{ width:80px; height:80px; object-fit:contain; }
+      #s7 .foot{ position:absolute; bottom:200px; left:0; right:0; text-align:center;
+        font-family:"Space Grotesk",sans-serif; font-size:44px; font-weight:500;
+        letter-spacing:0.4em; color:#d5d1ad; opacity:0.78; text-transform:uppercase; }
+      #s7 .curtain{ position:absolute; inset:0; background:#000; opacity:0;
+        pointer-events:none; z-index:99; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="60"
+         data-width="2160" data-height="3840">
+
+      <!-- S1 HOOK 0-6s -->
+      <div id="s1" class="scene">
+        <div id="s1-k" class="label">uygun davet</div>
+        <div id="s1-hook" class="hook">sayılar,<br /><span class="g">konuşuyor.</span></div>
+        <div id="s1-sub" class="sub">gerçek veriler · gerçek davet</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S2 stat 1 6-16s: 2847 çift -->
+      <div id="s2" class="scene">
+        <div id="s2-l" class="label">01 · seçildi</div>
+        <div id="s2-num" class="big-num">0</div>
+        <div id="s2-u" class="unit">çift <span class="accent">Uygun Davet</span>'i seçti.</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S3 stat 2 16-26s: 73000 davetli -->
+      <div id="s3" class="scene">
+        <div id="s3-l" class="label">02 · ulaştı</div>
+        <div id="s3-num" class="big-num">0</div>
+        <div id="s3-u" class="unit">davetli,<br /><span class="accent">tek link</span>ten açtı.</div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S4 stat 3 26-36s: 12 ülke -->
+      <div id="s4" class="scene">
+        <div id="s4-l" class="label">03 · kapsadı</div>
+        <div id="s4-num" class="big-num">0</div>
+        <div id="s4-u" class="unit">ülkeden<br /><span class="accent">cevap geldi.</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S5 stat 4 36-44s: 5 dk -->
+      <div id="s5" class="scene">
+        <div id="s5-l" class="label">04 · süre</div>
+        <div id="s5-num" class="big-num">0<span style="font-size:180px;">&nbsp;dk</span></div>
+        <div id="s5-u" class="unit">ortalama<br /><span class="accent">hazırlama süresi.</span></div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S6 combined 44-52s -->
+      <div id="s6" class="scene">
+        <div id="s6-t" class="title">özetle</div>
+        <div id="s6-g" class="grid">
+          <div class="tile"><div class="n">2,847<span class="p">+</span></div><div class="u">çift</div></div>
+          <div class="tile"><div class="n">73K<span class="p">+</span></div><div class="u">davetli</div></div>
+          <div class="tile"><div class="n">12<span class="p">+</span></div><div class="u">ülke</div></div>
+          <div class="tile"><div class="n">5<span class="p">+</span></div><div class="u">dakika</div></div>
+        </div>
+        <div class="grain"></div>
+      </div>
+
+      <!-- S7 CTA 52-60s -->
+      <div id="s7" class="scene">
+        <div id="s7-q" class="question">binlerce çift<br />neden <span style="color:#e8c872">güvendi?</span></div>
+        <div id="s7-p" class="power">GÜVEN<span class="d">.</span></div>
+        <div id="s7-cta" class="cta">
+          <span class="a"><img src="assets/logo.png" alt="" /></span>
+          <span>Davetiyenizi Oluşturun</span>
+          <span>→</span>
+        </div>
+        <div id="s7-foot" class="foot">uygundavet.com · tr · en · de</div>
+        <div id="s7-curtain" class="curtain"></div>
+        <div class="grain"></div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function xf(out, inc, T, dur=0.5){
+        tl.to(out, {opacity:0, filter:"blur(16px)", scale:1.02, duration:dur, ease:"power2.inOut"}, T-dur/2);
+        tl.fromTo(inc, {opacity:0, filter:"blur(16px)", scale:0.985},
+          {opacity:1, filter:"blur(0px)", scale:1, duration:dur, ease:"power2.inOut"}, T-dur/2);
+      }
+
+      function countUp(id, target, T, dur=3.2, suffix="+"){
+        const state = { v: 0 };
+        tl.to(state, {
+          v: target, duration: dur, ease: "power3.out",
+          onUpdate: function(){
+            const el = document.getElementById(id);
+            if (!el) return;
+            const n = Math.floor(state.v);
+            el.textContent = n.toLocaleString("tr-TR");
+            if (n >= target) {
+              el.innerHTML = target.toLocaleString("tr-TR") + '<span class="plus">'+suffix+'</span>';
+            }
+          }
+        }, T);
+      }
+
+      /* S1 HOOK */
+      tl.from("#s1-k",    {y:-14, opacity:0, duration:0.6, ease:"power3.out"}, 0.3);
+      tl.from("#s1-hook", {y:50, opacity:0, duration:1.0, ease:"expo.out"}, 0.55);
+      tl.from("#s1-sub",  {y:14, opacity:0, duration:0.6, ease:"sine.inOut"}, 1.8);
+
+      xf("#s1","#s2", 6.0);
+
+      /* S2 - 2847 */
+      tl.from("#s2-l", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 6.0);
+      tl.from("#s2-u", {y:24, opacity:0, duration:0.7, ease:"sine.out"}, 6.2);
+      countUp("s2-num", 2847, 6.5, 3.8);
+
+      xf("#s2","#s3", 16.0);
+
+      /* S3 - 73000 */
+      tl.from("#s3-l", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 16.0);
+      tl.from("#s3-u", {y:24, opacity:0, duration:0.7, ease:"sine.out"}, 16.2);
+      countUp("s3-num", 73000, 16.5, 3.8);
+
+      xf("#s3","#s4", 26.0);
+
+      /* S4 - 12 ülke */
+      tl.from("#s4-l", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 26.0);
+      tl.from("#s4-u", {y:24, opacity:0, duration:0.7, ease:"sine.out"}, 26.2);
+      countUp("s4-num", 12, 26.5, 2.8);
+
+      xf("#s4","#s5", 36.0);
+
+      /* S5 - 5 dk */
+      tl.from("#s5-l", {y:-14, opacity:0, duration:0.5, ease:"power3.out"}, 36.0);
+      tl.from("#s5-u", {y:24, opacity:0, duration:0.7, ease:"sine.out"}, 36.2);
+      /* custom counter for 5 with dk suffix preserved */
+      const s5state = { v: 0 };
+      tl.to(s5state, {
+        v: 5, duration: 2.4, ease: "power3.out",
+        onUpdate: function(){
+          const el = document.getElementById("s5-num");
+          if (el) el.innerHTML = Math.floor(s5state.v) + '<span style="font-size:180px;">&nbsp;dk</span>';
+        }
+      }, 36.5);
+
+      xf("#s5","#s6", 44.0);
+
+      /* S6 combined */
+      tl.from("#s6-t", {y:-14, opacity:0, duration:0.6, ease:"power3.out"}, 44.0);
+      tl.from("#s6-g .tile", {
+        y:40, opacity:0, scale:0.92,
+        duration:0.5, ease:"power3.out", stagger:0.12
+      }, 44.3);
+
+      xf("#s6","#s7", 52.0);
+
+      /* S7 CTA */
+      tl.from("#s7-q",   {y:40, opacity:0, duration:0.95, ease:"expo.out"}, 51.9);
+      tl.from("#s7-p",   {y:28, opacity:0, letterSpacing:"0.5em", duration:0.85, ease:"power3.out"}, 53.0);
+      tl.from("#s7-cta", {y:40, opacity:0, duration:0.7, ease:"power3.out"}, 53.8);
+      tl.from("#s7-foot",{y:14, opacity:0, duration:0.55, ease:"sine.inOut"}, 54.3);
+      tl.to("#s7-cta", {scale:1.035, duration:0.85, ease:"sine.inOut", yoyo:true, repeat:3}, 54.8);
+      tl.to(["#s7-q","#s7-p","#s7-cta","#s7-foot"],
+        {opacity:0, duration:0.8, ease:"power2.in"}, 59.0);
+      tl.to("#s7-curtain", {opacity:1, duration:0.9, ease:"power2.in"}, 59.0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -208,14 +208,16 @@ export function PillNav() {
                 >
                   <div className="bg-white rounded-[20px] overflow-hidden shadow-xl">
                     <div className="px-6 py-5">
-                      {[
-                        ...(!session ? [
-                          { key: "register", href: "/login?mode=register" },
-                          { key: "loginLink", href: "/login" },
-                        ] : []),
-                        { key: "dashboard", href: session ? "/dashboard" : "/login" },
-                        { key: "profile", href: session ? "/dashboard/ayarlar" : "/login" },
-                      ].map((item, i) => (
+                      {(!session
+                        ? [
+                            { key: "register", href: "/login?mode=register" },
+                            { key: "loginLink", href: "/login" },
+                          ]
+                        : [
+                            { key: "dashboard", href: "/dashboard" },
+                            { key: "profile", href: "/dashboard/ayarlar" },
+                          ]
+                      ).map((item, i) => (
                         <motion.div
                           key={item.key}
                           initial={{ opacity: 0, x: -8 }}
@@ -369,6 +371,72 @@ export function PillNav() {
                       )}
                     </motion.a>
                   ))}
+
+                  <div className="md:hidden">
+                    <div className="h-px bg-black/5 my-3" />
+
+                    {(!session
+                      ? [
+                          { key: "register", href: "/login?mode=register" },
+                          { key: "loginLink", href: "/login" },
+                        ]
+                      : [
+                          { key: "dashboard", href: "/dashboard" },
+                          { key: "profile", href: "/dashboard/ayarlar" },
+                        ]
+                    ).map((item, i) => (
+                      <motion.div
+                        key={item.key}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.05 + (navLinks.length + i) * 0.05 }}
+                      >
+                        <Link
+                          href={item.href}
+                          className="flex items-center justify-between py-3.5 group/link"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span className="font-chakra text-base md:text-lg uppercase tracking-[0.12em] text-[#1c1a1b] font-semibold group-hover/link:translate-x-1.5 transition-transform duration-200">
+                            {t(item.key)}
+                          </span>
+                          <ChevronRight className="w-4 h-4 text-[#1c1a1b]/30 group-hover/link:text-[#1c1a1b] transition-colors" />
+                        </Link>
+                      </motion.div>
+                    ))}
+
+                    {session && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.05 + (navLinks.length + 3) * 0.05 }}
+                      >
+                        <button
+                          className="flex items-center gap-2 py-3.5 w-full cursor-pointer group/link"
+                          onClick={() => {
+                            setIsOpen(false);
+                            authClient.signOut().then(() => {
+                              window.location.href = "/";
+                            });
+                          }}
+                        >
+                          <LogOut className="w-4 h-4 text-red-500" />
+                          <span className="font-chakra text-base md:text-lg uppercase tracking-[0.12em] text-red-500 font-semibold group-hover/link:translate-x-1.5 transition-transform duration-200">
+                            {t("logout")}
+                          </span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+                <div className="md:hidden border-t border-black/5 px-7 py-4">
+                  <Link
+                    href="/demo"
+                    className="flex items-center gap-2 text-sm font-sans text-[#1c1a1b]/60 hover:text-[#1c1a1b] transition-colors duration-200"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <span>{t("viewDemo")}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
 

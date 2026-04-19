@@ -7,10 +7,12 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Logo } from "@/app/components/Logo";
 import { MorphButton } from "@/app/components/MorphButton";
+import { authClient } from "@/lib/auth-client";
 
 export function SectionCTA() {
   const t = useTranslations("CTA");
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { data: session } = authClient.useSession();
 
   return (
     <section className="relative w-full py-32 md:py-44 px-6 border-t border-border/30 overflow-hidden flex items-center justify-center min-h-[500px]">
@@ -53,12 +55,14 @@ export function SectionCTA() {
           {...fadeUp(0.4)}
           className="flex items-center gap-4 flex-col sm:flex-row w-full sm:w-auto"
         >
-          <Link href="/login">
-            <MorphButton variant="filled" className="w-full sm:w-auto">
-              {t("subscribeNow")}
-            </MorphButton>
-          </Link>
-          <Link href="/sunset">
+          {!session && (
+            <Link href="/login">
+              <MorphButton variant="filled" className="w-full sm:w-auto">
+                {t("subscribeNow")}
+              </MorphButton>
+            </Link>
+          )}
+          <Link href="/demo">
             <MorphButton variant="outline" className="w-full sm:w-auto">
               {t("startWriting")}
             </MorphButton>
