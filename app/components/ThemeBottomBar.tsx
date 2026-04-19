@@ -36,12 +36,12 @@ export function ThemeBottomBar({
     >
       <div
         className={cn(
-          "flex items-center gap-1.5 rounded-2xl bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]",
+          "flex items-center justify-between gap-1 rounded-2xl bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-1.5 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]",
           barClassName
         )}
       >
         <Link
-          href={base}
+          href={"https://www.uygundavet.com"}
           aria-label="Ana sayfa"
           className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors"
         >
@@ -62,7 +62,7 @@ export function ThemeBottomBar({
               key={item.href}
               href={item.href}
               className={cn(
-                "flex-1 min-w-0 rounded-xl h-11 px-2 flex items-center justify-center text-center font-chakra text-[10px] tracking-[0.08em] uppercase font-semibold border transition-colors",
+                "shrink-0 rounded-xl h-11 px-4 flex items-center justify-center text-center font-chakra text-[10px] tracking-[0.08em] uppercase font-semibold border-b transition-colors",
                 active
                   ? cn(
                       "bg-white text-[#1c1a1b] border-white",
