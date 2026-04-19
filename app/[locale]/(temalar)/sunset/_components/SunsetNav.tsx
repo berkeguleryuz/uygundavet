@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 import { t } from "../_lib/i18n";
 import { MenuIcon } from "../_icons/MenuIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
@@ -54,6 +55,7 @@ export function SunsetNav() {
   };
 
   return (
+    <>
     <nav className="fixed top-0 left-0 right-0 z-[60] px-4 md:px-6 pt-4">
       <div
         className={cn(
@@ -152,5 +154,14 @@ export function SunsetNav() {
         )}
       </AnimatePresence>
     </nav>
+    <ThemeBottomBar
+      base="/sunset"
+      items={[
+        ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/sunset/galeri" }] : []),
+        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/sunset/ani-defteri" }] : []),
+        { label: t("navRsvp"), href: "/sunset/lcv" },
+      ]}
+    />
+    </>
   );
 }

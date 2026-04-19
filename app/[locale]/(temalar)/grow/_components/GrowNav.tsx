@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 
 const BASE = "/grow";
 
@@ -63,6 +64,7 @@ export function GrowNav() {
   };
 
   return (
+    <>
     <nav className="fixed top-0 left-0 right-0 z-[60] px-3 md:px-6 pt-3">
       <motion.div
         className={cn(
@@ -162,5 +164,14 @@ export function GrowNav() {
         )}
       </AnimatePresence>
     </nav>
+    <ThemeBottomBar
+      base="/grow"
+      items={[
+        ...(wedding.hasGallery ? [{ label: "Galeri", href: "/grow/galeri" }] : []),
+        ...(wedding.hasMemoryBook ? [{ label: "Anı Defteri", href: "/grow/ani-defteri" }] : []),
+        { label: "LCV", href: "/grow/lcv" },
+      ]}
+    />
+    </>
   );
 }

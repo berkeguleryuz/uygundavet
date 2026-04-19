@@ -44,18 +44,40 @@ export function SectionHero() {
   return (
     <section
       ref={rootRef}
-      className="relative min-h-svh overflow-hidden bg-gradient-to-br from-[#faf5ec] via-[#e8d4b4] to-[#c1666b]/35"
+      className="relative min-h-svh overflow-hidden bg-[#2d2620]"
     >
-      {/* Central radial sun glow */}
-      <div
+      {/* Background video */}
+      <video
         aria-hidden
-        className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.55)_0%,_rgba(244,169,0,0.15)_40%,_rgba(244,169,0,0)_70%)] pointer-events-none"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        src="/yuzuk.mp4"
       />
 
-      {/* Large rotating sun silhouette */}
+      {/* Warm tint overlay to keep golden palette readable */}
       <div
         aria-hidden
-        className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 pointer-events-none md:w-[780px] md:h-[780px] w-[350px] h-[350px]"
+        className="absolute inset-0 pointer-events-none bg-gradient-to-br from-[#faf5ec]/75 via-[#e8d4b4]/60 to-[#c1666b]/55"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(250,245,236,0)_0%,_rgba(45,38,32,0.35)_100%)]"
+      />
+
+      {/* Bottom-right radial sun glow */}
+      <div
+        aria-hidden
+        className="absolute -right-[12%] -bottom-[18%] w-[620px] h-[620px] md:w-[800px] md:h-[800px] rounded-full bg-[radial-gradient(circle,_rgba(244,169,0,0.55)_0%,_rgba(244,169,0,0.15)_40%,_rgba(244,169,0,0)_70%)] pointer-events-none"
+      />
+
+      {/* Bottom-right rotating sun silhouette */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none -right-[14%] -bottom-[22%] md:-right-[10%] md:-bottom-[26%] md:w-[720px] md:h-[720px] w-[360px] h-[360px]"
       >
         <div
           data-sun-rotate

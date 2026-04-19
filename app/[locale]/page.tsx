@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { PillNav } from "@/app/components/PillNav";
+import { MainBottomBar } from "@/app/components/MainBottomBar";
 import { SectionMindloopHero } from "@/app/sections/SectionMindloopHero";
 import { SectionPlatforms } from "@/app/sections/SectionPlatforms";
 import { HomepageJsonLd } from "@/app/components/HomepageJsonLd";
@@ -54,6 +55,7 @@ export default async function Home({
       <SectionFAQ />
       <SectionFinalCTA />
       <Footer />
+      <MainBottomBar />
     </main>
   );
 }

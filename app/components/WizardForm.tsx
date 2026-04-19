@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, type Variants } from "framer-motion";
 import {
@@ -157,6 +157,18 @@ export function WizardForm({ onComplete }: WizardFormProps = {}) {
   const [submitting, setSubmitting] = useState(false);
 
   const isLoggedIn = !isPending && !!session?.user;
+
+  useEffect(() => {
+    if (wizard.selectedPackage) return;
+    try {
+      const stored = localStorage.getItem("selectedPackage");
+      if (stored === "starter" || stored === "pro" || stored === "business") {
+        wizard.setPackage(stored);
+        localStorage.removeItem("selectedPackage");
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const STEPS = [
     { id: 1, name: t("step1Name"), description: t("step1Desc"), icon: Users },

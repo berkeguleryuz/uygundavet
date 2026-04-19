@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 import { t } from "../_lib/i18n";
 import { MenuIcon } from "../_icons/MenuIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
@@ -58,6 +59,7 @@ export function CrystalNav() {
   };
 
   return (
+    <>
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-[60] h-16 flex items-center px-6 md:px-12 transition-all duration-500",
@@ -158,5 +160,14 @@ export function CrystalNav() {
         )}
       </AnimatePresence>
     </nav>
+    <ThemeBottomBar
+      base="/crystal"
+      items={[
+        ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/crystal/galeri" }] : []),
+        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/crystal/ani-defteri" }] : []),
+        { label: t("navRsvp"), href: "/crystal/lcv" },
+      ]}
+    />
+    </>
   );
 }

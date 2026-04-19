@@ -7,6 +7,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useWedding } from "../_lib/context";
+import { ThemeBottomBar } from "@/app/components/ThemeBottomBar";
 import { t } from "../_lib/i18n";
 import { MenuIcon } from "../_icons/MenuIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
@@ -69,6 +70,7 @@ export function GoldenNav() {
   const dark = isOnDarkPage || isDarkFromScroll;
 
   return (
+    <>
     <nav aria-label="Golden navigation" className="fixed top-5 left-1/2 -translate-x-1/2 z-[60] w-[calc(100%-2rem)] max-w-5xl">
       <motion.div
         initial={{ y: -18, opacity: 0 }}
@@ -182,5 +184,14 @@ export function GoldenNav() {
         )}
       </AnimatePresence>
     </nav>
+    <ThemeBottomBar
+      base="/golden"
+      items={[
+        ...(wedding.hasGallery ? [{ label: t("navGallery"), href: "/golden/galeri" }] : []),
+        ...(wedding.hasMemoryBook ? [{ label: t("navMemory"), href: "/golden/ani-defteri" }] : []),
+        { label: t("navRsvp"), href: "/golden/lcv" },
+      ]}
+    />
+    </>
   );
 }

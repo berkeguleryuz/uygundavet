@@ -6,14 +6,25 @@ import { useTranslations } from "next-intl";
 import { PricingCard } from "@/app/components/PricingCard";
 import { useWizardStore } from "@/store/wizard-store";
 import type { PackageKey } from "@/lib/packages";
+import { useRouter } from "@/i18n/navigation";
+import { authClient } from "@/lib/auth-client";
 
 export function SectionPricing() {
   const t = useTranslations("Pricing");
   const wizard = useWizardStore();
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
 
   const handleSelect = (key: PackageKey) => {
     wizard.setPackage(key);
-    document.getElementById("wizard")?.scrollIntoView({ behavior: "smooth" });
+    try {
+      localStorage.setItem("selectedPackage", key);
+    } catch {}
+    if (session) {
+      document.getElementById("wizard")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      router.push(`/login?mode=register&package=${key}`);
+    }
   };
 
   const packages = [

@@ -41,7 +41,8 @@
     "features": "Funktionen",
     "howItWorks": "So funktioniert's",
     "themes": "Themen",
-    "pricing": "Preise"
+    "pricing": "Preise",
+    "buyNow": "Jetzt Kaufen"
   },
   "Hero": {
     "subscriberCount": "5.000+ Paare vertrauen uns",
@@ -194,6 +195,7 @@
     "or": "oder",
     "registerTitle": "Registrieren",
     "loginTitle": "Anmelden",
+    "selectedPackageLabel": "Ausgewähltes Paket",
     "emailPlaceholder": "Ihre E-Mail-Adresse",
     "passwordPlaceholder": "Passwort (min. 6 Zeichen)",
     "registerBtn": "Registrieren",
