@@ -39,8 +39,17 @@ export function PillNav() {
   const lastScrollY = useRef(0);
 
   const [isOverLight, setIsOverLight] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const collapsed = isScrolled && !isOpen;
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const collapsed = (isScrolled || isMobile) && !isOpen;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (!isOpen) {
