@@ -6,6 +6,8 @@ export function useTheme() {
     resolvedTheme: "dark" as Theme,
     systemTheme: "dark" as Theme,
     themes: ["dark"] as Theme[],
-    setTheme: (_theme: Theme) => {},
+    setTheme: (theme: Theme) => {
+      void theme;
+    },
   };
 }
