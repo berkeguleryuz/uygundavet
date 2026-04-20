@@ -1,9 +1,11 @@
+type Theme = "dark" | "light" | "system";
+
 export function useTheme() {
   return {
-    theme: "dark" as const,
-    resolvedTheme: "dark" as const,
-    systemTheme: "dark" as const,
-    themes: ["dark"],
-    setTheme: () => {},
+    theme: "dark" as Theme,
+    resolvedTheme: "dark" as Theme,
+    systemTheme: "dark" as Theme,
+    themes: ["dark"] as Theme[],
+    setTheme: (_theme: Theme) => {},
   };
 }
