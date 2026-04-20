@@ -27,7 +27,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/lib/theme";
 import { useDashboardStore } from "@/store/dashboard-store";
 
 const demoChartDataWeek = [

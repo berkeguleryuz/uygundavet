@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  ArrowRight,
   ChevronRight,
   HelpCircle,
   Home,
@@ -13,6 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSupportStore } from "@/store/support-store";
+import { useSalesStore } from "@/store/sales-store";
+import { THEME_OPTIONS } from "@/lib/themes";
 
 const WHATSAPP_NUMBER = "905546789780";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
@@ -38,12 +42,50 @@ function WhatsAppGlyph({ className }: { className?: string }) {
   );
 }
 
-export function SupportWidget() {
-  const t = useTranslations("Support");
-  const open = useSupportStore((s) => s.isOpen);
-  const close = useSupportStore((s) => s.close);
+type WidgetMode = "support" | "sales";
+
+interface SupportWidgetProps {
+  mode?: WidgetMode;
+}
+
+export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
+  const t = useTranslations(mode === "sales" ? "Sales" : "Support");
+  const tPricing = useTranslations("Pricing");
+  const locale = useLocale();
+  const supportOpen = useSupportStore((s) => s.isOpen);
+  const supportClose = useSupportStore((s) => s.close);
+  const salesOpen = useSalesStore((s) => s.isOpen);
+  const salesClose = useSalesStore((s) => s.close);
+  const open = mode === "sales" ? salesOpen : supportOpen;
+  const close = mode === "sales" ? salesClose : supportClose;
+  const isSales = mode === "sales";
   const [tab, setTab] = useState<Tab>("home");
   const [query, setQuery] = useState("");
+
+  const packages = useMemo(
+    () => [
+      {
+        key: "starter",
+        name: tPricing("starter.name"),
+        price: tPricing("starter.price"),
+        desc: tPricing("starter.desc"),
+      },
+      {
+        key: "pro",
+        name: tPricing("pro.name"),
+        price: tPricing("pro.price"),
+        desc: tPricing("pro.desc"),
+        recommended: true,
+      },
+      {
+        key: "business",
+        name: tPricing("business.name"),
+        price: tPricing("business.price"),
+        desc: tPricing("business.desc"),
+      },
+    ],
+    [tPricing]
+  );
 
   const helpItems = useMemo(
     () => [t("helpItem1"), t("helpItem2"), t("helpItem3"), t("helpItem4")],
@@ -248,26 +290,80 @@ export function SupportWidget() {
                     >
                       {t("helpTitle")}
                     </h3>
-                    <div className="rounded-xl bg-[#f5f6f3] border border-black/5 overflow-hidden">
-                      {helpItems.map((label, i, arr) => (
-                        <button
-                          key={label}
-                          onClick={openWhatsApp}
-                          className={cn(
-                            "w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-white transition-colors cursor-pointer",
-                            i !== arr.length - 1 && "border-b border-black/5"
-                          )}
+                    {isSales ? (
+                      <>
+                        <div className="space-y-2">
+                          {packages.map((pkg) => (
+                            <Link
+                              key={pkg.key}
+                              href={`/${locale}/#fiyatlar`}
+                              onClick={close}
+                              className="block rounded-xl bg-[#f5f6f3] border border-black/5 p-4 hover:bg-white transition-colors cursor-pointer"
+                            >
+                              <div className="flex items-baseline justify-between gap-3">
+                                <span className="text-sm font-chakra font-semibold text-[#1c1a1b] flex items-center gap-2">
+                                  {pkg.name}
+                                  {pkg.recommended && (
+                                    <span
+                                      className="text-[10px] font-sans font-medium uppercase tracking-[0.1em] px-2 py-0.5 rounded-full"
+                                      style={{
+                                        backgroundColor: GOLD_DEEP,
+                                        color: DARK_TEXT,
+                                      }}
+                                    >
+                                      {tPricing("pro.badge")}
+                                    </span>
+                                  )}
+                                </span>
+                                <span
+                                  className="text-sm font-chakra font-bold"
+                                  style={{ color: DARK_TEXT }}
+                                >
+                                  {pkg.price}
+                                </span>
+                              </div>
+                              <p className="text-xs font-sans text-[#555670] mt-1">
+                                {pkg.desc}
+                              </p>
+                            </Link>
+                          ))}
+                        </div>
+                        <Link
+                          href={`/${locale}/#fiyatlar`}
+                          onClick={close}
+                          className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-chakra text-sm uppercase tracking-[0.15em] font-semibold transition-colors hover:opacity-90"
+                          style={{
+                            backgroundColor: DARK_TEXT,
+                            color: GOLD_DEEP,
+                          }}
                         >
-                          <span className="flex-1 text-sm text-[#1c1a1b] font-sans">
-                            {label}
-                          </span>
-                          <ChevronRight
-                            className="w-4 h-4"
-                            style={{ color: GOLD_DEEP }}
-                          />
-                        </button>
-                      ))}
-                    </div>
+                          <span>{t("ctaStart")}</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </>
+                    ) : (
+                      <div className="rounded-xl bg-[#f5f6f3] border border-black/5 overflow-hidden">
+                        {helpItems.map((label, i, arr) => (
+                          <button
+                            key={label}
+                            onClick={openWhatsApp}
+                            className={cn(
+                              "w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-white transition-colors cursor-pointer",
+                              i !== arr.length - 1 &&
+                                "border-b border-black/5"
+                            )}
+                          >
+                            <span className="flex-1 text-sm text-[#1c1a1b] font-sans">
+                              {label}
+                            </span>
+                            <ChevronRight
+                              className="w-4 h-4"
+                              style={{ color: GOLD_DEEP }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -286,28 +382,50 @@ export function SupportWidget() {
                     >
                       {t("newsTitle")}
                     </h3>
-                    {[
-                      {
-                        title: t("newsItem1Title"),
-                        desc: t("newsItem1Desc"),
-                      },
-                      {
-                        title: t("newsItem2Title"),
-                        desc: t("newsItem2Desc"),
-                      },
-                    ].map((item) => (
-                      <div
-                        key={item.title}
-                        className="rounded-xl bg-[#f5f6f3] border border-black/5 p-4"
-                      >
-                        <div className="text-sm font-chakra font-semibold text-[#1c1a1b]">
-                          {item.title}
-                        </div>
-                        <div className="text-xs font-sans text-[#555670] mt-1">
-                          {item.desc}
-                        </div>
+                    {isSales ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {THEME_OPTIONS.map((theme) => (
+                          <Link
+                            key={theme.key}
+                            href={`/${locale}/${theme.key}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between rounded-xl bg-[#f5f6f3] border border-black/5 px-3 py-2.5 hover:bg-white transition-colors cursor-pointer group"
+                          >
+                            <span className="text-xs font-chakra font-semibold uppercase tracking-[0.1em] text-[#1c1a1b] capitalize">
+                              {theme.key}
+                            </span>
+                            <ChevronRight
+                              className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                              style={{ color: GOLD_DEEP }}
+                            />
+                          </Link>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      [
+                        {
+                          title: t("newsItem1Title"),
+                          desc: t("newsItem1Desc"),
+                        },
+                        {
+                          title: t("newsItem2Title"),
+                          desc: t("newsItem2Desc"),
+                        },
+                      ].map((item) => (
+                        <div
+                          key={item.title}
+                          className="rounded-xl bg-[#f5f6f3] border border-black/5 p-4"
+                        >
+                          <div className="text-sm font-chakra font-semibold text-[#1c1a1b]">
+                            {item.title}
+                          </div>
+                          <div className="text-xs font-sans text-[#555670] mt-1">
+                            {item.desc}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

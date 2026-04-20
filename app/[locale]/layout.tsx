@@ -69,10 +69,11 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark" disableTransitionOnChange enableColorScheme={false}>
+    <ThemeProvider>
       <NextIntlClientProvider messages={messages}>
         {children}
         <SupportWidget />
+        <SupportWidget mode="sales" />
         <Toaster position="top-center" theme="dark" richColors />
       </NextIntlClientProvider>
     </ThemeProvider>
