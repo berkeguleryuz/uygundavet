@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="stylesheet" href="fonts/fonts.css" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html,body{ margin:0; width:1080px; height:1920px; overflow:hidden; background:#f5f6f3;
+        font-family:"Space Grotesk",system-ui,sans-serif; color:#252224; }
+      .scene{ position:absolute; top:0; left:0; width:1080px; height:1920px; overflow:hidden;
+        background:#f5f6f3; color:#252224; padding:200px 100px;
+        display:flex; flex-direction:column; justify-content:center; }
+
+      #s1{z-index:1}#s2{z-index:2;opacity:0}#s3{z-index:3;opacity:0}
+      #s4{z-index:4;opacity:0}#s5{z-index:5;opacity:0}#s6{z-index:6;opacity:0}
+
+      /* Conversational, left-aligned */
+      .convo {
+        font-family:"Merienda",cursive;
+        font-weight:500;
+        font-size:120px;
+        line-height:1.02;
+        letter-spacing:-0.01em;
+        color:#252224;
+      }
+      .convo .em { color:#c4a962; }
+      .hint {
+        font-family:"Space Grotesk",sans-serif;
+        font-size:30px; font-weight:600;
+        letter-spacing:0.28em; color:#c4a962;
+        text-transform:uppercase;
+        margin-bottom:56px;
+        opacity:0.85;
+      }
+      .arrow {
+        font-family:"Space Grotesk",sans-serif;
+        font-size:28px; font-weight:500;
+        letter-spacing:0.22em; color:#555670;
+        margin-top:48px;
+      }
+
+      /* S4 demo (theme preview card) */
+      #s4 .demo-card {
+        position:absolute;
+        left:80px; right:80px; top:480px;
+        height:880px;
+        border-radius:36px;
+        overflow:hidden;
+        background:#000;
+        box-shadow: 0 40px 90px -20px rgba(0,0,0,0.3);
+      }
+      #s4 .demo-title {
+        position:absolute; top:120px; left:100px; right:100px;
+        font-family:"Merienda",cursive;
+        font-size:104px; font-weight:500;
+        line-height:1.02; letter-spacing:-0.01em;
+        color:#252224;
+      }
+      #s4 .demo-title .em { color:#c4a962; }
+      #s4 .demo-badge {
+        position:absolute; left:48px; bottom:100px;
+        background:rgba(0,0,0,0.7); color:#fff;
+        padding:14px 28px; border-radius:999px;
+        font-family:"Orbitron",sans-serif;
+        font-size:16px; font-weight:700;
+        letter-spacing:0.4em; text-transform:uppercase;
+        backdrop-filter:blur(8px);
+        z-index:20;
+      }
+
+      /* S6 brand close */
+      #s6 { background:#252224; color:#d5d1ad; }
+      #s6 .bc {
+        position:absolute; inset:0;
+        display:flex; flex-direction:column;
+        justify-content:center; align-items:center;
+        padding:200px 80px;
+      }
+      #s6 .logo { width:160px; height:160px; object-fit:contain;
+        filter:drop-shadow(0 6px 30px rgba(217,138,90,0.35)); margin-bottom:56px; }
+      #s6 .brand { width:480px; height:auto; margin-bottom:120px; }
+      #s6 .pill {
+        display:flex; align-items:center; gap:22px;
+        background:#fff; color:#000;
+        padding:28px 48px 28px 36px;
+        border-radius:999px;
+        font-family:"Orbitron",sans-serif;
+        font-weight:700; font-size:22px;
+        letter-spacing:0.28em; text-transform:uppercase;
+        margin-bottom:56px;
+      }
+      #s6 .pill .av { width:48px; height:48px; background:#252224;
+        border-radius:999px; display:flex; align-items:center; justify-content:center;
+        overflow:hidden; }
+      #s6 .pill .av img { width:40px; height:40px; object-fit:contain; }
+      #s6 .url {
+        font-family:"Space Grotesk",sans-serif;
+        font-size:22px; font-weight:500;
+        letter-spacing:0.4em; color:#d5d1ad; opacity:0.75;
+        text-transform:uppercase;
+      }
+      #s6 .curtain { position:absolute; inset:0; background:#000; opacity:0;
+        pointer-events:none; z-index:99; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main"
+         data-start="0" data-duration="30"
+         data-width="1080" data-height="1920">
+
+      <!-- S1 0-5s: "doğrusunu söyleyelim." -->
+      <div id="s1" class="scene">
+        <div id="s1-hint" class="hint">şu an · dürüst kısım</div>
+        <div id="s1-t" class="convo">doğrusunu<br />söyleyelim.</div>
+      </div>
+
+      <!-- S2 5-10s: "kâğıdın devri bitti." -->
+      <div id="s2" class="scene">
+        <div id="s2-t" class="convo">kâğıdın<br />devri bitti.<br /><span class="em">sessizce.</span></div>
+      </div>
+
+      <!-- S3 10-15s: "ve kimse geri dönmek istemiyor." -->
+      <div id="s3" class="scene">
+        <div id="s3-t" class="convo">ve kimse<br />geri dönmek<br /><span class="em">istemiyor.</span></div>
+      </div>
+
+      <!-- S4 15-22s: demo (Garden showcased inside card) -->
+      <div id="s4" class="scene">
+        <div id="s4-title" class="demo-title">mesela bu,<br /><span class="em">siz olabilirsiniz.</span></div>
+        <div id="s4-card" class="demo-card"></div>
+        <div id="s4-badge" class="demo-badge">canlı · uygundavet.com</div>
+      </div>
+
+      <!-- S5 22-27s: "siz de denediğinizde anlayacaksınız." -->
+      <div id="s5" class="scene">
+        <div id="s5-t" class="convo">siz de<br />denediğinizde<br /><span class="em">anlayacaksınız.</span></div>
+        <div id="s5-a" class="arrow">5 dakikada · ücretsiz dene</div>
+      </div>
+
+      <!-- S6 27-30s: brand close -->
+      <div id="s6" class="scene">
+        <div class="bc">
+          <img id="bc-logo" class="logo" src="assets/logo.png" alt="" />
+          <img id="bc-brand" class="brand" src="assets/brand-text.png" alt="Uygun Davet" />
+          <div id="bc-pill" class="pill">
+            <span class="av"><img src="assets/logo.png" alt="" /></span>
+            <span>Davetiyenizi Oluşturun</span>
+            <span>→</span>
+          </div>
+          <div id="bc-url" class="url">uygundavet.com</div>
+        </div>
+        <div id="s6-curtain" class="curtain"></div>
+      </div>
+    </div>
+
+    <!-- Garden video plays inside s4's demo card.  We position it at the same rect as .demo-card.  -->
+    <video id="demo-v" class="clip"
+           style="position:absolute; left:80px; top:480px; width:920px; height:880px; object-fit:cover; border-radius:36px; z-index:10; opacity:0; background:#000;"
+           data-start="16" data-duration="6" data-track-index="20"
+           src="assets/garden.mp4" muted playsinline></video>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused:true });
+
+      function xf(out, inc, T, dur=0.55){
+        tl.to(out, {opacity:0, filter:"blur(14px)", scale:1.02, duration:dur, ease:"power2.inOut"}, T-dur/2);
+        tl.fromTo(inc, {opacity:0, filter:"blur(14px)", scale:0.985},
+          {opacity:1, filter:"blur(0px)", scale:1, duration:dur, ease:"power2.inOut"}, T-dur/2);
+      }
+
+      /* S1 */
+      tl.from("#s1-hint", {y:-16, opacity:0, duration:0.6, ease:"power3.out"}, 0.25);
+      tl.from("#s1-t",    {y:40, opacity:0, duration:0.85, ease:"expo.out"}, 0.55);
+      xf("#s1","#s2", 5.0);
+
+      /* S2 */
+      tl.from("#s2-t", {y:40, opacity:0, duration:0.85, ease:"expo.out"}, 5.0);
+      xf("#s2","#s3", 10.0);
+
+      /* S3 */
+      tl.from("#s3-t", {y:40, opacity:0, duration:0.85, ease:"expo.out"}, 10.0);
+      xf("#s3","#s4", 15.0);
+
+      /* S4 demo */
+      tl.from("#s4-title", {y:30, opacity:0, duration:0.8, ease:"power3.out"}, 15.0);
+      tl.fromTo("#s4-card", {opacity:0, scale:0.94}, {opacity:1, scale:1, duration:0.7, ease:"power3.out"}, 15.8);
+      tl.to("#demo-v", {opacity:1, duration:0.5, ease:"power2.inOut"}, 16.0);
+      tl.from("#s4-badge", {y:20, opacity:0, duration:0.5, ease:"power3.out"}, 16.5);
+
+      xf("#s4","#s5", 22.0);
+      tl.to("#demo-v", {opacity:0, duration:0.3, ease:"power2.inOut"}, 21.7);
+
+      /* S5 */
+      tl.from("#s5-t", {y:40, opacity:0, duration:0.85, ease:"expo.out"}, 22.0);
+      tl.from("#s5-a", {y:14, opacity:0, duration:0.55, ease:"sine.inOut"}, 23.5);
+
+      xf("#s5","#s6", 27.0, 0.5);
+
+      /* S6 brand close */
+      tl.from("#bc-logo",  {scale:0.6, opacity:0, duration:0.6, ease:"power3.out"}, 26.9);
+      tl.from("#bc-brand", {y:20, opacity:0, duration:0.55, ease:"power3.out"}, 27.25);
+      tl.from("#bc-pill",  {y:30, opacity:0, duration:0.55, ease:"power3.out"}, 27.6);
+      tl.from("#bc-url",   {y:12, opacity:0, duration:0.4, ease:"sine.inOut"}, 27.9);
+      tl.to("#bc-pill", {scale:1.04, duration:0.5, ease:"sine.inOut", yoyo:true, repeat:2}, 28.2);
+      tl.to(["#bc-logo","#bc-brand","#bc-pill","#bc-url"],
+        {opacity:0, duration:0.5, ease:"power2.in"}, 29.4);
+      tl.to("#s6-curtain", {opacity:1, duration:0.5, ease:"power2.in"}, 29.4);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

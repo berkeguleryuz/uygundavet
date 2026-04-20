@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<title>Uygun Davet — Tanıtım E-postası</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Merienda:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    /* Uygun Davet design tokens — from globals.css */
+    --ud-bg: #252224;        /* background / dark */
+    --ud-fg: #f5f6f3;        /* foreground / light */
+    --ud-accent: #d5d1ad;    /* pale champagne gold — from SectionThemes */
+    --ud-muted: rgba(245,246,243,0.55);
+    --ud-border: rgba(245,246,243,0.10);
+    --ud-card: #2d2a2c;
+    --ud-card-2: #1c1a1c;
+
+    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-chakra: 'Chakra Petch', ui-sans-serif, system-ui, sans-serif;
+    --font-merienda: 'Merienda', ui-serif, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--ud-bg);
+    color: var(--ud-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  * { box-sizing: border-box; }
+  a { color: inherit; }
+
+  /* ===== Desktop mail chrome ===== */
+  .app {
+    max-width: 1280px;
+    margin: 28px auto;
+    background: #1c1a1c;
+    border: 1px solid var(--ud-border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 40px 120px -40px rgba(0,0,0,0.8);
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--ud-border);
+    background: #1c1a1c;
+  }
+  .topbar .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-chakra); font-weight: 600;
+    font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ud-fg);
+  }
+  .topbar .brand .dot {
+    width: 28px; height: 28px; border-radius: 999px;
+    background: #000; border: 1px solid var(--ud-border);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .topbar .brand .dot i {
+    width: 14px; height: 14px; border-radius: 999px;
+    background: var(--ud-fg); color: #000;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-chakra); font-weight: 700; font-style: normal;
+    font-size: 8px;
+  }
+  .topbar .search {
+    flex: 1; max-width: 560px;
+    background: rgba(245,246,243,0.04);
+    border: 1px solid var(--ud-border);
+    border-radius: 999px;
+    padding: 8px 14px; font-size: 12px;
+    color: var(--ud-muted);
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-sans);
+  }
+  .topbar .right {
+    margin-left: auto; display: flex; gap: 12px; align-items: center;
+    font-size: 11px; color: var(--ud-muted);
+    font-family: var(--font-chakra); letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .topbar .avatar {
+    width: 32px; height: 32px; border-radius: 999px;
+    background: var(--ud-fg); color: #000;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-chakra); font-weight: 700; font-size: 12px;
+  }
+
+  .body-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 820px;
+  }
+
+  /* ===== Left nav ===== */
+  .nav {
+    background: #1a181a;
+    border-right: 1px solid var(--ud-border);
+    padding: 22px 12px;
+  }
+  .nav .compose {
+    width: 100%;
+    background: var(--ud-fg); color: #000;
+    border: 1px solid var(--ud-fg);
+    border-radius: 999px;
+    padding: 12px 16px;
+    font-family: var(--font-chakra);
+    font-weight: 600; font-size: 12px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+  }
+  .nav ul { list-style: none; padding: 0; margin: 18px 0 0; }
+  .nav li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 999px;
+    font-size: 12px; color: var(--ud-muted); cursor: pointer;
+    font-family: var(--font-chakra); letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .nav li.active {
+    background: rgba(213,209,173,0.10);
+    color: var(--ud-accent);
+    border: 1px solid rgba(213,209,173,0.20);
+  }
+  .nav li .count { margin-left: auto; font-size: 10px; color: var(--ud-muted); font-family: var(--font-mono); letter-spacing: 0.04em;}
+  .nav .label {
+    margin-top: 22px; padding: 0 14px 8px;
+    font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,246,243,0.35);
+    font-family: var(--font-mono);
+  }
+
+  /* ===== Message pane ===== */
+  .pane {
+    background: var(--ud-bg);
+    overflow: hidden;
+  }
+  .pane-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--ud-border);
+    background: #1c1a1c;
+    font-size: 12px;
+  }
+  .pane-head .iconbtn {
+    width: 32px; height: 32px; border-radius: 999px;
+    border: 1px solid var(--ud-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ud-muted); cursor: pointer;
+    font-size: 14px;
+  }
+  .pane-head .iconbtn:hover { background: rgba(245,246,243,0.04); color: var(--ud-fg); }
+  .pane-head .sep { width: 1px; height: 18px; background: var(--ud-border); }
+
+  /* ===== Subject ===== */
+  .subject {
+    padding: 28px 40px 10px;
+    background: var(--ud-bg);
+  }
+  .subject .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ud-accent);
+    padding: 6px 14px;
+    border: 1px solid rgba(213,209,173,0.30);
+    border-radius: 999px;
+    background: rgba(213,209,173,0.05);
+    font-family: var(--font-chakra); font-weight: 500;
+  }
+  .subject h1 {
+    font-family: var(--font-chakra);
+    font-weight: 500;
+    font-size: 34px;
+    line-height: 1.05;
+    color: var(--ud-fg);
+    margin: 16px 0 10px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  .subject h1 em {
+    font-family: var(--font-merienda);
+    font-weight: 400;
+    font-style: italic;
+    text-transform: none;
+    color: var(--ud-accent);
+    letter-spacing: 0;
+  }
+  .sender {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 40px 24px;
+    border-bottom: 1px dashed var(--ud-border);
+    background: var(--ud-bg);
+  }
+  .sender .av {
+    width: 44px; height: 44px; border-radius: 999px;
+    background: #000;
+    border: 1px solid var(--ud-border);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .sender .av i {
+    width: 22px; height: 22px; border-radius: 999px;
+    background: var(--ud-fg); color: #000;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-chakra); font-weight: 700; font-style: normal; font-size: 11px;
+  }
+  .sender .meta { flex: 1; }
+  .sender .from {
+    font-family: var(--font-chakra);
+    font-size: 13px; color: var(--ud-fg); font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .sender .from .email { color: var(--ud-muted); font-weight: 400; }
+  .sender .to {
+    font-size: 11px; color: var(--ud-muted); margin-top: 3px;
+    font-family: var(--font-mono); letter-spacing: 0.02em;
+  }
+  .sender .to b { color: var(--ud-fg); font-weight: 500; font-style: italic; font-family: var(--font-merienda); }
+  .sender .date {
+    font-size: 11px; color: var(--ud-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* ===== Scroll ===== */
+  .scroll {
+    max-height: 720px;
+    overflow-y: auto;
+    padding: 30px 0 60px;
+  }
+  .scroll::-webkit-scrollbar { width: 10px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(213,209,173,0.20); border-radius: 10px; }
+
+  /* ===== Email body (640px campaign) ===== */
+  .email {
+    width: 680px;
+    margin: 0 auto;
+    background: var(--ud-bg);
+    border: 1px solid var(--ud-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -40px rgba(0,0,0,0.9);
+  }
+
+  /* Email header / PillNav-ish */
+  .eh {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--ud-border);
+    background: #1c1a1c;
+  }
+  .eh .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-chakra); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  .eh .logo .mark {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .eh .logo .mark img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 8px rgba(213,209,173,0.5)); }
+  .eh nav {
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--ud-muted);
+    display: flex; gap: 4px;
+  }
+  .eh nav span {
+    padding: 8px 12px; border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .eh nav span.on {
+    color: var(--ud-fg);
+    border-color: var(--ud-border);
+    background: rgba(245,246,243,0.04);
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    height: 620px;
+    background: #000;
+    overflow: hidden;
+  }
+  .hero video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 72% 32%, rgba(213,209,173,0.28), transparent 55%);
+    mix-blend-mode: screen;
+    pointer-events: none; z-index: 1;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(37,34,36,0.05) 0%, rgba(37,34,36,0.35) 55%, rgba(37,34,36,0.96) 100%);
+    pointer-events: none; z-index: 1;
+  }
+  .hero .grain {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.6;
+    z-index: 1; pointer-events: none;
+  }
+  .hero .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 36px 38px 36px;
+    color: var(--ud-fg);
+    z-index: 3;
+  }
+  .hero .kicker {
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.38em; text-transform: uppercase;
+    color: var(--ud-accent);
+    margin-bottom: 18px;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .hero .kicker::before {
+    content: ""; width: 32px; height: 1px; background: var(--ud-accent);
+  }
+  .hero h2 {
+    font-family: var(--font-chakra);
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    margin: 0 0 22px;
+    text-wrap: balance;
+    max-width: 580px;
+  }
+  .hero h2 em {
+    font-family: var(--font-merienda);
+    font-weight: 400;
+    font-style: italic;
+    text-transform: none;
+    color: var(--ud-accent);
+    letter-spacing: 0;
+    font-size: 0.92em;
+    display: inline-block;
+    transform: translateY(2px);
+  }
+  .hero .sub {
+    font-family: var(--font-sans);
+    font-size: 14.5px; color: rgba(245,246,243,0.78);
+    max-width: 440px; line-height: 1.6;
+  }
+  .hero .ring {
+    position: absolute; top: 32px; right: 36px;
+    width: 160px; height: 160px;
+    filter: drop-shadow(0 0 36px rgba(213,209,173,0.55));
+    z-index: 3;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { filter: drop-shadow(0 0 36px rgba(213,209,173,0.55)); }
+    50% { filter: drop-shadow(0 0 52px rgba(213,209,173,0.80)); }
+  }
+  .hero .corner {
+    position: absolute; z-index: 3;
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(245,246,243,0.55);
+  }
+  .hero .corner.tl { top: 28px; left: 32px; }
+  .hero .corner.bl { bottom: 28px; right: 36px; text-align: right; }
+  .hero .corner.bl b { color: var(--ud-accent); font-weight: 400; }
+  .hero .pricepin {
+    display: none;
+  }
+
+  /* Content sections */
+  .section { padding: 44px 44px; }
+  .lede {
+    font-family: var(--font-chakra);
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.22;
+    color: var(--ud-fg);
+    margin: 0 0 22px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: pretty;
+  }
+  .lede em {
+    font-family: var(--font-merienda);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ud-accent);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .body-copy {
+    font-family: var(--font-sans);
+    font-size: 14.5px; line-height: 1.75;
+    color: rgba(245,246,243,0.72);
+    margin: 0 0 18px;
+    text-wrap: pretty;
+  }
+  .body-copy b { color: var(--ud-fg); font-weight: 500; }
+  .divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 6px 0 22px;
+    color: var(--ud-accent);
+    font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+    font-family: var(--font-chakra); font-weight: 500;
+  }
+  .divider::before, .divider::after {
+    content: ""; flex: 1; height: 1px;
+    background: var(--ud-border);
+  }
+
+  /* Benefits */
+  .benefits {
+    display: grid; grid-template-columns: 1fr; gap: 0;
+    border-top: 1px solid var(--ud-border);
+    border-bottom: 1px solid var(--ud-border);
+    margin: 10px 0 0;
+  }
+  .benefit {
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 18px;
+    padding: 22px 4px;
+    border-bottom: 1px solid var(--ud-border);
+    align-items: center;
+  }
+  .benefit:last-child { border-bottom: none; }
+  .benefit .num {
+    font-family: var(--font-chakra); font-weight: 500;
+    font-size: 30px;
+    color: var(--ud-accent);
+    letter-spacing: -0.02em;
+  }
+  .benefit .title {
+    font-family: var(--font-chakra); font-weight: 600;
+    font-size: 15px;
+    color: var(--ud-fg);
+    margin-bottom: 6px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .benefit .desc {
+    font-family: var(--font-sans);
+    font-size: 13px; color: rgba(245,246,243,0.66); line-height: 1.55;
+    text-wrap: pretty;
+  }
+  .benefit .tag {
+    align-self: center;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ud-accent);
+    font-family: var(--font-mono);
+    padding: 6px 10px;
+    border: 1px solid rgba(213,209,173,0.30);
+    border-radius: 999px;
+  }
+
+  /* Theme gallery */
+  .gallery-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 22px;
+  }
+  .gallery-head h3 {
+    font-family: var(--font-chakra);
+    font-weight: 500;
+    font-size: 26px;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--ud-fg);
+    text-transform: uppercase;
+  }
+  .gallery-head h3 em {
+    font-family: var(--font-merienda);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ud-accent);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .gallery-head .count {
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ud-muted);
+    font-family: var(--font-mono);
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .theme {
+    position: relative;
+    aspect-ratio: 3/4;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--ud-border);
+  }
+  .theme video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .theme::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%);
+  }
+  .theme .tn {
+    position: absolute;
+    bottom: 14px; left: 14px; right: 14px;
+    color: var(--ud-fg); z-index: 2;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .theme .name {
+    font-family: var(--font-chakra);
+    font-weight: 600; font-size: 14px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .theme .idx {
+    font-size: 9px; letter-spacing: 0.22em;
+    font-family: var(--font-mono);
+    color: var(--ud-accent);
+  }
+
+  /* Secondary */
+  .secondary {
+    position: relative;
+    margin-top: 36px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--ud-border);
+    height: 300px;
+  }
+  .secondary video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .secondary .caption {
+    position: absolute; inset: auto 0 0 0;
+    padding: 24px 26px;
+    color: var(--ud-fg);
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
+    z-index: 2;
+  }
+  .secondary .caption .eyebrow {
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--ud-accent);
+    margin-bottom: 8px;
+  }
+  .secondary .caption .text {
+    font-family: var(--font-merienda);
+    font-weight: 400; font-style: italic;
+    font-size: 22px;
+    line-height: 1.3;
+    max-width: 440px;
+  }
+
+  /* Quote */
+  .quote {
+    padding: 50px 0 28px;
+    text-align: center;
+  }
+  .quote .mark {
+    font-family: var(--font-merienda);
+    font-size: 60px; line-height: 0;
+    color: var(--ud-accent);
+    display: inline-block;
+    margin-bottom: 30px;
+  }
+  .quote p {
+    font-family: var(--font-merienda);
+    font-weight: 400; font-style: italic;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ud-fg);
+    margin: 0 auto 18px;
+    max-width: 460px;
+    text-wrap: pretty;
+  }
+  .quote .by {
+    font-family: var(--font-chakra);
+    font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ud-muted);
+    font-weight: 500;
+  }
+
+  /* Stats strip */
+  .strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    margin-top: 40px;
+    border-top: 1px solid var(--ud-border);
+    border-bottom: 1px solid var(--ud-border);
+  }
+  .strip .cell {
+    padding: 24px 8px;
+    text-align: center;
+    border-right: 1px solid var(--ud-border);
+  }
+  .strip .cell:last-child { border-right: none; }
+  .strip .k {
+    font-family: var(--font-chakra); font-weight: 500;
+    font-size: 32px; color: var(--ud-fg);
+    letter-spacing: -0.02em;
+  }
+  .strip .k em {
+    font-family: var(--font-merienda);
+    font-style: italic; font-weight: 400;
+    color: var(--ud-accent);
+    font-size: 34px;
+  }
+  .strip .k .tr {
+    font-size: 14px; vertical-align: super;
+    color: var(--ud-accent); font-weight: 400;
+    margin-left: 2px;
+  }
+  .strip .v {
+    margin-top: 6px;
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ud-muted);
+  }
+
+  /* Packages */
+  .packages {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .pkg {
+    position: relative;
+    border: 1px solid var(--ud-border);
+    border-radius: 14px;
+    padding: 22px 18px 20px;
+    background: linear-gradient(180deg, rgba(213,209,173,0.02), transparent);
+    display: flex; flex-direction: column;
+    min-height: 280px;
+  }
+  .pkg.featured {
+    border-color: rgba(213,209,173,0.5);
+    background: linear-gradient(180deg, rgba(213,209,173,0.08), rgba(213,209,173,0.01));
+    box-shadow: inset 0 0 40px rgba(213,209,173,0.04);
+  }
+  .pkg .ribbon {
+    position: absolute; top: -1px; right: 16px;
+    font-family: var(--font-chakra);
+    font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: #000; background: var(--ud-accent);
+    padding: 5px 10px;
+    border-radius: 0 0 6px 6px;
+    font-weight: 600;
+  }
+  .pkg .name {
+    font-family: var(--font-chakra);
+    font-weight: 600;
+    font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ud-fg);
+    margin-bottom: 4px;
+  }
+  .pkg .tag-sub {
+    font-family: var(--font-merienda);
+    font-style: italic; font-size: 13px;
+    color: var(--ud-accent);
+    margin-bottom: 18px;
+  }
+  .pkg .price {
+    display: flex; align-items: baseline; gap: 4px;
+    padding-bottom: 14px; margin-bottom: 14px;
+    border-bottom: 1px dashed var(--ud-border);
+  }
+  .pkg .price .num {
+    font-family: var(--font-chakra); font-weight: 500;
+    font-size: 38px; letter-spacing: -0.02em;
+    color: var(--ud-fg);
+    line-height: 1;
+  }
+  .pkg .price .cur {
+    font-family: var(--font-chakra);
+    font-size: 18px; color: var(--ud-accent);
+  }
+  .pkg .price .per {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ud-muted);
+    margin-left: 6px;
+  }
+  .pkg ul {
+    list-style: none; padding: 0; margin: 0 0 16px;
+    font-family: var(--font-sans); font-size: 12.5px;
+    color: rgba(245,246,243,0.72);
+    flex: 1;
+  }
+  .pkg ul li {
+    display: flex; gap: 9px;
+    padding: 5px 0;
+    line-height: 1.4;
+  }
+  .pkg ul li::before {
+    content: "+";
+    color: var(--ud-accent);
+    font-family: var(--font-chakra); font-weight: 600;
+    font-size: 13px;
+  }
+  .pkg .choose {
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ud-muted);
+    padding: 10px 0;
+    border-top: 1px solid var(--ud-border);
+    text-align: center;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+  .pkg:hover .choose { color: var(--ud-accent); }
+  .pkg.featured .choose { color: var(--ud-accent); border-top-color: rgba(213,209,173,0.3); }
+
+  /* Phone preview */
+  .phone-section {
+    margin-top: 48px;
+    padding: 40px 0 20px;
+    border-top: 1px solid var(--ud-border);
+  }
+  .phone-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+    align-items: center;
+  }
+  .phone-copy .eyebrow {
+    font-family: var(--font-chakra);
+    font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: var(--ud-accent);
+    margin-bottom: 14px;
+  }
+  .phone-copy h4 {
+    font-family: var(--font-chakra);
+    font-weight: 500;
+    font-size: 30px; line-height: 1;
+    margin: 0 0 18px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .phone-copy h4 em {
+    font-family: var(--font-merienda);
+    font-weight: 400; font-style: italic;
+    color: var(--ud-accent);
+    text-transform: none; letter-spacing: 0;
+  }
+  .phone-copy p {
+    font-family: var(--font-sans);
+    font-size: 13px; line-height: 1.7;
+    color: rgba(245,246,243,0.7);
+    margin: 0 0 20px;
+  }
+  .phone-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .phone-chips span {
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ud-fg);
+    padding: 6px 10px;
+    border: 1px solid var(--ud-border);
+    border-radius: 999px;
+  }
+  .phone-frame {
+    justify-self: center;
+    position: relative;
+    width: 220px; height: 450px;
+    background: #0a0809;
+    border-radius: 34px;
+    padding: 10px;
+    border: 1px solid #2a2628;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(213,209,173,0.08);
+  }
+  .phone-frame::before {
+    content: ""; position: absolute;
+    top: 18px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 22px;
+    background: #0a0809; border-radius: 999px;
+    z-index: 5;
+  }
+  .phone-screen {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 26px;
+    overflow: hidden;
+    background: #000;
+  }
+  .phone-screen video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .phone-screen::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 20%, transparent 55%, rgba(0,0,0,0.92) 100%);
+  }
+  .phone-ui {
+    position: absolute; inset: 0;
+    z-index: 3;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 18px 24px;
+    color: var(--ud-fg);
+  }
+  .phone-ui .p-top {
+    text-align: center;
+    font-family: var(--font-chakra);
+    font-size: 8px; letter-spacing: 0.32em; text-transform: uppercase;
+    color: rgba(245,246,243,0.7);
+  }
+  .phone-ui .p-names {
+    text-align: center;
+  }
+  .phone-ui .p-names .eyb {
+    font-family: var(--font-chakra);
+    font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--ud-accent);
+    margin-bottom: 8px;
+  }
+  .phone-ui .p-names .who {
+    font-family: var(--font-merienda);
+    font-style: italic; font-weight: 400;
+    font-size: 26px; line-height: 1.05;
+    color: var(--ud-fg);
+  }
+  .phone-ui .p-names .amp {
+    color: var(--ud-accent);
+    font-size: 20px;
+    display: block; margin: 2px 0;
+  }
+  .phone-ui .p-names .date {
+    margin-top: 12px;
+    font-family: var(--font-chakra);
+    font-size: 9px; letter-spacing: 0.28em;
+    color: rgba(245,246,243,0.75);
+  }
+  .phone-ui .p-btn {
+    text-align: center;
+    font-family: var(--font-chakra);
+    font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+    padding: 11px 0;
+    background: rgba(245,246,243,0.92);
+    color: #000;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  /* CTA */
+  .cta-wrap {
+    text-align: center;
+    padding: 38px 0 12px;
+  }
+  .cta {
+    display: inline-flex; align-items: center; gap: 14px;
+    background: var(--ud-fg); color: #000;
+    padding: 20px 40px;
+    border: 1px solid var(--ud-fg);
+    border-radius: 999px;
+    font-family: var(--font-chakra);
+    font-weight: 600;
+    font-size: 12px; letter-spacing: 0.28em; text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.18s ease;
+  }
+  .cta:hover { transform: translateY(-1px); }
+  .cta .arrow {
+    font-family: var(--font-sans); font-size: 16px;
+    letter-spacing: 0;
+  }
+  .cta-note {
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ud-muted);
+  }
+
+  /* Footer */
+  .ef {
+    background: #1c1a1c;
+    padding: 28px 40px;
+    border-top: 1px solid var(--ud-border);
+  }
+  .ef .row1 {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 18px; border-bottom: 1px solid var(--ud-border);
+  }
+  .ef .row1 .mark {
+    font-family: var(--font-chakra);
+    font-weight: 700; font-size: 14px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ef .row1 .mark img { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(213,209,173,0.4)); }
+  .ef .row1 .social {
+    display: flex; gap: 6px;
+  }
+  .ef .row1 .social a {
+    width: 32px; height: 32px; border-radius: 999px;
+    background: transparent; border: 1px solid var(--ud-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ud-muted);
+    transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    text-decoration: none;
+  }
+  .ef .row1 .social a:hover {
+    color: var(--ud-accent);
+    border-color: rgba(213,209,173,0.5);
+    transform: translateY(-1px);
+  }
+  .ef .row1 .social a svg {
+    display: block;
+  }
+  .ef .row2 {
+    padding-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px; color: var(--ud-muted); line-height: 1.85;
+    letter-spacing: 0.02em;
+  }
+  .ef a {
+    color: var(--ud-fg);
+    text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: rgba(213,209,173,0.4);
+  }
+  .ef .tag {
+    color: var(--ud-accent);
+    font-family: var(--font-chakra);
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+
+  /* ===== Right rail: A/B options + theme switcher ===== */
+  .preview-rail {
+    position: fixed;
+    right: 28px; top: 50%; transform: translateY(-50%);
+    width: 300px;
+    display: flex; flex-direction: column; gap: 12px;
+    z-index: 20;
+  }
+  .card {
+    background: #1c1a1c;
+    border: 1px solid var(--ud-border);
+    border-radius: 14px; padding: 14px 16px;
+    font-family: var(--font-sans);
+    font-size: 12px; color: var(--ud-muted);
+    box-shadow: 0 20px 60px -30px rgba(0,0,0,0.7);
+  }
+  .card h4 {
+    margin: 0 0 12px;
+    font-family: var(--font-chakra);
+    font-weight: 600;
+    font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ud-accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h4::before {
+    content: ""; width: 6px; height: 6px; border-radius: 999px;
+    background: var(--ud-accent);
+  }
+  .card .opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 10px; border-radius: 10px; cursor: pointer;
+    line-height: 1.45;
+    color: rgba(245,246,243,0.62);
+  }
+  .card .opt:hover { background: rgba(245,246,243,0.04); color: var(--ud-fg); }
+  .card .opt.active {
+    background: rgba(213,209,173,0.08);
+    color: var(--ud-fg);
+    border: 1px solid rgba(213,209,173,0.22);
+  }
+  .card .radio {
+    width: 12px; height: 12px; border-radius: 999px;
+    border: 1.5px solid var(--ud-accent);
+    flex-shrink: 0; margin-top: 3px;
+  }
+  .card .opt.active .radio { background: var(--ud-accent); box-shadow: inset 0 0 0 2px var(--ud-bg); }
+  .card .small {
+    font-family: var(--font-mono);
+    font-size: 9px; color: var(--ud-muted);
+    margin-top: 3px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .card .kv { display: flex; justify-content: space-between; padding: 4px 0; }
+  .card .kv strong { color: var(--ud-fg); font-weight: 500; }
+
+  .theme-switch {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    margin-top: 2px;
+  }
+  .theme-switch button {
+    border: 1px solid var(--ud-border);
+    background: transparent;
+    padding: 10px 6px;
+    border-radius: 10px;
+    font-family: var(--font-chakra);
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ud-muted);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .theme-switch button:hover { color: var(--ud-fg); }
+  .theme-switch button.active {
+    background: var(--ud-fg); color: #000;
+    border-color: var(--ud-fg);
+  }
+
+  @media (max-width: 1600px) { .preview-rail { display: none; } }
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- Mail chrome -->
+    <div class="topbar">
+      <div class="brand">
+        <span class="dot"><i>M</i></span>
+        POSTA
+      </div>
+      <div class="search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Uygun Davet, düğün, lansman
+      </div>
+      <div class="right">
+        <span>Pazarlama</span>
+        <span class="avatar">N</span>
+      </div>
+    </div>
+
+    <div class="body-grid">
+      <aside class="nav">
+        <button class="compose">
+          <span style="font-size:12px;">✦</span> Yeni Kampanya
+        </button>
+        <ul>
+          <li class="active">Gelen Kutusu <span class="count">12</span></li>
+          <li>Yıldızlı</li>
+          <li>Taslaklar <span class="count">3</span></li>
+          <li>Gönderilen</li>
+          <li>Planlanan <span class="count">1</span></li>
+        </ul>
+        <div class="label">Kampanyalar</div>
+        <ul>
+          <li>Yaz 2026 Lansman</li>
+          <li>Sonbahar Koleksiyonu</li>
+          <li>Kurumsal Davetler</li>
+        </ul>
+      </aside>
+
+      <main class="pane">
+        <div class="pane-head">
+          <span class="iconbtn">←</span>
+          <span class="sep"></span>
+          <span class="iconbtn" title="Arşivle">⌘</span>
+          <span class="iconbtn" title="Sil">⎋</span>
+          <span class="iconbtn" title="İşaretle">✓</span>
+          <span class="sep"></span>
+          <span class="iconbtn" title="Ertele">⏱</span>
+          <span style="margin-left:auto; color:var(--ud-muted); font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em;">01 / 847</span>
+          <span class="iconbtn">‹</span>
+          <span class="iconbtn">›</span>
+        </div>
+
+        <!-- Subject -->
+        <div class="subject">
+          <span class="tag">◆ Konu Satırı</span>
+          <h1 id="subject-text">SÖZ VERDİĞİNİZ KİŞİYE, <em>kelimeleri kadar güzel</em> BİR DAVETİYE.</h1>
+        </div>
+
+        <div class="sender">
+          <div class="av"><i>U</i></div>
+          <div class="meta">
+            <div class="from">UYGUN DAVET <span class="email">&lt;davet@uygundavet.com&gt;</span></div>
+            <div class="to">Kime: siz · 1.247 kişiye gönderildi · önizleme: <b id="preview-text">Kağıda gerek yok. Tek bağlantı, herkes davetli.</b></div>
+          </div>
+          <div class="date">19 NİS 2026 · 09:24</div>
+        </div>
+
+        <div class="scroll">
+          <article class="email">
+
+            <header class="eh">
+              <div class="logo">
+                <span class="mark"><img src="email/assets/logo.png" alt="Uygun Davet"/></span>
+                UYGUN DAVET
+              </div>
+              <nav>
+                <span class="on">Temalar</span>
+                <span>Paketler</span>
+                <span>Hikaye</span>
+              </nav>
+            </header>
+
+            <!-- Hero -->
+            <section class="hero">
+              <video autoplay loop muted playsinline>
+                <source src="email/assets/golden.mp4" type="video/mp4"/>
+              </video>
+              <div class="grain"></div>
+              <img class="ring" src="email/assets/logo.png" alt="Uygun Davet"/>
+              <div class="corner tl">UD / 2026 · Golden Sezon</div>
+              <div class="corner bl">Ref <b>UD—26—GLD</b></div>
+              <div class="overlay">
+                <div class="kicker">2026 Sezon Koleksiyonu</div>
+                <h2>Bir hayat boyu sürecek <em>ilk izlenim.</em></h2>
+                <div class="sub">Kağıda, zarfa, postaya gerek yok. Düğününüz kelimesi kelimesine, zamanında, herkese ulaşır.</div>
+              </div>
+            </section>
+
+            <!-- Lede -->
+            <section class="section">
+              <div class="divider">◆ Merhaba çift adayları</div>
+              <p class="lede">
+                DAVETİYEYİ AÇTIĞI AN, HİKAYENİZ BAŞLAR. UYGUN DAVET, O İLK ANI <em>sinematik bir filmle</em> AVUCA BIRAKIR.
+              </p>
+              <p class="body-copy">
+                Sekiz tema, bir platform. <b>Grow, Pearl, Rose, Sunset, Crystal, Garden, Ocean, Golden.</b> Dijital davetiye, düğün web siteniz, <b>LCV, anı defteri, QR kod, misafir yönetimi</b> hepsi tek çatı altında. İsterseniz <b>TR, EN, DE</b> dillerinde.
+              </p>
+            </section>
+
+            <!-- Benefits -->
+            <section class="section" style="padding-top:0;">
+              <div class="divider">◆ Özellikler</div>
+              <div class="benefits">
+                <div class="benefit">
+                  <div class="num">01</div>
+                  <div>
+                    <div class="title">LCV Sistemi</div>
+                    <div class="desc">Misafirlerinizin katılım durumlarını anlık olarak takip edin, otomatik hatırlatmalar gönderin.</div>
+                  </div>
+                  <div class="tag">Canlı</div>
+                </div>
+                <div class="benefit">
+                  <div class="num">02</div>
+                  <div>
+                    <div class="title">Anı Defteri</div>
+                    <div class="desc">Misafirlerinizin özel mesajlarını ve anılarını biriktirin. Düğününüze dair unutulmaz hatıralar.</div>
+                  </div>
+                  <div class="tag">Mesaj</div>
+                </div>
+                <div class="benefit">
+                  <div class="num">03</div>
+                  <div>
+                    <div class="title">QR Kod</div>
+                    <div class="desc">Fiziksel davetiyenize QR kod ekleyerek dijital dünyaya köprü kurun.</div>
+                  </div>
+                  <div class="tag">Hibrit</div>
+                </div>
+                <div class="benefit">
+                  <div class="num">04</div>
+                  <div>
+                    <div class="title">Misafir Yönetimi</div>
+                    <div class="desc">Davetli listeleri, oturma planı, anlık bildirimler ve detaylı raporlar.</div>
+                  </div>
+                  <div class="tag">Panel</div>
+                </div>
+                <div class="benefit">
+                  <div class="num">05</div>
+                  <div>
+                    <div class="title">Kolay Paylaşım</div>
+                    <div class="desc">WhatsApp, SMS ve sosyal medyadan tek tıkla tüm sevdiklerinize ulaştırın.</div>
+                  </div>
+                  <div class="tag">Tek tık</div>
+                </div>
+                <div class="benefit">
+                  <div class="num">06</div>
+                  <div>
+                    <div class="title">Çoklu Dil</div>
+                    <div class="desc">Türkçe, İngilizce ve Almanca davetiye desteği. Yurt dışındaki misafirleriniz için ideal.</div>
+                  </div>
+                  <div class="tag">TR / EN / DE</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Packages -->
+            <section class="section" style="padding-top:0;">
+              <div class="divider">◆ Fiyatlandırma</div>
+              <div class="packages">
+                <div class="pkg">
+                  <div class="name">Başlangıç</div>
+                  <div class="tag-sub">sade ve yeterli</div>
+                  <div class="price">
+                    <span class="num">7.499</span><span class="cur">₺</span>
+                    <span class="per">Tek seferlik</span>
+                  </div>
+                  <ul>
+                    <li>Düğün web sitesi</li>
+                    <li>Dijital davetiye</li>
+                    <li>Online LCV formu</li>
+                    <li>Konum ve yol tarifi</li>
+                    <li>Geri sayım sayacı</li>
+                    <li>WhatsApp ile paylaşım</li>
+                  </ul>
+                  <a href="#" class="choose">Bu paketi seç</a>
+                </div>
+                <div class="pkg featured">
+                  <div class="ribbon">Önerilen</div>
+                  <div class="name">Pro</div>
+                  <div class="tag-sub">eksiksiz deneyim</div>
+                  <div class="price">
+                    <span class="num">12.999</span><span class="cur">₺</span>
+                    <span class="per">Tek seferlik</span>
+                  </div>
+                  <ul>
+                    <li>Fotoğraf yükleme ve galeri</li>
+                    <li>Anı defteri, misafir mesajları</li>
+                    <li>Arka plan müziği</li>
+                    <li>Hikayeniz bölümü</li>
+                    <li>Çoklu dil: TR, EN, DE</li>
+                    <li>Hatırlatma bildirimleri</li>
+                    <li>Başlangıç paketindeki her şey</li>
+                  </ul>
+                  <a href="#" class="choose">Bu paketi seç</a>
+                </div>
+                <div class="pkg">
+                  <div class="name">Elit</div>
+                  <div class="tag-sub">dijital ve fiziksel</div>
+                  <div class="price">
+                    <span class="num">14.999</span><span class="cur">₺</span>
+                    <span class="per">Tek seferlik</span>
+                  </div>
+                  <ul>
+                    <li>Basılı gerçek davetiye, 100 adet</li>
+                    <li>QR kod sticker, 25 adet</li>
+                    <li>Özel tasarım desteği</li>
+                    <li>Öncelikli destek</li>
+                    <li>Özel domain</li>
+                    <li>Pro paketindeki her şey</li>
+                  </ul>
+                  <a href="#" class="choose">Bu paketi seç</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- Theme gallery -->
+            <section class="section" style="padding-top:0;">
+              <div class="gallery-head">
+                <h3>Sekiz tema, <em>bir düğün.</em></h3>
+                <div class="count">08 / 08</div>
+              </div>
+              <div class="gallery">
+                <div class="theme">
+                  <img src="email/assets/grow.png" alt="Grow" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+                  <div class="tn"><span class="name">Grow</span><span class="idx">01</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/pearl.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Pearl</span><span class="idx">02</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/rose.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Rose</span><span class="idx">03</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/sunset.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Sunset</span><span class="idx">04</span></div>
+                </div>
+                <div class="theme">
+                  <img src="email/assets/crystal.png" alt="Crystal" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+                  <div class="tn"><span class="name">Crystal</span><span class="idx">05</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/garden.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Garden</span><span class="idx">06</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/ocean.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Ocean</span><span class="idx">07</span></div>
+                </div>
+                <div class="theme">
+                  <video autoplay loop muted playsinline><source src="email/assets/golden.mp4" type="video/mp4"/></video>
+                  <div class="tn"><span class="name">Golden</span><span class="idx">08</span></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Secondary + quote + stats + CTA -->
+            <section class="section" style="padding-top:0;">
+              <div class="secondary">
+                <video autoplay loop muted playsinline>
+                  <source src="email/assets/pearl.mp4" type="video/mp4"/>
+                </video>
+                <div class="caption">
+                  <div class="eyebrow">◆ Detay</div>
+                  <div class="text">Yüzük çerçevesi, altın yaldız, el yazısı imza. Her davetiye size özel kalibre edilir.</div>
+                </div>
+              </div>
+
+              <div class="phone-section">
+                <div class="phone-wrap">
+                  <div class="phone-copy">
+                    <div class="eyebrow">◆ Telefonda canlı</div>
+                    <h4>Misafirin avucunda, <em>sinema salonu gibi.</em></h4>
+                    <p>Davetiye WhatsApp, SMS veya e‑postayla tek bağlantı olarak gönderilir. Açıldığı an tam ekran sinematik deneyim başlar. Her cihazda, her ekranda aktığı gibi.</p>
+                    <div class="phone-chips">
+                      <span>iOS</span><span>Android</span><span>WhatsApp</span><span>Mail</span><span>QR</span>
+                    </div>
+                  </div>
+                  <div class="phone-frame">
+                    <div class="phone-screen">
+                      <video autoplay loop muted playsinline>
+                        <source src="email/assets/garden.mp4" type="video/mp4"/>
+                      </video>
+                      <div class="phone-ui">
+                        <div class="p-top">2026 · Davetiyeniz</div>
+                        <div class="p-names">
+                          <div class="eyb">Sevgiyle davetlisiniz</div>
+                          <div class="who">Zeynep<span class="amp">&amp;</span>Can</div>
+                          <div class="date">14 Haziran 2026 · 19:00</div>
+                        </div>
+                        <div class="p-btn">Cevabınızı bırakın</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="quote">
+                <span class="mark">“</span>
+                <p>İki gün içinde 180 misafire ulaştık. Herkes <br>“bu şimdiye kadar gördüğüm en güzel davetiye” dedi.</p>
+                <div class="by">Ayşe &amp; Emre · Eylül 2025</div>
+              </div>
+
+              <div class="strip">
+                <div class="cell">
+                  <div class="k">7.499<span class="tr">₺</span></div>
+                  <div class="v">Başlangıç paketi</div>
+                </div>
+                <div class="cell">
+                  <div class="k">3<span class="tr">adım</span></div>
+                  <div class="v">Tema, kişisel, paylaş</div>
+                </div>
+                <div class="cell">
+                  <div class="k">TR<em>·</em>EN<em>·</em>DE</div>
+                  <div class="v">Çoklu dil desteği</div>
+                </div>
+              </div>
+
+              <div class="cta-wrap">
+                <a href="#" class="cta">Davetiyenizi Hazırlayın <span class="arrow">→</span></a>
+                <div class="cta-note">uygundavet.com · ilk taslak ücretsiz</div>
+              </div>
+            </section>
+
+            <footer class="ef">
+              <div class="row1">
+                <div class="mark"><img src="email/assets/logo.png" alt=""/> UYGUN DAVET</div>
+                <div class="social">
+                  <a href="#" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="5"/>
+                      <circle cx="12" cy="12" r="4"/>
+                      <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/>
+                    </svg>
+                  </a>
+                  <a href="#" aria-label="Pinterest">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="9"/>
+                      <path d="M11 8c0 3-2 6-2 9"/>
+                      <path d="M9 13c.5 1.5 2 2.5 3.5 2.5 2 0 3.5-1.8 3.5-4 0-2.3-1.8-4.2-4.2-4.2-2.7 0-4.3 2-4.3 4 0 1.2.5 2 1.2 2.4"/>
+                    </svg>
+                  </a>
+                  <a href="#" aria-label="TikTok">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 4v11.5a3.5 3.5 0 11-3.5-3.5"/>
+                      <path d="M14 4c.2 2.3 2 4 4.3 4"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <div class="row2">
+                Bu e-postayı, 2026 sezonu lansmanımıza ilgi gösterdiğiniz için aldınız.<br>
+                <a href="#">Abonelikten çık</a> · <a href="#">Gizlilik</a> · <a href="#">Şablonlara göz at</a><br>
+                <span class="tag">© 2026 UYGUN DAVET</span>
+              </div>
+            </footer>
+
+          </article>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Right rail removed -->
+
+<script>
+</script>
+</body>
+</html>

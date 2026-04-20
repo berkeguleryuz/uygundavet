@@ -627,5 +627,29 @@
     "title": "Page Not Found",
     "description": "The page you are looking for does not exist or may have been moved.",
     "backHome": "Back to Home"
+  },
+  "Support": {
+    "greetingTitle": "Hey there 👋",
+    "greetingSubtitle": "How can we help you today?",
+    "searchPlaceholder": "Search for help...",
+    "whatsappTitle": "Chat with us on WhatsApp",
+    "whatsappDesc": "Send your questions directly and we'll get back to you soon.",
+    "whatsappCta": "Open WhatsApp",
+    "homeTab": "Home",
+    "whatsappTab": "WhatsApp",
+    "helpTab": "Help",
+    "newsTab": "News",
+    "helpTitle": "Frequently Asked",
+    "helpItem1": "How do I customize my invitation?",
+    "helpItem2": "How do I track RSVP responses?",
+    "helpItem3": "How does pricing work?",
+    "helpItem4": "How do I send it to my guests?",
+    "newsTitle": "What's new",
+    "newsItem1Title": "New theme collection is live!",
+    "newsItem1Desc": "6 fresh spring-inspired designs are now available.",
+    "newsItem2Title": "Multi-language support has arrived",
+    "newsItem2Desc": "Share your invitations in TR, EN and DE.",
+    "close": "Close",
+    "openSupport": "Open support panel"
   }
 }
