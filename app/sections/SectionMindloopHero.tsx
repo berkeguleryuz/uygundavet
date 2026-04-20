@@ -94,8 +94,9 @@ export function SectionMindloopHero() {
   const sideOpacity = imageProgress;
   const sideTranslateLeft = -100 + imageProgress * 100;
   const sideTranslateRight = 100 - imageProgress * 100;
-  const borderRadius = imageProgress * 24;
+  const borderRadius = 12 + imageProgress * 12;
   const gap = imageProgress * 16;
+  const basePadding = 8 + imageProgress * 8;
   const sideTranslateY = -(imageProgress * 15);
 
   return (
@@ -107,7 +108,7 @@ export function SectionMindloopHero() {
             className="relative flex h-full w-full items-stretch justify-center"
             style={{
               gap: `${gap}px`,
-              padding: `${imageProgress * 16}px`,
+              padding: `${basePadding}px`,
               paddingBottom: `${60 + imageProgress * 40}px`,
             }}
           >

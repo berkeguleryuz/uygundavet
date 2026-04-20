@@ -627,5 +627,29 @@
     "title": "Seite nicht gefunden",
     "description": "Die gesuchte Seite existiert nicht oder wurde möglicherweise verschoben.",
     "backHome": "Zurück zur Startseite"
+  },
+  "Support": {
+    "greetingTitle": "Hallo 👋",
+    "greetingSubtitle": "Wie können wir Ihnen heute helfen?",
+    "searchPlaceholder": "Hilfe suchen...",
+    "whatsappTitle": "Schreiben Sie uns auf WhatsApp",
+    "whatsappDesc": "Senden Sie Ihre Fragen direkt – wir melden uns schnell zurück.",
+    "whatsappCta": "WhatsApp öffnen",
+    "homeTab": "Startseite",
+    "whatsappTab": "WhatsApp",
+    "helpTab": "Hilfe",
+    "newsTab": "News",
+    "helpTitle": "Häufig gestellte Fragen",
+    "helpItem1": "Wie passe ich meine Einladung an?",
+    "helpItem2": "Wie verfolge ich die Zusagen?",
+    "helpItem3": "Wie funktioniert die Preisgestaltung?",
+    "helpItem4": "Wie sende ich sie an meine Gäste?",
+    "newsTitle": "Neuigkeiten",
+    "newsItem1Title": "Neue Themen-Kollektion ist live!",
+    "newsItem1Desc": "6 frische frühlingsinspirierte Designs sind jetzt verfügbar.",
+    "newsItem2Title": "Mehrsprachige Unterstützung ist da",
+    "newsItem2Desc": "Teilen Sie Ihre Einladungen in TR, EN und DE.",
+    "close": "Schließen",
+    "openSupport": "Support-Panel öffnen"
   }
 }

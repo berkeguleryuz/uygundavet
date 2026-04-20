@@ -627,5 +627,29 @@
     "title": "Sayfa Bulunamadı",
     "description": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
     "backHome": "Ana Sayfaya Dön"
+  },
+  "Support": {
+    "greetingTitle": "Merhaba 👋",
+    "greetingSubtitle": "Size nasıl yardımcı olabiliriz?",
+    "searchPlaceholder": "Yardım ara...",
+    "whatsappTitle": "WhatsApp'tan yazın",
+    "whatsappDesc": "Sorularınızı direkt bize iletin, en kısa sürede dönelim.",
+    "whatsappCta": "WhatsApp'ı aç",
+    "homeTab": "Anasayfa",
+    "whatsappTab": "WhatsApp",
+    "helpTab": "Yardım",
+    "newsTab": "Haberler",
+    "helpTitle": "Sıkça Sorulan Sorular",
+    "helpItem1": "Davetiyemi nasıl kişiselleştiririm?",
+    "helpItem2": "LCV yanıtlarını nasıl takip ederim?",
+    "helpItem3": "Fiyatlandırma planları nasıl işler?",
+    "helpItem4": "Misafirlerime nasıl gönderirim?",
+    "newsTitle": "Yenilikler",
+    "newsItem1Title": "Yeni tema koleksiyonu yayında!",
+    "newsItem1Desc": "Bahar esintili 6 yeni tasarım artık kullanımınızda.",
+    "newsItem2Title": "Çoklu dil desteği geldi",
+    "newsItem2Desc": "Davetiyelerinizi TR, EN ve DE dillerinde paylaşabilirsiniz.",
+    "close": "Kapat",
+    "openSupport": "Destek panelini aç"
   }
 }

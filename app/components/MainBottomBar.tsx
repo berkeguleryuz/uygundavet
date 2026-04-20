@@ -5,14 +5,27 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEME_OPTIONS } from "@/lib/themes";
+import { useSupportStore } from "@/store/support-store";
 
 export function MainBottomBar() {
   const t = useTranslations("Navbar");
+  const tSupport = useTranslations("Support");
+  const toggleSupport = useSupportStore((s) => s.toggle);
+  const supportOpen = useSupportStore((s) => s.isOpen);
   const [isThemesOpen, setIsThemesOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const popRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     if (!isThemesOpen) return;
@@ -26,32 +39,33 @@ export function MainBottomBar() {
   }, [isThemesOpen]);
 
   return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[55] px-3">
-      <div className="flex items-center gap-2 rounded-full bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-2 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]">
+    <>
+    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-[55] px-2 sm:px-3 max-w-[calc(00vw-1rem)]">
+      <div className="flex items-center gap-3 sm:gap-5 rounded-full bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-1.5 pl-0 pr-2 sm:p-2 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]">
         <Link
           href="/"
           aria-label="Uygun Davet"
-          className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
+          className="shrink-0 w-14 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
         >
           <Image
             src="/logo-gold-transparent.png"
             alt=""
             width={36}
             height={36}
-            className="object-contain"
+            className="object-contain w-9 h-9 sm:w-10 sm:h-10"
           />
         </Link>
 
         <div ref={popRef} className="relative">
           <button
             onClick={() => setIsThemesOpen((v) => !v)}
-            className="flex items-center gap-2 rounded-full h-14 px-6 sm:px-7 text-white/85 font-chakra text-sm tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-1.5 sm:gap-2 rounded-full h-11 sm:h-14 px-3 sm:px-7 text-white/85 font-chakra text-[11px] sm:text-sm tracking-[0.12em] sm:tracking-[0.15em] uppercase font-semibold hover:text-white transition-colors cursor-pointer whitespace-nowrap"
             aria-expanded={isThemesOpen}
           >
             {t("themes")}
             <ChevronUp
               className={cn(
-                "w-4 h-4 transition-transform",
+                "w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform",
                 isThemesOpen ? "rotate-0" : "rotate-180"
               )}
             />
@@ -87,11 +101,48 @@ export function MainBottomBar() {
 
         <Link
           href="/#fiyatlar"
-          className="flex items-center rounded-full h-14 px-6 sm:px-7 bg-white text-[#1c1a1b] font-chakra text-sm tracking-[0.15em] uppercase font-semibold hover:bg-white/90 transition-colors whitespace-nowrap"
+          className="flex items-center rounded-full h-11 sm:h-14 px-4 sm:px-7 bg-white text-[#1c1a1b] font-chakra text-[11px] sm:text-sm tracking-[0.12em] sm:tracking-[0.15em] uppercase font-semibold hover:bg-white/90 transition-colors whitespace-nowrap"
         >
           {t("buyNow")}
         </Link>
+
+        {isMobile && (
+          <button
+            type="button"
+            onClick={toggleSupport}
+            aria-label={supportOpen ? tSupport("close") : tSupport("openSupport")}
+            aria-expanded={supportOpen}
+            className="relative shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-[#d5d1ad] text-[#1c1a1b] hover:bg-[#c9c39b] transition-colors cursor-pointer"
+          >
+            <HelpCircle className="w-5 h-5" strokeWidth={2} />
+            {!supportOpen && (
+              <span
+                className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-[#ef4444]"
+                style={{ boxShadow: "0 0 0 2px #d5d1ad" }}
+              />
+            )}
+          </button>
+        )}
       </div>
     </div>
+
+    {!isMobile && (
+      <button
+        type="button"
+        onClick={toggleSupport}
+        aria-label={supportOpen ? tSupport("close") : tSupport("openSupport")}
+        aria-expanded={supportOpen}
+        className="fixed right-6 bottom-5 z-[56] w-16 h-16 rounded-full flex items-center justify-center bg-white text-[#1c1a1b] hover:bg-white/90 transition-colors cursor-pointer shadow-[0_18px_40px_-12px_rgba(0,0,0,0.45)] border border-black/5"
+      >
+        <HelpCircle className="w-7 h-7" strokeWidth={2} />
+        {!supportOpen && (
+          <span
+            className="absolute top-1 right-1 w-3 h-3 rounded-full bg-[#ef4444]"
+            style={{ boxShadow: "0 0 0 2px #ffffff" }}
+          />
+        )}
+      </button>
+    )}
+    </>
   );
 }

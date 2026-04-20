@@ -4,6 +4,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/app/components/theme-provider";
+import { SupportWidget } from "@/app/components/SupportWidget";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -71,6 +72,7 @@ export default async function LocaleLayout({
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark" disableTransitionOnChange enableColorScheme={false}>
       <NextIntlClientProvider messages={messages}>
         {children}
+        <SupportWidget />
         <Toaster position="top-center" theme="dark" richColors />
       </NextIntlClientProvider>
     </ThemeProvider>

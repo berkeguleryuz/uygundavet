@@ -138,14 +138,21 @@ export function PillNav() {
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 cursor-pointer">
             <Logo className="w-[42px] h-[42px]" />
-            <span className={cn("font-merienda font-bold text-xl hidden sm:block", isOverLight ? "text-[#252224]" : "text-foreground")}>
+            <span
+              className={cn("font-merienda font-bold text-xl hidden sm:block", isOverLight ? "text-[#252224]" : "text-foreground")}
+              style={
+                isOverLight
+                  ? undefined
+                  : { textShadow: "0 2px 14px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.4)" }
+              }
+            >
               {tNav("brand")}
             </span>
           </Link>
 
           <div className={cn(
-            "hidden md:flex items-center rounded-full backdrop-blur-sm border overflow-hidden",
-            isOverLight ? "bg-black/8 border-black/10" : "bg-white/10 border-white/10"
+            "hidden md:flex items-center rounded-full backdrop-blur-md border overflow-hidden",
+            isOverLight ? "bg-black/8 border-black/10" : "bg-black/30 border-white/15"
           )}>
             {routing.locales.map((loc) => (
               <button
@@ -159,7 +166,7 @@ export function PillNav() {
                       : "bg-white text-[#1c1a1b] rounded-full"
                     : isOverLight
                       ? "text-[#252224]/50 hover:text-[#252224]"
-                      : "text-white/50 hover:text-white"
+                      : "text-white/80 hover:text-white"
                 )}
               >
                 {loc}
