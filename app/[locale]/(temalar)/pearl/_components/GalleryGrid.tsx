@@ -9,6 +9,7 @@ import { useWedding } from "../_lib/context";
 import { t } from "../_lib/i18n";
 import { CameraIcon } from "../_icons/CameraIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
+import { UserIcon } from "../_icons/UserIcon";
 
 interface Photo {
   _id: string;
@@ -136,15 +137,21 @@ export function GalleryGrid() {
           className="max-w-lg mx-auto"
         >
           <div className="bg-white rounded-3xl border border-[#1c1917]/[0.06] shadow-sm p-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input
-                type="text"
-                value={uploaderName}
-                onChange={(e) => setUploaderName(e.target.value)}
-                placeholder={t("galleryUploadNamePlaceholder")}
-                aria-label={t("galleryUploadNamePlaceholder")}
-                className="flex-1 h-10 rounded-2xl border border-[#1c1917]/10 bg-white px-4 text-sm text-[#1c1917] placeholder:text-[#1c1917]/30 focus:border-[#b8a088] focus:outline-none focus:ring-2 focus:ring-[#b8a088]/20 transition-all font-sans"
-              />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="relative flex-1">
+                <UserIcon
+                  size={16}
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#b8a088]"
+                />
+                <input
+                  type="text"
+                  value={uploaderName}
+                  onChange={(e) => setUploaderName(e.target.value)}
+                  placeholder={t("galleryUploadNamePlaceholder")}
+                  aria-label={t("galleryUploadNamePlaceholder")}
+                  className="w-full h-11 rounded-xl border border-[#1c1917]/10 bg-[#faf6f1] pl-9 pr-4 text-sm text-[#1c1917] placeholder:text-[#1c1917]/40 focus:border-[#b8a088] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#b8a088]/15 transition-all font-sans"
+                />
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -166,7 +173,7 @@ export function GalleryGrid() {
                 }}
                 disabled={isUploading}
                 className={cn(
-                  "h-10 px-5 rounded-2xl font-sans text-xs font-medium tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
+                  "h-11 px-5 rounded-xl font-sans text-xs font-semibold tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
                   isUploading
                     ? "bg-[#b8a088]/20 text-[#b8a088]/50 cursor-not-allowed"
                     : "bg-gradient-to-r from-[#b8a088] to-[#c4a296] text-white hover:opacity-90 cursor-pointer"

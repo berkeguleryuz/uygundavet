@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Loader2, ImagePlus, X } from "lucide-react";
+import { Upload, Loader2, ImagePlus, X, User } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -128,14 +128,21 @@ export function GalleryGrid() {
       {wedding.hasGallery && (
         <ScrollReveal className="max-w-xl mx-auto">
           <div className="liquid-glass rounded-2xl border border-white/15 p-5">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input
-                type="text"
-                value={uploaderName}
-                onChange={(e) => setUploaderName(e.target.value)}
-                placeholder="Adınız Soyadınız"
-                className="flex-1 h-10 rounded-lg border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/45 focus:border-[#d5d1ad]/50 focus:outline-none transition-all font-sans"
-              />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="relative flex-1">
+                <User
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#d5d1ad]/70"
+                  strokeWidth={1.6}
+                />
+                <input
+                  type="text"
+                  value={uploaderName}
+                  onChange={(e) => setUploaderName(e.target.value)}
+                  placeholder="Adınız Soyadınız"
+                  aria-label="Adınız Soyadınız"
+                  className="w-full h-11 rounded-lg border border-white/15 bg-white/5 pl-9 pr-3 text-sm text-white placeholder:text-white/50 focus:border-[#d5d1ad]/50 focus:outline-none transition-all font-sans"
+                />
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -157,7 +164,7 @@ export function GalleryGrid() {
                 }}
                 disabled={isUploading}
                 className={cn(
-                  "h-10 px-5 rounded-lg font-sans text-xs font-medium tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
+                  "h-11 px-5 rounded-lg font-sans text-xs font-semibold tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
                   isUploading
                     ? "bg-[#d5d1ad]/20 text-[#d5d1ad]/50 cursor-not-allowed"
                     : "bg-[#d5d1ad] text-[#252224] hover:bg-[#d5d1ad]/90 cursor-pointer"

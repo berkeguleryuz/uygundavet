@@ -100,9 +100,12 @@ export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
     );
   }, [helpItems, query]);
 
-  const openWhatsApp = () => {
+  const openWhatsApp = (prefill?: string) => {
     if (typeof window === "undefined") return;
-    window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
+    const url = prefill
+      ? `${WHATSAPP_URL}?text=${encodeURIComponent(prefill)}`
+      : WHATSAPP_URL;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleTab = (next: Tab) => {
@@ -208,7 +211,7 @@ export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
                           filteredHelp.map((label, i, arr) => (
                             <button
                               key={label}
-                              onClick={openWhatsApp}
+                              onClick={() => openWhatsApp(label)}
                               className={cn(
                                 "w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-white transition-colors cursor-pointer",
                                 i !== arr.length - 1 &&
@@ -253,7 +256,7 @@ export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
                           {helpItems.slice(0, 3).map((label, i, arr) => (
                             <button
                               key={label}
-                              onClick={() => setTab("help")}
+                              onClick={() => openWhatsApp(label)}
                               className={cn(
                                 "w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-white transition-colors cursor-pointer",
                                 i !== arr.length - 1 &&
@@ -346,7 +349,7 @@ export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
                         {helpItems.map((label, i, arr) => (
                           <button
                             key={label}
-                            onClick={openWhatsApp}
+                            onClick={() => openWhatsApp(label)}
                             className={cn(
                               "w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-white transition-colors cursor-pointer",
                               i !== arr.length - 1 &&

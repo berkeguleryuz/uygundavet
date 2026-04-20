@@ -122,7 +122,7 @@ export function ThemeBottomBar({
           onClick={toggleSales}
           aria-label="Bilgi al"
           aria-expanded={salesOpen}
-          className="relative shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-[#d5d1ad] text-[#1c1a1b] hover:bg-[#c9c39b] transition-colors cursor-pointer"
+          className="relative shrink-0 w-11 mr-[0.75px] h-11 rounded-full flex items-center justify-center bg-[#d5d1ad] text-[#1c1a1b] hover:bg-[#c9c39b] transition-colors cursor-pointer"
         >
           <ChatSmileGlyph className="w-5 h-5" />
           {!salesOpen && (
