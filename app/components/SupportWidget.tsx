@@ -232,7 +232,7 @@ export function SupportWidget({ mode = "support" }: SupportWidgetProps) {
                     ) : (
                       <>
                         <button
-                          onClick={openWhatsApp}
+                          onClick={() => openWhatsApp()}
                           className="w-full text-left rounded-xl bg-[#f5f6f3] border border-black/5 p-4 flex items-start gap-3 hover:bg-white transition-colors cursor-pointer"
                         >
                           <span className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0">
