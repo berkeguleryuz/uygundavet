@@ -1,14 +1,90 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, HelpCircle } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEME_OPTIONS } from "@/lib/themes";
 import { useSupportStore } from "@/store/support-store";
+
+function ChatSmileGlyph({ className }: { className?: string }) {
+  const maskId = useId();
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <defs>
+        <mask id={maskId} maskUnits="userSpaceOnUse">
+          <rect width="24" height="24" fill="white" />
+          <circle cx="8" cy="10" r="1" fill="black">
+            <animate
+              attributeName="r"
+              values="0.6;1.4;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.6;1;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle cx="12" cy="10" r="1" fill="black">
+            <animate
+              attributeName="r"
+              values="0.6;1.4;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0.2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.6;1;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0.2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle cx="16" cy="10" r="1" fill="black">
+            <animate
+              attributeName="r"
+              values="0.6;1.4;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0.4s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.6;1;0.6"
+              keyTimes="0;0.5;1"
+              dur="1.2s"
+              begin="0.4s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </mask>
+      </defs>
+      <path
+        mask={`url(#${maskId})`}
+        d="M6 3.5A2.5 2.5 0 0 0 3.5 6v8A2.5 2.5 0 0 0 6 16.5h1.3v2.6c0 .57.68.87 1.1.48l3.4-3.08H18a2.5 2.5 0 0 0 2.5-2.5V6A2.5 2.5 0 0 0 18 3.5H6Z"
+      />
+    </svg>
+  );
+}
 
 export function MainBottomBar() {
   const t = useTranslations("Navbar");
@@ -114,7 +190,7 @@ export function MainBottomBar() {
             aria-expanded={supportOpen}
             className="relative shrink-0 w-11 h-11 rounded-full flex items-center justify-center bg-[#d5d1ad] text-[#1c1a1b] hover:bg-[#c9c39b] transition-colors cursor-pointer"
           >
-            <HelpCircle className="w-5 h-5" strokeWidth={2} />
+            <ChatSmileGlyph className="w-5 h-5" />
             {!supportOpen && (
               <span
                 className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-[#ef4444]"
@@ -134,7 +210,7 @@ export function MainBottomBar() {
         aria-expanded={supportOpen}
         className="fixed right-6 bottom-5 z-[56] w-16 h-16 rounded-full flex items-center justify-center bg-white text-[#1c1a1b] hover:bg-white/90 transition-colors cursor-pointer shadow-[0_18px_40px_-12px_rgba(0,0,0,0.45)] border border-black/5"
       >
-        <HelpCircle className="w-7 h-7" strokeWidth={2} />
+        <ChatSmileGlyph className="w-7 h-7" />
         {!supportOpen && (
           <span
             className="absolute top-1 right-1 w-3 h-3 rounded-full bg-[#ef4444]"

@@ -9,6 +9,7 @@ import { useWedding } from "../_lib/context";
 import { t } from "../_lib/i18n";
 import { CameraIcon } from "../_icons/CameraIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
+import { UserIcon } from "../_icons/UserIcon";
 
 interface Photo {
   _id: string;
@@ -135,14 +136,21 @@ export function GalleryGrid() {
           className="max-w-lg"
         >
           <div className="bg-[#241710] rounded-xl border border-[#e8a87c]/10 p-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input
-                type="text"
-                value={uploaderName}
-                onChange={(e) => setUploaderName(e.target.value)}
-                placeholder={t("galleryUploadNamePlaceholder")}
-                className="flex-1 h-10 rounded-lg border border-[#e8a87c]/15 bg-[#1a0f0a] px-3 text-sm text-[#faf0e6] placeholder:text-[#8a7565] focus:border-[#e8a87c]/40 focus:outline-none transition-all font-sans"
-              />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="relative flex-1">
+                <UserIcon
+                  size={16}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#e8a87c]"
+                />
+                <input
+                  type="text"
+                  value={uploaderName}
+                  onChange={(e) => setUploaderName(e.target.value)}
+                  placeholder={t("galleryUploadNamePlaceholder")}
+                  aria-label={t("galleryUploadNamePlaceholder")}
+                  className="w-full h-11 rounded-lg border border-[#e8a87c]/15 bg-[#1a0f0a] pl-9 pr-3 text-sm text-[#faf0e6] placeholder:text-[#8a7565] focus:border-[#e8a87c]/40 focus:outline-none transition-all font-sans"
+                />
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -164,7 +172,7 @@ export function GalleryGrid() {
                 }}
                 disabled={isUploading}
                 className={cn(
-                  "h-10 px-5 rounded-lg font-sans text-xs font-medium tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
+                  "h-11 px-5 rounded-lg font-sans text-xs font-semibold tracking-wide flex items-center justify-center gap-2 transition-all shrink-0",
                   isUploading
                     ? "bg-[#e8a87c]/20 text-[#e8a87c]/50 cursor-not-allowed"
                     : "bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white hover:opacity-90 cursor-pointer"
