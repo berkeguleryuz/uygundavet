@@ -42,20 +42,29 @@ export async function GET() {
     const memoryMap = new Map(memoryCounts.map((m) => [m._id, m.count]));
     const guestMap = new Map(guestCounts.map((g) => [g._id, g.count]));
 
-    const websites = customers.map((c) => ({
-      _id: c._id,
-      userId: c.userId,
-      bride: c.bride,
-      groom: c.groom,
-      weddingDate: c.weddingDate,
-      inviteCode: c.inviteCode,
-      customDomain: c.customDomain || "",
-      invitationViews: c.invitationViews || 0,
-      selectedTheme: orderMap.get(c.userId)?.selectedTheme || "—",
-      photoCount: photoMap.get(c.userId) || 0,
-      memoryCount: memoryMap.get(c.userId) || 0,
-      guestCount: guestMap.get(c.userId) || 0,
-    }));
+    const websites = customers.map((c) => {
+      const order = orderMap.get(c.userId);
+      return {
+        _id: c._id,
+        userId: c.userId,
+        bride: c.bride,
+        groom: c.groom,
+        weddingDate: c.weddingDate,
+        inviteCode: c.inviteCode,
+        customDomain: c.customDomain || "",
+        invitationViews: c.invitationViews || 0,
+        selectedTheme: order?.selectedTheme || "—",
+        selectedPackage: order?.selectedPackage || null,
+        userEmail: order?.userEmail || "",
+        userPhone: order?.userPhone || "",
+        paymentStatus: order?.paymentStatus || null,
+        paidAmount: order?.paidAmount || 0,
+        totalAmount: order?.totalAmount || 0,
+        photoCount: photoMap.get(c.userId) || 0,
+        memoryCount: memoryMap.get(c.userId) || 0,
+        guestCount: guestMap.get(c.userId) || 0,
+      };
+    });
 
     return NextResponse.json({ websites });
   } catch (error) {

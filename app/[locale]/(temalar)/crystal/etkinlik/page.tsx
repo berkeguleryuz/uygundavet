@@ -33,11 +33,11 @@ export default function EtkinlikPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#f6f3ee] via-[#1a1a2e]/40 to-transparent" />
 
         <div className="absolute bottom-8 left-6 md:left-12 z-10">
-          <div className="w-12 h-px bg-[#d4c4b0] mb-4" />
-          <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/70 mb-2">
+          <div className="w-12 h-px bg-[#8a6a48] mb-4" />
+          <p className="font-chakra text-xs md:text-sm tracking-[0.3em] uppercase font-bold text-[#8a6a48] mb-2 drop-shadow-[0_1px_8px_rgba(246,243,238,0.9)]">
             {t("eventLabel")}
           </p>
-          <h1 className="font-merienda text-3xl md:text-4xl text-white">
+          <h1 className="font-merienda text-3xl md:text-4xl text-[#1a1a2e] drop-shadow-[0_2px_12px_rgba(246,243,238,0.85)]">
             {brideFirst} & {groomFirst}
           </h1>
         </div>
