@@ -12,8 +12,11 @@ import {
   BookOpen,
   Users,
   Eye,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
+
+type PaymentStatus = "pending" | "deposit_paid" | "fully_paid" | null;
 
 interface WebsiteItem {
   _id: string;
@@ -25,10 +28,35 @@ interface WebsiteItem {
   customDomain: string;
   invitationViews: number;
   selectedTheme: string;
+  selectedPackage: string | null;
+  userEmail: string;
+  userPhone: string;
+  paymentStatus: PaymentStatus;
+  paidAmount: number;
+  totalAmount: number;
   photoCount: number;
   memoryCount: number;
   guestCount: number;
 }
+
+const PAYMENT_BADGE: Record<
+  Exclude<PaymentStatus, null>,
+  { label: string; className: string }
+> = {
+  pending: {
+    label: "Bekliyor",
+    className: "bg-amber-500/10 text-amber-300 border border-amber-400/20",
+  },
+  deposit_paid: {
+    label: "Kapora Ödendi",
+    className: "bg-sky-500/10 text-sky-300 border border-sky-400/20",
+  },
+  fully_paid: {
+    label: "Tam Ödendi",
+    className:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-400/20",
+  },
+};
 
 export default function WebsiteleriPage() {
   const [websites, setWebsites] = useState<WebsiteItem[]>([]);
@@ -93,15 +121,36 @@ export default function WebsiteleriPage() {
                 className="flex items-center justify-between p-4"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <p className="text-sm font-medium text-white font-sans truncate">
                       {site.bride.firstName} & {site.groom.firstName}
                     </p>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-white/50 font-sans capitalize shrink-0">
                       {site.selectedTheme}
                     </span>
+                    {site.selectedPackage && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-white/50 font-sans capitalize shrink-0">
+                        {site.selectedPackage}
+                      </span>
+                    )}
+                    {site.paymentStatus && (
+                      <span
+                        className={cn(
+                          "text-xs px-2 py-0.5 rounded-full font-sans shrink-0",
+                          PAYMENT_BADGE[site.paymentStatus].className
+                        )}
+                      >
+                        {PAYMENT_BADGE[site.paymentStatus].label}
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-3 mt-1.5">
+                  <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                    {site.userEmail && (
+                      <span className="flex items-center gap-1 text-xs text-white/50 font-sans">
+                        <Mail className="w-3 h-3" />
+                        {site.userEmail}
+                      </span>
+                    )}
                     <span className="text-xs text-white/40 font-sans">
                       {new Date(site.weddingDate).toLocaleDateString("tr-TR", {
                         day: "numeric",
@@ -109,6 +158,12 @@ export default function WebsiteleriPage() {
                         year: "numeric",
                       })}
                     </span>
+                    {site.totalAmount > 0 && (
+                      <span className="text-xs text-white/40 font-sans tabular-nums">
+                        {site.paidAmount.toLocaleString("tr-TR")} /{" "}
+                        {site.totalAmount.toLocaleString("tr-TR")}₺
+                      </span>
+                    )}
                     {site.customDomain && (
                       <span className="text-xs text-white/30 font-sans">
                         {site.customDomain}

@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle,
+  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle, Camera,
 } from "lucide-react";
 import Link from "next/link";
 import { useDashboardStore } from "@/store/dashboard-store";
 import { QrSticker } from "./QrSticker";
+import { UploadQrSticker } from "./UploadQrSticker";
+import { TableCardQr } from "./TableCardQr";
 
 const themeColorDefs = [
   { key: "themeGold", color: "#d5d1ad", active: true },
@@ -49,6 +51,18 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
     : customer
       ? `${customer.bride.firstName} & ${customer.groom.firstName}`
       : "...";
+
+  const brideFirst = isDemo
+    ? "Ayşe"
+    : customer?.bride?.firstName || "";
+  const groomFirst = isDemo
+    ? "Mehmet"
+    : customer?.groom?.firstName || "";
+
+  const uploadLink = inviteCode
+    ? `${siteUrl}/paylas/${inviteCode}`
+    : siteUrl;
+  const showMemoryQrs = isDemo || Boolean(inviteCode && brideFirst && groomFirst);
 
   const weddingDateStr = isDemo
     ? "15 Haziran 2026, Cumartesi"
@@ -106,7 +120,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-1">
           <Card className="rounded-2xl relative overflow-hidden py-0">
             {isDemo && (
               <Badge variant="outline" className="absolute top-4 right-4 text-amber-500 border-amber-500/40 bg-card z-10">
@@ -114,7 +128,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
               </Badge>
             )}
 
-            <CardContent className="px-6 sm:px-8 py-14 sm:py-20 flex flex-col items-center text-center gap-6">
+            <CardContent className="px-5 sm:px-6 py-10 sm:py-14 flex flex-col items-center text-center gap-5">
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
                 <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
@@ -126,7 +140,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                   {t("weAreGettingMarried")}
                 </p>
                 <h2
-                  className="text-3xl sm:text-4xl lg:text-5xl font-merienda tracking-tight"
+                  className="text-2xl sm:text-3xl font-merienda tracking-tight"
                   style={{ color: themeColorDefs[selectedTheme].color }}
                 >
                   {coupleName}
@@ -142,17 +156,17 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 </span>
               </div>
 
-              <div className="bg-muted/50 rounded-xl border p-6 max-w-md w-full">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <MapPin className="size-4" style={{ color: themeColorDefs[selectedTheme].color }} />
-                  <span className="font-medium text-sm">{t("venue")}</span>
+              <div className="bg-muted/50 rounded-xl border p-4 w-full">
+                <div className="flex items-center justify-center gap-2 mb-1.5">
+                  <MapPin className="size-3.5" style={{ color: themeColorDefs[selectedTheme].color }} />
+                  <span className="font-medium text-xs">{t("venue")}</span>
                 </div>
-                <p className="text-lg font-medium">{venue}</p>
-                {venueAddr && <p className="text-sm text-muted-foreground mt-1">{venueAddr}</p>}
-                {weddingTime && <p className="text-sm text-muted-foreground">{t("time")} {weddingTime}</p>}
+                <p className="text-sm font-medium">{venue}</p>
+                {venueAddr && <p className="text-xs text-muted-foreground mt-1">{venueAddr}</p>}
+                {weddingTime && <p className="text-xs text-muted-foreground">{t("time")} {weddingTime}</p>}
               </div>
 
-              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {t("invitationMessage")}
               </p>
 
@@ -164,6 +178,58 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             </CardContent>
           </Card>
         </div>
+
+        {showMemoryQrs && (
+          <div className="lg:col-span-1 flex flex-col gap-4 sm:gap-6">
+            <Card className="rounded-xl py-0">
+              <CardContent className="px-5 py-5 flex flex-col gap-4">
+                <div className="flex items-start gap-2">
+                  <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <Camera className="size-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm">
+                      {t("memoryQrSectionTitle")}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                      {t("memoryQrSectionHint")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col items-center gap-2">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                      {t("tableStickerLabel")}
+                    </p>
+                    <UploadQrSticker
+                      url={uploadLink}
+                      coupleName={coupleName}
+                    />
+                    <p className="text-[9px] text-muted-foreground/70 text-center leading-snug">
+                      {t("tableStickerHint")}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-2">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                      {t("tableCardLabel")}
+                    </p>
+                    <TableCardQr
+                      url={uploadLink}
+                      brideFirst={brideFirst}
+                      groomFirst={groomFirst}
+                      weddingDateStr={weddingDateStr}
+                    />
+                    <p className="text-[9px] text-muted-foreground/70 text-center leading-snug">
+                      {t("tableCardHint")}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="lg:col-span-1 flex flex-col gap-4 sm:gap-6">
           <Card className="rounded-xl py-0">
