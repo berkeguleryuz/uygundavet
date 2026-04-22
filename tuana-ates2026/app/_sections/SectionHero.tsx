@@ -24,7 +24,7 @@ function formatWeddingDate(dateStr: string): string {
 const bentoMedia = [
   { type: "image" as const, src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&q=85" },
   { type: "image" as const, src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=800&q=85" },
-  { type: "video" as const, src: "/crystal/yuzuk.mp4" },
+  { type: "video" as const, src: "/yuzuk.mp4" },
   { type: "image" as const, src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=85" },
   { type: "image" as const, src: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=800&q=85" },
   { type: "image" as const, src: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=85" },

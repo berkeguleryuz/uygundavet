@@ -69,6 +69,21 @@ const updateCustomerSchema = z.object({
     )
     .max(10)
     .optional(),
+  customDomain: z
+    .string()
+    .max(253)
+    .trim()
+    .transform((v) =>
+      v
+        .replace(/^https?:\/\//i, "")
+        .replace(/\/+$/, "")
+        .toLowerCase()
+    )
+    .refine(
+      (v) => v === "" || /^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/.test(v),
+      { message: "Geçerli bir domain girin (örn. ornek.com)" }
+    )
+    .optional(),
 });
 
 export async function GET() {

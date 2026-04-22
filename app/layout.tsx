@@ -39,6 +39,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       style={{ colorScheme: "dark" }}
       className={cn(
         "h-full",

@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Check, CreditCard, Package, Palette, Clock, Trash2,
 import { toast } from "sonner";
 import type { OrderData } from "@/models/Order";
 import Image from "next/image";
+import { QrCodesSection } from "@/app/components/admin/QrCodesSection";
 
 interface CustomerInfo {
   _id: string;
@@ -26,6 +27,7 @@ interface CustomerInfo {
     mother: { firstName: string; lastName: string };
   };
   inviteCode?: string;
+  customDomain?: string;
   eventSchedule: { time: string; label: string }[];
   storyMilestones: {
     date: string;
@@ -368,6 +370,14 @@ export default function OrderDetailPage() {
                 ))}
               </div>
             )}
+
+            <QrCodesSection
+              customDomain={customer.customDomain}
+              inviteCode={customer.inviteCode}
+              brideFirst={customer.bride?.firstName}
+              groomFirst={customer.groom?.firstName}
+              weddingDate={customer.weddingDate}
+            />
 
             {customer.storyMilestones && customer.storyMilestones.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">

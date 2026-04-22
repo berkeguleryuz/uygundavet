@@ -132,12 +132,17 @@ export function SunsetFooter() {
       <div className="bg-[#241710]">
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
+            <Link
+              href="https://uygundavet.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <Logo className="w-3.5 h-3.5 opacity-40" />
-              <p className="font-sans text-[11px] text-[#8a7565]">
+              <p className="font-sans text-[11px] text-[#8a7565] hover:text-[#c4a88a] transition-colors">
                 Uygun Davet {t("footerCreatedWith")}
               </p>
-            </div>
+            </Link>
 
             <Link
               href="https://uygundavet.com/privacy"

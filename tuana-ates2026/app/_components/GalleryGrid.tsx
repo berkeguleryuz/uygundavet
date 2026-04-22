@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -12,43 +13,27 @@ import { CloseIcon } from "../_icons/CloseIcon";
 import { UserIcon } from "../_icons/UserIcon";
 
 interface Photo {
-  _id: string;
+  id: string;
   name: string;
   url: string;
   thumbnailUrl: string;
   uploader: string;
-  createdAt: string;
 }
 
-export function GalleryGrid() {
+interface Props {
+  initialPhotos: Photo[];
+}
+
+export function GalleryGrid({ initialPhotos }: Props) {
   const wedding = useWedding();
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const photos = initialPhotos;
   const [uploaderName, setUploaderName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-
-  const fetchPhotos = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `/api/public/rsvp/${wedding.inviteCode}/gallery`
-      );
-      if (!res.ok) return;
-      const data = await res.json();
-      setPhotos(data.photos || []);
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  }, [wedding.inviteCode]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchPhotos();
-  }, [fetchPhotos]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -63,7 +48,7 @@ export function GalleryGrid() {
 
     const oversized = fileArray.filter((f) => f.size > 10 * 1024 * 1024);
     if (oversized.length > 0) {
-      toast.error(`${oversized.length} dosya 10MB s\u0131n\u0131r\u0131n\u0131 a\u015f\u0131yor.`);
+      toast.error(`${oversized.length} dosya 10MB sınırını aşıyor.`);
       return;
     }
 
@@ -94,7 +79,7 @@ export function GalleryGrid() {
 
     if (successCount > 0) {
       toast.success(`${successCount} ${t("galleryUploadSuccess")}`);
-      await fetchPhotos();
+      router.refresh();
     }
     if (failCount > 0) {
       toast.error(`${failCount} ${t("galleryUploadError")}`);
@@ -104,14 +89,6 @@ export function GalleryGrid() {
     setUploadProgress({ current: 0, total: 0 });
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#e8a87c]/30 border-t-[#e8a87c] rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">
@@ -203,7 +180,7 @@ export function GalleryGrid() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-2">
           {photos.map((photo, index) => (
             <motion.div
-              key={photo._id}
+              key={photo.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}

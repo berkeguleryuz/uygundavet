@@ -41,7 +41,7 @@ export function SectionMission() {
   return (
     <section ref={containerRef} data-theme="light" className="relative w-full pt-32 md:pt-44 pb-32 md:pb-44 px-6 bg-[#f5f6f3] flex flex-col items-center">
 
-      <div ref={textRef} className="max-w-4xl mx-auto flex flex-col text-center font-sans mb-16">
+      <div ref={textRef} className="relative max-w-4xl mx-auto flex flex-col text-center font-sans mb-16">
         <p className="text-2xl md:text-4xl lg:text-5xl font-medium tracking-[-1px] leading-snug">
           {p1.map((word, i) => {
             const start = i / (p1.length + p2.length);

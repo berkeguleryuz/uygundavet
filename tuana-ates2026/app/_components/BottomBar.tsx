@@ -22,11 +22,11 @@ export function BottomBar({ items }: Props) {
       aria-label="Mobil gezinme"
       className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-1rem)]"
     >
-      <div className="flex items-center justify-between rounded-full bg-[#1c1a1b]/90 backdrop-blur-md border border-white/10 p-1 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.7)]">
+      <div className="flex items-center justify-between rounded-full bg-[#1a0f0a]/90 backdrop-blur-md border border-[#e8a87c]/15 p-1 shadow-[0_10px_40px_-8px_rgba(26,15,10,0.7)]">
         <Link
           href="/"
           aria-label="Ana sayfa"
-          className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center hover:bg-white/5 transition-colors"
+          className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#e8a87c]/10 transition-colors"
         >
           <Image
             src="/logo-gold-transparent.png"
@@ -45,10 +45,10 @@ export function BottomBar({ items }: Props) {
               key={item.href}
               href={item.href}
               className={cn(
-                "shrink-0 rounded-xl py-1 px-2.5 flex items-center justify-center text-center text-[10px] tracking-[0.08em] uppercase font-semibold transition-colors",
+                "shrink-0 rounded-full py-1.5 px-3 flex items-center justify-center text-center text-[10px] tracking-[0.12em] uppercase transition-all",
                 active
-                  ? "bg-white text-[#1c1a1b]"
-                  : "text-white/80 hover:text-white"
+                  ? "bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white"
+                  : "text-[#c4a88a] hover:text-[#faf0e6]"
               )}
             >
               {item.label}

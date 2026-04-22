@@ -69,7 +69,7 @@ export function SunsetNav() {
           href={BASE}
           className="shrink-0 flex items-center gap-2 font-merienda text-sm text-[#e8a87c] hover:opacity-70 transition-opacity"
         >
-          <Image src="/logo-gold-transparent.png" alt="Logo" width={100} height={100} />
+          <Image src="/logo-gold-transparent.png" alt="Logo" width={100} height={100} priority />
           {brideFirst} & {groomFirst}
         </Link>
 

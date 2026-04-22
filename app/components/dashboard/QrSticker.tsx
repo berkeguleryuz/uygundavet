@@ -1,137 +1,47 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { downloadNodeAsPng } from "./downloadFromDom";
 
 interface QrStickerProps {
   url: string;
   coupleName: string;
 }
 
-async function loadFont(name: string, url: string) {
-  const font = new FontFace(name, `url(${url})`);
-  await font.load();
-  document.fonts.add(font);
-}
-
 export function QrSticker({ url, coupleName }: QrStickerProps) {
   const t = useTranslations("Dashboard");
   const stickerRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const handleDownload = useCallback(async () => {
     const el = stickerRef.current;
     if (!el) return;
-
-    await loadFont(
-      "Merienda-Canvas",
-      "https://fonts.gstatic.com/s/merienda/v19/gNMHW3x8Qoy5_mf8uVMCOou6_dvg.woff2"
-    );
-
-    const canvas = document.createElement("canvas");
-    const scale = 3;
-    const w = 300;
-    const h = 400;
-    canvas.width = w * scale;
-    canvas.height = h * scale;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.scale(scale, scale);
-
-    ctx.fillStyle = "#1c1a1b";
-    ctx.beginPath();
-    ctx.roundRect(0, 0, w, h, 20);
-    ctx.fill();
-
-    ctx.strokeStyle = "#d5d1ad";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(8, 8, w - 16, h - 16, 14);
-    ctx.stroke();
-
-    ctx.strokeStyle = "#d5d1ad30";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(16, 16, w - 32, h - 32, 10);
-    ctx.stroke();
-
-    ctx.fillStyle = "#d5d1ad";
-    ctx.font = "14px serif";
-    ctx.textAlign = "center";
-    ctx.fillText("♥", w / 2, 42);
-
-    ctx.strokeStyle = "#d5d1ad40";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(60, 38);
-    ctx.lineTo(w / 2 - 14, 38);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(w / 2 + 14, 38);
-    ctx.lineTo(w - 60, 38);
-    ctx.stroke();
-
-    ctx.fillStyle = "#d5d1ad";
-    ctx.font = "bold 26px 'Merienda-Canvas', cursive";
-    ctx.textAlign = "center";
-    ctx.fillText(t("scanMe"), w / 2, 72);
-
-    const svgEl = el.querySelector("svg");
-    if (svgEl) {
-      const svgData = new XMLSerializer().serializeToString(svgEl);
-      const img = new Image();
-      const blob = new Blob([svgData], { type: "image/svg+xml" });
-      const urlObj = URL.createObjectURL(blob);
-
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          const qrSize = 180;
-          const qrX = (w - qrSize) / 2;
-          const qrY = 90;
-
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 14);
-          ctx.fill();
-
-          ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
-          URL.revokeObjectURL(urlObj);
-          resolve();
-        };
-        img.src = urlObj;
-      });
+    setDownloading(true);
+    try {
+      const filename = `qr-sticker-${coupleName.replace(/\s+/g, "-").toLowerCase() || "uygundavet"}`;
+      await downloadNodeAsPng(el, filename, { pixelRatio: 6 });
+    } catch (err) {
+      console.error("QR sticker download failed:", err);
+      toast.error(
+        err instanceof Error && err.message
+          ? `İndirilemedi: ${err.message}`
+          : "Sticker indirilemedi"
+      );
+    } finally {
+      setDownloading(false);
     }
-
-    ctx.strokeStyle = "#d5d1ad30";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(50, 310);
-    ctx.lineTo(w - 50, 310);
-    ctx.stroke();
-
-    ctx.fillStyle = "#d5d1ad";
-    ctx.font = "18px 'Merienda-Canvas', cursive";
-    ctx.textAlign = "center";
-    ctx.fillText(coupleName, w / 2, 340);
-
-    ctx.fillStyle = "#ffffff25";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("uygundavet.com", w / 2, 375);
-
-    const link = document.createElement("a");
-    link.download = `qr-sticker-${coupleName.replace(/\s+/g, "-").toLowerCase()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  }, [coupleName, t]);
+  }, [coupleName]);
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3 w-full max-w-[200px] mx-auto">
       <div
         ref={stickerRef}
-        className="bg-[#1c1a1b] rounded-2xl border-2 border-[#d5d1ad] p-6 flex flex-col items-center gap-3 mx-auto max-w-[200px] relative"
+        className="bg-[#1c1a1b] rounded-2xl border-2 border-[#d5d1ad] p-6 flex flex-col items-center gap-3 relative"
       >
         <div className="flex items-center gap-2 w-full">
           <div className="flex-1 h-px bg-[#d5d1ad]/20" />
@@ -159,10 +69,16 @@ export function QrSticker({ url, coupleName }: QrStickerProps) {
 
       <Button
         onClick={handleDownload}
+        disabled={downloading}
         variant="outline"
-        className="w-full gap-2 rounded-xl"
+        size="sm"
+        className="w-full gap-1.5 rounded-lg h-8 text-xs mt-auto"
       >
-        <Download className="size-4" />
+        {downloading ? (
+          <Loader2 className="size-3.5 animate-spin" />
+        ) : (
+          <Download className="size-3.5" />
+        )}
         {t("downloadSticker")}
       </Button>
     </div>

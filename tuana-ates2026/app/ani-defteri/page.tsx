@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import { MemoryForm } from "../_components/MemoryForm";
+import { getMemories } from "../_lib/public-data";
 
 export const metadata: Metadata = {
-  title: "An\u0131 Defteri",
+  title: "Anı Defteri",
 };
 
-export default function AniDefteriPage() {
+export default async function AniDefteriPage() {
+  const memories = await getMemories();
+
   return (
     <div className="pt-24 pb-12 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto">
-        <MemoryForm />
+        <MemoryForm initialMemories={memories} />
       </div>
     </div>
   );
