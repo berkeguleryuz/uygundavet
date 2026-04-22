@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import type { WeddingData, FamilyInfo } from "./types";
+import { upstreamUrl } from "./upstream";
 
 interface InvitationApiResponse {
   invitation: {
@@ -26,24 +27,13 @@ interface InvitationApiResponse {
   };
 }
 
-const API_BASE = process.env.UYGUNDAVET_API_URL || "https://uygundavet.com";
-const INVITE_CODE = process.env.INVITE_CODE;
-
-if (!INVITE_CODE) {
-  throw new Error(
-    "INVITE_CODE env değişkeni tanımlı değil. .env.local dosyasını kontrol et."
-  );
-}
-
 export const getWeddingData = cache(async (): Promise<WeddingData> => {
-  const res = await fetch(`${API_BASE}/api/public/rsvp/${INVITE_CODE}`, {
+  const res = await fetch(upstreamUrl(""), {
     next: { revalidate: 300 },
   });
 
   if (!res.ok) {
-    throw new Error(
-      `Düğün verisi alınamadı (HTTP ${res.status}). İnvite kodu: ${INVITE_CODE}`
-    );
+    throw new Error(`Düğün verisi alınamadı (HTTP ${res.status}).`);
   }
 
   const data = (await res.json()) as InvitationApiResponse;

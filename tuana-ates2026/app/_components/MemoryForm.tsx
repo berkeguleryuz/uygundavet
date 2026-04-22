@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -11,47 +11,29 @@ import { SendIcon } from "../_icons/SendIcon";
 import { QuoteIcon } from "../_icons/QuoteIcon";
 
 interface Memory {
-  _id: string;
+  id: string;
   authorName: string;
   message: string;
   createdAt: string;
   pending?: boolean;
 }
 
+interface Props {
+  initialMemories: Memory[];
+}
+
 const inputClass =
   "w-full h-12 rounded-xl border border-[#e8a87c]/15 bg-[#241710] px-4 text-sm text-[#faf0e6] placeholder:text-[#8a7565] focus:border-[#e8a87c]/40 focus:outline-none transition-all font-sans";
 
-export function MemoryForm() {
+export function MemoryForm({ initialMemories }: Props) {
   const wedding = useWedding();
   const brideFirst = wedding.brideName.split(" ")[0];
   const groomFirst = wedding.groomName.split(" ")[0];
 
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [memories, setMemories] = useState<Memory[]>(initialMemories);
   const [authorName, setAuthorName] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fetchMemories = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `/api/public/rsvp/${wedding.inviteCode}/memories`
-      );
-      if (!res.ok) return;
-      const data = await res.json();
-      setMemories(
-        (data.memories || []).map((m: Memory) => ({ ...m, pending: false }))
-      );
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  }, [wedding.inviteCode]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchMemories();
-  }, [fetchMemories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +68,7 @@ export function MemoryForm() {
       }
 
       const newMemory: Memory = {
-        _id: `pending-${Date.now()}`,
+        id: `pending-${Date.now()}`,
         authorName: authorName.trim(),
         message: message.trim(),
         createdAt: new Date().toISOString(),
@@ -179,11 +161,7 @@ export function MemoryForm() {
         </div>
       </motion.div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 border-2 border-[#e8a87c]/30 border-t-[#e8a87c] rounded-full animate-spin" />
-        </div>
-      ) : memories.length > 0 ? (
+      {memories.length > 0 ? (
         <div className="space-y-0">
           <div className="flex items-center gap-3 mb-6">
             <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-[#8a7565] shrink-0">
@@ -195,7 +173,7 @@ export function MemoryForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {memories.map((memory) => (
               <MemoryCard
-                key={memory._id}
+                key={memory.id}
                 authorName={memory.authorName}
                 message={memory.message}
                 createdAt={memory.createdAt}

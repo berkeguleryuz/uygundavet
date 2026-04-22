@@ -8,25 +8,23 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle, Camera,
+  PenLine, Copy, Check, Eye, Share2, Heart, MapPin, CalendarHeart, Loader2, ExternalLink, MessageCircle, Camera, Globe, Save,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useDashboardStore } from "@/store/dashboard-store";
 import { QrSticker } from "./QrSticker";
 import { UploadQrSticker } from "./UploadQrSticker";
 import { TableCardQr } from "./TableCardQr";
 
-const themeColorDefs = [
-  { key: "themeGold", color: "#d5d1ad", active: true },
-  { key: "themeRose", color: "#e8b4b8", active: false },
-  { key: "themeSage", color: "#b8c5b4", active: false },
-];
+const accentColor = "#d5d1ad";
 
 export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
   const t = useTranslations("Dashboard");
-  const { customer, stats, isLoadingCustomer, fetchCustomer, fetchStats } = useDashboardStore();
+  const { customer, stats, isLoadingCustomer, fetchCustomer, fetchStats, updateCustomer } = useDashboardStore();
   const [copied, setCopied] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState(0);
+  const [customDomain, setCustomDomain] = useState("");
+  const [savingDomain, setSavingDomain] = useState(false);
 
   useEffect(() => {
     if (!isDemo) {
@@ -35,16 +33,39 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
     }
   }, [isDemo, customer, stats, fetchCustomer, fetchStats]);
 
+  const [lastSyncedDomain, setLastSyncedDomain] = useState<string | undefined>(undefined);
+  if (customer?.customDomain !== lastSyncedDomain) {
+    setLastSyncedDomain(customer?.customDomain);
+    setCustomDomain(customer?.customDomain || "");
+  }
+
+  const handleSaveDomain = async () => {
+    if (isDemo) return;
+    setSavingDomain(true);
+    const ok = await updateCustomer({ customDomain: customDomain.trim() } as Parameters<typeof updateCustomer>[0]);
+    setSavingDomain(false);
+    if (ok) toast.success(t("customDomainSaved"));
+    else toast.error(t("customDomainInvalid"));
+  };
+
+  const domainDirty = (customer?.customDomain || "") !== customDomain.trim();
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";
   const inviteCode = customer?.inviteCode;
+  const savedDomain = (customer?.customDomain || "").trim();
+  const customBase = savedDomain ? `https://${savedDomain}` : "";
   const shareLink = isDemo
     ? `${siteUrl}/demo`
+    : customBase
+      ? `${customBase}/lcv`
+      : inviteCode
+        ? `${siteUrl}/rsvp/${inviteCode}`
+        : siteUrl;
+  const whatsappShareLink = customBase
+    ? `${customBase}/lcv?source=whatsapp`
     : inviteCode
-      ? `${siteUrl}/rsvp/${inviteCode}`
+      ? `${siteUrl}/rsvp/${inviteCode}?source=whatsapp`
       : siteUrl;
-  const whatsappShareLink = inviteCode
-    ? `${siteUrl}/rsvp/${inviteCode}?source=whatsapp`
-    : siteUrl;
 
   const coupleName = isDemo
     ? "Ayşe & Mehmet"
@@ -59,9 +80,11 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
     ? "Mehmet"
     : customer?.groom?.firstName || "";
 
-  const uploadLink = inviteCode
-    ? `${siteUrl}/paylas/${inviteCode}`
-    : siteUrl;
+  const uploadLink = customBase
+    ? customBase
+    : inviteCode
+      ? `${siteUrl}/paylas/${inviteCode}`
+      : siteUrl;
   const showMemoryQrs = isDemo || Boolean(inviteCode && brideFirst && groomFirst);
 
   const weddingDateStr = isDemo
@@ -131,7 +154,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
             <CardContent className="px-5 sm:px-6 py-10 sm:py-14 flex flex-col items-center text-center gap-5">
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
-                <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
+                <Heart className="size-5" style={{ color: accentColor }} />
                 <div className="h-px w-12 bg-border" />
               </div>
 
@@ -141,7 +164,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                 </p>
                 <h2
                   className="text-2xl sm:text-3xl font-merienda tracking-tight"
-                  style={{ color: themeColorDefs[selectedTheme].color }}
+                  style={{ color: accentColor }}
                 >
                   {coupleName}
                 </h2>
@@ -158,7 +181,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
 
               <div className="bg-muted/50 rounded-xl border p-4 w-full">
                 <div className="flex items-center justify-center gap-2 mb-1.5">
-                  <MapPin className="size-3.5" style={{ color: themeColorDefs[selectedTheme].color }} />
+                  <MapPin className="size-3.5" style={{ color: accentColor }} />
                   <span className="font-medium text-xs">{t("venue")}</span>
                 </div>
                 <p className="text-sm font-medium">{venue}</p>
@@ -172,7 +195,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
 
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
-                <Heart className="size-5" style={{ color: themeColorDefs[selectedTheme].color }} />
+                <Heart className="size-5" style={{ color: accentColor }} />
                 <div className="h-px w-12 bg-border" />
               </div>
             </CardContent>
@@ -234,27 +257,50 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
         <div className="lg:col-span-1 flex flex-col gap-4 sm:gap-6">
           <Card className="rounded-xl py-0">
             <CardContent className="px-5 py-5 flex flex-col gap-4">
-              <h3 className="font-medium text-sm">{t("themeSelection")}</h3>
-              <div className="flex items-center gap-3">
-                {themeColorDefs.map((theme, index) => (
-                  <button
-                    key={theme.key}
-                    onClick={() => !isDemo && setSelectedTheme(index)}
-                    disabled={isDemo}
-                    className="flex flex-col items-center gap-2 group"
-                  >
-                    <div
-                      className={`size-10 rounded-full border-2 transition-all ${
-                        selectedTheme === index
-                          ? "border-foreground scale-110"
-                          : "border-transparent hover:border-muted-foreground/50"
-                      }`}
-                      style={{ backgroundColor: theme.color }}
-                    />
-                    <span className="text-xs text-muted-foreground">{t(theme.key)}</span>
-                  </button>
-                ))}
+              <div className="flex items-start gap-2">
+                <div className="size-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <Globe className="size-4 text-muted-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm">{t("customDomainTitle")}</h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                    {t("customDomainDesc")}
+                  </p>
+                </div>
               </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={customDomain}
+                  onChange={(e) => setCustomDomain(e.target.value)}
+                  placeholder={t("customDomainPlaceholder")}
+                  disabled={isDemo}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  className="text-sm bg-muted/50 border-border/50 h-9"
+                />
+                <Button
+                  className="h-9 shrink-0 gap-1.5 bg-[#d5d1ad] text-neutral-900 hover:bg-[#c6c29f] disabled:opacity-50"
+                  onClick={handleSaveDomain}
+                  disabled={isDemo || savingDomain || !domainDirty}
+                >
+                  {savingDomain ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Save className="size-4" />
+                  )}
+                  {t("customDomainSave")}
+                </Button>
+              </div>
+              {customer?.customDomain && !domainDirty && (
+                <p className="text-[10px] text-muted-foreground/80">
+                  {t("customDomainActive")}:{" "}
+                  <span className="font-mono text-foreground/80">
+                    {customer.customDomain}
+                  </span>
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -274,18 +320,18 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
                       href={`https://wa.me/?text=${encodeURIComponent(whatsappShareLink)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full h-10 rounded-xl bg-[#25D366] hover:bg-[#22c55e] text-white text-sm font-medium transition-colors"
+                      className="flex items-center justify-center gap-1.5 w-full max-w-[200px] mx-auto h-8 rounded-lg bg-[#25D366] hover:bg-[#22c55e] text-white text-xs font-medium transition-colors"
                     >
-                      <MessageCircle className="size-4" />
+                      <MessageCircle className="size-3.5" />
                       {t("shareWhatsApp")}
                     </a>
                     <QrSticker url={shareLink} coupleName={coupleName} />
                     <Link
                       href={`/rsvp/${inviteCode}`}
                       target="_blank"
-                      className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-border/50 text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors font-sans"
+                      className="flex items-center justify-center gap-1.5 w-full max-w-[200px] mx-auto h-8 rounded-lg border border-border/50 text-xs text-muted-foreground hover:text-foreground hover:border-border transition-colors font-sans"
                     >
-                      <ExternalLink className="size-3.5" />
+                      <ExternalLink className="size-3" />
                       {t("previewRsvpForm")}
                     </Link>
                   </>

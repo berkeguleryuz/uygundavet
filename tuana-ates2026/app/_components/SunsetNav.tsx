@@ -16,6 +16,7 @@ import { BottomBar } from "./BottomBar";
 import { t } from "../_lib/i18n";
 import { MenuIcon } from "../_icons/MenuIcon";
 import { CloseIcon } from "../_icons/CloseIcon";
+import { UserIcon } from "../_icons/UserIcon";
 
 interface NavItem {
   label: string;
@@ -73,8 +74,9 @@ export function SunsetNav() {
             <Image
               src="/logo-gold-transparent.png"
               alt="Logo"
-              width={28}
-              height={28}
+              width={100}
+              height={100}
+              priority
             />
             {brideFirst} & {groomFirst}
           </Link>
@@ -85,7 +87,7 @@ export function SunsetNav() {
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "px-3 py-1 rounded-full text-[11px] tracking-[0.12em] uppercase transition-all",
+                  "px-3 py-1 rounded-full font-sans text-[11px] tracking-[0.12em] uppercase transition-all",
                   isActive(item.href)
                     ? "text-[#e8a87c]"
                     : "text-[#c4a88a]/80 hover:text-[#faf0e6]"
@@ -99,9 +101,18 @@ export function SunsetNav() {
           <div className="flex items-center gap-2">
             <Link
               href="/lcv"
-              className="hidden md:inline-flex items-center rounded-full px-4 py-1 text-[10px] tracking-[0.15em] uppercase bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white hover:opacity-90 transition-opacity"
+              className="hidden md:inline-flex items-center rounded-full px-4 py-1 font-sans text-[10px] tracking-[0.15em] uppercase bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white hover:opacity-90 transition-opacity"
             >
               {t("navRsvp")}
+            </Link>
+
+            <Link
+              href="https://uygundavet.com/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.06] text-[#c4a88a] hover:text-[#faf0e6] transition-colors"
+            >
+              <UserIcon className="size-3.5" size={14} />
             </Link>
 
             <button
@@ -129,7 +140,7 @@ export function SunsetNav() {
                     href={item.href}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      "flex items-center px-4 py-2.5 rounded-xl text-sm transition-all",
+                      "flex items-center px-4 py-2.5 rounded-xl font-sans text-sm transition-all",
                       isActive(item.href)
                         ? "bg-[#e8a87c]/10 text-[#e8a87c]"
                         : "text-[#c4a88a] hover:bg-white/5 hover:text-[#faf0e6]"
@@ -142,7 +153,7 @@ export function SunsetNav() {
                 <Link
                   href="/lcv"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center mx-4 py-2.5 rounded-full bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white text-xs tracking-[0.15em] uppercase"
+                  className="flex items-center justify-center mx-4 py-2.5 rounded-full bg-gradient-to-r from-[#d4735e] to-[#e8a87c] text-white font-sans text-xs tracking-[0.15em] uppercase"
                 >
                   {t("navRsvp")}
                 </Link>

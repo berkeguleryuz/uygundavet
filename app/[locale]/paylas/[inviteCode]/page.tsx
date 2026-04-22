@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -32,29 +32,37 @@ interface PaylasData {
   memoryUrl: string;
 }
 
-async function loadPaylasData(inviteCode: string): Promise<PaylasData | null> {
+async function loadPaylasData(inviteCode: string): Promise<
+  { type: "redirect"; target: string } | { type: "data"; data: PaylasData } | null
+> {
   await connectDB();
   const customer = await Customer.findOne({ inviteCode }).lean();
   if (!customer) return null;
 
+  const customDomain = (customer.customDomain || "")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/+$/, "");
+
+  if (customDomain) {
+    return { type: "redirect", target: `https://${customDomain}` };
+  }
+
   const order = await Order.findOne({ userId: customer.userId }).lean();
   const pkg = (order?.selectedPackage || "starter") as SelectedPackage;
   const theme = order?.selectedTheme || "sunset";
-  const customDomain = (customer.customDomain || "").trim().replace(/\/+$/, "");
-
-  const base = customDomain
-    ? /^https?:\/\//.test(customDomain)
-      ? customDomain
-      : `https://${customDomain}`
-    : `/${theme}`;
+  const base = `/${theme}`;
 
   return {
-    brideFirst: customer.bride.firstName || "",
-    groomFirst: customer.groom.firstName || "",
-    hasGallery: canAccess("gallery", pkg),
-    hasMemoryBook: canAccess("memoryBook", pkg),
-    galleryUrl: `${base}/galeri`,
-    memoryUrl: `${base}/ani-defteri`,
+    type: "data",
+    data: {
+      brideFirst: customer.bride.firstName || "",
+      groomFirst: customer.groom.firstName || "",
+      hasGallery: canAccess("gallery", pkg),
+      hasMemoryBook: canAccess("memoryBook", pkg),
+      galleryUrl: `${base}/galeri`,
+      memoryUrl: `${base}/ani-defteri`,
+    },
   };
 }
 
@@ -65,9 +73,11 @@ export default async function PaylasPage({
 }) {
   const { inviteCode, locale } = await params;
   const t = await getTranslations({ locale, namespace: "Paylas" });
-  const data = await loadPaylasData(inviteCode);
-  if (!data) notFound();
+  const result = await loadPaylasData(inviteCode);
+  if (!result) notFound();
+  if (result.type === "redirect") redirect(result.target);
 
+  const data = result.data;
   const coupleName = `${data.brideFirst} & ${data.groomFirst}`;
 
   return (

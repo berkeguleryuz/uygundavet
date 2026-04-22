@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { QrCodesSection } from "@/app/components/admin/QrCodesSection";
 
 interface PersonName {
   firstName: string;
@@ -558,6 +559,14 @@ export default function WebsiteDetailPage() {
               </button>
             </div>
           </div>
+
+          <QrCodesSection
+            customDomain={customer.customDomain}
+            inviteCode={customer.inviteCode}
+            brideFirst={customer.bride?.firstName}
+            groomFirst={customer.groom?.firstName}
+            weddingDate={customer.weddingDate}
+          />
 
           <a
             href="/grow"
