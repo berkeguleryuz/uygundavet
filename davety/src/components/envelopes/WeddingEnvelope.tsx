@@ -19,6 +19,21 @@ export type WeddingEnvelopeStage =
   | "opening"
   | "out";
 
+export interface StampConfig {
+  /** Background color (or leave blank for transparent dashed style). */
+  color?: string;
+  /** Text color for label. */
+  textColor?: string;
+  /** Short label shown inside stamp (e.g. "H&İ", "2026"). */
+  label?: string;
+  /** Optional image URL — renders inside stamp if provided (overrides label). */
+  image?: string;
+  /** Border style — default "dashed" looks like classic postage. */
+  borderStyle?: "dashed" | "solid" | "perforated";
+  /** Relative size as percent of envelope width (0–1). Default 0.18. */
+  size?: number;
+}
+
 export interface WeddingEnvelopeProps {
   guestName?: string;
   /** Base envelope width; scales responsively via container. */
@@ -32,6 +47,18 @@ export interface WeddingEnvelopeProps {
   /** Card theme + content props. */
   cardProps?: InvitationCardProps;
   cardRender?: (props: { width: number; height: number }) => ReactNode;
+  /**
+   * Back pocket visual style:
+   *   "flat"   → single uniform color with faint crease lines
+   *   "shaded" → 4 visible triangles with subtle shading (top=bottom, left=right)
+   */
+  backStyle?: "flat" | "shaded";
+  /**
+   * Stamp shown on top-right of the front face.
+   *   - `undefined` / `null` / `false` → no stamp
+   *   - object                           → render customised stamp
+   */
+  stamp?: StampConfig | null | false;
   /** Decoration slots — per-variant visual customisation. */
   frontExtra?: ReactNode;
   backExtra?: ReactNode;
@@ -55,6 +82,8 @@ export function WeddingEnvelope({
   liningBg = "#1f1c17",
   cardProps,
   cardRender,
+  backStyle = "flat",
+  stamp,
   frontExtra,
   backExtra,
   flapSeal,
@@ -173,6 +202,7 @@ export function WeddingEnvelope({
             onOpen={handleStart}
             extra={frontExtra}
             border={frontBorder}
+            stamp={stamp ?? null}
           />
           <EnvelopeBack
             width={envelopeWidth}
@@ -184,6 +214,7 @@ export function WeddingEnvelope({
             liningBg={liningBg}
             extra={backExtra}
             flapSeal={flapSeal}
+            backStyle={backStyle}
           />
         </div>
       </div>
@@ -213,6 +244,7 @@ function EnvelopeFront({
   onOpen,
   extra,
   border,
+  stamp,
 }: {
   width: number;
   height: number;
@@ -221,7 +253,9 @@ function EnvelopeFront({
   onOpen: () => void;
   extra?: ReactNode;
   border?: ReactNode;
+  stamp: StampConfig | null | false;
 }) {
+  const textColor = isLight(bg) ? "#2a2420" : "#f3ecdc";
   return (
     <div
       className="absolute inset-0 overflow-hidden cursor-pointer"
@@ -240,18 +274,10 @@ function EnvelopeFront({
       {/* Optional border overlay (air-mail stripes etc.) */}
       {border}
 
-      {/* Stamp area top-right (dashed square) */}
-      <div
-        className="absolute"
-        style={{
-          top: "10%",
-          right: "8%",
-          width: Math.round(width * 0.15),
-          height: Math.round(width * 0.15),
-          border: "2px dashed rgba(60, 120, 160, 0.55)",
-          borderRadius: 3,
-        }}
-      />
+      {/* Stamp (optional, customisable) */}
+      {stamp ? (
+        <Stamp config={stamp} envelopeWidth={width} envelopeBg={bg} />
+      ) : null}
 
       {/* Content bottom-left */}
       <div
@@ -259,7 +285,7 @@ function EnvelopeFront({
         style={{
           bottom: "12%",
           left: "8%",
-          color: "#2a2420",
+          color: textColor,
           fontFamily: "Merienda, serif",
           maxWidth: "70%",
         }}
@@ -273,8 +299,8 @@ function EnvelopeFront({
         <div
           className="inline-block px-3 py-1.5 text-sm italic rounded border-2"
           style={{
-            borderColor: "#2a2420",
-            color: "#2a2420",
+            borderColor: textColor,
+            color: textColor,
           }}
         >
           Davetiyeyi Görüntüle
@@ -300,6 +326,7 @@ function EnvelopeBack({
   liningBg,
   extra,
   flapSeal,
+  backStyle,
 }: {
   width: number;
   height: number;
@@ -310,7 +337,15 @@ function EnvelopeBack({
   liningBg: string;
   extra?: ReactNode;
   flapSeal?: ReactNode;
+  backStyle: "flat" | "shaded";
 }) {
+  // Shaded mode: 4 V-seam triangles using harmonious shades of bg.
+  // Top and bottom share the same shade (user requirement); left and right share another.
+  const shadedTop = darken(bg, 0.05);
+  const shadedBottom = darken(bg, 0.05); // same as top
+  const shadedLeft = darken(bg, 0.02);
+  const shadedRight = darken(bg, 0.02); // same as left
+  const shadedFlap = darken(bg, 0.05); // matches top/bottom for consistency
   return (
     <div
       className="absolute inset-0 overflow-hidden"
@@ -326,26 +361,58 @@ function EnvelopeBack({
           "0 10px 30px -8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.05)",
       }}
     >
-      {/* Back body — uniform envelope color */}
-      <div
-        className="absolute inset-0"
-        style={{ background: bg, zIndex: 1 }}
-      />
-      {/* V-seam crease lines — very subtle, only show the paper fold structure */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
-        style={{ zIndex: 1 }}
-      >
-        <path
-          d="M 0 0 L 50 50 M 100 0 L 50 50 M 0 100 L 50 50 M 100 100 L 50 50"
-          stroke="rgba(0,0,0,0.08)"
-          strokeWidth="0.15"
-          fill="none"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
+      {backStyle === "flat" ? (
+        <>
+          {/* Back body — uniform envelope color */}
+          <div
+            className="absolute inset-0"
+            style={{ background: bg, zIndex: 1 }}
+          />
+          {/* V-seam crease lines — very subtle paper fold hint */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 100"
+            style={{ zIndex: 1 }}
+          >
+            <path
+              d="M 0 0 L 50 50 M 100 0 L 50 50 M 0 100 L 50 50 M 100 100 L 50 50"
+              stroke="rgba(0,0,0,0.08)"
+              strokeWidth="0.15"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </>
+      ) : (
+        <>
+          {/* Shaded mode — 4 visible triangles, all from same color family */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: shadedLeft,
+              clipPath: "polygon(0 0, 50% 50%, 0 100%)",
+              zIndex: 1,
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: shadedRight,
+              clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
+              zIndex: 1,
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: shadedBottom,
+              clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
+              zIndex: 1,
+            }}
+          />
+        </>
+      )}
 
       {/* Extra decorations behind flap */}
       {extra}
@@ -362,11 +429,11 @@ function EnvelopeBack({
         <LiningPattern kind={liningPattern} />
       </div>
 
-      {/* Top flap — cream outer face, collapses on open */}
+      {/* Top flap — collapses on open */}
       <div
         className="absolute inset-0"
         style={{
-          background: flapColor,
+          background: backStyle === "shaded" ? shadedFlap : flapColor,
           clipPath: flapOpen
             ? "polygon(0 0, 100% 0, 50% 0)"
             : "polygon(0 0, 100% 0, 50% 50%)",
@@ -495,6 +562,87 @@ function LiningPattern({
 }
 
 /* =====================================================================
+ * Stamp — customisable postage stamp on the front face
+ * ===================================================================== */
+function Stamp({
+  config,
+  envelopeWidth,
+  envelopeBg,
+}: {
+  config: StampConfig;
+  envelopeWidth: number;
+  envelopeBg: string;
+}) {
+  const sizeRatio = config.size ?? 0.18;
+  const size = Math.round(envelopeWidth * sizeRatio);
+  const height = Math.round(size * 1.2); // classic portrait stamp
+  const borderStyle = config.borderStyle ?? "dashed";
+
+  const isBgLight = isLight(envelopeBg);
+  const defaultOutline = isBgLight
+    ? "rgba(40, 40, 50, 0.45)"
+    : "rgba(220, 220, 230, 0.55)";
+  const outline = config.color ?? defaultOutline;
+  const fill = config.color ?? "transparent";
+  const text =
+    config.textColor ??
+    (config.color
+      ? isLight(config.color)
+        ? "#2a2420"
+        : "#f8f3e6"
+      : isBgLight
+      ? "#2a2420"
+      : "#f3ecdc");
+
+  const isPerforated = borderStyle === "perforated";
+
+  return (
+    <div
+      className="absolute flex items-center justify-center overflow-hidden pointer-events-none"
+      style={{
+        top: "10%",
+        right: "8%",
+        width: size,
+        height,
+        background: fill,
+        border: isPerforated ? "none" : `2px ${borderStyle} ${outline}`,
+        borderRadius: isPerforated ? 0 : 3,
+        boxShadow: config.color
+          ? "0 2px 4px rgba(0,0,0,0.15)"
+          : "none",
+        // Perforated edge effect via radial mask
+        WebkitMask: isPerforated
+          ? "radial-gradient(circle at 0 50%, transparent 2px, #000 2.5px) 0 50%/8px 8px repeat-y, radial-gradient(circle at 100% 50%, transparent 2px, #000 2.5px) 100% 50%/8px 8px repeat-y, radial-gradient(circle at 50% 0, transparent 2px, #000 2.5px) 50% 0/8px 8px repeat-x, radial-gradient(circle at 50% 100%, transparent 2px, #000 2.5px) 50% 100%/8px 8px repeat-x, linear-gradient(#000, #000)"
+          : undefined,
+        WebkitMaskComposite: isPerforated ? "source-in" : undefined,
+      }}
+    >
+      {config.image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={config.image}
+          alt=""
+          className="w-full h-full object-cover"
+          draggable={false}
+        />
+      ) : config.label ? (
+        <span
+          className="font-medium text-center leading-tight"
+          style={{
+            color: text,
+            fontFamily: "Merienda, serif",
+            fontSize: Math.round(size * 0.32),
+            padding: 4,
+          }}
+        >
+          {config.label}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/* =====================================================================
  * Seal primitives — used by variants to decorate the back flap
  * ===================================================================== */
 
@@ -564,6 +712,30 @@ export function PillSeal({
       {letter}
     </div>
   );
+}
+
+function isLight(hex: string): boolean {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return true;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  // Perceived luminance (rec. 601)
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.55;
+}
+
+function darken(hex: string, amount: number): string {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  const f = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v * (1 - amount))))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${f(r)}${f(g)}${f(b)}`;
 }
 
 export function MonogramSeal({

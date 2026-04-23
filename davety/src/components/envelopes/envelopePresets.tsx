@@ -193,9 +193,9 @@ function KraftTexture() {
   );
 }
 
-/* ─── 16 presets ────────────────────────────────────────────────────── */
+/* ─── 16 base presets (flat) — katlı variants derived below ─────────── */
 
-export const ENVELOPE_PRESETS: EnvelopePreset[] = [
+const BASE_PRESETS: EnvelopePreset[] = [
   // ── Original 11 ─────────────────────────────────────────────────────
   {
     id: "classic-v",
@@ -446,4 +446,18 @@ export const ENVELOPE_PRESETS: EnvelopePreset[] = [
       },
     },
   },
+];
+
+/**
+ * 32 total presets = 16 flat + 16 shaded ("Katlı") derivatives.
+ * Katlı versions share visuals + decorations with their flat counterparts,
+ * differing only in backStyle which renders the 4 V-seam triangles visibly.
+ */
+export const ENVELOPE_PRESETS: EnvelopePreset[] = [
+  ...BASE_PRESETS,
+  ...BASE_PRESETS.map<EnvelopePreset>((p) => ({
+    id: `${p.id}-katli`,
+    name: `${p.name} (Katlı)`,
+    props: { ...p.props, backStyle: "shaded" },
+  })),
 ];
