@@ -95,11 +95,10 @@ export function WeddingEnvelope({
 
   const envelopeHeight = Math.round(envelopeWidth * 0.62);
   const sceneWidth = Math.max(cardWidth, envelopeWidth);
-  // Scene exactly fits card. Envelope sits lower so card has room to emerge
-  // above it AND the lifted flap has room above envelope.
+  // Scene exactly fits card. Envelope pinned to scene bottom so card can
+  // never poke out below piece 1 (bottom triangle acts as the visual floor).
   const sceneHeight = cardHeight;
-  // Envelope positioned toward bottom so card visible portion reaches upward.
-  const envelopeTop = Math.round(sceneHeight - envelopeHeight - sceneHeight * 0.06);
+  const envelopeTop = sceneHeight - envelopeHeight;
 
   const handleOpen = () => {
     if (stage !== "closed") return;
@@ -161,7 +160,7 @@ export function WeddingEnvelope({
           transition: flipped
             ? "transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.9s"
             : "transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
-          zIndex: 75,
+          zIndex: 200,
         }}
       >
         {/* Paper outer face (pointing up) */}
@@ -199,28 +198,6 @@ export function WeddingEnvelope({
               "linear-gradient(to bottom, rgba(0,0,0,0.15), transparent)",
           }}
         />
-      </div>
-
-      {/* ─── CARD (z=50) — inside envelope initially, slides up to emerge ─── */}
-      <div
-        className="absolute left-1/2"
-        style={{
-          top: 0,
-          width: cardWidth,
-          height: cardHeight,
-          transform: `translateX(-50%) translateY(${
-            cardEmerging ? cardTranslateEnd : cardTranslateStart
-          }px)`,
-          transition: cardEmerging
-            ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1)"
-            : "none",
-          zIndex: 50,
-          pointerEvents: stage === "done" ? "auto" : "none",
-        }}
-      >
-        {cardRender
-          ? cardRender({ width: cardWidth, height: cardHeight })
-          : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
       </div>
 
       {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates ─── */}
@@ -286,7 +263,7 @@ export function WeddingEnvelope({
 
         {/* ══ BACK SCENE (rotateY 180) — V-pocket envelope ══ */}
         <div
-          className="absolute inset-0 overflow-hidden"
+          className="absolute inset-0"
           style={{
             transform: "rotateY(180deg)",
             backfaceVisibility: "hidden",
@@ -303,7 +280,7 @@ export function WeddingEnvelope({
 
           {/* Lining base — stays visible in top triangle area (instead of flap disappearing) */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 overflow-hidden"
             style={{
               clipPath: "polygon(50% 50%, 100% 0, 0 0)",
               background: liningBg,
@@ -312,6 +289,31 @@ export function WeddingEnvelope({
             }}
           >
             <LiningPattern kind={liningPattern} />
+          </div>
+
+          {/* ─── CARD (z=50) — INSIDE back scene, between lining (z=1) and
+                   triangles (z=99). Emerges from the V-pocket opening. Hidden
+                   until flip completes via opacity gate. ─── */}
+          <div
+            className="absolute left-1/2"
+            style={{
+              top: -envelopeTop,
+              width: cardWidth,
+              height: cardHeight,
+              transform: `translateX(-50%) translateY(${
+                cardEmerging ? cardTranslateEnd : cardTranslateStart
+              }px)`,
+              opacity: cardEmerging ? 1 : 0,
+              transition: cardEmerging
+                ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out"
+                : "opacity 0.1s",
+              zIndex: 50,
+              pointerEvents: stage === "done" ? "auto" : "none",
+            }}
+          >
+            {cardRender
+              ? cardRender({ width: cardWidth, height: cardHeight })
+              : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
           </div>
 
           {/* Flap seal — sits on top triangle, subtle */}
