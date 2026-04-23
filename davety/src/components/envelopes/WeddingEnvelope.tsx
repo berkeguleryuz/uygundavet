@@ -94,11 +94,16 @@ export function WeddingEnvelope({
   const [stage, setStage] = useState<WeddingEnvelopeStage>("closed");
 
   const envelopeHeight = Math.round(envelopeWidth * 0.62);
-  const sceneWidth = Math.max(cardWidth, envelopeWidth);
-  // Scene exactly fits card. Envelope pinned to scene bottom so card can
-  // never poke out below piece 1 (bottom triangle acts as the visual floor).
-  const sceneHeight = cardHeight;
-  const envelopeTop = sceneHeight - envelopeHeight;
+  // Inner scene exactly contains card + envelope (envelope pinned to inner
+  // bottom so card can never poke out below piece 1). Outer wrapper adds top
+  // and bottom breathing room without exposing the card under the envelope.
+  const sceneTopPad = 48;
+  const sceneBottomPad = 80;
+  const sceneSidePad = 32;
+  const sceneWidth = Math.max(cardWidth, envelopeWidth) + sceneSidePad * 2;
+  const innerSceneHeight = cardHeight + sceneTopPad;
+  const sceneHeight = innerSceneHeight + sceneBottomPad;
+  const envelopeTop = innerSceneHeight - envelopeHeight;
 
   const handleOpen = () => {
     if (stage !== "closed") return;
@@ -129,9 +134,10 @@ export function WeddingEnvelope({
 
   // Card starts INSIDE envelope (translateY = envelopeTop so card's top aligns
   // with envelope's top, meaning card is "tucked in" envelope). As it animates
-  // to translateY=0, card slides up and emerges from envelope.
+  // to translateY=sceneTopPad, card slides up and emerges, resting with its
+  // top at the scene's top-padding line (not flush with scene edge).
   const cardTranslateStart = envelopeTop;
-  const cardTranslateEnd = 0;
+  const cardTranslateEnd = sceneTopPad;
 
   // Lifted flap sits ABOVE envelope when open, showing lining inside.
   const flapLiftHeight = Math.round(envelopeHeight * 0.55);
@@ -143,8 +149,14 @@ export function WeddingEnvelope({
         width: "100%",
         maxWidth: sceneWidth,
         height: sceneHeight,
+      }}
+    >
+    <div
+      className="relative"
+      style={{
+        width: "100%",
+        height: innerSceneHeight,
         perspective: "1800px",
-        overflow: "hidden",
       }}
     >
       {/* ─── LIFTED FLAP (z=75) — the "5th piece": opened flap ABOVE envelope,
@@ -291,29 +303,39 @@ export function WeddingEnvelope({
             <LiningPattern kind={liningPattern} />
           </div>
 
-          {/* ─── CARD (z=50) — INSIDE back scene, between lining (z=1) and
-                   triangles (z=99). Emerges from the V-pocket opening. Hidden
-                   until flip completes via opacity gate. ─── */}
+          {/* ─── CARD WRAPPER (z=50) — clips card at envelope bottom so the
+                   card never peeks below piece 1, while the envelope itself is
+                   free to extend during 3D rotation. ─── */}
           <div
-            className="absolute left-1/2"
+            className="absolute left-1/2 overflow-hidden"
             style={{
               top: -envelopeTop,
               width: cardWidth,
-              height: cardHeight,
-              transform: `translateX(-50%) translateY(${
-                cardEmerging ? cardTranslateEnd : cardTranslateStart
-              }px)`,
-              opacity: cardEmerging ? 1 : 0,
-              transition: cardEmerging
-                ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out"
-                : "opacity 0.1s",
+              height: innerSceneHeight,
+              transform: "translateX(-50%)",
               zIndex: 50,
-              pointerEvents: stage === "done" ? "auto" : "none",
+              pointerEvents: "none",
             }}
           >
-            {cardRender
-              ? cardRender({ width: cardWidth, height: cardHeight })
-              : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
+            <div
+              className="absolute left-0 right-0"
+              style={{
+                top: 0,
+                height: cardHeight,
+                transform: `translateY(${
+                  cardEmerging ? cardTranslateEnd : cardTranslateStart
+                }px)`,
+                opacity: cardEmerging ? 1 : 0,
+                transition: cardEmerging
+                  ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out"
+                  : "opacity 0.1s",
+                pointerEvents: stage === "done" ? "auto" : "none",
+              }}
+            >
+              {cardRender
+                ? cardRender({ width: cardWidth, height: cardHeight })
+                : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
+            </div>
           </div>
 
           {/* Flap seal — sits on top triangle, subtle */}
@@ -394,6 +416,7 @@ export function WeddingEnvelope({
           Tekrar Oynat
         </button>
       ) : null}
+    </div>
     </div>
   );
 }
