@@ -1,42 +1,58 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { InvitationCard, type InvitationCardProps } from "./InvitationCard";
 
 /**
- * Wedding invitation envelope with davetli.com-style reveal flow.
+ * Wedding envelope reveal with proper 3D flip + card emerge.
  *
- *   front → flipping (rotateY 180°) → back → opening (flap lifts) → out (card appears)
+ * Scene layout (card slides up from below scene through envelope):
+ *   ┌─────────────────────┐ scene top (y=0)
+ *   │   Card top (names)  │ ← visible ABOVE envelope (final state)
+ *   ├─────────────────────┤
+ *   │  Envelope (V-pocket)│ ← flip container, covers middle of card
+ *   ├─────────────────────┤
+ *   │  Card bottom        │ ← visible BELOW envelope (final state)
+ *   └─────────────────────┘ scene bottom
  *
- * Mobile-first: the card REPLACES the envelope at the same position.
- * On ≥md screens the card can sit to the left of the envelope (side-by-side).
+ * Z-stack:
+ *   • Card                      z = 50   (behind envelope, visible outside envelope bounds)
+ *   • Flip container             z = 100  (envelope, isolates stacking)
+ *     ├─ Front face (rotateY 0)           guest name + button + stamp
+ *     └─ Back scene (rotateY 180)         V-pocket envelope
+ *         ├─ body bg               z=0
+ *         ├─ top flap              z=1   (closed V → open V with lining)
+ *         └─ pocket triangles      z=99  (always in front, form V-pocket)
+ *
+ * Flow:
+ *   1. closed:    front face visible, card BELOW scene (clipped by overflow)
+ *   2. flipping:  flip container rotates Y 180°. Front face fades (backface hidden).
+ *                 Back scene is inside same container at rotateY(180) — becomes visible
+ *                 ONLY AFTER 90° of rotation (backface hidden prevents early show).
+ *   3. emerging:  after flip completes, card translates UP from below scene to natural
+ *                 position. Card passes through envelope area (hidden inside envelope
+ *                 bounds because flip container z=100 covers it). Card visible above
+ *                 and below envelope.
+ *   4. done:      card at natural position (top at scene top, bottom at scene bottom).
  */
 
 export type WeddingEnvelopeStage =
-  | "front"
+  | "closed"
   | "flipping"
-  | "back"
-  | "opening"
-  | "out";
+  | "emerging"
+  | "done";
 
 export interface StampConfig {
-  /** Background color (or leave blank for transparent dashed style). */
   color?: string;
-  /** Text color for label. */
   textColor?: string;
-  /** Short label shown inside stamp (e.g. "H&İ", "2026"). */
   label?: string;
-  /** Optional image URL — renders inside stamp if provided (overrides label). */
   image?: string;
-  /** Border style — default "dashed" looks like classic postage. */
   borderStyle?: "dashed" | "solid" | "perforated";
-  /** Relative size as percent of envelope width (0–1). Default 0.18. */
   size?: number;
 }
 
 export interface WeddingEnvelopeProps {
   guestName?: string;
-  /** Base envelope width; scales responsively via container. */
   envelopeWidth?: number;
   cardWidth?: number;
   cardHeight?: number;
@@ -44,38 +60,23 @@ export interface WeddingEnvelopeProps {
   flapColor?: string;
   liningPattern?: "daisy" | "rose" | "gold" | "none" | "chevron";
   liningBg?: string;
-  /** Card theme + content props. */
   cardProps?: InvitationCardProps;
   cardRender?: (props: { width: number; height: number }) => ReactNode;
-  /**
-   * Back pocket visual style:
-   *   "flat"   → single uniform color with faint crease lines
-   *   "shaded" → 4 visible triangles with subtle shading (top=bottom, left=right)
-   */
   backStyle?: "flat" | "shaded";
-  /**
-   * Stamp shown on top-right of the front face.
-   *   - `undefined` / `null` / `false` → no stamp
-   *   - object                           → render customised stamp
-   */
   stamp?: StampConfig | null | false;
-  /** Decoration slots — per-variant visual customisation. */
   frontExtra?: ReactNode;
   backExtra?: ReactNode;
-  /** Seal/medallion on the back flap's outside (fades when flap opens). */
   flapSeal?: ReactNode;
-  /** Overlay border (air-mail stripes etc.) drawn on top of front face. */
   frontBorder?: ReactNode;
-  /** Layout mode: "replace" = card takes envelope's spot; "side-by-side" = card left of envelope on ≥md. */
   layout?: "replace" | "side-by-side";
   className?: string;
 }
 
 export function WeddingEnvelope({
   guestName = "Misafir Adı",
-  envelopeWidth = 440,
-  cardWidth = 360,
-  cardHeight = 680,
+  envelopeWidth = 420,
+  cardWidth = 340,
+  cardHeight = 640,
   envelopeColor = "#f5f1e8",
   flapColor,
   liningPattern = "daisy",
@@ -88,82 +89,133 @@ export function WeddingEnvelope({
   backExtra,
   flapSeal,
   frontBorder,
-  layout = "replace",
   className,
 }: WeddingEnvelopeProps) {
-  const [stage, setStage] = useState<WeddingEnvelopeStage>("front");
-  const [isWide, setIsWide] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const [stage, setStage] = useState<WeddingEnvelopeStage>("closed");
 
   const envelopeHeight = Math.round(envelopeWidth * 0.62);
+  const sceneWidth = Math.max(cardWidth, envelopeWidth);
+  // Scene exactly fits card. Envelope sits lower so card has room to emerge
+  // above it AND the lifted flap has room above envelope.
+  const sceneHeight = cardHeight;
+  // Envelope positioned toward bottom so card visible portion reaches upward.
+  const envelopeTop = Math.round(sceneHeight - envelopeHeight - sceneHeight * 0.06);
 
-  // Observe container width — switch to side-by-side on wide enough containers
-  useEffect(() => {
-    if (layout !== "side-by-side" || !wrapRef.current) return;
-    const threshold = cardWidth + envelopeWidth + 60;
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) {
-        setIsWide(e.contentRect.width >= threshold);
-      }
-    });
-    ro.observe(wrapRef.current);
-    return () => ro.disconnect();
-  }, [layout, cardWidth, envelopeWidth]);
-
-  const handleStart = () => {
-    if (stage !== "front") return;
-    setStage("flipping");
-    setTimeout(() => setStage("back"), 1000);
-    setTimeout(() => setStage("opening"), 1200);
-    setTimeout(() => setStage("out"), 1800);
+  const handleOpen = () => {
+    if (stage !== "closed") return;
+    setStage("flipping");                         // Y-flip starts
+    setTimeout(() => setStage("emerging"), 1100);  // after flip completes, card emerges
+    setTimeout(() => setStage("done"), 3200);      // card translated up
   };
-  const handleReset = () => setStage("front");
+  const handleReset = () => setStage("closed");
 
-  const flipped = stage !== "front";
-  const flapOpen = stage === "opening" || stage === "out";
-  const cardOut = stage === "out";
+  const flipped = stage !== "closed";
+  const cardEmerging =
+    stage === "emerging" || stage === "done";
 
-  // Scene dimensions
-  const sideBySide = layout === "side-by-side" && isWide;
-  const gap = 28;
-  const sceneWidth = sideBySide ? cardWidth + gap + envelopeWidth : Math.max(cardWidth, envelopeWidth);
-  const sceneHeight = sideBySide ? Math.max(cardHeight, envelopeHeight) : cardOut ? cardHeight : envelopeHeight;
+  const actualFlapColor = flapColor ?? envelopeColor;
 
-  // Envelope position within scene
-  const envLeft = sideBySide ? cardWidth + gap : (sceneWidth - envelopeWidth) / 2;
-  const envTop = sideBySide ? (sceneHeight - envelopeHeight) / 2 : 0;
+  // Shaded variant colors
+  const shadedTop = darken(envelopeColor, 0.05);
+  const shadedBottom = darken(envelopeColor, 0.05);
+  const shadedLeft = darken(envelopeColor, 0.02);
+  const shadedRight = darken(envelopeColor, 0.02);
 
-  // Card position within scene
-  const cardLeftFinal = sideBySide ? 0 : (sceneWidth - cardWidth) / 2;
-  const cardLeftStart = envLeft + (envelopeWidth - cardWidth) / 2; // "behind" envelope
-  const cardTopFinal = 0;
-  const cardTopStart = envTop + (envelopeHeight - cardHeight) / 2;
+  const leftTriColor = backStyle === "shaded" ? shadedLeft : envelopeColor;
+  const rightTriColor = backStyle === "shaded" ? shadedRight : envelopeColor;
+  const bottomTriColor = backStyle === "shaded" ? shadedBottom : envelopeColor;
+  const topFlapColor = backStyle === "shaded" ? shadedTop : actualFlapColor;
+
+  const textColor = isLight(envelopeColor) ? "#2a2420" : "#f3ecdc";
+
+  // Card starts INSIDE envelope (translateY = envelopeTop so card's top aligns
+  // with envelope's top, meaning card is "tucked in" envelope). As it animates
+  // to translateY=0, card slides up and emerges from envelope.
+  const cardTranslateStart = envelopeTop;
+  const cardTranslateEnd = 0;
+
+  // Lifted flap sits ABOVE envelope when open, showing lining inside.
+  const flapLiftHeight = Math.round(envelopeHeight * 0.55);
 
   return (
     <div
-      ref={wrapRef}
       className={`relative mx-auto ${className ?? ""}`}
       style={{
         width: "100%",
         maxWidth: sceneWidth,
         height: sceneHeight,
-        transition: "height 0.7s cubic-bezier(0.7, 0, 0.2, 1)",
+        perspective: "1800px",
+        overflow: "hidden",
       }}
     >
-      {/* Card — positioned absolutely, fades in + moves to final spot */}
+      {/* ─── LIFTED FLAP (z=75) — the "5th piece": opened flap ABOVE envelope,
+               showing lining pattern inside. Appears only after flip completes. ─── */}
       <div
-        className="absolute"
+        className="absolute left-1/2 pointer-events-none"
         style={{
+          top: envelopeTop - flapLiftHeight,
+          width: envelopeWidth,
+          height: flapLiftHeight,
+          transform: `translateX(-50%) scaleY(${flipped ? 1 : 0})`,
+          transformOrigin: "bottom center",
+          transition: flipped
+            ? "transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.9s"
+            : "transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
+          zIndex: 75,
+        }}
+      >
+        {/* Paper outer face (pointing up) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+            background: envelopeColor,
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+            boxShadow: "0 -6px 14px -4px rgba(0,0,0,0.22)",
+          }}
+        />
+        {/* Inner lining (floral pattern), inset slightly for paper-border effect */}
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            top: "6%",
+            left: "4%",
+            right: "4%",
+            bottom: "8%",
+            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+            background: liningBg,
+          }}
+        >
+          <LiningPattern kind={liningPattern} />
+        </div>
+        {/* Fold edge highlight where flap meets envelope top */}
+        <div
+          className="absolute left-0 right-0"
+          style={{
+            bottom: 0,
+            height: 2,
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.15), transparent)",
+          }}
+        />
+      </div>
+
+      {/* ─── CARD (z=50) — inside envelope initially, slides up to emerge ─── */}
+      <div
+        className="absolute left-1/2"
+        style={{
+          top: 0,
           width: cardWidth,
           height: cardHeight,
-          left: cardOut ? cardLeftFinal : cardLeftStart,
-          top: cardOut ? cardTopFinal : cardTopStart,
-          opacity: cardOut ? 1 : 0,
-          transform: cardOut ? "scale(1)" : "scale(0.85)",
-          transition:
-            "left 0.8s cubic-bezier(0.7, 0, 0.2, 1), top 0.8s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.55s ease-out, transform 0.8s cubic-bezier(0.7, 0, 0.2, 1)",
-          zIndex: cardOut ? 3 : 1,
-          pointerEvents: cardOut ? "auto" : "none",
+          transform: `translateX(-50%) translateY(${
+            cardEmerging ? cardTranslateEnd : cardTranslateStart
+          }px)`,
+          transition: cardEmerging
+            ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1)"
+            : "none",
+          zIndex: 50,
+          pointerEvents: stage === "done" ? "auto" : "none",
         }}
       >
         {cardRender
@@ -171,60 +223,171 @@ export function WeddingEnvelope({
           : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
       </div>
 
-      {/* Envelope — flips around Y axis */}
+      {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates ─── */}
       <div
-        className="absolute"
+        onClick={handleOpen}
+        className="absolute left-1/2"
         style={{
-          left: envLeft,
-          top: envTop,
+          top: envelopeTop,
           width: envelopeWidth,
           height: envelopeHeight,
-          perspective: "1800px",
-          zIndex: 2,
-          opacity: !sideBySide && cardOut ? 0 : 1,
-          pointerEvents: !sideBySide && cardOut ? "none" : "auto",
-          transition: "opacity 0.4s ease-out, left 0.7s cubic-bezier(0.7, 0, 0.2, 1), top 0.7s cubic-bezier(0.7, 0, 0.2, 1)",
+          transform: `translateX(-50%) ${
+            flipped ? "rotateY(180deg)" : "rotateY(0deg)"
+          }`,
+          transformStyle: "preserve-3d",
+          transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
+          zIndex: 100,
+          cursor: flipped ? "default" : "pointer",
+          pointerEvents: flipped ? "none" : "auto",
         }}
       >
+        {/* ══ FRONT FACE (rotateY 0) ══ */}
         <div
-          className="relative w-full h-full"
+          className="absolute inset-0 overflow-hidden"
           style={{
-            transformStyle: "preserve-3d",
-            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-            transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
+            background: envelopeColor,
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+            borderRadius: 4,
+            boxShadow:
+              "0 10px 30px -8px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.05)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
           }}
         >
-          <EnvelopeFront
-            width={envelopeWidth}
-            height={envelopeHeight}
-            bg={envelopeColor}
-            guestName={guestName}
-            onOpen={handleStart}
-            extra={frontExtra}
-            border={frontBorder}
-            stamp={stamp ?? null}
+          {frontBorder}
+          {stamp ? (
+            <Stamp config={stamp} envelopeWidth={envelopeWidth} envelopeBg={envelopeColor} />
+          ) : null}
+          <div
+            className="absolute"
+            style={{
+              bottom: "12%",
+              left: "8%",
+              color: textColor,
+              fontFamily: "Merienda, serif",
+              maxWidth: "70%",
+            }}
+          >
+            <div className="text-lg italic mb-1 leading-tight">
+              Sayın <span className="font-medium">{guestName}</span>,
+            </div>
+            <div className="text-sm italic opacity-85 mb-3 leading-tight">
+              Bir etkinliğe davet edildiniz.
+            </div>
+            <div
+              className="inline-block px-3 py-1.5 text-sm italic rounded border-2"
+              style={{ borderColor: textColor, color: textColor }}
+            >
+              Davetiyeyi Görüntüle
+            </div>
+          </div>
+        </div>
+
+        {/* ══ BACK SCENE (rotateY 180) — V-pocket envelope ══ */}
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{
+            transform: "rotateY(180deg)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            background: envelopeColor,
+            backgroundImage:
+              "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+            borderRadius: 4,
+            boxShadow:
+              "0 10px 30px -8px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.05)",
+          }}
+        >
+          {backExtra}
+
+          {/* Lining base — stays visible in top triangle area (instead of flap disappearing) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              clipPath: "polygon(50% 50%, 100% 0, 0 0)",
+              background: liningBg,
+              zIndex: 1,
+              boxShadow: "inset 0 6px 14px rgba(0,0,0,0.2)",
+            }}
+          >
+            <LiningPattern kind={liningPattern} />
+          </div>
+
+          {/* Flap seal — sits on top triangle, subtle */}
+          {flapSeal ? (
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                left: "50%",
+                top: "25%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 2,
+              }}
+            >
+              {flapSeal}
+            </div>
+          ) : null}
+
+          {/* LEFT pocket triangle */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: leftTriColor,
+              clipPath: "polygon(0 0, 50% 50%, 0 100%)",
+              backgroundImage:
+                "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+              zIndex: 99,
+            }}
           />
-          <EnvelopeBack
-            width={envelopeWidth}
-            height={envelopeHeight}
-            bg={envelopeColor}
-            flapColor={flapColor ?? envelopeColor}
-            flapOpen={flapOpen}
-            liningPattern={liningPattern}
-            liningBg={liningBg}
-            extra={backExtra}
-            flapSeal={flapSeal}
-            backStyle={backStyle}
+          {/* RIGHT pocket triangle */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: rightTriColor,
+              clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
+              backgroundImage:
+                "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+              zIndex: 99,
+            }}
           />
+          {/* BOTTOM pocket triangle */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: bottomTriColor,
+              clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
+              backgroundImage:
+                "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+              zIndex: 99,
+            }}
+          />
+          {/* V-seam crease lines */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 100"
+            style={{ zIndex: 99 }}
+          >
+            <path
+              d="M 0 0 L 50 50 L 100 0 M 0 100 L 50 50 L 100 100"
+              stroke="rgba(0,0,0,0.14)"
+              strokeWidth="0.25"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+
+          {frontExtra}
         </div>
       </div>
 
       {/* Reset button */}
-      {stage === "out" ? (
+      {stage === "done" ? (
         <button
           onClick={handleReset}
-          className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground cursor-pointer border border-border rounded-full px-4 py-1.5 bg-white z-10"
-          style={{ fontFamily: "Space Grotesk, sans-serif" }}
+          className="absolute top-1 left-1/2 -translate-x-1/2 text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground cursor-pointer border border-border rounded-full px-4 py-1.5 bg-white"
+          style={{ fontFamily: "Space Grotesk, sans-serif", zIndex: 1200 }}
         >
           Tekrar Oynat
         </button>
@@ -233,249 +396,13 @@ export function WeddingEnvelope({
   );
 }
 
-/* =====================================================================
- * Envelope Front
- * ===================================================================== */
-function EnvelopeFront({
-  width,
-  height,
-  bg,
-  guestName,
-  onOpen,
-  extra,
-  border,
-  stamp,
-}: {
-  width: number;
-  height: number;
-  bg: string;
-  guestName: string;
-  onOpen: () => void;
-  extra?: ReactNode;
-  border?: ReactNode;
-  stamp: StampConfig | null | false;
-}) {
-  const textColor = isLight(bg) ? "#2a2420" : "#f3ecdc";
-  return (
-    <div
-      className="absolute inset-0 overflow-hidden cursor-pointer"
-      style={{
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        background: bg,
-        backgroundImage:
-          "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
-        borderRadius: 4,
-        boxShadow:
-          "0 10px 30px -8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.05)",
-      }}
-      onClick={onOpen}
-    >
-      {/* Optional border overlay (air-mail stripes etc.) */}
-      {border}
-
-      {/* Stamp (optional, customisable) */}
-      {stamp ? (
-        <Stamp config={stamp} envelopeWidth={width} envelopeBg={bg} />
-      ) : null}
-
-      {/* Content bottom-left */}
-      <div
-        className="absolute"
-        style={{
-          bottom: "12%",
-          left: "8%",
-          color: textColor,
-          fontFamily: "Merienda, serif",
-          maxWidth: "70%",
-        }}
-      >
-        <div className="text-lg italic mb-1 leading-tight">
-          Sayın <span className="font-medium">{guestName}</span>,
-        </div>
-        <div className="text-sm italic opacity-85 mb-3 leading-tight">
-          Bir etkinliğe davet edildiniz.
-        </div>
-        <div
-          className="inline-block px-3 py-1.5 text-sm italic rounded border-2"
-          style={{
-            borderColor: textColor,
-            color: textColor,
-          }}
-        >
-          Davetiyeyi Görüntüle
-        </div>
-      </div>
-
-      {/* Extra decorations (stamps, stickers) */}
-      {extra}
-    </div>
-  );
-}
-
-/* =====================================================================
- * Envelope Back
- * ===================================================================== */
-function EnvelopeBack({
-  width,
-  height,
-  bg,
-  flapColor,
-  flapOpen,
-  liningPattern,
-  liningBg,
-  extra,
-  flapSeal,
-  backStyle,
-}: {
-  width: number;
-  height: number;
-  bg: string;
-  flapColor: string;
-  flapOpen: boolean;
-  liningPattern: "daisy" | "rose" | "gold" | "none" | "chevron";
-  liningBg: string;
-  extra?: ReactNode;
-  flapSeal?: ReactNode;
-  backStyle: "flat" | "shaded";
-}) {
-  // Shaded mode: 4 V-seam triangles using harmonious shades of bg.
-  // Top and bottom share the same shade (user requirement); left and right share another.
-  const shadedTop = darken(bg, 0.05);
-  const shadedBottom = darken(bg, 0.05); // same as top
-  const shadedLeft = darken(bg, 0.02);
-  const shadedRight = darken(bg, 0.02); // same as left
-  const shadedFlap = darken(bg, 0.05); // matches top/bottom for consistency
-  return (
-    <div
-      className="absolute inset-0 overflow-hidden"
-      style={{
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        transform: "rotateY(180deg)",
-        background: bg,
-        backgroundImage:
-          "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
-        borderRadius: 4,
-        boxShadow:
-          "0 10px 30px -8px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.05)",
-      }}
-    >
-      {backStyle === "flat" ? (
-        <>
-          {/* Back body — uniform envelope color */}
-          <div
-            className="absolute inset-0"
-            style={{ background: bg, zIndex: 1 }}
-          />
-          {/* V-seam crease lines — very subtle paper fold hint */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            preserveAspectRatio="none"
-            viewBox="0 0 100 100"
-            style={{ zIndex: 1 }}
-          >
-            <path
-              d="M 0 0 L 50 50 M 100 0 L 50 50 M 0 100 L 50 50 M 100 100 L 50 50"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="0.15"
-              fill="none"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </>
-      ) : (
-        <>
-          {/* Shaded mode — 4 visible triangles, all from same color family */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: shadedLeft,
-              clipPath: "polygon(0 0, 50% 50%, 0 100%)",
-              zIndex: 1,
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: shadedRight,
-              clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
-              zIndex: 1,
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: shadedBottom,
-              clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
-              zIndex: 1,
-            }}
-          />
-        </>
-      )}
-
-      {/* Extra decorations behind flap */}
-      {extra}
-
-      {/* Lining triangle — revealed when top flap collapses */}
-      <div
-        className="absolute inset-0"
-        style={{
-          clipPath: "polygon(0 0, 100% 0, 50% 50%)",
-          background: liningBg,
-          zIndex: 3,
-        }}
-      >
-        <LiningPattern kind={liningPattern} />
-      </div>
-
-      {/* Top flap — collapses on open */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: backStyle === "shaded" ? shadedFlap : flapColor,
-          clipPath: flapOpen
-            ? "polygon(0 0, 100% 0, 50% 0)"
-            : "polygon(0 0, 100% 0, 50% 50%)",
-          transition: "clip-path 0.55s cubic-bezier(0.7, 0, 0.2, 1)",
-          boxShadow: flapOpen ? "none" : "inset 0 -8px 12px rgba(0,0,0,0.08)",
-          zIndex: 4,
-        }}
-      />
-
-      {/* Flap seal (wax seal / monogram) — sits on outer flap, fades when flap opens */}
-      {flapSeal ? (
-        <div
-          className="absolute"
-          style={{
-            left: "50%",
-            top: "30%",
-            transform: `translate(-50%, -50%) scale(${flapOpen ? 0 : 1}) rotate(${
-              flapOpen ? 180 : 0
-            }deg)`,
-            opacity: flapOpen ? 0 : 1,
-            transition:
-              "transform 0.5s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.4s ease-out",
-            zIndex: 5,
-          }}
-        >
-          {flapSeal}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-/* =====================================================================
- * Lining patterns
- * ===================================================================== */
+/* ───── Lining patterns ───── */
 function LiningPattern({
   kind,
 }: {
   kind: "daisy" | "rose" | "gold" | "none" | "chevron";
 }) {
   if (kind === "none") return null;
-
   if (kind === "gold") {
     return (
       <svg viewBox="0 0 200 100" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
@@ -494,7 +421,6 @@ function LiningPattern({
       </svg>
     );
   }
-
   if (kind === "rose") {
     return (
       <svg viewBox="0 0 200 100" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
@@ -512,7 +438,6 @@ function LiningPattern({
       </svg>
     );
   }
-
   if (kind === "chevron") {
     return (
       <svg viewBox="0 0 200 100" className="w-full h-full" preserveAspectRatio="none">
@@ -525,8 +450,6 @@ function LiningPattern({
       </svg>
     );
   }
-
-  // daisy
   return (
     <svg viewBox="0 0 200 100" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
       <defs>
@@ -561,9 +484,7 @@ function LiningPattern({
   );
 }
 
-/* =====================================================================
- * Stamp — customisable postage stamp on the front face
- * ===================================================================== */
+/* ───── Stamp ───── */
 function Stamp({
   config,
   envelopeWidth,
@@ -574,17 +495,16 @@ function Stamp({
   envelopeBg: string;
 }) {
   const sizeRatio = config.size ?? 0.18;
-  const size = Math.round(envelopeWidth * sizeRatio);
-  const height = Math.round(size * 1.2); // classic portrait stamp
+  const w = Math.round(envelopeWidth * sizeRatio);
+  const h = Math.round(w * 1.2);
   const borderStyle = config.borderStyle ?? "dashed";
-
   const isBgLight = isLight(envelopeBg);
   const defaultOutline = isBgLight
     ? "rgba(40, 40, 50, 0.45)"
     : "rgba(220, 220, 230, 0.55)";
   const outline = config.color ?? defaultOutline;
   const fill = config.color ?? "transparent";
-  const text =
+  const textColor =
     config.textColor ??
     (config.color
       ? isLight(config.color)
@@ -593,59 +513,83 @@ function Stamp({
       : isBgLight
       ? "#2a2420"
       : "#f3ecdc");
-
   const isPerforated = borderStyle === "perforated";
-
   return (
     <div
-      className="absolute flex items-center justify-center overflow-hidden pointer-events-none"
-      style={{
-        top: "10%",
-        right: "8%",
-        width: size,
-        height,
-        background: fill,
-        border: isPerforated ? "none" : `2px ${borderStyle} ${outline}`,
-        borderRadius: isPerforated ? 0 : 3,
-        boxShadow: config.color
-          ? "0 2px 4px rgba(0,0,0,0.15)"
-          : "none",
-        // Perforated edge effect via radial mask
-        WebkitMask: isPerforated
-          ? "radial-gradient(circle at 0 50%, transparent 2px, #000 2.5px) 0 50%/8px 8px repeat-y, radial-gradient(circle at 100% 50%, transparent 2px, #000 2.5px) 100% 50%/8px 8px repeat-y, radial-gradient(circle at 50% 0, transparent 2px, #000 2.5px) 50% 0/8px 8px repeat-x, radial-gradient(circle at 50% 100%, transparent 2px, #000 2.5px) 50% 100%/8px 8px repeat-x, linear-gradient(#000, #000)"
-          : undefined,
-        WebkitMaskComposite: isPerforated ? "source-in" : undefined,
-      }}
+      className="absolute pointer-events-none overflow-visible"
+      style={{ top: "8%", right: "6%", width: w, height: h }}
     >
-      {config.image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={config.image}
-          alt=""
-          className="w-full h-full object-cover"
-          draggable={false}
-        />
-      ) : config.label ? (
-        <span
-          className="font-medium text-center leading-tight"
+      {isPerforated ? (
+        <svg viewBox={`0 0 ${w} ${h}`} width={w} height={h} style={{ overflow: "visible", display: "block" }}>
+          <defs>
+            <mask id={`perf-${w}-${h}`}>
+              <rect x="0" y="0" width={w} height={h} fill="white" />
+              {perforationHoles(w, h).map((c, i) => (
+                <circle key={i} cx={c.x} cy={c.y} r={c.r} fill="black" />
+              ))}
+            </mask>
+          </defs>
+          <rect x="0" y="0" width={w} height={h} fill={fill === "transparent" ? envelopeBg : fill} mask={`url(#perf-${w}-${h})`} />
+          <rect x="0" y="0" width={w} height={h} fill="none" stroke={outline} strokeWidth="0.5" mask={`url(#perf-${w}-${h})`} />
+          {config.image ? (
+            <image href={config.image} x={w * 0.1} y={h * 0.1} width={w * 0.8} height={h * 0.8} preserveAspectRatio="xMidYMid slice" mask={`url(#perf-${w}-${h})`} />
+          ) : config.label ? (
+            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill={textColor} fontFamily="Merienda, serif" fontSize={w * 0.32} fontWeight="500">
+              {config.label}
+            </text>
+          ) : null}
+        </svg>
+      ) : (
+        <div
+          className="flex items-center justify-center overflow-hidden w-full h-full"
           style={{
-            color: text,
-            fontFamily: "Merienda, serif",
-            fontSize: Math.round(size * 0.32),
-            padding: 4,
+            background: fill,
+            border: `2px ${borderStyle} ${outline}`,
+            borderRadius: 3,
+            boxShadow: config.color ? "0 2px 4px rgba(0,0,0,0.15)" : "none",
           }}
         >
-          {config.label}
-        </span>
-      ) : null}
+          {config.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={config.image} alt="" className="w-full h-full object-cover" draggable={false} />
+          ) : config.label ? (
+            <span
+              className="font-medium text-center leading-tight"
+              style={{
+                color: textColor,
+                fontFamily: "Merienda, serif",
+                fontSize: Math.round(w * 0.32),
+                padding: 4,
+              }}
+            >
+              {config.label}
+            </span>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }
 
-/* =====================================================================
- * Seal primitives — used by variants to decorate the back flap
- * ===================================================================== */
+function perforationHoles(
+  w: number,
+  h: number
+): Array<{ x: number; y: number; r: number }> {
+  const holes: Array<{ x: number; y: number; r: number }> = [];
+  const holeR = Math.max(2, Math.round(Math.min(w, h) * 0.04));
+  const spacing = holeR * 3;
+  for (let x = spacing / 2; x <= w; x += spacing) {
+    holes.push({ x, y: 0, r: holeR });
+    holes.push({ x, y: h, r: holeR });
+  }
+  for (let y = spacing / 2; y <= h; y += spacing) {
+    holes.push({ x: 0, y, r: holeR });
+    holes.push({ x: w, y, r: holeR });
+  }
+  return holes;
+}
 
+/* ───── Seal primitives ───── */
 export function WaxSeal({
   letter = "D",
   color = "#a8323d",
@@ -714,30 +658,6 @@ export function PillSeal({
   );
 }
 
-function isLight(hex: string): boolean {
-  const h = hex.replace("#", "");
-  if (h.length !== 6) return true;
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  // Perceived luminance (rec. 601)
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return lum > 0.55;
-}
-
-function darken(hex: string, amount: number): string {
-  const h = hex.replace("#", "");
-  if (h.length !== 6) return hex;
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  const f = (v: number) =>
-    Math.max(0, Math.min(255, Math.round(v * (1 - amount))))
-      .toString(16)
-      .padStart(2, "0");
-  return `#${f(r)}${f(g)}${f(b)}`;
-}
-
 export function MonogramSeal({
   letter = "D",
   gold = "#d4b886",
@@ -769,3 +689,25 @@ export function MonogramSeal({
   );
 }
 
+function isLight(hex: string): boolean {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return true;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.55;
+}
+
+function darken(hex: string, amount: number): string {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  const f = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v * (1 - amount))))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${f(r)}${f(g)}${f(b)}`;
+}
