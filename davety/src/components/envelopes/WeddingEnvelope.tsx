@@ -160,7 +160,7 @@ export function WeddingEnvelope({
           transition: flipped
             ? "transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.9s"
             : "transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
-          zIndex: 200,
+          zIndex: 40,
         }}
       >
         {/* Paper outer face (pointing up) */}
