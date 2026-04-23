@@ -1,0 +1,129 @@
+{
+  "Common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "next": "İlerle",
+    "back": "Geri Git",
+    "continue": "Devam Et",
+    "loading": "Yükleniyor"
+  },
+  "Landing": {
+    "title": "Dijital Davetiyeni Sen Yarat",
+    "subtitle": "3D zarfa dokun, tarih seç, davetiyeni yarat.",
+    "cta": "Davetiyeni Yarat",
+    "viewSample": "Örnek Davetiyeyi Gör"
+  },
+  "DateDialog": {
+    "title": "Düğün Tarihini Seç",
+    "subtitle": "Davetiyeni buna göre oluşturacağız. Daha sonra değiştirebilirsin.",
+    "dateLabel": "Tarih",
+    "timeLabel": "Saat",
+    "submit": "Devam Et"
+  },
+  "Editor": {
+    "stepTitle": "1/3: Davetiyeni Düzenle",
+    "save": "Kaydet",
+    "whatsappHelp": "Whatsapp Yardım",
+    "mainButton": "Davetiyeni Kaydet",
+    "tabs": {
+      "design": "Davetiye Tasarımı",
+      "envelope": "Zarf Tasarımı",
+      "music": "Arkaplan Müziği"
+    },
+    "viewChanges": "Değişiklikleri Gör",
+    "advanced": "Gelişmiş Ayarlar",
+    "textPanel": {
+      "size": "Metin Boyutu",
+      "align": "Metin Hizalama",
+      "color": "Metin Rengi",
+      "style": "Metin Tarzı",
+      "advanced": "Gelişmiş Seçenekler",
+      "show": "Göster",
+      "fontStyle": "Metin Stili",
+      "fontSearch": "Metin Stili Ara",
+      "categories": {
+        "all": "Tümü",
+        "modern": "Modern",
+        "classic": "Klasik",
+        "typewriter": "Daktilo",
+        "handwriting": "El Yazısı",
+        "display": "Gösterişli"
+      }
+    },
+    "block": {
+      "hide": "Gizle",
+      "show": "Göster",
+      "info": "?",
+      "chooseLocation": "Konum Seç",
+      "changeDate": "Tarihi Değiştir",
+      "enterInfo": "Bilgileri Gir",
+      "changeSettings": "Ayarları Değiştir",
+      "uploadMedia": "Görsel veya Video Yükle",
+      "startDesign": "Tasarıma Başla"
+    },
+    "onboarding": {
+      "congrats": "Tebrikler!",
+      "firstStep": "Davetiyeni tasarlamak için ilk adımını attın.",
+      "editHint": "Değiştirmek istediğin metnin üzerine tıklayarak değişiklik yapabilirsin.",
+      "buttonsHint": "Metinlere tıkladığında bu butonları görebilirsin.",
+      "hideButton": "Bu buton tıklanan alanı davetiyede gizlemeni sağlar.",
+      "infoButton": "Bu buton tıklanan alanın işlevi hakkında bilgi verir.",
+      "styleButton": "Bu buton seçili metinde stil ve renk düzenlemesi yapmanı sağlar.",
+      "spacingButtons": "Bu butonlara tıklayıp sürükleyerek seçili alanın altındaki boşluğu ayarlayabilirsin.",
+      "yellowHint": "Soluk sarı arkaplanlı alanların üzerine tıklayarak bu butonları görebilirsin."
+    },
+    "countdown": {
+      "days": "Gün",
+      "hours": "Saat",
+      "minutes": "Dakika",
+      "seconds": "Saniye",
+      "today": "Düğün Günü"
+    },
+    "errors": {
+      "saveFailed": "Kaydedilemedi. Tekrar dene.",
+      "staleVersion": "Başka bir sekmede değişiklik yapıldı. Sayfayı yenile."
+    }
+  },
+  "Publish": {
+    "title": "Tebrikler Davetiyen Yayında",
+    "subtitle": "Davetiye paylaşım linkinizi paylaşarak misafirlerinizi davet etmeye başlayabilirsiniz.",
+    "shareLink": "Davetiye Paylaşım Linkiniz",
+    "copy": "Kopyala",
+    "whatsappShare": "Whatsapp ile Paylaş",
+    "customLink": "Özel Link Tanımla",
+    "customLinkDesc": "Etkinliğinize özel link oluşturarak, okunabilir daha prestijli bir link oluşturabilirsiniz.",
+    "currentLink": "Mevcut Link",
+    "customize": "Linkinizi Özelleştirin"
+  },
+  "Envelope": {
+    "view": "Görüntüle",
+    "edit": "Düzenle",
+    "favorite": "Favorilere Ekle"
+  },
+  "Blocks": {
+    "hero": {
+      "title": "Başlık Bölümü",
+      "coupleNames": "Çift İsimleri",
+      "subtitle": "Alt Başlık",
+      "description": "Açıklama"
+    },
+    "countdown": {
+      "title": "Geri Sayım"
+    },
+    "families": {
+      "title": "Aileler",
+      "brideFamily": "Gelinin Ailesi",
+      "groomFamily": "Damadın Ailesi"
+    },
+    "eventProgram": {
+      "title": "Etkinlik Programı"
+    },
+    "memoryBook": {
+      "title": "Hatıra Defteri"
+    },
+    "donation": {
+      "title": "Bizlere Destek Olun"
+    }
+  }
+}

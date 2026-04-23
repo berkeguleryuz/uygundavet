@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["mongodb"],
+  transpilePackages: ["@davety/renderer", "@davety/schema"],
   turbopack: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     root: __dirname as any, // Silences conflicting lockfiles warning between home dir and project dir
@@ -19,6 +20,8 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      { protocol: "https", hostname: "*.r2.dev" },
+      { protocol: "https", hostname: "imagedelivery.net" },
     ],
   },
 };
