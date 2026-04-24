@@ -8,11 +8,10 @@ type Stage = "closed" | "flipping" | "emerging" | "done";
 const W = 380;
 const H = Math.round(W * 0.62); // 236
 const D = 22; // envelope depth
-const FLAP_H = Math.round(H * 0.55); // 130
 const CARD_W = 300;
-const CARD_H = 440;
+const CARD_H = 600;
 const SCENE_H = 760;
-const ENVELOPE_BOTTOM_OFFSET = 80;
+const ENVELOPE_BOTTOM_OFFSET = 140;
 
 /* ── Palette (matches WeddingEnvelope defaults) ── */
 const ENVELOPE_COLOR = "#f5f1e8";
@@ -106,11 +105,25 @@ export function Envelope3DScene() {
               transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
             }}
           >
-            {/* ══════ FRONT FACE (address side) ══════ */}
+            {/* ══════ FRONT FACE (address side, closest to viewer pre-flip) ══════ */}
             <FrontFace guestName={guestName} />
 
-            {/* ══════ BACK FACE (V-pocket like 2D back scene) ══════ */}
-            <BackFaceVPocket />
+            {/* ══════ INNER LINING — deepest layer, visible through top V opening ══════ */}
+            <InnerLining />
+
+            {/* ══════ CARD — middle layer, emerges UP through the V opening.
+                Placed BEHIND PocketWalls in z-order so its lower portion stays
+                hidden by the pocket paper triangles, exactly like a real card
+                being pulled out of an envelope. ══════ */}
+            <CardLayer
+              emerging={cardEmerging}
+              visible={cardEmerging}
+              guestName={guestName}
+            />
+
+            {/* ══════ POCKET WALLS — three paper triangles + V-seam, CLOSEST to
+                the viewer post-flip, occluding the card's bottom portion. ══════ */}
+            <PocketWalls />
 
             {/* ══════ Side walls for real depth ══════ */}
             <SideWall axis="left" />
@@ -118,11 +131,14 @@ export function Envelope3DScene() {
             <SideWall axis="top" />
             <SideWall axis="bottom" />
 
-            {/* ══════ LIFTED FLAP — above envelope back, scales in ══════ */}
-            <LiftedFlap active={flipped} />
-
-            {/* ══════ CARD — tucked inside pocket, emerges ══════ */}
-            <CardLayer emerging={cardEmerging} guestName={guestName} />
+            {/* ══════ FLAP PIECE (parts 4 → 5 of the envelope back).
+                Closed: the 4th pocket triangle (top), paper color, flat on the
+                back — completing the square with the other 3 triangles.
+                Opening: hinges at its top edge (transform-origin center top)
+                and rotates -180° about X, flipping up and above the envelope.
+                Its paper face hides (backface) while the lining face is
+                revealed — becoming the "5th piece". ═════════════════════════ */}
+            <FlapPiece active={flipped} />
           </div>
 
           {/* Ground shadow */}
@@ -143,6 +159,25 @@ export function Envelope3DScene() {
           />
         </div>
         </div>
+
+        {/* 2D occluder (flat overlay, not in 3D scene). Paints the strip below
+            the envelope with the page background, hiding the card's body
+            before it rises above the envelope top. Without this the 38px
+            band beneath the envelope exposes the card's bottom — the user
+            sees it "start from the empty area below the envelope" instead of
+            appearing to emerge from inside the envelope's V opening. */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: ENVELOPE_BOTTOM_OFFSET,
+            background: "#f5f6f3",
+            pointerEvents: "none",
+            zIndex: 10,
+          }}
+        />
       </div>
 
       <div className="flex flex-col items-center gap-3">
@@ -271,8 +306,37 @@ function FrontFace({ guestName }: { guestName: string }) {
   );
 }
 
-/* ───── Back face V-pocket (matches 2D back scene exactly) ───── */
-function BackFaceVPocket() {
+/* ───── Inner lining — deep inside the pocket, visible through the V opening.
+   Positioned near the inner surface of the front face (local z=+D/2-2) so
+   after the body's 180° Y flip it ends up at global z ≈ -9, i.e. the farthest
+   plane from the viewer. The card sits in front of it (at z=0 local → 0 global)
+   and the pocket paper walls sit in front of the card. ─── */
+function InnerLining() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        transform: `translateZ(${D / 2 - 2}px) rotateY(180deg)`,
+        backfaceVisibility: "hidden",
+        background: LINING_BG,
+        boxShadow:
+          "inset 0 8px 18px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(0,0,0,0.2)",
+        overflow: "hidden",
+        borderRadius: 4,
+      }}
+    >
+      <LiningDaisyPattern />
+    </div>
+  );
+}
+
+/* ───── Pocket walls — the three paper triangles forming the pocket (left,
+   right, bottom) plus the V-seam. At local z=-D/2 (outer back surface), which
+   after the body flip is global z=+11, i.e. the CLOSEST plane to the viewer.
+   This is the layer that occludes the card's lower portion, making the card
+   visibly emerge out of the pocket's top V opening. ─── */
+function PocketWalls() {
   return (
     <div
       style={{
@@ -280,29 +344,10 @@ function BackFaceVPocket() {
         inset: 0,
         transform: `translateZ(${-D / 2}px) rotateY(180deg)`,
         backfaceVisibility: "hidden",
-        background: ENVELOPE_COLOR,
-        backgroundImage: PAPER_TEXTURE,
-        borderRadius: 4,
-        boxShadow:
-          "0 10px 30px -8px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(0,0,0,0.05)",
-        overflow: "hidden",
+        pointerEvents: "none",
+        filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.18))",
       }}
     >
-      {/* Lining base — top triangle (inside of envelope visible through the V) */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          clipPath: "polygon(50% 50%, 100% 0, 0 0)",
-          background: LINING_BG,
-          zIndex: 1,
-          boxShadow: "inset 0 6px 14px rgba(0,0,0,0.2)",
-          overflow: "hidden",
-        }}
-      >
-        <LiningDaisyPattern />
-      </div>
-
       {/* LEFT pocket triangle */}
       <div
         style={{
@@ -311,7 +356,6 @@ function BackFaceVPocket() {
           background: ENVELOPE_COLOR,
           clipPath: "polygon(0 0, 50% 50%, 0 100%)",
           backgroundImage: PAPER_TEXTURE,
-          zIndex: 99,
         }}
       />
       {/* RIGHT pocket triangle */}
@@ -322,7 +366,6 @@ function BackFaceVPocket() {
           background: ENVELOPE_COLOR,
           clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
           backgroundImage: PAPER_TEXTURE,
-          zIndex: 99,
         }}
       />
       {/* BOTTOM pocket triangle */}
@@ -333,7 +376,6 @@ function BackFaceVPocket() {
           background: ENVELOPE_COLOR,
           clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
           backgroundImage: PAPER_TEXTURE,
-          zIndex: 99,
         }}
       />
 
@@ -344,7 +386,6 @@ function BackFaceVPocket() {
           inset: 0,
           width: "100%",
           height: "100%",
-          zIndex: 99,
           pointerEvents: "none",
         }}
         preserveAspectRatio="none"
@@ -352,8 +393,8 @@ function BackFaceVPocket() {
       >
         <path
           d="M 0 0 L 50 50 L 100 0 M 0 100 L 50 50 L 100 100"
-          stroke="rgba(0,0,0,0.14)"
-          strokeWidth="0.25"
+          stroke="rgba(0,0,0,0.18)"
+          strokeWidth="0.3"
           fill="none"
           vectorEffect="non-scaling-stroke"
         />
@@ -429,71 +470,95 @@ function SideWall({ axis }: { axis: "left" | "right" | "top" | "bottom" }) {
   );
 }
 
-/* ───── Lifted Flap (the 5th piece: opens above envelope, shows lining inside) ───── */
-function LiftedFlap({ active }: { active: boolean }) {
+/* ───── Flap piece — parts 4 & 5 of the envelope back.
+   When `active` is false, it's the 4th pocket triangle: apex-down triangle
+   lying flat on the top half of the back face, paper colored, completing the
+   square with the three static pocket triangles. When `active` is true, the
+   element hinges at its top edge and rotates -180° about X, flipping UP and
+   BACK above the envelope. Its paper face is then pointing away (hidden by
+   backface) and the inner lining face is revealed toward the viewer — this is
+   the 5th piece. Because it's a single physical flap rotating about its own
+   hinge, the animation reads as "the envelope opening", not as a new piece
+   appearing out of nowhere. ───── */
+function FlapPiece({ active }: { active: boolean }) {
+  const FLAP_HEIGHT = Math.round(H / 2); // 118 — top half of back square
   return (
     <div
       style={{
         position: "absolute",
         left: 0,
-        top: -FLAP_H,
+        top: 0,
         width: W,
-        height: FLAP_H,
-        transform: `translateZ(${-D / 2 - 0.5}px) rotateY(180deg)`,
+        height: FLAP_HEIGHT,
         transformStyle: "preserve-3d",
+        transformOrigin: "center top",
+        transform: `translateZ(${-D / 2 - 0.6}px) rotateY(180deg) rotateX(${
+          active ? -180 : 0
+        }deg)`,
+        // Rotation animates the flap from closed to open during the body
+        // flip so the viewer reads a 4 → 5 transition; the flap then snaps
+        // out of view by the time the card begins to emerge (stage flips to
+        // "emerging" at 1.1s). This leaves only the envelope's V opening
+        // with InnerLining visible — no 5th piece lingering in front of
+        // the rising invitation.
+        opacity: active ? 0 : 1,
+        transition: active
+          ? "transform 0.5s cubic-bezier(0.65, 0, 0.25, 1) 0.55s, opacity 0.15s ease-out 0.95s"
+          : "transform 0.3s ease, opacity 0.2s ease",
         pointerEvents: "none",
-        zIndex: 75,
       }}
     >
+      {/* Paper side — faces outward on the envelope back when closed.
+          Apex points DOWN (toward the center of the back square). */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          transform: `scaleY(${active ? 1 : 0})`,
-          transformOrigin: "center bottom",
-          transition: active
-            ? "transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.9s"
-            : "transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
+          clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+          background: ENVELOPE_COLOR,
+          backgroundImage: PAPER_TEXTURE,
+          backfaceVisibility: "hidden",
+          boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.05)",
+        }}
+      />
+
+      {/* Lining side — rotated 180° about Y so it faces the opposite direction
+          of the paper side. Revealed when the flap has rotated open. */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transform: "rotateY(180deg)",
+          backfaceVisibility: "hidden",
+          transformStyle: "preserve-3d",
         }}
       >
-        {/* Paper outer triangle (pointing up) */}
+        {/* Paper border (same triangle shape, full size) */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+            clipPath: "polygon(0 0, 100% 0, 50% 100%)",
             background: ENVELOPE_COLOR,
             backgroundImage: PAPER_TEXTURE,
             boxShadow: "0 -6px 14px -4px rgba(0,0,0,0.22)",
           }}
         />
-        {/* Inner lining, inset for paper-border effect */}
+        {/* Lining inset — paper border effect */}
         <div
           style={{
             position: "absolute",
-            top: "6%",
+            top: "4%",
             left: "4%",
             right: "4%",
-            bottom: "8%",
-            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+            bottom: "10%",
+            clipPath: "polygon(0 0, 100% 0, 50% 100%)",
             background: LINING_BG,
             overflow: "hidden",
           }}
         >
           <LiningDaisyPattern />
         </div>
-        {/* Fold highlight at hinge */}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 2,
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.15), transparent)",
-          }}
-        />
       </div>
     </div>
   );
@@ -502,18 +567,24 @@ function LiftedFlap({ active }: { active: boolean }) {
 /* ───── Invitation card inside pocket (emerges up + forward) ───── */
 function CardLayer({
   emerging,
+  visible,
   guestName,
 }: {
   emerging: boolean;
+  visible: boolean;
   guestName: string;
 }) {
-  // Card sits behind back face (z=-D/2 + 1 in envelope-local, which after body
-  // 180Y flip becomes just behind the V-pocket back face from viewer's side).
-  // It rises straight up through the pocket — only Y translation, like the 2D
-  // version. The portion above envelope top becomes visible because nothing
-  // occludes it; the bottom portion stays hidden behind the V-pocket panel.
+  // Card stays BEHIND the V-pocket back face in 3D depth (local z just behind
+  // the back face plane). The only motion is vertical translateY, matching the
+  // 2D WeddingEnvelope exactly. After the body's 180° Y flip the back face is
+  // between the viewer and the card, so the portion of the card that overlaps
+  // the envelope XY bounds is hidden behind the V-pocket panel. The portion
+  // that moves ABOVE the envelope top becomes visible — it reads as the card
+  // sliding up out of the pocket opening. A tiny strip pokes out below the
+  // envelope too, reinforcing the "card passes through envelope" feel.
   const CARD_TOP_REST = 0;
-  const CARD_RISE = 380;
+  const ENVELOPE_TOP_IN_SCENE = SCENE_H - ENVELOPE_BOTTOM_OFFSET - H;
+  const CARD_RISE = ENVELOPE_TOP_IN_SCENE; // card top travels from envelope top to scene top
 
   return (
     <div
@@ -524,30 +595,18 @@ function CardLayer({
         width: CARD_W,
         height: CARD_H,
         transform: `
-          translateZ(${-D / 2 + 1}px)
+          translateZ(0px)
           rotateY(180deg)
           translateY(${emerging ? -CARD_RISE : 0}px)
         `,
-        transformStyle: "preserve-3d",
         transition: emerging
           ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1)"
           : "none",
         pointerEvents: emerging ? "auto" : "none",
+        visibility: visible ? "visible" : "hidden",
       }}
     >
       <InvitationCardFront guestName={guestName} />
-      {/* Card back face (so card doesn't look 2D from behind) */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transform: "translateZ(-2px) rotateY(180deg)",
-          background: "#efeee6",
-          border: "1px solid #d8d5c4",
-          borderRadius: 8,
-          backfaceVisibility: "hidden",
-        }}
-      />
     </div>
   );
 }

@@ -109,11 +109,11 @@ export function WeddingEnvelope({
     if (stage !== "closed") return;
     // Timeline:
     //   0.0s  click → Y-flip begins (1s duration)
-    //   0.9s  flap starts lifting (1s, finishes at 1.9s)
-    //   2.9s  1-second pause after flap open, card begins emerging (2s)
+    //   1.0s  Y-flip fully done → flap starts lifting (1s, finishes at 2.0s)
+    //   3.0s  1-second pause after flap open, card begins emerging (2s)
     //   5.0s  card settled → stage "done" (reset button appears)
     setStage("flipping");
-    setTimeout(() => setStage("emerging"), 2900);
+    setTimeout(() => setStage("emerging"), 3000);
     setTimeout(() => setStage("done"), 5000);
   };
   const handleReset = () => setStage("closed");
@@ -241,17 +241,37 @@ export function WeddingEnvelope({
         >
           {backExtra}
 
-          {/* Lining base — stays visible in top triangle area (instead of flap disappearing) */}
+          {/* Lining base (piece 4 — static pocket interior). Lives underneath
+               the flap (piece 5). Starts rendered in envelope cream so nothing
+               patterned bleeds through during the Y-flip. When piece 5 begins
+               its 180° lift at t=1s, piece 4 crossfades to the lining colour
+               and the pattern fades in at the same instant — so the inside of
+               the envelope only "wakes up" as the flap actually rises. */}
           <div
             className="absolute inset-0 overflow-hidden"
             style={{
               clipPath: "polygon(50% 50%, 100% 0, 0 0)",
-              background: liningBg,
+              backgroundColor: flipped ? liningBg : envelopeColor,
               zIndex: 1,
               boxShadow: "inset 0 6px 14px rgba(0,0,0,0.2)",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transition: flipped
+                ? "background-color 0.25s linear 1s"
+                : "background-color 0.1s linear",
             }}
           >
-            <LiningPattern kind={liningPattern} />
+            <div
+              className="absolute inset-0"
+              style={{
+                opacity: flipped ? 1 : 0,
+                transition: flipped
+                  ? "opacity 0.25s linear 1s"
+                  : "opacity 0.1s linear",
+              }}
+            >
+              <LiningPattern kind={liningPattern} />
+            </div>
           </div>
 
           {/* ─── CARD WRAPPER (z=50) — clips card at envelope bottom so the
@@ -306,7 +326,7 @@ export function WeddingEnvelope({
               transformStyle: "preserve-3d",
               opacity: flipped ? 1 : 0,
               transition: flipped
-                ? "opacity 0.05s linear 0.5s, transform 1s cubic-bezier(0.34, 1.1, 0.64, 1) 0.9s"
+                ? "opacity 0.05s linear 0.5s, transform 1s cubic-bezier(0.34, 1.1, 0.64, 1) 1s"
                 : "opacity 0.1s, transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
               zIndex: 40,
             }}
@@ -379,6 +399,8 @@ export function WeddingEnvelope({
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
               zIndex: 99,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
           {/* RIGHT pocket triangle */}
@@ -390,6 +412,8 @@ export function WeddingEnvelope({
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
               zIndex: 99,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
           {/* BOTTOM pocket triangle */}
@@ -401,6 +425,8 @@ export function WeddingEnvelope({
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
               zIndex: 99,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
             }}
           />
           {/* V-seam crease lines */}
@@ -408,7 +434,11 @@ export function WeddingEnvelope({
             className="absolute inset-0 w-full h-full pointer-events-none"
             preserveAspectRatio="none"
             viewBox="0 0 100 100"
-            style={{ zIndex: 99 }}
+            style={{
+              zIndex: 99,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+            }}
           >
             <path
               d="M 0 0 L 50 50 L 100 0 M 0 100 L 50 50 L 100 100"
