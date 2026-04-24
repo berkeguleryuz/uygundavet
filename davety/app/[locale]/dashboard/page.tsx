@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { Link } from "@/i18n/navigation";
+import { DashboardList } from "@/app/components/DashboardList";
 
 export default async function DashboardPage({
   params,
@@ -22,6 +23,9 @@ export default async function DashboardPage({
     orderBy: { updatedAt: "desc" },
   });
 
+  const publicBase =
+    process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "http://localhost:3000";
+
   return (
     <main className="min-h-dvh max-w-3xl mx-auto px-6 py-12">
       <header className="flex items-center justify-between mb-8">
@@ -34,55 +38,17 @@ export default async function DashboardPage({
         </Link>
       </header>
 
-      {designs.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Henüz bir davetiye oluşturmadın. Yeni Davetiye butonuna tıkla.
-        </p>
-      ) : (
-        <ul className="divide-y divide-border border border-border rounded-lg overflow-hidden bg-card">
-          {designs.map((d) => (
-            <li key={d.id} className="p-4 flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium">{d.vanityPath ?? d.slug}</div>
-                <div className="text-xs text-muted-foreground">
-                  {d.status === "published" ? "Yayında" : "Taslak"} ·{" "}
-                  {new Date(d.updatedAt).toLocaleDateString(locale)}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/dashboard/${d.id}/guests` as never}
-                  className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted"
-                >
-                  Misafirler
-                </Link>
-                <Link
-                  href={`/dashboard/${d.id}/memories` as never}
-                  className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted"
-                >
-                  Hatıralar
-                </Link>
-                {d.status === "published" && (
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "http://localhost:3000"}/i/${d.vanityPath ?? d.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted"
-                  >
-                    Görüntüle
-                  </a>
-                )}
-                <Link
-                  href={`/design/invitations/${d.id}/editor` as never}
-                  className="text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground font-chakra uppercase tracking-[0.15em]"
-                >
-                  Düzenle
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <DashboardList
+        designs={designs.map((d) => ({
+          id: d.id,
+          slug: d.slug,
+          vanityPath: d.vanityPath,
+          status: d.status,
+          updatedAt: d.updatedAt.toISOString(),
+        }))}
+        locale={locale}
+        publicBase={publicBase}
+      />
     </main>
   );
 }

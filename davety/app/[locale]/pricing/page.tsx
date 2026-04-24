@@ -1,7 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
-import { SectionDesigns } from "@/app/sections/SectionDesigns";
+import { SectionPricing } from "@/app/sections/SectionPricing";
 
-export default async function LandingPage({
+export default async function PricingPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -11,7 +11,7 @@ export default async function LandingPage({
 
   return (
     <main className="min-h-dvh">
-      <SectionDesigns />
+      <SectionPricing />
     </main>
   );
 }

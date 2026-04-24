@@ -29,6 +29,7 @@ export function TextStylePanel() {
 
   const doc = useEditorStore((s) => s.doc);
   const updateFieldStyle = useEditorStore((s) => s.updateFieldStyle);
+  const updateBlockData = useEditorStore((s) => s.updateBlockData);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const fieldId = useUIStore((s) => s.selectedFieldId);
 
@@ -49,12 +50,80 @@ export function TextStylePanel() {
     updateFieldStyle(blockId, fieldId, patch);
   };
 
+  // Raw text-content editing for the selected field. Reads the current value
+  // out of block.data and writes it back via updateBlockData so the canvas
+  // reflects edits immediately.
+  const isCoupleNames = fieldId === "coupleNames";
+  const fieldValue = isCoupleNames
+    ? undefined
+    : extractFieldValue(block.data, fieldId);
+  const showContentEditor = isCoupleNames || fieldValue !== undefined;
+  const fieldLabel = fieldLabelFor(fieldId);
+  const isLongText =
+    fieldId === "description" || fieldId === "prompt" || fieldId === "body";
+
   const fonts = filterByCategory(category).filter((f) =>
     query ? f.family.toLowerCase().includes(query.toLowerCase()) : true
   );
 
   return (
     <div className="p-5 flex flex-col gap-5">
+      {/* Field content editor — edit the actual text of the selected field */}
+      {showContentEditor ? (
+        isCoupleNames ? (
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">
+                Gelin Adı
+              </label>
+              <input
+                value={(block.data["brideName"] as string) ?? ""}
+                onChange={(e) =>
+                  updateBlockData(blockId, { brideName: e.target.value })
+                }
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">
+                Damat Adı
+              </label>
+              <input
+                value={(block.data["groomName"] as string) ?? ""}
+                onChange={(e) =>
+                  updateBlockData(blockId, { groomName: e.target.value })
+                }
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <label className="text-[11px] text-muted-foreground block mb-1">
+              {fieldLabel}
+            </label>
+            {isLongText ? (
+              <textarea
+                value={(fieldValue as string) ?? ""}
+                onChange={(e) =>
+                  updateBlockData(blockId, { [fieldId]: e.target.value })
+                }
+                rows={4}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-y"
+              />
+            ) : (
+              <input
+                value={(fieldValue as string) ?? ""}
+                onChange={(e) =>
+                  updateBlockData(blockId, { [fieldId]: e.target.value })
+                }
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            )}
+          </div>
+        )
+      ) : null}
+
       {/* Size + Align + Color + Style row */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -197,4 +266,38 @@ export function TextStylePanel() {
       </div>
     </div>
   );
+}
+
+function extractFieldValue(
+  data: Record<string, unknown>,
+  fieldId: string
+): string | undefined {
+  // Hero "coupleNames" is a composite of brideName + groomName — surface
+  // the bride's name and let groomName edit through its own field.
+  if (fieldId === "coupleNames") {
+    const v = data["brideName"];
+    return typeof v === "string" ? v : undefined;
+  }
+  const v = data[fieldId];
+  return typeof v === "string" ? v : undefined;
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  coupleNames: "Gelin Adı",
+  brideName: "Gelin Adı",
+  groomName: "Damat Adı",
+  subtitle: "Alt Başlık",
+  description: "Açıklama",
+  title: "Başlık",
+  venueName: "Mekan Adı",
+  venueAddress: "Mekan Adresi",
+  prompt: "Soru / Yönlendirme",
+  note: "Not",
+  body: "İçerik",
+  text: "Metin",
+  label: "Etiket",
+};
+
+function fieldLabelFor(fieldId: string): string {
+  return FIELD_LABELS[fieldId] ?? "Metin İçeriği";
 }

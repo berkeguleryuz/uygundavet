@@ -1,3 +1,5 @@
+import { ENVELOPE_CARD_LAYOUT } from "./envelopeGeometry.ts";
+
 export type EnvelopeRevealPhase = "front" | "flipping" | "opening" | "emerging" | "settled";
 
 export interface EnvelopeRevealState {
@@ -20,13 +22,11 @@ export interface EnvelopeRevealState {
 const FLIP_SECONDS = 1.18;
 const FLAP_OPEN_SECONDS = 1.05;
 const CARD_RELEASE_SECONDS = 2.35;
-const CARD_FORWARD_RELEASE_SECONDS = 1.55;
 const SETTLED_SECONDS = 4.8;
 
-const FLAP_FINAL_ANGLE = 2.24;
-const CARD_FINAL_LIFT = 1.72;
-const CARD_FINAL_FORWARD = 1.08;
-const CARD_FINAL_TILT = 0.03;
+const FLAP_FINAL_ANGLE = 2.86;
+const CARD_FINAL_LIFT = ENVELOPE_CARD_LAYOUT.cardFinalLift;
+const CARD_FINAL_TILT = 0.018;
 
 export function getEnvelopeRevealState(timeSeconds: number): EnvelopeRevealState {
   const t = Math.max(0, timeSeconds);
@@ -70,18 +70,16 @@ function getCard(t: number) {
   }
 
   const elapsed = t - CARD_RELEASE_SECONDS;
-  const liftProgress = clamp01(elapsed / CARD_FORWARD_RELEASE_SECONDS);
-  const forwardProgress = clamp01((elapsed - CARD_FORWARD_RELEASE_SECONDS) / 1.05);
+  const liftProgress = clamp01(elapsed / 1.55);
   const lift = CARD_FINAL_LIFT * springRise(liftProgress);
-  const forward = CARD_FINAL_FORWARD * springRise(forwardProgress);
-  const settle = Math.max(0, elapsed - CARD_FORWARD_RELEASE_SECONDS);
-  const wobble = Math.exp(-settle * 2.5) * Math.sin(settle * 10) * 0.07;
+  const settle = Math.max(0, elapsed - 1.55);
+  const wobble = Math.exp(-settle * 2.8) * Math.sin(settle * 10) * 0.035;
 
   return {
     visible: true,
     lift,
-    forward,
-    tilt: CARD_FINAL_TILT * easeOutCubic(forwardProgress) + wobble,
+    forward: 0,
+    tilt: CARD_FINAL_TILT * easeOutCubic(liftProgress) + wobble,
     wobble,
   };
 }

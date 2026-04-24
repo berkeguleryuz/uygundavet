@@ -12,6 +12,20 @@ const createSchema = z.object({
   groomName: z.string().optional(),
   locale: z.enum(["tr", "en", "de"]).optional(),
   templateId: z.string().optional(),
+  // Optional theme override for blank-from-sample flows (homepage design grid).
+  theme: z
+    .object({
+      bgColor: z.string().optional(),
+      accentColor: z.string().optional(),
+      envelope: z
+        .object({
+          color: z.string().optional(),
+          liningPattern: z.string().optional(),
+          flapColor: z.string().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export async function GET() {
@@ -106,6 +120,26 @@ export async function POST(req: Request) {
       groomName: parsed.data.groomName,
       locale: parsed.data.locale ?? "tr",
     });
+    if (parsed.data.theme) {
+      doc = {
+        ...doc,
+        theme: {
+          ...doc.theme,
+          bgColor: parsed.data.theme.bgColor ?? doc.theme.bgColor,
+          accentColor: parsed.data.theme.accentColor ?? doc.theme.accentColor,
+          envelope: {
+            ...doc.theme.envelope,
+            color: parsed.data.theme.envelope?.color ?? doc.theme.envelope.color,
+            liningPattern:
+              parsed.data.theme.envelope?.liningPattern ??
+              doc.theme.envelope.liningPattern,
+            flapColor:
+              parsed.data.theme.envelope?.flapColor ??
+              doc.theme.envelope.flapColor,
+          },
+        },
+      };
+    }
   }
 
   // generate unique slug (retry on collision)

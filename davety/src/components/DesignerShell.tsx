@@ -47,7 +47,7 @@ export function DesignerShell({
   }
 
   return (
-    <div className="min-h-dvh grid grid-rows-[56px_1fr] bg-background">
+    <div className="h-dvh grid grid-rows-[56px_1fr] bg-background overflow-hidden">
       {/* Top bar */}
       <header className="border-b border-border flex items-center justify-between px-4">
         <div className="flex items-center gap-3">

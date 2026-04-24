@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { ENVELOPE_CARD_LAYOUT } from "./envelopeGeometry.ts";
 import { getEnvelopeRevealState } from "./envelopePhysics.ts";
 
 describe("getEnvelopeRevealState", () => {
@@ -31,28 +32,33 @@ describe("getEnvelopeRevealState", () => {
     assert.equal(state.card.visible, false);
   });
 
-  it("keeps the card inside the pocket until its bottom clears the rim", () => {
+  it("keeps the card moving vertically inside the pocket", () => {
     const state = getEnvelopeRevealState(2.7);
-    const rimY = 0.34;
-    const cardBaseY = -0.24;
-    const cardHalfHeight = 1.06;
-    const cardBottom = cardBaseY + state.card.lift - cardHalfHeight;
+    const cardBottom =
+      ENVELOPE_CARD_LAYOUT.cardBaseY +
+      state.card.lift -
+      ENVELOPE_CARD_LAYOUT.cardHeight / 2;
 
     assert.equal(state.phase, "emerging");
     assert.equal(state.card.visible, true);
-    assert.ok(cardBottom < rimY);
-    assert.ok(state.card.forward < 0.02);
+    assert.ok(cardBottom < ENVELOPE_CARD_LAYOUT.pocketRimY);
+    assert.equal(state.card.forward, 0);
   });
 
   it("settles with the invitation readable in front of the open envelope", () => {
     const state = getEnvelopeRevealState(5.2);
+    const cardBottom =
+      ENVELOPE_CARD_LAYOUT.cardBaseY +
+      state.card.lift -
+      ENVELOPE_CARD_LAYOUT.cardHeight / 2;
 
     assert.equal(state.phase, "settled");
     assert.equal(state.card.visible, true);
     assert.ok(Math.abs(state.envelope.rotationY - Math.PI) < 0.04);
-    assert.ok(Math.abs(state.flap.angle - 2.24) < 0.08);
-    assert.ok(Math.abs(state.card.lift - 1.72) < 0.08);
-    assert.ok(Math.abs(state.card.forward - 1.08) < 0.08);
-    assert.ok(Math.abs(state.card.tilt - 0.03) < 0.06);
+    assert.ok(Math.abs(state.flap.angle - 2.86) < 0.08);
+    assert.ok(Math.abs(state.card.lift - ENVELOPE_CARD_LAYOUT.cardFinalLift) < 0.08);
+    assert.ok(cardBottom <= ENVELOPE_CARD_LAYOUT.pocketRimY - 0.08);
+    assert.equal(state.card.forward, 0);
+    assert.ok(Math.abs(state.card.tilt - 0.018) < 0.04);
   });
 });

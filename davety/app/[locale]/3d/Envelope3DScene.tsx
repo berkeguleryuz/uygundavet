@@ -37,8 +37,8 @@ export function Envelope3DScene() {
       const dx = (e.clientX - cx) / r.width;
       const dy = (e.clientY - cy) / r.height;
       setTilt({
-        x: clamp(-4 - dy * 10, -14, 6),
-        y: clamp(dx * 18, -22, 22),
+        x: clamp(-4 - dy * 6, -10, 4),
+        y: clamp(dx * 7, -7, 7),
       });
     };
     window.addEventListener("mousemove", onMove);
@@ -492,19 +492,15 @@ function FlapPiece({ active }: { active: boolean }) {
         height: FLAP_HEIGHT,
         transformStyle: "preserve-3d",
         transformOrigin: "center top",
-        transform: `translateZ(${-D / 2 - 0.6}px) rotateY(180deg) rotateX(${
-          active ? -180 : 0
-        }deg)`,
-        // Rotation animates the flap from closed to open during the body
-        // flip so the viewer reads a 4 → 5 transition; the flap then snaps
-        // out of view by the time the card begins to emerge (stage flips to
-        // "emerging" at 1.1s). This leaves only the envelope's V opening
-        // with InnerLining visible — no 5th piece lingering in front of
-        // the rising invitation.
-        opacity: active ? 0 : 1,
+        // Open state also shifts the flap backward in Z so it settles BEHIND
+        // the card plane (world z<0 after the body's rotateY(180)). Closed
+        // state sits just in front of the pocket walls to cover the V.
+        transform: `translateZ(${
+          active ? -D / 2 - 0.6 + 30 : -D / 2 - 0.6
+        }px) rotateY(180deg) rotateX(${active ? -180 : 0}deg)`,
         transition: active
-          ? "transform 0.5s cubic-bezier(0.65, 0, 0.25, 1) 0.55s, opacity 0.15s ease-out 0.95s"
-          : "transform 0.3s ease, opacity 0.2s ease",
+          ? "transform 0.9s cubic-bezier(0.65, 0, 0.25, 1) 0.55s"
+          : "transform 0.3s ease",
         pointerEvents: "none",
       }}
     >

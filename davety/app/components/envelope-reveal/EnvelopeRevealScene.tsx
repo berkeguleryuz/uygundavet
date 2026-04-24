@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import type { InvitationDoc } from "@davety/schema";
+import { ENVELOPE_CARD_LAYOUT, ENVELOPE_RENDER_DEPTHS } from "./envelopeGeometry";
 import { getEnvelopeRevealState } from "./envelopePhysics";
 
 interface EnvelopeRevealSceneProps {
@@ -15,7 +16,13 @@ const ENVELOPE_W = 3.25;
 const ENVELOPE_H = 2.02;
 const ENVELOPE_DEPTH = 0.08;
 const FLAP_H = 1.12;
-const CARD_BASE_Y = -0.24;
+const CARD_BASE_Y = ENVELOPE_CARD_LAYOUT.cardBaseY;
+const {
+  backBaseZ: BACK_BASE_Z,
+  cardZ: CARD_Z,
+  pocketZ: POCKET_Z,
+  flapZ: FLAP_Z,
+} = ENVELOPE_RENDER_DEPTHS;
 
 export function EnvelopeRevealScene({ invitation }: EnvelopeRevealSceneProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -81,9 +88,9 @@ export function EnvelopeRevealScene({ invitation }: EnvelopeRevealSceneProps) {
       envelope.flapPivot.rotation.x = -state.flap.angle;
       envelope.card.visible = state.card.visible;
       envelope.card.position.y = CARD_BASE_Y + state.card.lift;
-      envelope.card.position.z = -0.025 - state.card.forward;
+      envelope.card.position.z = CARD_Z;
       envelope.card.rotation.x = -0.02 - state.card.tilt;
-      envelope.card.rotation.z = state.card.wobble * 0.4;
+      envelope.card.rotation.z = state.card.wobble * 0.18;
 
       stage.rotation.x += ((-pointer.y * 0.025) - stage.rotation.x) * 0.04;
       stage.rotation.y += ((pointer.x * 0.025) - stage.rotation.y) * 0.04;
@@ -194,10 +201,16 @@ function createEnvelope(invitation: InvitationDoc) {
     metalness: 0.01,
     side: THREE.DoubleSide,
   });
+  const paperDark = new THREE.MeshStandardMaterial({
+    color: "#d2c0a3",
+    roughness: 0.86,
+    metalness: 0.01,
+    side: THREE.DoubleSide,
+  });
   const lining = new THREE.MeshStandardMaterial({
-    color: "#2a211d",
-    roughness: 0.74,
-    metalness: 0.03,
+    color: "#efe2ca",
+    roughness: 0.9,
+    metalness: 0,
     side: THREE.DoubleSide,
   });
 
@@ -210,84 +223,146 @@ function createEnvelope(invitation: InvitationDoc) {
   front.receiveShadow = true;
   root.add(front);
 
-  const backBase = new THREE.Mesh(
-    new THREE.BoxGeometry(ENVELOPE_W, ENVELOPE_H, ENVELOPE_DEPTH * 0.65),
-    paper,
-  );
-  backBase.position.z = -ENVELOPE_DEPTH / 2;
-  backBase.castShadow = true;
-  backBase.receiveShadow = true;
-  root.add(backBase);
+  addPanel(root, paper, envelopeRect(), BACK_BASE_Z, 0.018);
+  addPanel(root, lining, [
+    [-ENVELOPE_W / 2 + 0.16, ENVELOPE_H / 2 - 0.16],
+    [ENVELOPE_W / 2 - 0.16, ENVELOPE_H / 2 - 0.16],
+    [0.9, 0.23],
+    [0, -0.03],
+    [-0.9, 0.23],
+  ], -0.09, 0.01);
 
-  const liner = new THREE.Mesh(
-    makeTriangleGeometry([
-      [-ENVELOPE_W / 2 + 0.12, ENVELOPE_H / 2 - 0.1],
-      [ENVELOPE_W / 2 - 0.12, ENVELOPE_H / 2 - 0.1],
-      [0, 0.18],
-    ]),
-    lining,
-  );
-  liner.position.z = -0.005;
-  root.add(liner);
+  const card = createInvitationCard(invitation);
+  card.position.set(0, CARD_BASE_Y, CARD_Z);
+  card.visible = false;
+  root.add(card);
 
-  addPocketTriangle(root, paperShade, [
+  addPanel(root, paperShade, [
     [-ENVELOPE_W / 2, -ENVELOPE_H / 2],
     [-ENVELOPE_W / 2, ENVELOPE_H / 2],
-    [0, 0.18],
-  ]);
-  addPocketTriangle(root, paperShade, [
+    [-0.92, 0.23],
+    [0, -0.24],
+  ], POCKET_Z - 0.004, 0.016);
+  addPanel(root, paperShade, [
     [ENVELOPE_W / 2, -ENVELOPE_H / 2],
     [ENVELOPE_W / 2, ENVELOPE_H / 2],
-    [0, 0.18],
-  ]);
-  addPocketTriangle(root, paper, [
+    [0.92, 0.23],
+    [0, -0.24],
+  ], POCKET_Z - 0.006, 0.016);
+  addPanel(root, paper, [
     [-ENVELOPE_W / 2, -ENVELOPE_H / 2],
     [ENVELOPE_W / 2, -ENVELOPE_H / 2],
-    [0, 0.18],
-  ]);
+    [0.96, 0.31],
+    [-0.96, 0.31],
+  ], POCKET_Z - 0.012, 0.018);
+  addPanel(root, paperDark, [
+    [-0.96, 0.31],
+    [0.96, 0.31],
+    [0.84, 0.22],
+    [-0.84, 0.22],
+  ], POCKET_Z - 0.024, 0.008);
+  addCreaseLine(root, [
+    [-ENVELOPE_W / 2 + 0.06, ENVELOPE_H / 2 - 0.04],
+    [-0.92, 0.23],
+    [0, -0.24],
+    [0.92, 0.23],
+    [ENVELOPE_W / 2 - 0.06, ENVELOPE_H / 2 - 0.04],
+  ], POCKET_Z - 0.04);
+  addCreaseLine(root, [
+    [-ENVELOPE_W / 2 + 0.08, -ENVELOPE_H / 2 + 0.04],
+    [-0.96, 0.31],
+    [0.96, 0.31],
+    [ENVELOPE_W / 2 - 0.08, -ENVELOPE_H / 2 + 0.04],
+  ], POCKET_Z - 0.041);
 
   const flapPivot = new THREE.Group();
-  flapPivot.position.set(0, ENVELOPE_H / 2, 0.035);
+  flapPivot.position.set(0, ENVELOPE_H / 2, FLAP_Z);
   root.add(flapPivot);
 
   const flap = new THREE.Mesh(
-    makeTriangleGeometry([
+    makePanelGeometry([
       [-ENVELOPE_W / 2, 0],
       [ENVELOPE_W / 2, 0],
-      [0, -FLAP_H],
-    ]),
+      [0.72, -FLAP_H],
+      [-0.72, -FLAP_H],
+    ], 0.018),
     paper,
   );
   flap.castShadow = true;
   flap.receiveShadow = true;
   flapPivot.add(flap);
 
-  const card = createInvitationCard(invitation);
-  card.position.set(0, CARD_BASE_Y, -0.025);
-  card.visible = false;
-  root.add(card);
+  const glue = new THREE.Mesh(
+    makePanelGeometry([
+      [-ENVELOPE_W / 2 + 0.34, -0.12],
+      [ENVELOPE_W / 2 - 0.34, -0.12],
+      [0.54, -FLAP_H + 0.2],
+      [-0.54, -FLAP_H + 0.2],
+    ], 0.008),
+    new THREE.MeshStandardMaterial({
+      color: "#f8efd9",
+      roughness: 0.92,
+      metalness: 0,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.18,
+    }),
+  );
+  glue.position.z = -0.014;
+  flapPivot.add(glue);
 
   return { root, flapPivot, card };
 }
 
-function addPocketTriangle(
+function addPanel(
   root: THREE.Group,
   material: THREE.Material,
   points: Array<[number, number]>,
+  z: number,
+  thickness: number,
 ) {
-  const mesh = new THREE.Mesh(makeTriangleGeometry(points), material);
-  mesh.position.z = 0.02;
+  const mesh = new THREE.Mesh(makePanelGeometry(points, thickness), material);
+  mesh.position.z = z;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   root.add(mesh);
 }
 
-function makeTriangleGeometry(points: Array<[number, number]>) {
+function addCreaseLine(root: THREE.Group, points: Array<[number, number]>, z: number) {
+  const geometry = new THREE.BufferGeometry().setFromPoints(
+    points.map(([x, y]) => new THREE.Vector3(x, y, z)),
+  );
+  const line = new THREE.Line(
+    geometry,
+    new THREE.LineBasicMaterial({
+      color: "#b7a486",
+      transparent: true,
+      opacity: 0.72,
+    }),
+  );
+  root.add(line);
+}
+
+function envelopeRect() {
+  return [
+    [-ENVELOPE_W / 2, -ENVELOPE_H / 2],
+    [ENVELOPE_W / 2, -ENVELOPE_H / 2],
+    [ENVELOPE_W / 2, ENVELOPE_H / 2],
+    [-ENVELOPE_W / 2, ENVELOPE_H / 2],
+  ] satisfies Array<[number, number]>;
+}
+
+function makePanelGeometry(points: Array<[number, number]>, thickness: number) {
   const shape = new THREE.Shape();
   shape.moveTo(points[0][0], points[0][1]);
   points.slice(1).forEach(([x, y]) => shape.lineTo(x, y));
   shape.closePath();
-  return new THREE.ShapeGeometry(shape);
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: thickness,
+    bevelEnabled: false,
+  });
+  geometry.translate(0, 0, -thickness / 2);
+  return geometry;
 }
 
 function makeFrontEnvelopeMaterials() {
@@ -305,7 +380,11 @@ function createInvitationCard(invitation: InvitationDoc) {
   const texture = makeInvitationTexture(invitation);
   const front = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.72 });
   const edge = new THREE.MeshStandardMaterial({ color: "#eee8d9", roughness: 0.8 });
-  const card = new THREE.Mesh(new THREE.BoxGeometry(1.34, 2.12, 0.035), [
+  const card = new THREE.Mesh(new THREE.BoxGeometry(
+    ENVELOPE_CARD_LAYOUT.cardWidth,
+    ENVELOPE_CARD_LAYOUT.cardHeight,
+    ENVELOPE_CARD_LAYOUT.cardDepth,
+  ), [
     edge,
     edge,
     edge,
@@ -341,16 +420,6 @@ function drawFrontEnvelope(ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.fillStyle = "#f3ead8";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.strokeStyle = "rgba(37,34,36,0.16)";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(600, 390);
-  ctx.lineTo(1200, 0);
-  ctx.moveTo(0, 760);
-  ctx.lineTo(600, 390);
-  ctx.lineTo(1200, 760);
-  ctx.stroke();
   ctx.fillStyle = "#252224";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

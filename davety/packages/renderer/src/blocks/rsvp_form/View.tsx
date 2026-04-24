@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RsvpFormData } from "@davety/schema";
 import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
 import { apiUrl, useRendererContext } from "../../context";
@@ -12,6 +12,7 @@ export function RsvpFormView({
 }: BlockViewProps<RsvpFormData>) {
   const { slug: ctxSlug, publicBase } = useRendererContext();
   const rootStyle = styleToCss(block.style);
+  const [open, setOpen] = useState(false);
   const [attending, setAttending] = useState<"yes" | "no" | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -19,6 +20,17 @@ export function RsvpFormView({
   const [note, setNote] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  // Lock body scroll while the modal is open (guest view only; editors
+  // shouldn't have it open anyway).
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   const click = (id: string) =>
     editable && onFieldSelect
@@ -59,105 +71,162 @@ export function RsvpFormView({
     }
   }
 
-  if (submitted) {
-    return (
-      <section className="px-6 py-10 text-center" style={rootStyle}>
-        <h3 className="font-display text-2xl mb-2">Teşekkürler</h3>
-        <p className="opacity-70 text-sm">Cevabın kaydedildi.</p>
-      </section>
-    );
-  }
+  const buttonLabel =
+    (block.data as { buttonLabel?: string }).buttonLabel ?? "Katılım Bilgisi";
 
   return (
-    <section className="px-6 py-10" style={rootStyle}>
+    <section className="px-6 py-10 text-center" style={rootStyle}>
       <h3
         {...click("heading")}
-        className="font-display text-2xl text-center mb-2"
+        className="font-display text-2xl mb-2"
         style={fieldStyle(block, "heading")}
       >
         Katılım Bilgileri
       </h3>
-
       {block.data.note ? (
         <p
           {...click("note")}
-          className="text-sm text-center max-w-md mx-auto opacity-80 mb-6"
+          className="text-sm max-w-md mx-auto opacity-80 mb-5"
           style={fieldStyle(block, "note")}
         >
           {block.data.note}
         </p>
       ) : null}
 
-      <form onSubmit={handleSubmit} className="max-w-sm mx-auto space-y-3">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setAttending("yes")}
-            className={`flex-1 py-2 rounded-full text-sm border ${
-              attending === "yes"
-                ? "bg-current/90 text-white"
-                : "border-current/30 hover:bg-current/5"
-            }`}
-          >
-            Katılacağım
-          </button>
-          <button
-            type="button"
-            onClick={() => setAttending("no")}
-            className={`flex-1 py-2 rounded-full text-sm border ${
-              attending === "no"
-                ? "bg-current/90 text-white"
-                : "border-current/30 hover:bg-current/5"
-            }`}
-          >
-            Katılamayacağım
-          </button>
-        </div>
+      <button
+        type="button"
+        {...click("buttonLabel")}
+        onClick={(e) => {
+          if (editable) {
+            // in editor, let the field-select handler take over via click()
+            return;
+          }
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        className="inline-flex items-center justify-center rounded-full bg-current/90 text-white px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90"
+        style={fieldStyle(block, "buttonLabel")}
+      >
+        {buttonLabel}
+      </button>
 
-        <input
-          required
-          placeholder="Ad Soyad"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-md border border-current/20 bg-transparent px-3 py-2 text-sm"
-        />
-        <input
-          required
-          type="tel"
-          placeholder="Telefon"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="w-full rounded-md border border-current/20 bg-transparent px-3 py-2 text-sm"
-        />
-        {attending === "yes" ? (
-          <div>
-            <label className="text-xs opacity-70 mb-1 block">Kişi Sayısı</label>
-            <input
-              type="number"
-              min={1}
-              max={20}
-              value={guestCount}
-              onChange={(e) => setGuestCount(parseInt(e.target.value, 10) || 1)}
-              className="w-full rounded-md border border-current/20 bg-transparent px-3 py-2 text-sm"
-            />
-          </div>
-        ) : null}
-        <textarea
-          rows={2}
-          placeholder="Not (opsiyonel)"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          className="w-full rounded-md border border-current/20 bg-transparent px-3 py-2 text-sm resize-none"
-        />
-
-        <button
-          type="submit"
-          disabled={busy || attending === null}
-          className="w-full rounded-full bg-current/90 text-white py-3 text-xs font-chakra uppercase tracking-[0.2em] disabled:opacity-40 cursor-pointer"
+      {/* Popup — guest view */}
+      {open && !editable ? (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => !busy && setOpen(false)}
         >
-          {busy ? "..." : "Gönder"}
-        </button>
-      </form>
+          <div
+            className="bg-white text-[#252224] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {submitted ? (
+              <div className="p-8 text-center">
+                <h4 className="font-display text-2xl mb-2">Teşekkürler</h4>
+                <p className="opacity-70 text-sm mb-5">Cevabın kaydedildi.</p>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="rounded-full bg-[#252224] text-white px-6 py-2 text-xs uppercase tracking-[0.2em] cursor-pointer"
+                >
+                  Kapat
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="p-6 space-y-3">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <div>
+                    <h4 className="font-display text-xl">Katılım Bilgileri</h4>
+                    {block.data.note ? (
+                      <p className="text-xs opacity-70 mt-1">{block.data.note}</p>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label="Kapat"
+                    className="shrink-0 rounded-full size-8 flex items-center justify-center hover:bg-black/5 cursor-pointer text-lg"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAttending("yes")}
+                    className={`flex-1 py-2 rounded-full text-sm border ${
+                      attending === "yes"
+                        ? "bg-[#252224] text-white border-[#252224]"
+                        : "border-black/20 hover:bg-black/5"
+                    }`}
+                  >
+                    Katılacağım
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAttending("no")}
+                    className={`flex-1 py-2 rounded-full text-sm border ${
+                      attending === "no"
+                        ? "bg-[#252224] text-white border-[#252224]"
+                        : "border-black/20 hover:bg-black/5"
+                    }`}
+                  >
+                    Katılamayacağım
+                  </button>
+                </div>
+
+                <input
+                  required
+                  placeholder="Ad Soyad"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-md border border-black/20 bg-white px-3 py-2 text-sm"
+                />
+                <input
+                  required
+                  type="tel"
+                  placeholder="Telefon"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-md border border-black/20 bg-white px-3 py-2 text-sm"
+                />
+                {attending === "yes" ? (
+                  <div>
+                    <label className="text-xs opacity-70 mb-1 block">
+                      Kişi Sayısı
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={guestCount}
+                      onChange={(e) =>
+                        setGuestCount(parseInt(e.target.value, 10) || 1)
+                      }
+                      className="w-full rounded-md border border-black/20 bg-white px-3 py-2 text-sm"
+                    />
+                  </div>
+                ) : null}
+                <textarea
+                  rows={2}
+                  placeholder="Not (opsiyonel)"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="w-full rounded-md border border-black/20 bg-white px-3 py-2 text-sm resize-none"
+                />
+
+                <button
+                  type="submit"
+                  disabled={busy || attending === null}
+                  className="w-full rounded-full bg-[#252224] text-white py-3 text-xs font-chakra uppercase tracking-[0.2em] disabled:opacity-40 cursor-pointer"
+                >
+                  {busy ? "..." : "Gönder"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

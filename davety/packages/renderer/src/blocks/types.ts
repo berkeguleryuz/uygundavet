@@ -38,7 +38,7 @@ export function styleToCss(style: BlockStyle): CSSProperties {
   };
 }
 
-export function fieldStyle(block: Block, fieldId: string): CSSProperties {
+export function fieldStyle(block: Block<unknown>, fieldId: string): CSSProperties {
   const override = block.style.fieldOverrides?.[fieldId];
   if (!override) return {};
   return {
