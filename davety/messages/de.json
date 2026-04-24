@@ -1,0 +1,121 @@
+{
+  "Common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "continue": "Weiter",
+    "loading": "Laden"
+  },
+  "Landing": {
+    "title": "Gestalte deine digitale Einladung",
+    "subtitle": "Tippe auf den 3D-Umschlag, wähle ein Datum, erstelle deine Einladung.",
+    "cta": "Einladung erstellen",
+    "viewSample": "Beispiel ansehen"
+  },
+  "DateDialog": {
+    "title": "Wähle das Hochzeitsdatum",
+    "subtitle": "Wir erstellen deine Einladung auf Basis dieses Datums. Du kannst es später ändern.",
+    "dateLabel": "Datum",
+    "timeLabel": "Uhrzeit",
+    "submit": "Weiter"
+  },
+  "Editor": {
+    "stepTitle": "1/3: Einladung bearbeiten",
+    "save": "Speichern",
+    "whatsappHelp": "WhatsApp Hilfe",
+    "mainButton": "Einladung speichern",
+    "tabs": {
+      "design": "Einladungsdesign",
+      "envelope": "Umschlagdesign",
+      "music": "Hintergrundmusik"
+    },
+    "viewChanges": "Änderungen ansehen",
+    "advanced": "Erweiterte Einstellungen",
+    "textPanel": {
+      "size": "Textgröße",
+      "align": "Textausrichtung",
+      "color": "Textfarbe",
+      "style": "Textstil",
+      "advanced": "Erweitert",
+      "show": "Anzeigen",
+      "fontStyle": "Schriftart",
+      "fontSearch": "Schrift suchen",
+      "categories": {
+        "all": "Alle",
+        "modern": "Modern",
+        "classic": "Klassisch",
+        "typewriter": "Schreibmaschine",
+        "handwriting": "Handschrift",
+        "display": "Display"
+      }
+    },
+    "block": {
+      "hide": "Ausblenden",
+      "show": "Einblenden",
+      "info": "?",
+      "chooseLocation": "Ort wählen",
+      "changeDate": "Datum ändern",
+      "enterInfo": "Infos eingeben",
+      "changeSettings": "Einstellungen",
+      "uploadMedia": "Bild/Video hochladen",
+      "startDesign": "Design starten"
+    },
+    "onboarding": {
+      "congrats": "Herzlichen Glückwunsch!",
+      "firstStep": "Erster Schritt deiner Einladungsgestaltung.",
+      "editHint": "Klicke auf den Text, den du ändern möchtest.",
+      "buttonsHint": "Diese Buttons erscheinen beim Textklick.",
+      "hideButton": "Blendet den ausgewählten Bereich aus.",
+      "infoButton": "Gibt Infos zum ausgewählten Bereich.",
+      "styleButton": "Ändert Stil und Farbe des Textes.",
+      "spacingButtons": "Ziehen zum Anpassen des Abstands.",
+      "yellowHint": "Klicke die hellgelben Bereiche."
+    },
+    "countdown": {
+      "days": "Tage",
+      "hours": "Stunden",
+      "minutes": "Minuten",
+      "seconds": "Sekunden",
+      "today": "Hochzeitstag"
+    },
+    "errors": {
+      "saveFailed": "Speichern fehlgeschlagen.",
+      "staleVersion": "Änderung in einem anderen Tab. Bitte neu laden."
+    }
+  },
+  "Publish": {
+    "title": "Deine Einladung ist live",
+    "subtitle": "Teile deinen Einladungslink.",
+    "shareLink": "Dein Teilen-Link",
+    "copy": "Kopieren",
+    "whatsappShare": "Auf WhatsApp teilen",
+    "customLink": "Benutzerlink",
+    "customLinkDesc": "Erstelle einen lesbareren, prestigevolleren Link.",
+    "currentLink": "Aktueller Link",
+    "customize": "Link anpassen"
+  },
+  "Envelope": {
+    "view": "Ansehen",
+    "edit": "Bearbeiten",
+    "favorite": "Favorit"
+  },
+  "Blocks": {
+    "hero": {
+      "title": "Hero",
+      "coupleNames": "Paarnamen",
+      "subtitle": "Untertitel",
+      "description": "Beschreibung"
+    },
+    "countdown": { "title": "Countdown" },
+    "families": {
+      "title": "Familien",
+      "brideFamily": "Familie der Braut",
+      "groomFamily": "Familie des Bräutigams"
+    },
+    "eventProgram": { "title": "Programm" },
+    "memoryBook": { "title": "Gästebuch" },
+    "donation": { "title": "Unterstütze uns" }
+  }
+}
