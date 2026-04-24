@@ -9,8 +9,10 @@ const W = 380;
 const H = Math.round(W * 0.62); // 236
 const D = 22; // envelope depth
 const FLAP_H = Math.round(H * 0.55); // 130
-const CARD_W = 340;
-const CARD_H = 560;
+const CARD_W = 300;
+const CARD_H = 440;
+const SCENE_H = 760;
+const ENVELOPE_BOTTOM_OFFSET = 80;
 
 /* ── Palette (matches WeddingEnvelope defaults) ── */
 const ENVELOPE_COLOR = "#f5f1e8";
@@ -62,17 +64,25 @@ export function Envelope3DScene() {
   return (
     <div className="flex flex-col items-center gap-6 pb-24">
       <div
-        ref={sceneRef}
         onClick={handleClick}
         className="select-none"
         style={{
           width: "min(800px, 100%)",
-          height: 780,
-          perspective: "2200px",
-          perspectiveOrigin: "50% 45%",
+          height: SCENE_H,
+          overflow: "hidden",
+          position: "relative",
           cursor: stage === "closed" ? "pointer" : "default",
         }}
       >
+        <div
+          ref={sceneRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            perspective: "2200px",
+            perspectiveOrigin: "50% 70%",
+          }}
+        >
         <div
           style={{
             position: "relative",
@@ -83,16 +93,16 @@ export function Envelope3DScene() {
             transition: "transform 0.55s cubic-bezier(0.2, 0.7, 0.25, 1)",
           }}
         >
-          {/* Envelope body — centered in scene, 3D box, flips 180° Y */}
+          {/* Envelope body — anchored to bottom of scene, 3D box, flips 180° Y */}
           <div
             style={{
               position: "absolute",
               left: "50%",
-              top: "58%",
+              bottom: ENVELOPE_BOTTOM_OFFSET,
               width: W,
               height: H,
               transformStyle: "preserve-3d",
-              transform: `translate(-50%, -50%) rotateY(${flipped ? 180 : 0}deg)`,
+              transform: `translateX(-50%) rotateY(${flipped ? 180 : 0}deg)`,
               transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
             }}
           >
@@ -120,10 +130,10 @@ export function Envelope3DScene() {
             style={{
               position: "absolute",
               left: "50%",
-              top: "58%",
+              bottom: ENVELOPE_BOTTOM_OFFSET - 26,
               width: W * 1.15,
               height: 36,
-              transform: `translate(-50%, ${H / 2 + 26}px) rotateX(90deg)`,
+              transform: `translateX(-50%) rotateX(90deg)`,
               background:
                 "radial-gradient(ellipse at center, rgba(0,0,0,0.28) 0%, transparent 70%)",
               filter: "blur(6px)",
@@ -131,6 +141,7 @@ export function Envelope3DScene() {
               transition: "opacity 0.6s ease",
             }}
           />
+        </div>
         </div>
       </div>
 
@@ -496,11 +507,13 @@ function CardLayer({
   emerging: boolean;
   guestName: string;
 }) {
-  // Card initially sits with its top at envelope top (tucked in, extends below).
-  // When emerging, translates up and forward (in back-face local +Z → toward viewer after flip).
+  // Card sits behind back face (z=-D/2 + 1 in envelope-local, which after body
+  // 180Y flip becomes just behind the V-pocket back face from viewer's side).
+  // It rises straight up through the pocket — only Y translation, like the 2D
+  // version. The portion above envelope top becomes visible because nothing
+  // occludes it; the bottom portion stays hidden behind the V-pocket panel.
   const CARD_TOP_REST = 0;
-  const CARD_RISE = Math.round(CARD_H * 0.55);
-  const CARD_FORWARD = 60;
+  const CARD_RISE = 380;
 
   return (
     <div
@@ -514,13 +527,11 @@ function CardLayer({
           translateZ(${-D / 2 + 1}px)
           rotateY(180deg)
           translateY(${emerging ? -CARD_RISE : 0}px)
-          translateZ(${emerging ? CARD_FORWARD : 0}px)
         `,
         transformStyle: "preserve-3d",
         transition: emerging
           ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1)"
           : "none",
-        zIndex: 50,
         pointerEvents: emerging ? "auto" : "none",
       }}
     >

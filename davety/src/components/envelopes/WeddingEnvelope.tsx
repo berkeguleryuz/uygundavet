@@ -107,9 +107,14 @@ export function WeddingEnvelope({
 
   const handleOpen = () => {
     if (stage !== "closed") return;
-    setStage("flipping");                         // Y-flip starts
-    setTimeout(() => setStage("emerging"), 1100);  // after flip completes, card emerges
-    setTimeout(() => setStage("done"), 3200);      // card translated up
+    // Timeline:
+    //   0.0s  click → Y-flip begins (1s duration)
+    //   0.9s  flap starts lifting (1s, finishes at 1.9s)
+    //   2.9s  1-second pause after flap open, card begins emerging (2s)
+    //   5.0s  card settled → stage "done" (reset button appears)
+    setStage("flipping");
+    setTimeout(() => setStage("emerging"), 2900);
+    setTimeout(() => setStage("done"), 5000);
   };
   const handleReset = () => setStage("closed");
 
@@ -139,9 +144,6 @@ export function WeddingEnvelope({
   const cardTranslateStart = envelopeTop;
   const cardTranslateEnd = sceneTopPad;
 
-  // Lifted flap sits ABOVE envelope when open, showing lining inside.
-  const flapLiftHeight = Math.round(envelopeHeight * 0.55);
-
   return (
     <div
       className={`relative mx-auto ${className ?? ""}`}
@@ -156,62 +158,10 @@ export function WeddingEnvelope({
       style={{
         width: "100%",
         height: innerSceneHeight,
-        perspective: "1800px",
+        perspective: "900px",
+        perspectiveOrigin: "50% 40%",
       }}
     >
-      {/* ─── LIFTED FLAP (z=75) — the "5th piece": opened flap ABOVE envelope,
-               showing lining pattern inside. Appears only after flip completes. ─── */}
-      <div
-        className="absolute left-1/2 pointer-events-none"
-        style={{
-          top: envelopeTop - flapLiftHeight,
-          width: envelopeWidth,
-          height: flapLiftHeight,
-          transform: `translateX(-50%) scaleY(${flipped ? 1 : 0})`,
-          transformOrigin: "bottom center",
-          transition: flipped
-            ? "transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.9s"
-            : "transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
-          zIndex: 40,
-        }}
-      >
-        {/* Paper outer face (pointing up) */}
-        <div
-          className="absolute inset-0"
-          style={{
-            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
-            background: envelopeColor,
-            backgroundImage:
-              "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
-            boxShadow: "0 -6px 14px -4px rgba(0,0,0,0.22)",
-          }}
-        />
-        {/* Inner lining (floral pattern), inset slightly for paper-border effect */}
-        <div
-          className="absolute overflow-hidden"
-          style={{
-            top: "6%",
-            left: "4%",
-            right: "4%",
-            bottom: "8%",
-            clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
-            background: liningBg,
-          }}
-        >
-          <LiningPattern kind={liningPattern} />
-        </div>
-        {/* Fold edge highlight where flap meets envelope top */}
-        <div
-          className="absolute left-0 right-0"
-          style={{
-            bottom: 0,
-            height: 2,
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.15), transparent)",
-          }}
-        />
-      </div>
-
       {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates ─── */}
       <div
         onClick={handleOpen}
@@ -278,6 +228,7 @@ export function WeddingEnvelope({
           className="absolute inset-0"
           style={{
             transform: "rotateY(180deg)",
+            transformStyle: "preserve-3d",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
             background: envelopeColor,
@@ -338,20 +289,86 @@ export function WeddingEnvelope({
             </div>
           </div>
 
-          {/* Flap seal — sits on top triangle, subtle */}
-          {flapSeal ? (
+          {/* ─── FLAP (piece 4) ─── closed = cream paper triangle covering the
+                   V-opening (piece 5). Rotates -180° on top hinge to lift up;
+                   back face (lining pattern) is revealed as it opens. Sits at
+                   z=40 — above lining (z=1), below card (z=50). Opacity gated
+                   so the inner face doesn't bleed through during the Y-flip. ─── */}
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "50%",
+              transform: `rotateX(${flipped ? -180 : 0}deg)`,
+              transformOrigin: "top center",
+              transformStyle: "preserve-3d",
+              opacity: flipped ? 1 : 0,
+              transition: flipped
+                ? "opacity 0.05s linear 0.5s, transform 1s cubic-bezier(0.34, 1.1, 0.64, 1) 0.9s"
+                : "opacity 0.1s, transform 0.3s cubic-bezier(0.5, 0, 0.5, 1)",
+              zIndex: 40,
+            }}
+          >
+            {/* Outer face — cream paper, visible when closed */}
             <div
-              className="absolute pointer-events-none"
+              className="absolute inset-0"
               style={{
-                left: "50%",
-                top: "25%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 2,
+                clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                background: envelopeColor,
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+                boxShadow: "inset 0 -2px 6px rgba(0,0,0,0.12)",
               }}
             >
-              {flapSeal}
+              {flapSeal ? (
+                <div
+                  className="absolute"
+                  style={{
+                    left: "50%",
+                    top: "40%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  {flapSeal}
+                </div>
+              ) : null}
             </div>
-          ) : null}
+            {/* Inner face — lining, revealed after the flap folds -180°.
+                 The face is rotateX(180) relative to the flap; clipPath is
+                 UP-pointing in local coords so after the cascade of rotations
+                 lands it facing the viewer, the triangle's apex sits at the top
+                 and the base sits at the hinge (matches a real opened flap). */}
+            <div
+              className="absolute inset-0"
+              style={{
+                clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+                transform: "rotateX(180deg)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+                background: envelopeColor,
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
+              }}
+            >
+              <div
+                className="absolute overflow-hidden"
+                style={{
+                  top: "8%",
+                  left: "5%",
+                  right: "5%",
+                  bottom: "5%",
+                  clipPath: "polygon(0 100%, 100% 100%, 50% 0)",
+                  background: liningBg,
+                }}
+              >
+                <LiningPattern kind={liningPattern} />
+              </div>
+            </div>
+          </div>
 
           {/* LEFT pocket triangle */}
           <div
