@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { InvitationView } from "@davety/renderer";
-import type { InvitationDoc, Block } from "@davety/schema";
+import { InvitationView, getBlockView } from "@davety/renderer";
+import type { InvitationDoc, Block, HeroData } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
-import { ENVELOPE_PRESETS } from "@/src/components/envelopes/envelopePresets";
 
 interface Props {
   doc: InvitationDoc;
@@ -15,19 +14,9 @@ interface Props {
   isDraft: boolean;
 }
 
-function extractHero(doc: InvitationDoc): {
-  brideName?: string;
-  groomName?: string;
-  subtitle?: string;
-  description?: string;
-} {
-  const hero = doc.blocks.find((b: Block) => b.type === "hero");
-  return (hero?.data ?? {}) as {
-    brideName?: string;
-    groomName?: string;
-    subtitle?: string;
-    description?: string;
-  };
+function findHero(doc: InvitationDoc): Block<HeroData> | null {
+  const hero = doc.blocks.find((b) => b.type === "hero");
+  return (hero as Block<HeroData>) ?? null;
 }
 
 export function PublicInvitation({
@@ -39,10 +28,16 @@ export function PublicInvitation({
 }: Props) {
   const [revealed, setRevealed] = useState(false);
 
-  const hero = extractHero(doc);
+  const hero = findHero(doc);
 
-  // Default envelope preset — eventually stored on the design doc so user can pick.
-  const preset = ENVELOPE_PRESETS[0];
+  const envelopeColor = doc.theme.envelope?.color ?? "#f5eedb";
+  const liningPattern = (doc.theme.envelope?.liningPattern ?? "daisy") as
+    | "daisy"
+    | "rose"
+    | "gold"
+    | "none"
+    | "chevron";
+  const flapColor = doc.theme.envelope?.flapColor ?? envelopeColor;
 
   return (
     <main
@@ -70,25 +65,27 @@ export function PublicInvitation({
             cardWidth={340}
             cardHeight={640}
             layout="replace"
-            cardProps={{
-              brideName: hero.brideName,
-              groomName: hero.groomName,
-              subtitle: hero.subtitle,
-              description: hero.description,
-              weddingDate: doc.meta.weddingDate,
-              weddingTime: doc.meta.weddingTime,
-              locale: doc.meta.locale,
-              accent: doc.theme.accentColor,
-              bg: doc.theme.bgColor,
-            }}
-            {...preset.props}
+            envelopeColor={envelopeColor}
+            flapColor={flapColor}
+            liningPattern={liningPattern}
+            liningBg={doc.theme.accentColor}
+            cardRender={({ width, height }) =>
+              hero ? (
+                <RealHeroCard
+                  doc={doc}
+                  hero={hero}
+                  width={width}
+                  height={height}
+                />
+              ) : null
+            }
           />
           <button
             onClick={() => setRevealed(true)}
             className="mt-6 text-[11px] uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/70 backdrop-blur hover:bg-white cursor-pointer"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
-            Tüm Bloklari Gör
+            Tüm Davetiyeyi Gör
           </button>
         </div>
       ) : (
@@ -107,5 +104,82 @@ export function PublicInvitation({
         </Link>
       ) : null}
     </main>
+  );
+}
+
+/**
+ * What actually slides out of the envelope — the user's real hero block
+ * rendered with their chosen variant (arch / photo / floral-crown / …)
+ * plus the date row, wrapped in a card-sized frame so it looks like a
+ * printable invitation, not a generic placeholder.
+ */
+// Resolve the hero block view once at module scope so React treats it as a
+// stable component (calling getBlockView inside render triggers the
+// "Cannot create components during render" rule).
+const HeroViewComponent = getBlockView("hero") as React.ComponentType<{
+  block: Block<HeroData>;
+  theme: InvitationDoc["theme"];
+  editable?: boolean;
+}>;
+
+function RealHeroCard({
+  doc,
+  hero,
+  width,
+  height,
+}: {
+  doc: InvitationDoc;
+  hero: Block<HeroData>;
+  width: number;
+  height: number;
+}) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-md shadow-xl"
+      style={{
+        width,
+        height,
+        background: doc.theme.bgColor,
+        color: doc.theme.accentColor,
+      }}
+    >
+      <HeroViewComponent block={hero} theme={doc.theme} editable={false} />
+      <div
+        className="absolute inset-x-0 bottom-0 px-6 py-4 text-center text-[11px] uppercase tracking-[0.25em] border-t"
+        style={{
+          fontFamily: "Space Grotesk, sans-serif",
+          borderColor: `${doc.theme.accentColor}22`,
+          color: `${doc.theme.accentColor}cc`,
+        }}
+      >
+        <FormattedDate iso={doc.meta.weddingDate} time={doc.meta.weddingTime} />
+      </div>
+    </div>
+  );
+}
+
+function FormattedDate({ iso, time }: { iso?: string; time?: string }) {
+  if (!iso) return null;
+  const d = new Date(`${iso}T${time ?? "00:00"}:00`);
+  if (isNaN(d.getTime())) return null;
+  const months = [
+    "OCAK",
+    "ŞUBAT",
+    "MART",
+    "NİSAN",
+    "MAYIS",
+    "HAZİRAN",
+    "TEMMUZ",
+    "AĞUSTOS",
+    "EYLÜL",
+    "EKİM",
+    "KASIM",
+    "ARALIK",
+  ];
+  return (
+    <span>
+      {d.getDate()} · {months[d.getMonth()]} · {d.getFullYear()}
+      {time ? ` · ${time}` : ""}
+    </span>
   );
 }

@@ -4,6 +4,8 @@ import { buildDefaultDoc } from "@davety/schema";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { generateShortSlug } from "@/src/lib/slug";
+import { DESIGN_SAMPLES } from "@/app/components/designSamples";
+import { buildDesignDoc } from "@/app/components/buildDesignDoc";
 
 const createSchema = z.object({
   weddingDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -12,6 +14,8 @@ const createSchema = z.object({
   groomName: z.string().optional(),
   locale: z.enum(["tr", "en", "de"]).optional(),
   templateId: z.string().optional(),
+  /** Frontend design sample id (d-1, d-2, …) from the homepage grid. */
+  designId: z.string().optional(),
   // Optional theme override for blank-from-sample flows (homepage design grid).
   theme: z
     .object({
@@ -66,7 +70,35 @@ export async function POST(req: Request) {
 
   let doc: ReturnType<typeof buildDefaultDoc>;
 
-  if (parsed.data.templateId) {
+  // 1) Frontend design sample (homepage grid) — uses the layout variant
+  //    baked into hero + theme from DesignSample. Takes precedence over
+  //    theme/template since it's a complete template.
+  const designSample = parsed.data.designId
+    ? DESIGN_SAMPLES.find((d) => d.id === parsed.data.designId)
+    : null;
+
+  if (designSample) {
+    doc = buildDesignDoc(designSample, {
+      weddingDate: parsed.data.weddingDate,
+      weddingTime: parsed.data.weddingTime,
+      locale: parsed.data.locale ?? "tr",
+    });
+    // Override placeholder couple names if the caller supplied real ones.
+    if (parsed.data.brideName || parsed.data.groomName) {
+      doc.blocks = doc.blocks.map((b) => {
+        if (b.type !== "hero") return b;
+        const hero = b.data as { brideName?: string; groomName?: string };
+        return {
+          ...b,
+          data: {
+            ...b.data,
+            brideName: parsed.data.brideName ?? hero.brideName,
+            groomName: parsed.data.groomName ?? hero.groomName,
+          },
+        };
+      });
+    }
+  } else if (parsed.data.templateId) {
     const template = await prisma.designTemplate.findUnique({
       where: { id: parsed.data.templateId },
       select: { doc: true, published: true },

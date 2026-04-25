@@ -6,6 +6,7 @@ import { useSession, signOut } from "@/src/lib/auth-client";
 
 const TABS = [
   { key: "designs", href: "/", label: "Tasarımlar" },
+  { key: "gallery", href: "/davetiye-galerisi", label: "Galeri" },
   { key: "invitations", href: "/dashboard", label: "Davetiyelerim" },
   { key: "pricing", href: "/pricing", label: "Fiyatlandırma" },
 ] as const;
@@ -15,6 +16,7 @@ type TabKey = (typeof TABS)[number]["key"];
 function activeKeyFromPath(pathname: string): TabKey | null {
   if (pathname.startsWith("/dashboard")) return "invitations";
   if (pathname.startsWith("/pricing")) return "pricing";
+  if (pathname.startsWith("/davetiye-galerisi")) return "gallery";
   if (pathname === "/" || pathname === "") return "designs";
   return null;
 }

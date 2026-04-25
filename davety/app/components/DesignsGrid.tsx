@@ -135,15 +135,9 @@ function DesignDateDialog({
       body: JSON.stringify({
         weddingDate: date,
         weddingTime: time,
-        theme: {
-          bgColor: design.bg,
-          accentColor: design.accent,
-          envelope: {
-            color: design.envelopeColor,
-            liningPattern: design.liningPattern,
-            flapColor: design.flapColor ?? design.envelopeColor,
-          },
-        },
+        // Send the full design id — the server looks it up in DESIGN_SAMPLES
+        // and builds a doc with the matching hero variant + theme + photo.
+        designId: design.id,
       }),
     });
     if (!res.ok) {
