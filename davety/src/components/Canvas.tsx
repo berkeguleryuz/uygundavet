@@ -86,6 +86,9 @@ export function Canvas() {
               <InsertSlot
                 index={i}
                 active={insertingAt === i}
+                // Flip palette upward for the last 3 slots so it doesn't
+                // run off the bottom of the card / canvas.
+                flipUp={i >= doc.blocks.length - 2}
                 onOpen={() => setInsertingAt(i)}
                 onClose={() => setInsertingAt(null)}
                 onPick={(type) => handlePick(i, type)}
@@ -164,10 +167,12 @@ export function Canvas() {
           );
         })}
 
-        {/* Tail insert slot */}
+        {/* Tail insert slot — palette always opens upward since there's
+             nothing below it inside the card. */}
         <InsertSlot
           index={doc.blocks.length}
           active={insertingAt === doc.blocks.length}
+          flipUp
           onOpen={() => setInsertingAt(doc.blocks.length)}
           onClose={() => setInsertingAt(null)}
           onPick={(type) => handlePick(doc.blocks.length, type)}
@@ -208,17 +213,29 @@ function IconBtn({
 function InsertSlot({
   index: _i,
   active,
+  flipUp,
   onOpen,
   onClose,
   onPick,
 }: {
   index: number;
   active: boolean;
+  /** Open the palette above the button instead of below (used for slots
+   *  near the bottom of the card so it doesn't get clipped). */
+  flipUp: boolean;
   onOpen: () => void;
   onClose: () => void;
   onPick: (type: import("@davety/schema").BlockType) => void;
 }) {
   const entries = listBlockEntries();
+
+  // Palette positions itself centered horizontally so it stays inside the
+  // card frame even when the trigger sits at the very edge. Vertical
+  // direction flips based on flipUp so the menu never falls off the
+  // visible canvas — bottom slots open upward.
+  const paletteCls = flipUp
+    ? "absolute bottom-full mb-2 left-1/2 -translate-x-1/2"
+    : "absolute top-full mt-2 left-1/2 -translate-x-1/2";
 
   return (
     <div
@@ -234,10 +251,10 @@ function InsertSlot({
         </button>
       ) : (
         <div
-          className="absolute top-6 z-20 bg-card border border-border rounded-lg shadow-xl p-2 w-72"
+          className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between mb-1 px-1">
+          <div className="flex items-center justify-between mb-1 px-1 sticky top-0 bg-card pb-1">
             <span className="text-[11px] font-medium">Blok ekle</span>
             <button
               onClick={onClose}

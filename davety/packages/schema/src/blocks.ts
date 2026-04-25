@@ -77,12 +77,36 @@ export interface MediaRef {
   variants?: Partial<Record<"thumb" | "md" | "lg" | "original", string>>;
 }
 
+/**
+ * Top-of-card layout variants. Hero renders completely differently per
+ * variant (arched frame, full-bleed photo, oversized typography, etc.)
+ * while still using the same editable fields. Optional — when absent the
+ * renderer falls back to the "classic" variant.
+ */
+export type HeroVariant =
+  | "classic"
+  | "arch"
+  | "photo-top"
+  | "photo-full"
+  | "floral-crown"
+  | "monogram-circle"
+  | "bold-type"
+  | "botanical-frame";
+
 export interface HeroData {
   brideName: string;
   groomName: string;
   subtitle?: string;
   description?: string;
   media?: MediaRef;
+  /** Which top-of-card layout to render. Defaults to "classic" if absent. */
+  variant?: HeroVariant;
+  /** Explicit photo URL for photo-driven variants (photo-top / photo-full). */
+  photoUrl?: string;
+  /** Decorative style for floral-crown / classic ornaments. */
+  decorative?: "daisy" | "rose" | "gold" | "none";
+  /** Accent colour override for SVG flourishes. Falls back to theme.accent. */
+  accent?: string;
 }
 
 export interface CountdownData {

@@ -51,6 +51,13 @@ export function BlockControlsPanel() {
         </span>
       </header>
 
+      {block.type === "hero" ? (
+        <HeroVariantPicker
+          value={(block.data as { variant?: string }).variant ?? "classic"}
+          onChange={(variant) => updateBlockData(blockId, { variant })}
+        />
+      ) : null}
+
       <div className="grid grid-cols-3 gap-2 text-[11px]">
         <Chip
           icon={<MapPin className="size-4" />}
@@ -104,6 +111,46 @@ export function BlockControlsPanel() {
           onClick={() => toggleVisibility(blockId)}
           highlight
         />
+      </div>
+    </div>
+  );
+}
+
+const HERO_VARIANTS: { key: string; label: string }[] = [
+  { key: "classic", label: "Klasik" },
+  { key: "arch", label: "Arch" },
+  { key: "photo-top", label: "Foto-Üst" },
+  { key: "photo-full", label: "Tam Foto" },
+  { key: "floral-crown", label: "Çiçek Taç" },
+  { key: "monogram-circle", label: "Monogram" },
+  { key: "bold-type", label: "Büyük Yazı" },
+  { key: "botanical-frame", label: "Botanik" },
+];
+
+function HeroVariantPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <div className="text-[11px] text-muted-foreground mb-1.5">Kart Düzeni</div>
+      <div className="grid grid-cols-4 gap-1">
+        {HERO_VARIANTS.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => onChange(v.key)}
+            className={`px-1 py-1.5 rounded-md border text-[10px] cursor-pointer transition-colors ${
+              value === v.key
+                ? "bg-foreground text-background border-foreground"
+                : "bg-white border-border text-muted-foreground hover:border-foreground/40"
+            }`}
+          >
+            {v.label}
+          </button>
+        ))}
       </div>
     </div>
   );
