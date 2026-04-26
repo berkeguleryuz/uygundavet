@@ -1,5 +1,5 @@
 import type { CustomNoteData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 export function CustomNoteView({
   block,
@@ -21,11 +21,14 @@ export function CustomNoteView({
       : {};
 
   return (
-    <section className="px-6 py-10" style={rootStyle}>
+    <section
+      className={`px-6 py-10 flex flex-col ${alignClasses(block.style.align)}`}
+      style={rootStyle}
+    >
       {title ? (
         <h3
           {...click("title")}
-          className="font-display text-2xl text-center mb-3"
+          className="font-display text-2xl mb-3"
           style={fieldStyle(block, "title")}
         >
           {title}
@@ -33,7 +36,7 @@ export function CustomNoteView({
       ) : null}
       <p
         {...click("body")}
-        className="text-sm text-center max-w-lg mx-auto leading-relaxed opacity-90 whitespace-pre-wrap"
+        className="text-sm max-w-lg leading-relaxed opacity-90 whitespace-pre-wrap"
         style={fieldStyle(block, "body")}
       >
         {body}

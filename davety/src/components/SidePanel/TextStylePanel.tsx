@@ -40,14 +40,31 @@ export function TextStylePanel() {
   const block = doc.blocks.find((b) => b.id === blockId);
   if (!block) return null;
 
-  const currentField = block.style.fieldOverrides?.[fieldId] ?? {};
+  // For fanout fields (e.g. countdown date), read display values from the
+  // first underlying cell so the inputs show the actual rendered style.
+  const FANOUT_READ: Record<string, string> = {
+    targetIso: "days",
+  };
+  const readFieldId = FANOUT_READ[fieldId] ?? fieldId;
+  const currentField =
+    block.style.fieldOverrides?.[readFieldId] ?? {};
   const fontFamily = currentField.fontFamily ?? block.style.fontFamily ?? "";
   const fontSize = currentField.fontSize ?? block.style.fontSize ?? 24;
   const color = currentField.color ?? block.style.color ?? "#252224";
   const align = block.style.align ?? "center";
 
+  // Some "logical" field IDs map to multiple visual cells. Style edits on
+  // the date field need to fan out to all four countdown numbers
+  // (days/hours/minutes/seconds), since those are what the user sees and
+  // wants to restyle when they pick "Tarihi Değiştir".
+  const FANOUT: Record<string, string[]> = {
+    targetIso: ["days", "hours", "minutes", "seconds"],
+  };
   const update = (patch: Record<string, unknown>) => {
-    updateFieldStyle(blockId, fieldId, patch);
+    const targets = FANOUT[fieldId] ?? [fieldId];
+    for (const id of targets) {
+      updateFieldStyle(blockId, id, patch);
+    }
   };
 
   // Raw text-content editing for the selected field. Reads the current value

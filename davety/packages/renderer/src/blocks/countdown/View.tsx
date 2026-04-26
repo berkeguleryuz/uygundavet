@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CountdownData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 function computeParts(target: number) {
   const now = Date.now();
@@ -48,7 +48,7 @@ export function CountdownView({
 
   return (
     <section className="px-6 py-8" style={rootStyle}>
-      <div className="grid grid-cols-4 gap-3 text-center max-w-md mx-auto">
+      <div className={`grid grid-cols-4 gap-3 max-w-md mx-auto ${alignClasses(block.style.align)}`}>
         <Cell value={parts.d} label={labels.days} editable={editable} labelId="days" clickable={clickable} style={fieldStyle(block, "days")} />
         <Cell value={parts.h} label={labels.hours} editable={editable} labelId="hours" clickable={clickable} style={fieldStyle(block, "hours")} />
         <Cell value={parts.m} label={labels.minutes} editable={editable} labelId="minutes" clickable={clickable} style={fieldStyle(block, "minutes")} />

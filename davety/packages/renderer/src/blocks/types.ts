@@ -38,6 +38,29 @@ export function styleToCss(style: BlockStyle): CSSProperties {
   };
 }
 
+/**
+ * Maps the block-level `style.align` value into Tailwind classes that
+ * control both flex item alignment and text alignment. View components
+ * should compose this into their wrapper className so changes from the
+ * editor's text panel actually move content left/right/center/justify
+ * (instead of being overridden by hardcoded `items-center text-center`).
+ */
+export function alignClasses(
+  align: BlockStyle["align"] | undefined
+): string {
+  switch (align) {
+    case "left":
+      return "items-start text-left";
+    case "right":
+      return "items-end text-right";
+    case "justify":
+      return "items-stretch text-justify";
+    case "center":
+    default:
+      return "items-center text-center";
+  }
+}
+
 export function fieldStyle(block: Block<unknown>, fieldId: string): CSSProperties {
   const override = block.style.fieldOverrides?.[fieldId];
   if (!override) return {};
