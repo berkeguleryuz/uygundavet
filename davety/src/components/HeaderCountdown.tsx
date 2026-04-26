@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 export function HeaderCountdown({
-  dateIso,
-  time,
+  targetIso,
 }: {
-  dateIso: string;
-  time: string;
+  /** Full ISO timestamp the countdown counts down to. Should match the
+   *  countdown block's target so the header and canvas never disagree. */
+  targetIso: string;
 }) {
   const t = useTranslations("Editor.countdown");
-  const target = new Date(`${dateIso}T${time}:00`).getTime();
+  const target = new Date(targetIso).getTime();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {

@@ -30,6 +30,7 @@ export function TextStylePanel() {
   const doc = useEditorStore((s) => s.doc);
   const updateFieldStyle = useEditorStore((s) => s.updateFieldStyle);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
+  const applyPatch = useEditorStore((s) => s.applyPatch);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const fieldId = useUIStore((s) => s.selectedFieldId);
 
@@ -101,7 +102,16 @@ export function TextStylePanel() {
               )}
               onChange={(e) => {
                 const iso = datetimeLocalToIso(e.target.value);
-                if (iso) updateBlockData(blockId, { targetIso: iso });
+                if (!iso) return;
+                updateBlockData(blockId, { targetIso: iso });
+                // Mirror into doc.meta so the header countdown, public page,
+                // and any envelope-card preview that read meta directly stay
+                // in sync with the canvas countdown the user just edited.
+                const [date, time] = splitIso(e.target.value);
+                applyPatch((d) => {
+                  d.meta.weddingDate = date;
+                  d.meta.weddingTime = time;
+                });
               }}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
@@ -358,4 +368,11 @@ function datetimeLocalToIso(local: string): string | null {
   const d = new Date(local);
   if (isNaN(d.getTime())) return null;
   return d.toISOString();
+}
+
+/** Split "2026-06-15T19:00" into ["2026-06-15", "19:00"] for doc.meta which
+ *  stores date and time as separate fields. */
+function splitIso(local: string): [string, string] {
+  const [date = "", time = ""] = local.split("T");
+  return [date, time.slice(0, 5)];
 }

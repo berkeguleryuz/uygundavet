@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { X, Eye, Save, Star, Undo2, Redo2 } from "lucide-react";
-import type { InvitationDoc } from "@davety/schema";
+import type { Block, CountdownData, InvitationDoc } from "@davety/schema";
 import { useRouter } from "@/i18n/navigation";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
@@ -140,10 +140,7 @@ function DesignerShellInner({
           ) : null}
         </div>
 
-        <HeaderCountdown
-          dateIso={doc.meta.weddingDate}
-          time={doc.meta.weddingTime}
-        />
+        <HeaderCountdown targetIso={resolveCountdownIso(doc)} />
 
         <div className="flex items-center gap-2">
           <button
@@ -197,4 +194,17 @@ function DesignerShellInner({
       <PreviewOverlay />
     </div>
   );
+}
+
+/** Single source of truth for the header countdown: prefer the countdown
+ *  block's targetIso (what the user actually sees and edits in the canvas),
+ *  fall back to doc.meta when the doc has no countdown block. Without this
+ *  the header and the in-canvas countdown could disagree if meta and the
+ *  block were ever set independently. */
+function resolveCountdownIso(doc: InvitationDoc): string {
+  const cd = doc.blocks.find((b) => b.type === "countdown") as
+    | Block<CountdownData>
+    | undefined;
+  if (cd?.data.targetIso) return cd.data.targetIso;
+  return `${doc.meta.weddingDate}T${doc.meta.weddingTime}:00`;
 }
