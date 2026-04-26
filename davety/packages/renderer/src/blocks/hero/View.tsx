@@ -146,7 +146,7 @@ function ArchVariant({
   // typography and lets the parent's rounded top do the visual work.
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className={`relative px-10 pt-20 pb-12 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
+      <div className={`relative px-10 pt-10 pb-12 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         <div
           className="text-5xl italic opacity-40 mb-2"
           style={{ fontFamily: "Merienda, serif", color: accent }}

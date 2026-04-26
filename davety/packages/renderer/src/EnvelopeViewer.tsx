@@ -101,7 +101,7 @@ export function EnvelopeViewer({
 
   return (
     <div
-      className={`envelope-scene relative mx-auto ${className ?? ""}`}
+      className={`envelope-scene relative mx-auto min-h-screen ${className ?? ""}`}
       style={{
         width,
         height: height + (isOpen ? height * 0.55 : 0),

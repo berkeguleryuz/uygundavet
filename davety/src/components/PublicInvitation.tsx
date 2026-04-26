@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { InvitationView } from "@davety/renderer";
 import type { InvitationDoc } from "@davety/schema";
@@ -22,14 +22,28 @@ export function PublicInvitation({
   isOwner,
   isDraft,
 }: Props) {
-  const [revealed, setRevealed] = useState(false);
-
   const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
+
+  // Card slot starts at 640px (envelope's natural top-of-page geometry).
+  // `cardExpandedHeight` is what WeddingEnvelope grows to the moment its
+  // internal `dropping` state flips — same render, same CSS transition
+  // tick as the envelope's translateY, so the two animations are
+  // perfectly synced (no parent setTimeout race).
+  const [cardExpandedHeight, setCardExpandedHeight] = useState(700);
+
+  useEffect(() => {
+    function compute() {
+      setCardExpandedHeight(Math.max(640, window.innerHeight - 120));
+    }
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
 
   return (
     <main
-      className="min-h-dvh flex flex-col items-center justify-start px-4 py-10"
-      style={{ background: doc.theme.bgColor }}
+      className="min-h-dvh flex flex-col items-center justify-start py-10"
+      style={{ background: "#252224" }}
     >
       {isDraft && isOwner ? (
         <div className="w-full max-w-2xl mb-6 rounded-lg border border-amber-400/60 bg-amber-50 text-amber-900 px-4 py-2 text-xs text-center">
@@ -44,39 +58,27 @@ export function PublicInvitation({
         </div>
       ) : null}
 
-      {!revealed ? (
-        <div className="flex flex-col items-center gap-6 py-6 w-full">
-          <WeddingEnvelope
-            guestName="Misafir"
-            envelopeWidth={360}
-            cardWidth={340}
-            cardHeight={640}
-            layout="replace"
-            {...resolvedEnvelope}
-            cardRender={({ width, height }) => (
-              <FullInvitationCard
-                doc={doc}
-                slug={slug}
-                width={width}
-                height={height}
-              />
-            )}
-          />
-          <button
-            onClick={() => setRevealed(true)}
-            className="mt-6 text-[11px] uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/70 backdrop-blur hover:bg-white cursor-pointer"
-            style={{ fontFamily: "Space Grotesk, sans-serif" }}
-          >
-            Tüm Davetiyeyi Gör
-          </button>
-        </div>
-      ) : (
-        <div className="w-full max-w-md mx-auto rounded-xl overflow-hidden shadow-2xl animate-in fade-in duration-500">
-          <InvitationView doc={doc} slug={slug} />
-        </div>
-      )}
+      <div className="flex flex-col items-center gap-6 pb-6 w-full">
+        <WeddingEnvelope
+          guestName="Misafir"
+          envelopeWidth={360}
+          cardWidth={340}
+          cardHeight={640}
+          cardExpandedHeight={cardExpandedHeight}
+          layout="replace"
+          {...resolvedEnvelope}
+          cardRender={({ width, height }) => (
+            <FullInvitationCard
+              doc={doc}
+              slug={slug}
+              width={width}
+              height={height}
+            />
+          )}
+        />
+      </div>
 
-      {isOwner && revealed ? (
+      {isOwner ? (
         <Link
           href={`/design/invitations/${designId}/editor`}
           className="mt-8 text-xs uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/80 backdrop-blur hover:bg-white cursor-pointer"
@@ -115,10 +117,10 @@ function FullInvitationCard({
         height,
         background: doc.theme.bgColor,
         color: doc.theme.accentColor,
+        transition: "height 1.4s cubic-bezier(0.55, 0, 0.2, 1)",
       }}
     >
       <InvitationView doc={doc} slug={slug} />
     </div>
   );
 }
-
