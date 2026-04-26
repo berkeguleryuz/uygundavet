@@ -328,11 +328,22 @@ function InsertSlot({
    The envelope component handles its own click → flap-open animation,
    so theme tweaks (color, flap, lining) can be verified end-to-end
    the same way recipients will see them. */
+/* Resolve hero view component once at module scope so it stays a stable
+   ref across renders (calling getBlockView in render breaks React rules). */
+const EnvelopeHeroView = getBlockView("hero") as React.ComponentType<{
+  block: import("@davety/schema").Block<import("@davety/schema").HeroData>;
+  theme: import("@davety/schema").InvitationDoc["theme"];
+  editable?: boolean;
+}>;
+
 function EnvelopeCanvas() {
   const doc = useEditorStore((s) => s.doc);
   if (!doc) return null;
 
   const resolved = resolveEnvelopeProps(doc.theme.envelope);
+  const hero = doc.blocks.find((b) => b.type === "hero") as
+    | import("@davety/schema").Block<import("@davety/schema").HeroData>
+    | undefined;
 
   return (
     <div className="min-h-0 overflow-auto bg-muted/30 py-10 px-6 flex flex-col items-center gap-6">
@@ -346,6 +357,22 @@ function EnvelopeCanvas() {
         cardHeight={520}
         layout="replace"
         {...resolved}
+        cardRender={({ width, height }) =>
+          hero ? (
+            <div
+              className="relative overflow-hidden rounded-md shadow-xl"
+              style={{
+                width,
+                height,
+                background: doc.theme.bgColor,
+                color: doc.theme.accentColor,
+                ...getCardShapeStyle(doc),
+              }}
+            >
+              <EnvelopeHeroView block={hero} theme={doc.theme} editable={false} />
+            </div>
+          ) : null
+        }
       />
     </div>
   );
