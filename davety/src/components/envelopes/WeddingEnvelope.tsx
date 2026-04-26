@@ -70,6 +70,10 @@ export interface WeddingEnvelopeProps {
   frontBorder?: ReactNode;
   layout?: "replace" | "side-by-side";
   className?: string;
+  /** Fires after stage transitions to "done" — public/editor consumers
+   *  can hook into this if they need to know when the envelope drop
+   *  animation is allowed to begin. */
+  onReveal?: () => void;
 }
 
 export function WeddingEnvelope({
@@ -90,8 +94,15 @@ export function WeddingEnvelope({
   flapSeal,
   frontBorder,
   className,
+  onReveal,
 }: WeddingEnvelopeProps) {
   const [stage, setStage] = useState<WeddingEnvelopeStage>("closed");
+  // Once `dropping` flips true the V-pocket starts a slow translateY
+  // descent off the bottom of the scene (smooth, frame-by-frame as the
+  // user requested). The card stays anchored via a counter-translate on
+  // the wrapper so the recipient sees more of the invitation as the
+  // envelope falls away.
+  const [dropping, setDropping] = useState(false);
 
   const envelopeHeight = Math.round(envelopeWidth * 0.62);
   // Inner scene exactly contains card + envelope (envelope pinned to inner
@@ -111,12 +122,21 @@ export function WeddingEnvelope({
     //   0.0s  click → Y-flip begins (1s duration)
     //   1.0s  Y-flip fully done → flap starts lifting (1s, finishes at 2.0s)
     //   3.0s  1-second pause after flap open, card begins emerging (2s)
-    //   5.0s  card settled → stage "done" (reset button appears)
+    //   5.0s  card settled → stage "done"
+    //   5.3s  envelope V-pocket starts sliding DOWN (4s slow descent)
+    //         — the card stays put via counter-translate on its wrapper.
     setStage("flipping");
     setTimeout(() => setStage("emerging"), 3000);
-    setTimeout(() => setStage("done"), 5000);
+    setTimeout(() => {
+      setStage("done");
+      onReveal?.();
+    }, 5000);
+    setTimeout(() => setDropping(true), 5300);
   };
-  const handleReset = () => setStage("closed");
+  const handleReset = () => {
+    setStage("closed");
+    setDropping(false);
+  };
 
   const flipped = stage !== "closed";
   const cardEmerging =
@@ -149,6 +169,12 @@ export function WeddingEnvelope({
   const cardTranslateStart = envelopeTop;
   const cardTranslateEnd = sceneTopPad;
 
+  // After the card has emerged, the V-pocket translates DOWN out of the
+  // scene (frame-by-frame smooth, 4s linear). The card wrapper applies
+  // an equal-and-opposite translateY so the card stays anchored at its
+  // emerged position while the envelope falls away beneath it.
+  const envelopeDropY = dropping ? 1100 : 0;
+
   return (
     <div
       className={`relative mx-auto ${className ?? ""}`}
@@ -156,6 +182,11 @@ export function WeddingEnvelope({
         width: "100%",
         maxWidth: sceneWidth,
         height: sceneHeight,
+        // Clip the V-pocket once it translates past the bottom of the
+        // wrapper — without this it just floats over whatever sits
+        // below us in the page. The card is counter-translated and
+        // stays inside these bounds, so it remains visible.
+        overflow: "hidden",
       }}
     >
     <div
@@ -167,7 +198,12 @@ export function WeddingEnvelope({
         perspectiveOrigin: "50% 40%",
       }}
     >
-      {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates ─── */}
+      {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates.
+           Once `dropping` is true the whole envelope translates Y
+           downward off the bottom of the scene (4s smooth linear).
+           The Y-rotation stays at 180deg — only translateY changes,
+           no second flip. The outer wrapper has overflow:hidden so
+           the envelope is visually clipped as it leaves the scene. */}
       <div
         onClick={handleOpen}
         className="absolute left-1/2"
@@ -177,12 +213,14 @@ export function WeddingEnvelope({
           height: envelopeHeight,
           transform: `translateX(-50%) ${
             flipped ? "rotateY(180deg)" : "rotateY(0deg)"
-          }`,
+          } translateY(${envelopeDropY}px)`,
           transformStyle: "preserve-3d",
-          transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
+          transition: dropping
+            ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1)"
+            : "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
           zIndex: 100,
           cursor: flipped ? "default" : "pointer",
-          pointerEvents: flipped ? "none" : "auto",
+          pointerEvents: flipped || dropping ? "none" : "auto",
         }}
       >
         {/* ══ FRONT FACE (rotateY 0) ══ */}
@@ -303,7 +341,13 @@ export function WeddingEnvelope({
               top: -envelopeTop,
               width: cardWidth,
               height: innerSceneHeight,
-              transform: "translateX(-50%)",
+              // Counter-translate cancels the flip container's drop so
+              // the card visually stays anchored at its emerged
+              // position while the envelope falls away beneath it.
+              transform: `translateX(-50%) translateY(${-envelopeDropY}px)`,
+              transition: dropping
+                ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1)"
+                : "none",
               zIndex: 50,
               pointerEvents: "none",
             }}

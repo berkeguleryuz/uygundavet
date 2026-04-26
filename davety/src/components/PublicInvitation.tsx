@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { InvitationView, getBlockView } from "@davety/renderer";
-import type { InvitationDoc, Block, HeroData } from "@davety/schema";
+import { InvitationView } from "@davety/renderer";
+import type { InvitationDoc } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 
@@ -15,11 +15,6 @@ interface Props {
   isDraft: boolean;
 }
 
-function findHero(doc: InvitationDoc): Block<HeroData> | null {
-  const hero = doc.blocks.find((b) => b.type === "hero");
-  return (hero as Block<HeroData>) ?? null;
-}
-
 export function PublicInvitation({
   doc,
   slug,
@@ -28,8 +23,6 @@ export function PublicInvitation({
   isDraft,
 }: Props) {
   const [revealed, setRevealed] = useState(false);
-
-  const hero = findHero(doc);
 
   const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
 
@@ -60,16 +53,14 @@ export function PublicInvitation({
             cardHeight={640}
             layout="replace"
             {...resolvedEnvelope}
-            cardRender={({ width, height }) =>
-              hero ? (
-                <RealHeroCard
-                  doc={doc}
-                  hero={hero}
-                  width={width}
-                  height={height}
-                />
-              ) : null
-            }
+            cardRender={({ width, height }) => (
+              <FullInvitationCard
+                doc={doc}
+                slug={slug}
+                width={width}
+                height={height}
+              />
+            )}
           />
           <button
             onClick={() => setRevealed(true)}
@@ -99,34 +90,26 @@ export function PublicInvitation({
 }
 
 /**
- * What actually slides out of the envelope — the user's real hero block
- * rendered with their chosen variant (arch / photo / floral-crown / …)
- * plus the date row, wrapped in a card-sized frame so it looks like a
- * printable invitation, not a generic placeholder.
+ * Card slot content: the FULL InvitationView (every block — hero,
+ * countdown, families, program, venue, RSVP, …) wrapped in the
+ * envelope's card frame. Width/height are fixed by the envelope's
+ * card slot; the content scrolls inside so the recipient can read the
+ * entire invitation without leaving the envelope frame.
  */
-// Resolve the hero block view once at module scope so React treats it as a
-// stable component (calling getBlockView inside render triggers the
-// "Cannot create components during render" rule).
-const HeroViewComponent = getBlockView("hero") as React.ComponentType<{
-  block: Block<HeroData>;
-  theme: InvitationDoc["theme"];
-  editable?: boolean;
-}>;
-
-function RealHeroCard({
+function FullInvitationCard({
   doc,
-  hero,
+  slug,
   width,
   height,
 }: {
   doc: InvitationDoc;
-  hero: Block<HeroData>;
+  slug: string;
   width: number;
   height: number;
 }) {
   return (
     <div
-      className="relative overflow-hidden rounded-md shadow-xl"
+      className="relative overflow-auto rounded-md shadow-xl"
       style={{
         width,
         height,
@@ -134,43 +117,8 @@ function RealHeroCard({
         color: doc.theme.accentColor,
       }}
     >
-      <HeroViewComponent block={hero} theme={doc.theme} editable={false} />
-      <div
-        className="absolute inset-x-0 bottom-0 px-6 py-4 text-center text-[11px] uppercase tracking-[0.25em] border-t"
-        style={{
-          fontFamily: "Space Grotesk, sans-serif",
-          borderColor: `${doc.theme.accentColor}22`,
-          color: `${doc.theme.accentColor}cc`,
-        }}
-      >
-        <FormattedDate iso={doc.meta.weddingDate} time={doc.meta.weddingTime} />
-      </div>
+      <InvitationView doc={doc} slug={slug} />
     </div>
   );
 }
 
-function FormattedDate({ iso, time }: { iso?: string; time?: string }) {
-  if (!iso) return null;
-  const d = new Date(`${iso}T${time ?? "00:00"}:00`);
-  if (isNaN(d.getTime())) return null;
-  const months = [
-    "OCAK",
-    "ŞUBAT",
-    "MART",
-    "NİSAN",
-    "MAYIS",
-    "HAZİRAN",
-    "TEMMUZ",
-    "AĞUSTOS",
-    "EYLÜL",
-    "EKİM",
-    "KASIM",
-    "ARALIK",
-  ];
-  return (
-    <span>
-      {d.getDate()} · {months[d.getMonth()]} · {d.getFullYear()}
-      {time ? ` · ${time}` : ""}
-    </span>
-  );
-}

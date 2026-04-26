@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import { ArrowDown, ArrowUp, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import {
@@ -9,6 +9,7 @@ import {
   listBlockEntries,
   getCardShapeStyle,
   isArchShape,
+  InvitationView,
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
@@ -327,23 +328,33 @@ function InsertSlot({
    Renders a live preview of the envelope using current theme.envelope.
    The envelope component handles its own click → flap-open animation,
    so theme tweaks (color, flap, lining) can be verified end-to-end
-   the same way recipients will see them. */
-/* Resolve hero view component once at module scope so it stays a stable
-   ref across renders (calling getBlockView in render breaks React rules). */
-const EnvelopeHeroView = getBlockView("hero") as React.ComponentType<{
-  block: import("@davety/schema").Block<import("@davety/schema").HeroData>;
-  theme: import("@davety/schema").InvitationDoc["theme"];
-  editable?: boolean;
-}>;
+   the same way recipients will see them. The card slot inside the
+   envelope holds the FULL InvitationView (every block — hero,
+   countdown, families, program, …) so the editor preview matches what
+   the recipient actually sees. The card frame is a fixed size; the
+   InvitationView scrolls inside it so the user can read every block
+   without leaving the envelope frame. */
 
 function EnvelopeCanvas() {
   const doc = useEditorStore((s) => s.doc);
+  // Card height tracks the viewport so the envelope preview fills the
+  // available canvas vertically instead of leaving a big empty area
+  // below the scene. The subtracted offset accounts for the editor
+  // header, "Zarf Önizlemesi" label, sceneTopPad, sceneBottomPad and
+  // canvas padding — picked empirically to land the envelope cleanly
+  // inside the visible area on common desktop heights.
+  const [cardHeight, setCardHeight] = useState(780);
+  useEffect(() => {
+    const update = () =>
+      setCardHeight(Math.max(520, window.innerHeight - 260));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   if (!doc) return null;
 
   const resolved = resolveEnvelopeProps(doc.theme.envelope);
-  const hero = doc.blocks.find((b) => b.type === "hero") as
-    | import("@davety/schema").Block<import("@davety/schema").HeroData>
-    | undefined;
 
   return (
     <div className="min-h-0 overflow-auto bg-muted/30 py-10 px-6 flex flex-col items-center gap-6">
@@ -352,27 +363,25 @@ function EnvelopeCanvas() {
       </div>
       <WeddingEnvelope
         guestName="Misafir"
-        envelopeWidth={340}
-        cardWidth={300}
-        cardHeight={520}
+        envelopeWidth={520}
+        cardWidth={460}
+        cardHeight={cardHeight}
         layout="replace"
         {...resolved}
-        cardRender={({ width, height }) =>
-          hero ? (
-            <div
-              className="relative overflow-hidden rounded-md shadow-xl"
-              style={{
-                width,
-                height,
-                background: doc.theme.bgColor,
-                color: doc.theme.accentColor,
-                ...getCardShapeStyle(doc),
-              }}
-            >
-              <EnvelopeHeroView block={hero} theme={doc.theme} editable={false} />
-            </div>
-          ) : null
-        }
+        cardRender={({ width, height }) => (
+          <div
+            className="relative overflow-auto rounded-md shadow-xl"
+            style={{
+              width,
+              height,
+              background: doc.theme.bgColor,
+              color: doc.theme.accentColor,
+              ...getCardShapeStyle(doc),
+            }}
+          >
+            <InvitationView doc={doc} />
+          </div>
+        )}
       />
     </div>
   );
