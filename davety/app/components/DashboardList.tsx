@@ -11,6 +11,8 @@ export interface DashboardDesign {
   vanityPath: string | null;
   status: string;
   updatedAt: string;
+  coupleName?: string | null;
+  templateLabel?: string | null;
 }
 
 interface Props {
@@ -61,10 +63,14 @@ export function DashboardList({ designs: initial, locale, publicBase }: Props) {
           className="p-4 flex items-center justify-between gap-3 flex-wrap"
         >
           <div>
-            <div className="text-sm font-medium">{d.vanityPath ?? d.slug}</div>
+            <div className="text-sm font-medium">
+              {d.coupleName ?? d.vanityPath ?? d.slug}
+            </div>
             <div className="text-xs text-muted-foreground">
+              {d.templateLabel ? `${d.templateLabel} · ` : ""}
               {d.status === "published" ? "Yayında" : "Taslak"} ·{" "}
               {new Date(d.updatedAt).toLocaleDateString(locale)}
+              <span className="opacity-50"> · {d.vanityPath ?? d.slug}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">

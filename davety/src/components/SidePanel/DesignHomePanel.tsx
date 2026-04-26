@@ -6,6 +6,7 @@ import { FileText, MailOpen, Music } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
+import { useManualSave } from "@/src/hooks/useManualSave";
 import { DesignTab } from "./DesignTab";
 import { EnvelopeTab } from "./EnvelopeTab";
 import { MusicTab } from "./MusicTab";
@@ -16,17 +17,28 @@ export function DesignHomePanel() {
   const t = useTranslations("Editor");
   const router = useRouter();
   const docId = useEditorStore((s) => s.docId);
+  const dirty = useEditorStore((s) => s.dirty);
   const togglePreview = useUIStore((s) => s.togglePreview);
+  const { save, saving } = useManualSave();
 
   const [tab, setTab] = useState<Tab>("design");
+
+  async function handleSaveAndPublish() {
+    if (dirty) {
+      const ok = await save();
+      if (!ok) return;
+    }
+    router.push(`/design/invitations/${docId}/save`);
+  }
 
   return (
     <div className="p-5 flex flex-col gap-4">
       <button
-        onClick={() => router.push(`/design/invitations/${docId}/save`)}
-        className="rounded-md bg-primary text-primary-foreground py-3 font-medium text-sm cursor-pointer hover:opacity-90"
+        onClick={handleSaveAndPublish}
+        disabled={saving}
+        className="rounded-md bg-primary text-primary-foreground py-3 font-medium text-sm cursor-pointer hover:opacity-90 disabled:opacity-60"
       >
-        {t("mainButton")}
+        {saving ? "Kaydediliyor…" : t("mainButton")}
       </button>
 
       <div className="grid grid-cols-3 gap-2 text-center">
@@ -67,8 +79,8 @@ export function DesignHomePanel() {
       {tab === "music" ? <MusicTab /> : null}
 
       <div className="mt-4 text-xs text-muted-foreground leading-relaxed">
-        Davetiyeni düzenlemek için canvas'taki metinlere veya bloklara tıkla.
-        Sağdaki panel seçtiğin öğeye göre değişir.
+        Davetiyeni düzenlemek için canvas&apos;taki metinlere veya bloklara
+        tıkla. Sağdaki panel seçtiğin öğeye göre değişir.
       </div>
     </div>
   );

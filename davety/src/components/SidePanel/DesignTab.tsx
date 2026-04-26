@@ -119,15 +119,40 @@ function hslToHex(h: number, s: number, l: number): string {
 
 export function DesignTab() {
   const theme = useEditorStore((s) => s.doc?.theme);
-  const updateTheme = useEditorStore((s) => s.updateTheme);
+  const applyPatch = useEditorStore((s) => s.applyPatch);
 
   if (!theme) return null;
 
   const applyPreset = (p: Preset) => {
-    updateTheme({
-      bgColor: p.bgColor,
-      accentColor: p.accentColor,
-      envelope: p.envelope,
+    // Apply the preset AND wipe per-block / per-field color overrides so
+    // a previous template's hard-coded dark accent doesn't survive on top
+    // of a new bright theme (e.g. Altın Gece's gold accent was being
+    // overridden by an old #6b5a42 set on the hero block's coupleNames).
+    applyPatch((d) => {
+      d.theme.bgColor = p.bgColor;
+      d.theme.accentColor = p.accentColor;
+      d.theme.envelope = {
+        ...(d.theme.envelope ?? {}),
+        ...p.envelope,
+      };
+      for (const block of d.blocks) {
+        const data = block.data as Record<string, unknown>;
+        if ("accent" in data) {
+          (data as { accent?: string }).accent = p.accentColor;
+        }
+        // Strip stale color from block-level style
+        if (block.style && (block.style as { color?: string }).color) {
+          delete (block.style as { color?: string }).color;
+        }
+        // Strip color from each field override (preserve other style props)
+        const overrides = block.style?.fieldOverrides;
+        if (overrides) {
+          for (const id of Object.keys(overrides)) {
+            const o = overrides[id] as { color?: string };
+            if (o && "color" in o) delete o.color;
+          }
+        }
+      }
     });
   };
 

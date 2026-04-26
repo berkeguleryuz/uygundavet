@@ -57,7 +57,9 @@ export function TextStylePanel() {
   const fieldValue = isCoupleNames
     ? undefined
     : extractFieldValue(block.data, fieldId);
-  const showContentEditor = isCoupleNames || fieldValue !== undefined;
+  const isDateField = fieldId === "targetIso";
+  const showContentEditor =
+    isCoupleNames || isDateField || fieldValue !== undefined;
   const fieldLabel = fieldLabelFor(fieldId);
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
@@ -70,7 +72,27 @@ export function TextStylePanel() {
     <div className="p-5 flex flex-col gap-5">
       {/* Field content editor — edit the actual text of the selected field */}
       {showContentEditor ? (
-        isCoupleNames ? (
+        isDateField ? (
+          <div>
+            <label className="text-[11px] text-muted-foreground block mb-1">
+              Hedef Tarih ve Saat
+            </label>
+            <input
+              type="datetime-local"
+              value={isoToDatetimeLocal(
+                (block.data["targetIso"] as string) ?? ""
+              )}
+              onChange={(e) => {
+                const iso = datetimeLocalToIso(e.target.value);
+                if (iso) updateBlockData(blockId, { targetIso: iso });
+              }}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            />
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              Geri sayım bu zamana göre çalışır.
+            </p>
+          </div>
+        ) : isCoupleNames ? (
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-[11px] text-muted-foreground block mb-1">
@@ -300,4 +322,23 @@ const FIELD_LABELS: Record<string, string> = {
 
 function fieldLabelFor(fieldId: string): string {
   return FIELD_LABELS[fieldId] ?? "Metin İçeriği";
+}
+
+/** Convert "2026-06-15T19:00:00.000Z" → "2026-06-15T19:00" (datetime-local). */
+function isoToDatetimeLocal(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours()
+  )}:${pad(d.getMinutes())}`;
+}
+
+/** Convert "2026-06-15T19:00" → ISO string in local timezone. */
+function datetimeLocalToIso(local: string): string | null {
+  if (!local) return null;
+  const d = new Date(local);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString();
 }

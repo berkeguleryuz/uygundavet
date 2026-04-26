@@ -7,9 +7,12 @@ import {
   FontBoot,
   getBlockView,
   listBlockEntries,
+  getCardShapeStyle,
+  isArchShape,
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
+import { useConfirm } from "@/src/components/ConfirmDialog";
 import { cn } from "@/src/lib/utils";
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -40,10 +43,13 @@ export function Canvas() {
   const selectBlock = useUIStore((s) => s.selectBlock);
   const selectField = useUIStore((s) => s.selectField);
   const selectedBlockId = useUIStore((s) => s.selectedBlockId);
+  const confirm = useConfirm();
 
   const [insertingAt, setInsertingAt] = useState<number | null>(null);
 
   if (!doc) return null;
+
+  const archActive = isArchShape(doc);
 
   const handlePick = (index: number, type: import("@davety/schema").BlockType) => {
     const entry = listBlockEntries().find((e) => e.type === type);
@@ -72,7 +78,11 @@ export function Canvas() {
     >
       <div
         className="mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
-        style={{ background: doc.theme.bgColor, color: doc.theme.accentColor }}
+        style={{
+          background: doc.theme.bgColor,
+          color: doc.theme.accentColor,
+          ...getCardShapeStyle(doc),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <FontBoot doc={doc} />
@@ -80,19 +90,25 @@ export function Canvas() {
         {doc.blocks.map((block, i) => {
           const View = getBlockView(block.type);
           const selected = selectedBlockId === block.id;
+          // When the card has an arch silhouette, hide the very first
+          // insert slot — it would sit on top of the rounded dome and
+          // be visually clipped/unreachable.
+          const hideSlot = i === 0 && archActive;
 
           return (
             <div key={block.id} className="relative">
-              <InsertSlot
-                index={i}
-                active={insertingAt === i}
-                // Flip palette upward for the last 3 slots so it doesn't
-                // run off the bottom of the card / canvas.
-                flipUp={i >= doc.blocks.length - 2}
-                onOpen={() => setInsertingAt(i)}
-                onClose={() => setInsertingAt(null)}
-                onPick={(type) => handlePick(i, type)}
-              />
+              {hideSlot ? null : (
+                <InsertSlot
+                  index={i}
+                  active={insertingAt === i}
+                  // Flip palette upward for the last 3 slots so it doesn't
+                  // run off the bottom of the card / canvas.
+                  flipUp={i >= doc.blocks.length - 2}
+                  onOpen={() => setInsertingAt(i)}
+                  onClose={() => setInsertingAt(null)}
+                  onPick={(type) => handlePick(i, type)}
+                />
+              )}
 
               <div
                 className={cn(
@@ -150,9 +166,17 @@ export function Canvas() {
                       }
                       danger
                       disabled={block.locked}
-                      onClick={() => {
+                      onClick={async () => {
                         if (block.locked) return;
-                        if (confirm("Bu bloğu silmek istediğine emin misin?")) {
+                        const ok = await confirm({
+                          title: "Bloğu sil",
+                          description:
+                            "Bu bloğu silmek istediğine emin misin? Bu işlem geri alınabilir (Ctrl+Z).",
+                          confirmLabel: "Sil",
+                          cancelLabel: "Vazgeç",
+                          variant: "danger",
+                        });
+                        if (ok) {
                           deleteBlock(block.id);
                           selectBlock(null);
                         }

@@ -141,24 +141,12 @@ function ArchVariant({
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
+  // The arch silhouette is now drawn by the outer invitation container
+  // (see getCardShapeStyle in InvitationView), so this variant focuses on
+  // typography and lets the parent's rounded top do the visual work.
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <svg
-        className="absolute inset-x-8 top-4 bottom-0 w-[calc(100%-4rem)] h-[calc(100%-1rem)]"
-        viewBox="0 0 100 130"
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <path
-          d="M 10 125 L 10 40 Q 10 5 50 5 Q 90 5 90 40 L 90 125 Z"
-          fill="none"
-          stroke={accent ?? "currentColor"}
-          strokeWidth="0.4"
-          opacity="0.7"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-      <div className="relative px-10 py-14 flex flex-col gap-2 items-center text-center">
+      <div className="relative px-10 pt-20 pb-12 flex flex-col gap-2 items-center text-center">
         <div
           className="text-5xl italic opacity-40 mb-2"
           style={{ fontFamily: "Merienda, serif", color: accent }}

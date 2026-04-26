@@ -68,27 +68,24 @@ export function BlockControlsPanel() {
         <Chip
           icon={<Calendar className="size-4" />}
           label={t("changeDate")}
-          disabled={!["countdown", "story_timeline"].includes(block.type)}
-          onClick={() => selectField(blockId, "date")}
+          disabled={!["countdown"].includes(block.type)}
+          onClick={() => {
+            // Countdown stores ISO timestamp under data.targetIso.
+            // TextStylePanel renders a datetime-local input for this field.
+            selectField(blockId, "targetIso");
+          }}
         />
         <Chip
           icon={<Info className="size-4" />}
           label={t("enterInfo")}
-          onClick={() =>
-            selectField(
-              blockId,
-              block.type === "hero"
-                ? "description"
-                : block.type === "memory_book"
-                ? "prompt"
-                : "body"
-            )
-          }
+          onClick={() => selectField(blockId, primaryFieldFor(block.type))}
         />
         <Chip
           icon={<Sliders className="size-4" />}
           label={t("changeSettings")}
-          onClick={() => {}}
+          // Open the text/style panel for the block's primary field so the
+          // user can adjust fonts, sizes, colors, alignment from there.
+          onClick={() => selectField(blockId, primaryFieldFor(block.type))}
         />
         {supportsMedia ? (
           <Chip
@@ -114,6 +111,37 @@ export function BlockControlsPanel() {
       </div>
     </div>
   );
+}
+
+/**
+ * Returns the field id that best represents the block's "primary" editable
+ * text content — used by the Bilgileri Gir / Ayarları Değiştir chips so
+ * those buttons always open a useful editing surface, not an empty panel.
+ */
+function primaryFieldFor(blockType: string): string {
+  switch (blockType) {
+    case "hero":
+      return "description";
+    case "memory_book":
+      return "prompt";
+    case "venue":
+    case "event_program":
+    case "contact":
+      return "venueName";
+    case "countdown":
+      return "targetIso";
+    case "footer":
+      return "text";
+    case "custom_note":
+    case "custom_section":
+      return "title";
+    case "donation":
+      return "title";
+    case "rsvp_form":
+      return "note";
+    default:
+      return "body";
+  }
 }
 
 const HERO_VARIANTS: { key: string; label: string }[] = [

@@ -1,60 +1,31 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { toast } from "sonner";
-import type { InvitationDoc } from "@davety/schema";
+import { useEffect } from "react";
 import { useEditorStore } from "@/src/store/editor-store";
 
-const DEBOUNCE_MS = 800;
-
+/**
+ * Hook is intentionally a no-op for network persistence.
+ *
+ * Earlier this hook PATCHed the design every 800ms, which silently
+ * destroyed user state — if a session edit went bad, the draft was
+ * already in the DB and there was no way to roll back. Persistence
+ * now happens ONLY on explicit Save (see useManualSave). This hook is
+ * kept so existing call sites compile and to leave a hook anchor for
+ * future browser-warning logic.
+ */
 export function useDebouncedAutosave() {
-  const docId = useEditorStore((s) => s.docId);
-  const doc = useEditorStore((s) => s.doc);
   const dirty = useEditorStore((s) => s.dirty);
-  const lastAck = useEditorStore((s) => s.lastAckUpdatedAt);
-  const setAck = useEditorStore((s) => s.setAckUpdatedAt);
-  const markClean = useEditorStore((s) => s.markClean);
-
-  const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inflight = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
-    if (!docId || !doc || !dirty) return;
-
-    if (pending.current) clearTimeout(pending.current);
-    pending.current = setTimeout(() => {
-      pending.current = null;
-      void save(docId, doc, lastAck);
-    }, DEBOUNCE_MS);
-
-    return () => {
-      if (pending.current) clearTimeout(pending.current);
+    if (!dirty || typeof window === "undefined") return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // Modern browsers ignore the message string but still show a
+      // generic confirmation when preventDefault is called and
+      // returnValue is set.
+      e.returnValue = "";
     };
-  }, [docId, doc, dirty]);
-
-  async function save(id: string, d: InvitationDoc, clientUpdatedAt: string | null) {
-    if (inflight.current) await inflight.current;
-    inflight.current = (async () => {
-      try {
-        const res = await fetch(`/api/design/invitations/${id}`, {
-          method: "PATCH",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ doc: d, clientUpdatedAt }),
-        });
-        if (!res.ok) {
-          // Silent retry on transient errors; only surface after repeated failure
-          console.warn("autosave failed", res.status);
-          return;
-        }
-        const body = await res.json();
-        if (body?.updatedAt) setAck(body.updatedAt);
-        markClean();
-      } catch (err) {
-        console.warn("autosave network error", err);
-      } finally {
-        inflight.current = null;
-      }
-    })();
-    await inflight.current;
-  }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 }
