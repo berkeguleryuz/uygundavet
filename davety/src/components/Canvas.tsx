@@ -13,6 +13,8 @@ import {
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useConfirm } from "@/src/components/ConfirmDialog";
+import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
+import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { cn } from "@/src/lib/utils";
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -43,6 +45,8 @@ export function Canvas() {
   const selectBlock = useUIStore((s) => s.selectBlock);
   const selectField = useUIStore((s) => s.selectField);
   const selectedBlockId = useUIStore((s) => s.selectedBlockId);
+  const designTab = useUIStore((s) => s.designTab);
+  const panelMode = useUIStore((s) => s.panelMode);
   const confirm = useConfirm();
 
   const [insertingAt, setInsertingAt] = useState<number | null>(null);
@@ -50,6 +54,14 @@ export function Canvas() {
   if (!doc) return null;
 
   const archActive = isArchShape(doc);
+
+  // When the user is on the Zarf Tasarımı tab in the side panel, the
+  // canvas swaps to a live envelope preview instead of the invitation
+  // document. Click toggles the envelope open so envelope changes
+  // (color, flap, lining) can be verified end-to-end.
+  if (panelMode === "home" && designTab === "envelope") {
+    return <EnvelopeCanvas />;
+  }
 
   const handlePick = (index: number, type: import("@davety/schema").BlockType) => {
     const entry = listBlockEntries().find((e) => e.type === type);
@@ -131,7 +143,14 @@ export function Canvas() {
 
                 {selected ? (
                   <div
-                    className="absolute top-2 right-2 flex items-center gap-1 z-20 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1"
+                    // First block + arch shape: push toolbar below the
+                    // dome so move/hide/delete buttons aren't clipped
+                    // by the rounded top corners (overflow-hidden on
+                    // the card cuts off anything sitting in the curve).
+                    className={cn(
+                      "absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1",
+                      i === 0 && archActive ? "top-20" : "top-2"
+                    )}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <IconBtn
@@ -300,6 +319,34 @@ function InsertSlot({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─── Envelope canvas (Zarf Tasarımı) ───
+   Renders a live preview of the envelope using current theme.envelope.
+   The envelope component handles its own click → flap-open animation,
+   so theme tweaks (color, flap, lining) can be verified end-to-end
+   the same way recipients will see them. */
+function EnvelopeCanvas() {
+  const doc = useEditorStore((s) => s.doc);
+  if (!doc) return null;
+
+  const resolved = resolveEnvelopeProps(doc.theme.envelope);
+
+  return (
+    <div className="min-h-0 overflow-auto bg-muted/30 py-10 px-6 flex flex-col items-center gap-6">
+      <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+        Zarf Önizlemesi · Tıkla
+      </div>
+      <WeddingEnvelope
+        guestName="Misafir"
+        envelopeWidth={340}
+        cardWidth={300}
+        cardHeight={520}
+        layout="replace"
+        {...resolved}
+      />
     </div>
   );
 }

@@ -75,15 +75,18 @@ function Postmark() {
 }
 
 function VerticalRibbon({ color = "#a83a4f" }: { color?: string }) {
+  // Anchored to the right side instead of the center so the address text
+  // (which sits in the lower-left of the envelope front) stays clear.
+  // The ribbon still wraps the envelope when paired with a matching
+  // backExtra, but the address area is no longer cut by the band.
   return (
     <div
       className="absolute pointer-events-none"
       style={{
-        left: "50%",
+        right: "12%",
         top: 0,
         bottom: 0,
-        width: 32,
-        transform: "translateX(-50%)",
+        width: 28,
         background: `linear-gradient(to right, ${color}, #c8526a 50%, ${color})`,
         boxShadow: "inset 2px 0 4px rgba(0,0,0,0.2)",
         zIndex: 3,
@@ -93,12 +96,15 @@ function VerticalRibbon({ color = "#a83a4f" }: { color?: string }) {
 }
 
 function KraftTwine() {
+  // Positioned in the upper third so the dashed twine and its kraft tag
+  // never cross the address text (which sits in the lower 25% of the
+  // envelope front).
   return (
     <>
       <div
         className="absolute left-0 right-0 pointer-events-none"
         style={{
-          top: "50%",
+          top: "32%",
           height: 3,
           background:
             "repeating-linear-gradient(90deg, #d9c59c 0 5px, #8a6744 5px 9px)",
@@ -109,8 +115,8 @@ function KraftTwine() {
       <div
         className="absolute pointer-events-none"
         style={{
-          left: "58%",
-          top: "47%",
+          left: "60%",
+          top: "29%",
           width: 40,
           height: 26,
           background: "#efe2c6",

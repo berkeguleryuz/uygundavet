@@ -5,6 +5,7 @@ import Link from "next/link";
 import { InvitationView, getBlockView } from "@davety/renderer";
 import type { InvitationDoc, Block, HeroData } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
+import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 
 interface Props {
   doc: InvitationDoc;
@@ -30,14 +31,7 @@ export function PublicInvitation({
 
   const hero = findHero(doc);
 
-  const envelopeColor = doc.theme.envelope?.color ?? "#f5eedb";
-  const liningPattern = (doc.theme.envelope?.liningPattern ?? "daisy") as
-    | "daisy"
-    | "rose"
-    | "gold"
-    | "none"
-    | "chevron";
-  const flapColor = doc.theme.envelope?.flapColor ?? envelopeColor;
+  const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
 
   return (
     <main
@@ -65,10 +59,7 @@ export function PublicInvitation({
             cardWidth={340}
             cardHeight={640}
             layout="replace"
-            envelopeColor={envelopeColor}
-            flapColor={flapColor}
-            liningPattern={liningPattern}
-            liningBg={doc.theme.accentColor}
+            {...resolvedEnvelope}
             cardRender={({ width, height }) =>
               hero ? (
                 <RealHeroCard

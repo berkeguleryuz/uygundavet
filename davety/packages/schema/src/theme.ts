@@ -4,6 +4,21 @@ export const envelopeThemeSchema = z.object({
   color: z.string().default("#f5eedb"),
   liningPattern: z.string().default("daisy"),
   flapColor: z.string().default("#eee0be"),
+  /** Inner lining background (visible when the flap opens). */
+  liningBg: z.string().default("#1f1c17"),
+  /** Stamp visibility & color in the upper-right of the envelope front. */
+  stampEnabled: z.boolean().default(true),
+  stampColor: z.string().default("#b85450"),
+  /** Optional stamp text (e.g. couple's initials). Empty → no text. */
+  stampLabel: z.string().optional(),
+  /** Optional stamp image URL. When set the image replaces the label. */
+  stampImage: z.string().optional(),
+  /** Selected envelope preset id (e.g. "kraft-ip", "monogram"). The
+   *  preset contributes JSX-only decorations (twine, wax seal, window)
+   *  that can't live in the JSON theme; renderer resolves the preset
+   *  at draw time and the user's serializable overrides (colors,
+   *  lining, stamp) win over the preset values. */
+  presetId: z.string().optional(),
 });
 export type EnvelopeTheme = z.infer<typeof envelopeThemeSchema>;
 
@@ -16,6 +31,9 @@ export const themeSchema = z.object({
     color: "#f5eedb",
     liningPattern: "daisy",
     flapColor: "#eee0be",
+    liningBg: "#1f1c17",
+    stampEnabled: true,
+    stampColor: "#b85450",
   }),
 });
 export type Theme = z.infer<typeof themeSchema>;
@@ -27,5 +45,9 @@ export const defaultTheme: Theme = {
     color: "#f5eedb",
     liningPattern: "daisy",
     flapColor: "#eee0be",
+    liningBg: "#1f1c17",
+    stampEnabled: true,
+    stampColor: "#b85450",
+    stampLabel: "H&İ",
   },
 };

@@ -8,6 +8,7 @@ import type { Block, HeroData, InvitationDoc } from "@davety/schema";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
+import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { BoxRevealScene } from "@/app/components/box/BoxRevealScene";
 
 type WrapperKind = "envelope" | "box" | "direct";
@@ -181,14 +182,7 @@ function EnvelopeWrapper({
     | Block<HeroData>
     | undefined;
 
-  const envelopeColor = doc.theme.envelope?.color ?? "#f5eedb";
-  const liningPattern = (doc.theme.envelope?.liningPattern ?? "daisy") as
-    | "daisy"
-    | "rose"
-    | "gold"
-    | "none"
-    | "chevron";
-  const flapColor = doc.theme.envelope?.flapColor ?? envelopeColor;
+  const resolved = resolveEnvelopeProps(doc.theme.envelope);
 
   return (
     <div className="flex flex-col items-center gap-6 py-6">
@@ -198,10 +192,7 @@ function EnvelopeWrapper({
         cardWidth={340}
         cardHeight={640}
         layout="replace"
-        envelopeColor={envelopeColor}
-        flapColor={flapColor}
-        liningPattern={liningPattern}
-        liningBg={doc.theme.accentColor}
+        {...resolved}
         cardRender={({ width, height }) =>
           hero ? (
             <div

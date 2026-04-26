@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { FileText, MailOpen, Music } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
@@ -11,17 +10,15 @@ import { DesignTab } from "./DesignTab";
 import { EnvelopeTab } from "./EnvelopeTab";
 import { MusicTab } from "./MusicTab";
 
-type Tab = "design" | "envelope" | "music";
-
 export function DesignHomePanel() {
   const t = useTranslations("Editor");
   const router = useRouter();
   const docId = useEditorStore((s) => s.docId);
   const dirty = useEditorStore((s) => s.dirty);
   const togglePreview = useUIStore((s) => s.togglePreview);
+  const tab = useUIStore((s) => s.designTab);
+  const setTab = useUIStore((s) => s.setDesignTab);
   const { save, saving } = useManualSave();
-
-  const [tab, setTab] = useState<Tab>("design");
 
   async function handleSaveAndPublish() {
     if (dirty) {

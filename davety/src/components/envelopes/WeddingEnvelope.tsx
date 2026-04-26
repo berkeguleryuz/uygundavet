@@ -133,7 +133,12 @@ export function WeddingEnvelope({
   const leftTriColor = backStyle === "shaded" ? shadedLeft : envelopeColor;
   const rightTriColor = backStyle === "shaded" ? shadedRight : envelopeColor;
   const bottomTriColor = backStyle === "shaded" ? shadedBottom : envelopeColor;
-  const topFlapColor = backStyle === "shaded" ? shadedTop : actualFlapColor;
+  // Flap paper color (both the closed-state outer face and the opened
+  // inner face's paper border). This is what the user controls via
+  // "Kapak Rengi" in the editor — leaving it unused was the reason
+  // changing the colour did nothing visible.
+  const flapPaperColor =
+    backStyle === "shaded" ? shadedTop : actualFlapColor;
 
   const textColor = isLight(envelopeColor) ? "#2a2420" : "#f3ecdc";
 
@@ -184,7 +189,7 @@ export function WeddingEnvelope({
         <div
           className="absolute inset-0 overflow-hidden"
           style={{
-            background: envelopeColor,
+            backgroundColor: envelopeColor,
             backgroundImage:
               "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
             borderRadius: 4,
@@ -195,17 +200,32 @@ export function WeddingEnvelope({
           }}
         >
           {frontBorder}
+          {/* Preset decorations (twine, ribbon, kraft texture, postal stamp,
+              window cutout, etc.) belong on the address side of a real
+              envelope. Rendering them here — and stacking the address
+              text on top with z-index — keeps the chosen visual treatment
+              while keeping the guest name + CTA readable. */}
+          {frontExtra}
           {stamp ? (
             <Stamp config={stamp} envelopeWidth={envelopeWidth} envelopeBg={envelopeColor} />
           ) : null}
           <div
             className="absolute"
             style={{
-              bottom: "12%",
-              left: "8%",
+              bottom: "10%",
+              left: "6%",
               color: textColor,
               fontFamily: "Merienda, serif",
-              maxWidth: "70%",
+              maxWidth: "72%",
+              padding: "10px 14px",
+              borderRadius: 6,
+              // Soft same-tone backdrop so the guest name + CTA stay
+              // legible even when a preset's decorations (twine, ribbon,
+              // borders, kraft texture) cross the address area.
+              background: `${envelopeColor}d9`,
+              backdropFilter: "blur(2px)",
+              WebkitBackdropFilter: "blur(2px)",
+              zIndex: 8,
             }}
           >
             <div className="text-lg italic mb-1 leading-tight">
@@ -231,7 +251,7 @@ export function WeddingEnvelope({
             transformStyle: "preserve-3d",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            background: envelopeColor,
+            backgroundColor: envelopeColor,
             backgroundImage:
               "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
             borderRadius: 4,
@@ -331,12 +351,13 @@ export function WeddingEnvelope({
               zIndex: 40,
             }}
           >
-            {/* Outer face — cream paper, visible when closed */}
+            {/* Outer face — flap paper, visible when closed (top triangle
+                 of the front of the envelope) */}
             <div
               className="absolute inset-0"
               style={{
                 clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                background: envelopeColor,
+                backgroundColor: flapPaperColor,
                 backgroundImage:
                   "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
                 backfaceVisibility: "hidden",
@@ -369,7 +390,7 @@ export function WeddingEnvelope({
                 transform: "rotateX(180deg)",
                 backfaceVisibility: "hidden",
                 WebkitBackfaceVisibility: "hidden",
-                background: envelopeColor,
+                backgroundColor: flapPaperColor,
                 backgroundImage:
                   "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
               }}
@@ -394,7 +415,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: leftTriColor,
+              backgroundColor: leftTriColor,
               clipPath: "polygon(0 0, 50% 50%, 0 100%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -407,7 +428,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: rightTriColor,
+              backgroundColor: rightTriColor,
               clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -420,7 +441,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: bottomTriColor,
+              backgroundColor: bottomTriColor,
               clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -448,8 +469,6 @@ export function WeddingEnvelope({
               vectorEffect="non-scaling-stroke"
             />
           </svg>
-
-          {frontExtra}
         </div>
       </div>
 
@@ -771,7 +790,7 @@ function isLight(hex: string): boolean {
   return lum > 0.55;
 }
 
-function darken(hex: string, amount: number): string {
+export function darken(hex: string, amount: number): string {
   const h = hex.replace("#", "");
   if (h.length !== 6) return hex;
   const r = parseInt(h.slice(0, 2), 16);

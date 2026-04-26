@@ -243,20 +243,35 @@ function PhotoTopVariant({
 }
 
 /* ─── Photo full ─── */
+const DEFAULT_PHOTO_FULL =
+  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
+
 function PhotoFullVariant({
   block,
   editable,
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description } = block.data;
+  // Drop block.style.color from the root so the white-on-photo treatment
+  // isn't repainted with the doc's accent (which is usually dark and
+  // becomes unreadable against the photo backdrop).
+  const { color: _omit, ...rootStyle } = styleToCss(block.style);
+  void _omit;
+  // If the block has no explicit photo/media, fall back to a bright
+  // default wedding image so the gradient overlay isn't painting over
+  // black emptiness.
+  const hasMedia = !!(block.data.media?.url || block.data.photoUrl);
+  const data = hasMedia
+    ? block.data
+    : { ...block.data, photoUrl: DEFAULT_PHOTO_FULL };
   return (
     <section
       className="relative overflow-hidden min-h-[420px] text-white"
-      style={styleToCss(block.style)}
+      style={rootStyle}
     >
       <div className="absolute inset-0">
-        <MediaBackdrop data={block.data} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/75" />
+        <MediaBackdrop data={data} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80" />
       </div>
       <div className={`relative px-8 pb-12 pt-40 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         {subtitle ? (
@@ -421,9 +436,10 @@ function BoldTypeVariant({
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
+  const align = block.style.align ?? "left";
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className="relative px-6 py-14 flex flex-col gap-3">
+      <div className={`relative px-6 py-14 flex flex-col gap-3 ${alignClasses(align)}`}>
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}
@@ -435,8 +451,11 @@ function BoldTypeVariant({
         ) : null}
         <div
           {...selectableProps(editable, onFieldSelect, "coupleNames")}
-          className="text-left leading-[0.85]"
-          style={fieldStyle(block, "coupleNames")}
+          className="leading-[0.85]"
+          style={{
+            ...fieldStyle(block, "coupleNames"),
+            textAlign: align === "justify" ? "center" : align,
+          }}
         >
           <div className="text-4xl md:text-6xl font-semibold tracking-tight">
             {brideName}

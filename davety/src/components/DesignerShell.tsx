@@ -187,7 +187,7 @@ function DesignerShellInner({
       {/* Workspace — desktop: side-by-side, mobile: full-canvas + bottom sheet */}
       <div className="min-h-0 grid md:grid-cols-[1fr_380px]">
         <Canvas />
-        <div className="hidden md:block">
+        <div className="hidden md:block min-h-0">
           <SidePanel />
         </div>
       </div>
