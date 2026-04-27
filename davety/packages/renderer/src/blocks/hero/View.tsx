@@ -1,6 +1,7 @@
 import type { HeroData, HeroVariant } from "@davety/schema";
 import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 import { buildImgProps } from "../../media";
+import { parseInlineDecorations } from "../../decorations/inline";
 
 /**
  * Hero — branches on data.variant so each design sample from the homepage
@@ -117,7 +118,7 @@ function ClassicVariant({
             className={`text-2xl font-sans ${selectableProps(editable, onFieldSelect, "subtitle").className}`}
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </h2>
         ) : null}
         {description ? (
@@ -126,7 +127,7 @@ function ClassicVariant({
             className={`max-w-md text-base font-sans ${selectableProps(editable, onFieldSelect, "description").className}`}
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -159,7 +160,7 @@ function ArchVariant({
             className="text-[10px] uppercase tracking-[0.3em] opacity-70"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -177,7 +178,7 @@ function ArchVariant({
             className="max-w-md text-sm mt-3"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -216,7 +217,7 @@ function PhotoTopVariant({
             className="text-[11px] uppercase tracking-[0.3em] opacity-70 mt-2"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -234,7 +235,7 @@ function PhotoTopVariant({
             className="max-w-md text-sm mt-2"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -280,7 +281,7 @@ function PhotoFullVariant({
             className="text-[11px] uppercase tracking-[0.3em] opacity-90"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -298,7 +299,7 @@ function PhotoFullVariant({
             className="max-w-md text-sm mt-3 opacity-90"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -346,7 +347,7 @@ function FloralCrownVariant({
             className="text-[11px] uppercase tracking-[0.3em] opacity-70"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -364,7 +365,7 @@ function FloralCrownVariant({
             className="max-w-md text-sm mt-3"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -403,7 +404,7 @@ function MonogramCircleVariant({
             className="text-[11px] uppercase tracking-[0.3em] opacity-70 mt-2"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -421,7 +422,7 @@ function MonogramCircleVariant({
             className="max-w-md text-sm mt-2"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -446,7 +447,7 @@ function BoldTypeVariant({
             className="text-[11px] uppercase tracking-[0.35em] opacity-70"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -473,7 +474,7 @@ function BoldTypeVariant({
             className="max-w-md text-sm mt-4"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>
@@ -516,7 +517,7 @@ function BotanicalFrameVariant({
             className="text-[11px] uppercase tracking-[0.3em] opacity-70"
             style={fieldStyle(block, "subtitle")}
           >
-            {subtitle}
+            {parseInlineDecorations(subtitle)}
           </div>
         ) : null}
         <div
@@ -534,7 +535,7 @@ function BotanicalFrameVariant({
             className="max-w-md text-sm mt-3"
             style={fieldStyle(block, "description")}
           >
-            {description}
+            {parseInlineDecorations(description)}
           </p>
         ) : null}
       </div>

@@ -22,3 +22,8 @@ export {
   type DecorationIcon,
   type DecorationCategory,
 } from "./decorations/catalog";
+export {
+  parseInlineDecorations,
+  hasInlineDecorations,
+  type ParseInlineOptions,
+} from "./decorations/inline";

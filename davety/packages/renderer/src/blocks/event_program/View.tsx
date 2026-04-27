@@ -1,5 +1,6 @@
 import type { EventProgramData } from "@davety/schema";
 import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { parseInlineDecorations } from "../../decorations/inline";
 
 export function EventProgramView({
   block,
@@ -39,7 +40,9 @@ export function EventProgramView({
             <div className="font-chakra text-sm tabular-nums opacity-80 w-14">
               {item.time}
             </div>
-            <div className="flex-1 text-sm">{item.label}</div>
+            <div className="flex-1 text-sm">
+              {parseInlineDecorations(item.label)}
+            </div>
           </li>
         ))}
       </ul>
@@ -47,11 +50,11 @@ export function EventProgramView({
       {venueName ? (
         <div className="mt-6 text-center max-w-md mx-auto">
           <div className="font-display text-lg" style={fieldStyle(block, "venueName")}>
-            {venueName}
+            {parseInlineDecorations(venueName)}
           </div>
           {venueAddress ? (
             <div className="text-sm opacity-80 mt-1" style={fieldStyle(block, "venueAddress")}>
-              {venueAddress}
+              {parseInlineDecorations(venueAddress)}
             </div>
           ) : null}
           {mapUrl ? (

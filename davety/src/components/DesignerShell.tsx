@@ -14,6 +14,7 @@ import { HeaderCountdown } from "./HeaderCountdown";
 import { Canvas } from "./Canvas";
 import { SidePanel } from "./SidePanel/SidePanel";
 import { MobileSidePanel } from "./MobileSidePanel";
+import { MobileHintBar } from "./MobileHintBar";
 import { OnboardingFlow } from "./OnboardingFlow";
 import { PreviewOverlay } from "./PreviewOverlay";
 
@@ -118,35 +119,50 @@ function DesignerShellInner({
 
   return (
     <div className="h-dvh grid grid-rows-[56px_1fr] bg-background overflow-hidden">
-      {/* Top bar */}
-      <header className="border-b border-border flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
+      {/* Top bar — responsive: compact on mobile, rich on desktop */}
+      <header className="border-b border-border flex items-center justify-between gap-2 px-3 sm:px-4">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <button
             onClick={handleClose}
-            className="rounded-full p-1.5 hover:bg-muted cursor-pointer"
+            className="shrink-0 rounded-full p-1.5 hover:bg-muted cursor-pointer"
             aria-label="close"
           >
             <X className="size-4" />
           </button>
-          <span className="text-sm font-medium">{t("stepTitle")}</span>
+          <span className="text-sm font-medium truncate">
+            {t("stepTitle")}
+          </span>
           {dirty ? (
-            <span
-              className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/60 bg-amber-50 px-3 py-1.5 text-xs font-chakra uppercase tracking-[0.15em] text-amber-700"
-              title="Kaydedilmemiş değişiklikler"
-            >
-              <Star className="size-3.5 fill-amber-500 text-amber-500" />
-              Kaydedilmedi
-            </span>
+            <>
+              {/* Desktop: full pill with label */}
+              <span
+                className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-amber-400/60 bg-amber-50 px-3 py-1.5 text-xs font-chakra uppercase tracking-[0.15em] text-amber-700"
+                title="Kaydedilmemiş değişiklikler"
+              >
+                <Star className="size-3.5 fill-amber-500 text-amber-500" />
+                Kaydedilmedi
+              </span>
+              {/* Mobile/tablet: small dot only */}
+              <span
+                className="lg:hidden inline-block size-2 rounded-full bg-amber-500 shrink-0"
+                title="Kaydedilmemiş değişiklikler"
+                aria-label="Kaydedilmemiş değişiklikler"
+              />
+            </>
           ) : null}
         </div>
 
-        <HeaderCountdown targetIso={resolveCountdownIso(doc)} />
+        {/* Countdown — only desktop, takes too much room on mobile */}
+        <div className="hidden lg:block shrink-0">
+          <HeaderCountdown targetIso={resolveCountdownIso(doc)} />
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={undo}
             disabled={pastLen === 0}
             title="Geri Al (⌘Z)"
+            aria-label="Geri Al"
             className="inline-flex items-center justify-center rounded-full border border-border text-foreground p-2 cursor-pointer hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Undo2 className="size-3.5" />
@@ -155,41 +171,51 @@ function DesignerShellInner({
             onClick={redo}
             disabled={futureLen === 0}
             title="İleri Al (⌘⇧Z)"
+            aria-label="İleri Al"
             className="inline-flex items-center justify-center rounded-full border border-border text-foreground p-2 cursor-pointer hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Redo2 className="size-3.5" />
           </button>
+          {/* Önizle / Kaydet — desktop only; mobile gets these in the bottom toolbar */}
           <button
             onClick={togglePreview}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground text-xs px-3 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:bg-muted"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border text-foreground text-xs px-3 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:bg-muted"
           >
             <Eye className="size-3.5" /> Önizle
           </button>
           <button
             onClick={save}
             disabled={!dirty || saving}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border text-foreground text-xs px-3 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border text-foreground text-xs px-3 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Save className="size-3.5" /> {saving ? "Kaydediliyor…" : "Kaydet"}
           </button>
           <button
             onClick={handlePublish}
-            className="rounded-full bg-primary text-primary-foreground text-xs px-4 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90"
+            className="rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90"
           >
             Yayınla
           </button>
         </div>
       </header>
 
-      {/* Workspace — desktop: side-by-side, mobile: full-canvas + bottom sheet */}
-      <div className="min-h-0 grid md:grid-cols-[1fr_380px]">
+      {/* Workspace — desktop: side-by-side, mobile: full-canvas + bottom sheet.
+          Mobile reserves 64px at the bottom so the toolbar doesn't overlap
+          canvas content. */}
+      <div className="min-h-0 grid md:grid-cols-[1fr_380px] pb-16 md:pb-0">
         <Canvas />
         <div className="hidden md:block min-h-0">
           <SidePanel />
         </div>
       </div>
 
-      <MobileSidePanel />
+      <MobileHintBar />
+      <MobileSidePanel
+        onPreview={togglePreview}
+        onSave={save}
+        saving={saving}
+        dirty={dirty}
+      />
       <OnboardingFlow />
       <PreviewOverlay />
     </div>

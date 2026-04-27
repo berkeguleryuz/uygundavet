@@ -1,5 +1,6 @@
 import type { FooterData } from "@davety/schema";
 import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { parseInlineDecorations } from "../../decorations/inline";
 
 export function FooterView({
   block,
@@ -25,7 +26,7 @@ export function FooterView({
       style={rootStyle}
     >
       <div {...click("text")} style={fieldStyle(block, "text")}>
-        {block.data.text || "davety ile oluşturuldu"}
+        {parseInlineDecorations(block.data.text || "davety ile oluşturuldu")}
       </div>
     </footer>
   );

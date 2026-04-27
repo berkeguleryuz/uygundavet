@@ -1,5 +1,6 @@
 import type { CustomNoteData } from "@davety/schema";
 import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { parseInlineDecorations } from "../../decorations/inline";
 
 export function CustomNoteView({
   block,
@@ -31,7 +32,7 @@ export function CustomNoteView({
           className="font-display text-2xl mb-3"
           style={fieldStyle(block, "title")}
         >
-          {title}
+          {parseInlineDecorations(title)}
         </h3>
       ) : null}
       <p
@@ -39,7 +40,7 @@ export function CustomNoteView({
         className="text-sm max-w-lg leading-relaxed opacity-90 whitespace-pre-wrap"
         style={fieldStyle(block, "body")}
       >
-        {body}
+        {parseInlineDecorations(body)}
       </p>
     </section>
   );

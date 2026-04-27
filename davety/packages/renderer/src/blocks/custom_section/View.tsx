@@ -1,5 +1,6 @@
 import type { CustomSectionData } from "@davety/schema";
 import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { parseInlineDecorations } from "../../decorations/inline";
 
 export function CustomSectionView({
   block,
@@ -27,7 +28,7 @@ export function CustomSectionView({
         className="font-display text-2xl text-center mb-3"
         style={fieldStyle(block, "title")}
       >
-        {title}
+        {parseInlineDecorations(title)}
       </h3>
 
       {body ? (
@@ -36,7 +37,7 @@ export function CustomSectionView({
           className="text-sm text-center max-w-lg mx-auto opacity-80 mb-5"
           style={fieldStyle(block, "body")}
         >
-          {body}
+          {parseInlineDecorations(body)}
         </p>
       ) : null}
 
@@ -44,9 +45,13 @@ export function CustomSectionView({
         <ul className="max-w-md mx-auto space-y-3">
           {items.map((it, i) => (
             <li key={i} className="border-b border-current/10 pb-2">
-              <div className="font-medium text-sm">{it.title}</div>
+              <div className="font-medium text-sm">
+                {parseInlineDecorations(it.title)}
+              </div>
               {it.description ? (
-                <div className="text-xs opacity-70 mt-0.5">{it.description}</div>
+                <div className="text-xs opacity-70 mt-0.5">
+                  {parseInlineDecorations(it.description)}
+                </div>
               ) : null}
             </li>
           ))}

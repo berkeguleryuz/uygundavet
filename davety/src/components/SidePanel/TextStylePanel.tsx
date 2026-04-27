@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   AlignCenter,
@@ -11,10 +11,12 @@ import {
   Italic,
   Minus,
   Plus,
+  Sparkles,
   Strikethrough,
   Underline,
 } from "lucide-react";
 import {
+  DECORATION_ICONS,
   fontCatalog,
   fontCategories,
   filterByCategory,
@@ -36,6 +38,10 @@ export function TextStylePanel() {
 
   const [category, setCategory] = useState<FontCategory>("all");
   const [query, setQuery] = useState("");
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const fieldInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
+    null,
+  );
 
   if (!doc || !blockId || !fieldId) return null;
   const block = doc.blocks.find((b) => b.id === blockId);
@@ -153,6 +159,9 @@ export function TextStylePanel() {
             </label>
             {isLongText ? (
               <textarea
+                ref={(el) => {
+                  fieldInputRef.current = el;
+                }}
                 value={(fieldValue as string) ?? ""}
                 onChange={(e) =>
                   updateBlockData(blockId, { [fieldId]: e.target.value })
@@ -162,6 +171,9 @@ export function TextStylePanel() {
               />
             ) : (
               <input
+                ref={(el) => {
+                  fieldInputRef.current = el;
+                }}
                 value={(fieldValue as string) ?? ""}
                 onChange={(e) =>
                   updateBlockData(blockId, { [fieldId]: e.target.value })
@@ -169,6 +181,19 @@ export function TextStylePanel() {
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
             )}
+            <InlineDecorationButton
+              open={iconPickerOpen}
+              onToggle={() => setIconPickerOpen((v) => !v)}
+              onPick={(key) => {
+                insertAtCursor(
+                  fieldInputRef.current,
+                  `{{${key}}}`,
+                  (next) =>
+                    updateBlockData(blockId, { [fieldId]: next }),
+                  (fieldValue as string) ?? "",
+                );
+              }}
+            />
           </div>
         )
       ) : null}
@@ -375,4 +400,91 @@ function datetimeLocalToIso(local: string): string | null {
 function splitIso(local: string): [string, string] {
   const [date = "", time = ""] = local.split("T");
   return [date, time.slice(0, 5)];
+}
+
+/**
+ * Insert `marker` at the input/textarea's current cursor position. If no
+ * input ref is available, falls back to appending at the end. After
+ * inserting we restore focus and place the cursor right after the inserted
+ * marker so the user can keep typing.
+ */
+function insertAtCursor(
+  el: HTMLInputElement | HTMLTextAreaElement | null,
+  marker: string,
+  write: (next: string) => void,
+  fallbackValue: string,
+) {
+  if (!el) {
+    write(`${fallbackValue}${marker}`);
+    return;
+  }
+  const value = el.value;
+  const start = el.selectionStart ?? value.length;
+  const end = el.selectionEnd ?? value.length;
+  const next = value.slice(0, start) + marker + value.slice(end);
+  write(next);
+  // Restore selection on next tick after React has re-rendered.
+  requestAnimationFrame(() => {
+    if (!el || !document.body.contains(el)) return;
+    el.focus();
+    const cursor = start + marker.length;
+    el.setSelectionRange(cursor, cursor);
+  });
+}
+
+function InlineDecorationButton({
+  open,
+  onToggle,
+  onPick,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  onPick: (iconKey: string) => void;
+}) {
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full border cursor-pointer transition-colors ${
+          open
+            ? "bg-foreground text-background border-foreground"
+            : "bg-background border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+        }`}
+      >
+        <Sparkles className="size-3" />
+        Süsleme Ekle
+      </button>
+      {open ? (
+        <div className="mt-2 rounded-md border border-border bg-background p-2">
+          <p className="text-[10px] text-muted-foreground mb-1.5 leading-snug">
+            İmleç pozisyonuna bir ikon eklemek için tıkla. İkon yazıyla
+            birlikte boyutlanır ve metin rengini alır.
+          </p>
+          <div className="grid grid-cols-8 gap-1 max-h-32 overflow-y-auto pr-1">
+            {DECORATION_ICONS.map((i) => (
+              <button
+                key={i.id}
+                type="button"
+                onClick={() => onPick(i.id)}
+                title={i.label}
+                className="aspect-square rounded border border-border bg-background hover:border-foreground/40 hover:bg-muted cursor-pointer flex items-center justify-center transition-colors"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.4}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-3.5"
+                  dangerouslySetInnerHTML={{ __html: i.svg }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
