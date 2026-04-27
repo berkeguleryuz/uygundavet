@@ -15,6 +15,36 @@ interface Props {
   isDraft: boolean;
 }
 
+/** Pick a readable button palette against the page background — light
+ *  pages get a dark glass button, dark pages get a light glass button.
+ *  Threshold uses perceived luminance, not raw RGB average. */
+function readableButtonStyle(pageBg: string): {
+  border: string;
+  bg: string;
+  bgHover: string;
+  text: string;
+} {
+  const hex = pageBg.replace("#", "");
+  const r = parseInt(hex.slice(0, 2) || "25", 16);
+  const g = parseInt(hex.slice(2, 4) || "22", 16);
+  const b = parseInt(hex.slice(4, 6) || "24", 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (luminance > 0.5) {
+    return {
+      border: "rgba(0,0,0,0.25)",
+      bg: "rgba(0,0,0,0.06)",
+      bgHover: "rgba(0,0,0,0.12)",
+      text: "#1a1a1a",
+    };
+  }
+  return {
+    border: "rgba(255,255,255,0.3)",
+    bg: "rgba(255,255,255,0.1)",
+    bgHover: "rgba(255,255,255,0.2)",
+    text: "#ffffff",
+  };
+}
+
 export function PublicInvitation({
   doc,
   slug,
@@ -23,6 +53,7 @@ export function PublicInvitation({
   isDraft,
 }: Props) {
   const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
+  const editBtn = readableButtonStyle(doc.theme.pageBgColor ?? "#252224");
 
   // Card slot starts at 640px (envelope's natural top-of-page geometry).
   // `cardExpandedHeight` is what WeddingEnvelope grows to the moment its
@@ -59,8 +90,18 @@ export function PublicInvitation({
       {isOwner ? (
         <Link
           href={`/design/invitations/${designId}/editor`}
-          className="hidden md:inline-flex absolute top-4 right-4 items-center text-xs uppercase tracking-[0.25em] rounded-full border border-white/30 px-5 py-2 bg-white/10 text-white backdrop-blur hover:bg-white/20 cursor-pointer"
-          style={{ fontFamily: "Space Grotesk, sans-serif", zIndex: 50 }}
+          className="hidden md:inline-flex absolute top-4 right-4 items-center text-xs uppercase tracking-[0.25em] rounded-full border px-5 py-2 backdrop-blur cursor-pointer transition-colors"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            zIndex: 50,
+            borderColor: editBtn.border,
+            background: editBtn.bg,
+            color: editBtn.text,
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = editBtn.bgHover)
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.background = editBtn.bg)}
         >
           Düzenle
         </Link>
@@ -102,8 +143,13 @@ export function PublicInvitation({
       {isOwner ? (
         <Link
           href={`/design/invitations/${designId}/editor`}
-          className="md:hidden mt-8 mb-6 text-xs uppercase tracking-[0.25em] rounded-full border border-white/30 px-5 py-2 bg-white/10 text-white backdrop-blur hover:bg-white/20 cursor-pointer"
-          style={{ fontFamily: "Space Grotesk, sans-serif" }}
+          className="md:hidden mt-8 mb-6 text-xs uppercase tracking-[0.25em] rounded-full border px-5 py-2 backdrop-blur cursor-pointer transition-colors"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            borderColor: editBtn.border,
+            background: editBtn.bg,
+            color: editBtn.text,
+          }}
         >
           Düzenle
         </Link>
