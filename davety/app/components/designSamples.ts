@@ -522,7 +522,7 @@ export const DESIGN_SAMPLES: DesignSample[] = [
     envelopeColor: "#f4e6cd",
     liningBg: "#2a1c0c",
     liningPattern: "gold",
-    photoUrl: photo("photo-1537907510278-10acdb198d0f"),
+    photoUrl: photo("photo-1519741347686-c1e0aadf4611"),
     sampleBride: "İrem",
     sampleGroom: "Doruk",
     subtitle: "Birlikte Daha Güçlü",
