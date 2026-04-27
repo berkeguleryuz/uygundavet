@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { FileText, MailOpen, Music, ChevronDown } from "lucide-react";
+import { FileText, MailOpen, Music, Sparkles, ChevronDown } from "lucide-react";
 import type { Block, HeroData, HeroVariant } from "@davety/schema";
 import { useRouter } from "@/i18n/navigation";
 import { useEditorStore } from "@/src/store/editor-store";
@@ -11,6 +11,7 @@ import { useManualSave } from "@/src/hooks/useManualSave";
 import { DesignTab } from "./DesignTab";
 import { EnvelopeTab } from "./EnvelopeTab";
 import { MusicTab } from "./MusicTab";
+import { DecorationsTab } from "./DecorationsTab";
 
 export function DesignHomePanel() {
   const t = useTranslations("Editor");
@@ -41,7 +42,7 @@ export function DesignHomePanel() {
         {saving ? "Kaydediliyor…" : t("mainButton")}
       </button>
 
-      <div className="grid grid-cols-3 gap-2 text-center">
+      <div className="grid grid-cols-4 gap-1.5 text-center">
         <TabButton
           icon={<FileText className="size-5" />}
           label={t("tabs.design")}
@@ -59,6 +60,12 @@ export function DesignHomePanel() {
           label={t("tabs.music")}
           active={tab === "music"}
           onClick={() => setTab("music")}
+        />
+        <TabButton
+          icon={<Sparkles className="size-5" />}
+          label={t("tabs.decorations")}
+          active={tab === "decorations"}
+          onClick={() => setTab("decorations")}
         />
       </div>
 
@@ -93,6 +100,7 @@ export function DesignHomePanel() {
       {tab === "design" ? <DesignTab /> : null}
       {tab === "envelope" ? <EnvelopeTab /> : null}
       {tab === "music" ? <MusicTab /> : null}
+      {tab === "decorations" ? <DecorationsTab /> : null}
 
       <div className="mt-4 text-xs text-muted-foreground leading-relaxed">
         Davetiyeni düzenlemek için canvas&apos;taki metinlere veya bloklara

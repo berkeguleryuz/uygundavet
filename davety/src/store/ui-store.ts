@@ -3,7 +3,7 @@
 import { create } from "zustand";
 
 export type PanelMode = "home" | "block" | "text";
-export type DesignTab = "design" | "envelope" | "music";
+export type DesignTab = "design" | "envelope" | "music" | "decorations";
 
 interface UIState {
   selectedBlockId: string | null;

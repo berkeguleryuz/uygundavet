@@ -14,3 +14,11 @@ export { registry, getBlockView, getBlockEntry, listBlockEntries } from "./block
 export type { BlockRegistryEntry, BlockViewProps } from "./blocks/types";
 export { RendererProvider, useRendererContext, apiUrl } from "./context";
 export { buildImgProps } from "./media";
+export {
+  DECORATION_ICONS,
+  DECORATION_CATEGORIES,
+  findDecoration,
+  decorationsByCategory,
+  type DecorationIcon,
+  type DecorationCategory,
+} from "./decorations/catalog";

@@ -29,7 +29,8 @@
     "tabs": {
       "design": "Invitation Design",
       "envelope": "Envelope Design",
-      "music": "Background Music"
+      "music": "Background Music",
+      "decorations": "Decorations"
     },
     "viewChanges": "View Changes",
     "advanced": "Advanced Settings",
