@@ -82,7 +82,8 @@ export function Canvas() {
 
   return (
     <div
-      className="min-h-0 overflow-auto bg-muted/30 py-8 px-6"
+      className="min-h-0 overflow-auto py-8 px-6"
+      style={{ background: doc.theme.pageBgColor ?? "#252224" }}
       onClick={() => {
         // Click outside any block → deselect + close any open palette
         selectBlock(null);
@@ -357,7 +358,10 @@ function EnvelopeCanvas() {
   const resolved = resolveEnvelopeProps(doc.theme.envelope);
 
   return (
-    <div className="min-h-0 overflow-auto bg-muted/30 py-10 px-6 flex flex-col items-center gap-6">
+    <div
+      className="min-h-0 overflow-auto py-10 px-6 flex flex-col items-center gap-6"
+      style={{ background: doc.theme.pageBgColor ?? "#252224" }}
+    >
       <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
         Zarf Önizlemesi · Tıkla
       </div>

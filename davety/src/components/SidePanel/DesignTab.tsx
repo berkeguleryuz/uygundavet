@@ -206,6 +206,11 @@ export function DesignTab() {
             value={theme.accentColor}
             onChange={(v) => updateTheme({ accentColor: v })}
           />
+          <ColorRow
+            label="Sayfa Arka Planı"
+            value={theme.pageBgColor ?? "#252224"}
+            onChange={(v) => updateTheme({ pageBgColor: v })}
+          />
         </div>
         <p className="mt-2 text-[10px] text-muted-foreground">
           Zarf ve kapak renkleri için &quot;Zarf Tasarımı&quot; sekmesini kullan.

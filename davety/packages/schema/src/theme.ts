@@ -25,6 +25,11 @@ export type EnvelopeTheme = z.infer<typeof envelopeThemeSchema>;
 export const themeSchema = z.object({
   bgColor: z.string().default("#f5f6f3"),
   accentColor: z.string().default("#252224"),
+  /** Page background — the area around the envelope/card on the public
+   *  invitation page. Distinct from `bgColor` (which is the card's own
+   *  background) so the recipient sees a clear contrast between the
+   *  page chrome and the invitation itself. */
+  pageBgColor: z.string().default("#252224"),
   pattern: z.string().optional(),
   bgMusicUrl: z.string().optional(),
   envelope: envelopeThemeSchema.default({
@@ -41,6 +46,7 @@ export type Theme = z.infer<typeof themeSchema>;
 export const defaultTheme: Theme = {
   bgColor: "#f5f6f3",
   accentColor: "#252224",
+  pageBgColor: "#252224",
   envelope: {
     color: "#f5eedb",
     liningPattern: "daisy",

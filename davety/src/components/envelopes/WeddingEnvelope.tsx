@@ -79,6 +79,11 @@ export interface WeddingEnvelopeProps {
    *  drop in the same render guarantees the two animations stay in
    *  perfect lockstep — no setTimeout race between parent and child. */
   cardExpandedHeight?: number;
+  /** Same idea as `cardExpandedHeight` but for the horizontal axis —
+   *  the card slot widens to this value once the envelope drops, so
+   *  the recipient sees the invitation fill the page width instead
+   *  of staying pinned at the original `cardWidth`. */
+  cardExpandedWidth?: number;
 }
 
 export function WeddingEnvelope({
@@ -101,6 +106,7 @@ export function WeddingEnvelope({
   className,
   onReveal,
   cardExpandedHeight,
+  cardExpandedWidth,
 }: WeddingEnvelopeProps) {
   const [stage, setStage] = useState<WeddingEnvelopeStage>("closed");
   // Once `dropping` flips true the V-pocket starts a slow translateY
@@ -124,7 +130,17 @@ export function WeddingEnvelope({
   // translateY transition. No parent setTimeout race.
   const effectiveCardHeight =
     dropping && cardExpandedHeight ? cardExpandedHeight : cardHeight;
-  const sceneWidth = Math.max(cardWidth, envelopeWidth) + sceneSidePad * 2;
+  const effectiveCardWidth =
+    dropping && cardExpandedWidth ? cardExpandedWidth : cardWidth;
+  // Once the envelope has dropped away there's no need for the
+  // breathing-room padding around it — the card takes over and any
+  // padding here just shows up as a visible band between the card
+  // edge and the page background. Collapse it during the drop, and
+  // also ignore the envelope's width (it's gone) so the wrapper
+  // tightens to exactly the card.
+  const sceneWidth = dropping
+    ? effectiveCardWidth
+    : Math.max(effectiveCardWidth, envelopeWidth) + sceneSidePad * 2;
   const innerSceneHeight = effectiveCardHeight + sceneTopPad;
   const sceneHeight = innerSceneHeight + sceneBottomPad;
   const envelopeTop = innerSceneHeight - envelopeHeight;
@@ -189,7 +205,7 @@ export function WeddingEnvelope({
   // faster (≈1.4s) so it visibly completes around the same moment
   // the envelope is gone, instead of crawling on for 3 more seconds.
   const heightTransition =
-    "height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)";
+    "height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1), max-width 1.4s cubic-bezier(0.55, 0, 0.2, 1)";
 
   return (
     <div
@@ -197,7 +213,7 @@ export function WeddingEnvelope({
       style={{
         width: "100%",
         maxWidth: sceneWidth,
-        height: sceneHeight,
+        height: sceneHeight - 70,
         transition: heightTransition,
         // Clip the V-pocket once it translates past the bottom of the
         // wrapper — without this it just floats over whatever sits
@@ -207,8 +223,18 @@ export function WeddingEnvelope({
       }}
     >
     <div
-      className="relative w-full h-full"
+      className="relative w-full"
       style={{
+        // Parent wrapper has both `height: sceneHeight` (inline) and
+        // `min-height: 100vh` (class). When sceneHeight < 100vh the
+        // wrapper renders at 100vh, but a child's `height: 100%`
+        // resolves against the parent's **explicit** height (sceneHeight)
+        // — not the min-height. That left the inner scene short of the
+        // viewport, with empty space below the card after the reveal.
+        // Using min-height: 100vh + height: innerSceneHeight here mirrors
+        // the wrapper and guarantees the inner div fills the same area.
+        height: innerSceneHeight,
+        minHeight: "100vh",
         transition: heightTransition,
         perspective: "900px",
         perspectiveOrigin: "50% 40%",
@@ -361,14 +387,22 @@ export function WeddingEnvelope({
             className="absolute left-1/2 overflow-hidden"
             style={{
               top: -envelopeTop,
-              width: cardWidth,
+              width: effectiveCardWidth,
               height: innerSceneHeight,
+              // After the drop, mirror the wrapper's `min-height: 100vh`
+              // so the card slot grows with the viewport. Without this
+              // the slot stays pinned at innerSceneHeight (a JS-computed
+              // pixel value) while the surrounding wrapper expands —
+              // leaving an empty band below the card. Transition
+              // min-height in lockstep with `height` so the slot grows
+              // smoothly during the drop instead of snapping to 100dvh.
+              minHeight: dropping && cardExpandedHeight ? "100dvh" : "0px",
               // Counter-translate cancels the flip container's drop so
               // the card visually stays anchored at its emerged
               // position while the envelope falls away beneath it.
               transform: `translateX(-50%) translateY(${-envelopeDropY}px)`,
               transition: dropping
-                ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1), height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
+                ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1), width 1.4s cubic-bezier(0.55, 0, 0.2, 1), height 1.4s cubic-bezier(0.55, 0, 0.2, 1), min-height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
                 : heightTransition,
               zIndex: 50,
               pointerEvents: "none",
@@ -379,19 +413,23 @@ export function WeddingEnvelope({
               style={{
                 top: 0,
                 height: effectiveCardHeight,
+                minHeight:
+                  dropping && cardExpandedHeight
+                    ? "calc(100dvh - 48px)"
+                    : "0px",
                 transform: `translateY(${
                   cardEmerging ? cardTranslateEnd : cardTranslateStart
                 }px)`,
                 opacity: cardEmerging ? 1 : 0,
                 transition: cardEmerging
-                  ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out, height 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
+                  ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out, height 1.4s cubic-bezier(0.55, 0, 0.2, 1), min-height 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
                   : "opacity 0.1s",
                 pointerEvents: stage === "done" ? "auto" : "none",
               }}
             >
               {cardRender
-                ? cardRender({ width: cardWidth, height: effectiveCardHeight })
-                : <InvitationCard width={cardWidth} height={effectiveCardHeight} {...cardProps} />}
+                ? cardRender({ width: effectiveCardWidth, height: effectiveCardHeight })
+                : <InvitationCard width={effectiveCardWidth} height={effectiveCardHeight} {...cardProps} />}
             </div>
           </div>
 
