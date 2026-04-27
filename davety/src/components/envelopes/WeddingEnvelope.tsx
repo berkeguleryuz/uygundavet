@@ -70,6 +70,20 @@ export interface WeddingEnvelopeProps {
   frontBorder?: ReactNode;
   layout?: "replace" | "side-by-side";
   className?: string;
+  /** Fires after stage transitions to "done" — public/editor consumers
+   *  can hook into this if they need to know when the envelope drop
+   *  animation is allowed to begin. */
+  onReveal?: () => void;
+  /** When set, the card slot grows to this height the instant the
+   *  envelope drop begins. Pairing the height transition with the
+   *  drop in the same render guarantees the two animations stay in
+   *  perfect lockstep — no setTimeout race between parent and child. */
+  cardExpandedHeight?: number;
+  /** Same idea as `cardExpandedHeight` but for the horizontal axis —
+   *  the card slot widens to this value once the envelope drops, so
+   *  the recipient sees the invitation fill the page width instead
+   *  of staying pinned at the original `cardWidth`. */
+  cardExpandedWidth?: number;
 }
 
 export function WeddingEnvelope({
@@ -90,8 +104,17 @@ export function WeddingEnvelope({
   flapSeal,
   frontBorder,
   className,
+  onReveal,
+  cardExpandedHeight,
+  cardExpandedWidth,
 }: WeddingEnvelopeProps) {
   const [stage, setStage] = useState<WeddingEnvelopeStage>("closed");
+  // Once `dropping` flips true the V-pocket starts a slow translateY
+  // descent off the bottom of the scene (smooth, frame-by-frame as the
+  // user requested). The card stays anchored via a counter-translate on
+  // the wrapper so the recipient sees more of the invitation as the
+  // envelope falls away.
+  const [dropping, setDropping] = useState(false);
 
   const envelopeHeight = Math.round(envelopeWidth * 0.62);
   // Inner scene exactly contains card + envelope (envelope pinned to inner
@@ -100,8 +123,25 @@ export function WeddingEnvelope({
   const sceneTopPad = 48;
   const sceneBottomPad = 80;
   const sceneSidePad = 32;
-  const sceneWidth = Math.max(cardWidth, envelopeWidth) + sceneSidePad * 2;
-  const innerSceneHeight = cardHeight + sceneTopPad;
+  // The card's effective height swaps from `cardHeight` to
+  // `cardExpandedHeight` on the same render that flips `dropping`,
+  // so the height/top CSS transitions on every dependent box start
+  // their 4s animation in the exact same paint as the envelope's
+  // translateY transition. No parent setTimeout race.
+  const effectiveCardHeight =
+    dropping && cardExpandedHeight ? cardExpandedHeight : cardHeight;
+  const effectiveCardWidth =
+    dropping && cardExpandedWidth ? cardExpandedWidth : cardWidth;
+  // Once the envelope has dropped away there's no need for the
+  // breathing-room padding around it — the card takes over and any
+  // padding here just shows up as a visible band between the card
+  // edge and the page background. Collapse it during the drop, and
+  // also ignore the envelope's width (it's gone) so the wrapper
+  // tightens to exactly the card.
+  const sceneWidth = dropping
+    ? effectiveCardWidth
+    : Math.max(effectiveCardWidth, envelopeWidth) + sceneSidePad * 2;
+  const innerSceneHeight = effectiveCardHeight + sceneTopPad;
   const sceneHeight = innerSceneHeight + sceneBottomPad;
   const envelopeTop = innerSceneHeight - envelopeHeight;
 
@@ -111,13 +151,17 @@ export function WeddingEnvelope({
     //   0.0s  click → Y-flip begins (1s duration)
     //   1.0s  Y-flip fully done → flap starts lifting (1s, finishes at 2.0s)
     //   3.0s  1-second pause after flap open, card begins emerging (2s)
-    //   5.0s  card settled → stage "done" (reset button appears)
+    //   5.0s  card settled → stage "done"
+    //   5.3s  envelope V-pocket starts sliding DOWN (4s slow descent)
+    //         — the card stays put via counter-translate on its wrapper.
     setStage("flipping");
     setTimeout(() => setStage("emerging"), 3000);
-    setTimeout(() => setStage("done"), 5000);
+    setTimeout(() => {
+      setStage("done");
+      onReveal?.();
+    }, 5000);
+    setTimeout(() => setDropping(true), 5300);
   };
-  const handleReset = () => setStage("closed");
-
   const flipped = stage !== "closed";
   const cardEmerging =
     stage === "emerging" || stage === "done";
@@ -133,7 +177,12 @@ export function WeddingEnvelope({
   const leftTriColor = backStyle === "shaded" ? shadedLeft : envelopeColor;
   const rightTriColor = backStyle === "shaded" ? shadedRight : envelopeColor;
   const bottomTriColor = backStyle === "shaded" ? shadedBottom : envelopeColor;
-  const topFlapColor = backStyle === "shaded" ? shadedTop : actualFlapColor;
+  // Flap paper color (both the closed-state outer face and the opened
+  // inner face's paper border). This is what the user controls via
+  // "Kapak Rengi" in the editor — leaving it unused was the reason
+  // changing the colour did nothing visible.
+  const flapPaperColor =
+    backStyle === "shaded" ? shadedTop : actualFlapColor;
 
   const textColor = isLight(envelopeColor) ? "#2a2420" : "#f3ecdc";
 
@@ -144,25 +193,59 @@ export function WeddingEnvelope({
   const cardTranslateStart = envelopeTop;
   const cardTranslateEnd = sceneTopPad;
 
+  // After the card has emerged, the V-pocket translates DOWN out of the
+  // scene (frame-by-frame smooth, 4s linear). The card wrapper applies
+  // an equal-and-opposite translateY so the card stays anchored at its
+  // emerged position while the envelope falls away beneath it.
+  const envelopeDropY = dropping ? 1100 : 0;
+
+  // The envelope drop transitions translateY over 4s but the envelope
+  // is clipped by the outer wrapper after roughly 1.4s — so visually
+  // the drop "finishes" at ~1.4s. The card height growth runs 1.4×
+  // faster (≈1.4s) so it visibly completes around the same moment
+  // the envelope is gone, instead of crawling on for 3 more seconds.
+  const heightTransition =
+    "height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1), max-width 1.4s cubic-bezier(0.55, 0, 0.2, 1)";
+
   return (
     <div
-      className={`relative mx-auto ${className ?? ""}`}
+      className={`relative mx-auto min-h-screen ${className ?? ""}`}
       style={{
         width: "100%",
         maxWidth: sceneWidth,
-        height: sceneHeight,
+        height: sceneHeight - 70,
+        transition: heightTransition,
+        // Clip the V-pocket once it translates past the bottom of the
+        // wrapper — without this it just floats over whatever sits
+        // below us in the page. The card is counter-translated and
+        // stays inside these bounds, so it remains visible.
+        overflow: "hidden",
       }}
     >
     <div
-      className="relative"
+      className="relative w-full"
       style={{
-        width: "100%",
+        // Parent wrapper has both `height: sceneHeight` (inline) and
+        // `min-height: 100vh` (class). When sceneHeight < 100vh the
+        // wrapper renders at 100vh, but a child's `height: 100%`
+        // resolves against the parent's **explicit** height (sceneHeight)
+        // — not the min-height. That left the inner scene short of the
+        // viewport, with empty space below the card after the reveal.
+        // Using min-height: 100vh + height: innerSceneHeight here mirrors
+        // the wrapper and guarantees the inner div fills the same area.
         height: innerSceneHeight,
+        minHeight: "100vh",
+        transition: heightTransition,
         perspective: "900px",
         perspectiveOrigin: "50% 40%",
       }}
     >
-      {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates ─── */}
+      {/* ─── FLIP CONTAINER (z=100) — isolated stacking, Y-rotates.
+           Once `dropping` is true the whole envelope translates Y
+           downward off the bottom of the scene (4s smooth linear).
+           The Y-rotation stays at 180deg — only translateY changes,
+           no second flip. The outer wrapper has overflow:hidden so
+           the envelope is visually clipped as it leaves the scene. */}
       <div
         onClick={handleOpen}
         className="absolute left-1/2"
@@ -172,19 +255,27 @@ export function WeddingEnvelope({
           height: envelopeHeight,
           transform: `translateX(-50%) ${
             flipped ? "rotateY(180deg)" : "rotateY(0deg)"
-          }`,
+          } translateY(${envelopeDropY}px)`,
           transformStyle: "preserve-3d",
-          transition: "transform 1s cubic-bezier(0.7, 0, 0.2, 1)",
+          // `top` transitions in lockstep with the card slot's
+          // `top: -envelopeTop` so the two cancel and the card
+          // content stays visually anchored when cardHeight grows.
+          // Without this the flip container snaps to its new top
+          // while the card slot's top eases over 4s — the user sees
+          // the card slide down then crawl back up.
+          transition: dropping
+            ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
+            : "transform 1s cubic-bezier(0.7, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)",
           zIndex: 100,
           cursor: flipped ? "default" : "pointer",
-          pointerEvents: flipped ? "none" : "auto",
+          pointerEvents: flipped || dropping ? "none" : "auto",
         }}
       >
         {/* ══ FRONT FACE (rotateY 0) ══ */}
         <div
           className="absolute inset-0 overflow-hidden"
           style={{
-            background: envelopeColor,
+            backgroundColor: envelopeColor,
             backgroundImage:
               "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
             borderRadius: 4,
@@ -195,17 +286,32 @@ export function WeddingEnvelope({
           }}
         >
           {frontBorder}
+          {/* Preset decorations (twine, ribbon, kraft texture, postal stamp,
+              window cutout, etc.) belong on the address side of a real
+              envelope. Rendering them here — and stacking the address
+              text on top with z-index — keeps the chosen visual treatment
+              while keeping the guest name + CTA readable. */}
+          {frontExtra}
           {stamp ? (
             <Stamp config={stamp} envelopeWidth={envelopeWidth} envelopeBg={envelopeColor} />
           ) : null}
           <div
             className="absolute"
             style={{
-              bottom: "12%",
-              left: "8%",
+              bottom: "10%",
+              left: "6%",
               color: textColor,
               fontFamily: "Merienda, serif",
-              maxWidth: "70%",
+              maxWidth: "72%",
+              padding: "10px 14px",
+              borderRadius: 6,
+              // Soft same-tone backdrop so the guest name + CTA stay
+              // legible even when a preset's decorations (twine, ribbon,
+              // borders, kraft texture) cross the address area.
+              background: `${envelopeColor}d9`,
+              backdropFilter: "blur(2px)",
+              WebkitBackdropFilter: "blur(2px)",
+              zIndex: 8,
             }}
           >
             <div className="text-lg italic mb-1 leading-tight">
@@ -231,7 +337,7 @@ export function WeddingEnvelope({
             transformStyle: "preserve-3d",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            background: envelopeColor,
+            backgroundColor: envelopeColor,
             backgroundImage:
               "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
             borderRadius: 4,
@@ -281,9 +387,23 @@ export function WeddingEnvelope({
             className="absolute left-1/2 overflow-hidden"
             style={{
               top: -envelopeTop,
-              width: cardWidth,
+              width: effectiveCardWidth,
               height: innerSceneHeight,
-              transform: "translateX(-50%)",
+              // After the drop, mirror the wrapper's `min-height: 100vh`
+              // so the card slot grows with the viewport. Without this
+              // the slot stays pinned at innerSceneHeight (a JS-computed
+              // pixel value) while the surrounding wrapper expands —
+              // leaving an empty band below the card. Transition
+              // min-height in lockstep with `height` so the slot grows
+              // smoothly during the drop instead of snapping to 100dvh.
+              minHeight: dropping && cardExpandedHeight ? "100dvh" : "0px",
+              // Counter-translate cancels the flip container's drop so
+              // the card visually stays anchored at its emerged
+              // position while the envelope falls away beneath it.
+              transform: `translateX(-50%) translateY(${-envelopeDropY}px)`,
+              transition: dropping
+                ? "transform 4s cubic-bezier(0.55, 0, 0.2, 1), width 1.4s cubic-bezier(0.55, 0, 0.2, 1), height 1.4s cubic-bezier(0.55, 0, 0.2, 1), min-height 1.4s cubic-bezier(0.55, 0, 0.2, 1), top 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
+                : heightTransition,
               zIndex: 50,
               pointerEvents: "none",
             }}
@@ -292,20 +412,24 @@ export function WeddingEnvelope({
               className="absolute left-0 right-0"
               style={{
                 top: 0,
-                height: cardHeight,
+                height: effectiveCardHeight,
+                minHeight:
+                  dropping && cardExpandedHeight
+                    ? "calc(100dvh - 48px)"
+                    : "0px",
                 transform: `translateY(${
                   cardEmerging ? cardTranslateEnd : cardTranslateStart
                 }px)`,
                 opacity: cardEmerging ? 1 : 0,
                 transition: cardEmerging
-                  ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out"
+                  ? "transform 2s cubic-bezier(0.45, 0, 0.15, 1), opacity 0.2s ease-out, height 1.4s cubic-bezier(0.55, 0, 0.2, 1), min-height 1.4s cubic-bezier(0.55, 0, 0.2, 1)"
                   : "opacity 0.1s",
                 pointerEvents: stage === "done" ? "auto" : "none",
               }}
             >
               {cardRender
-                ? cardRender({ width: cardWidth, height: cardHeight })
-                : <InvitationCard width={cardWidth} height={cardHeight} {...cardProps} />}
+                ? cardRender({ width: effectiveCardWidth, height: effectiveCardHeight })
+                : <InvitationCard width={effectiveCardWidth} height={effectiveCardHeight} {...cardProps} />}
             </div>
           </div>
 
@@ -331,12 +455,13 @@ export function WeddingEnvelope({
               zIndex: 40,
             }}
           >
-            {/* Outer face — cream paper, visible when closed */}
+            {/* Outer face — flap paper, visible when closed (top triangle
+                 of the front of the envelope) */}
             <div
               className="absolute inset-0"
               style={{
                 clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-                background: envelopeColor,
+                backgroundColor: flapPaperColor,
                 backgroundImage:
                   "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
                 backfaceVisibility: "hidden",
@@ -369,7 +494,7 @@ export function WeddingEnvelope({
                 transform: "rotateX(180deg)",
                 backfaceVisibility: "hidden",
                 WebkitBackfaceVisibility: "hidden",
-                background: envelopeColor,
+                backgroundColor: flapPaperColor,
                 backgroundImage:
                   "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
               }}
@@ -394,7 +519,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: leftTriColor,
+              backgroundColor: leftTriColor,
               clipPath: "polygon(0 0, 50% 50%, 0 100%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -407,7 +532,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: rightTriColor,
+              backgroundColor: rightTriColor,
               clipPath: "polygon(100% 0, 100% 100%, 50% 50%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -420,7 +545,7 @@ export function WeddingEnvelope({
           <div
             className="absolute inset-0"
             style={{
-              background: bottomTriColor,
+              backgroundColor: bottomTriColor,
               clipPath: "polygon(0 100%, 50% 50%, 100% 100%)",
               backgroundImage:
                 "repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 1px, transparent 1px 5px)",
@@ -448,20 +573,26 @@ export function WeddingEnvelope({
               vectorEffect="non-scaling-stroke"
             />
           </svg>
-
-          {frontExtra}
         </div>
       </div>
 
-      {/* Reset button */}
+      {/* Brand logo (replaces the previous reset button — kept the
+          same top-of-scene slot so the logo sits above the envelope
+          once the card has settled). */}
       {stage === "done" ? (
-        <button
-          onClick={handleReset}
-          className="absolute top-1 left-1/2 -translate-x-1/2 text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground cursor-pointer border border-border rounded-full px-4 py-1.5 bg-white"
-          style={{ fontFamily: "Space Grotesk, sans-serif", zIndex: 1200 }}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2"
+          style={{ zIndex: 1200 }}
         >
-          Tekrar Oynat
-        </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-gold-transparent.png"
+            alt="uygundavet"
+            width={56}
+            height={56}
+            className="block transition-opacity duration-500 ease-in-out"
+          />
+        </div>
       ) : null}
     </div>
     </div>
@@ -771,7 +902,7 @@ function isLight(hex: string): boolean {
   return lum > 0.55;
 }
 
-function darken(hex: string, amount: number): string {
+export function darken(hex: string, amount: number): string {
   const h = hex.replace("#", "");
   if (h.length !== 6) return hex;
   const r = parseInt(h.slice(0, 2), 16);

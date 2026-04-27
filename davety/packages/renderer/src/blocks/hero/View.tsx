@@ -1,5 +1,5 @@
 import type { HeroData, HeroVariant } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 import { buildImgProps } from "../../media";
 
 /**
@@ -102,7 +102,7 @@ function ClassicVariant({
   const { brideName, groomName, subtitle, description } = block.data;
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className="relative px-8 py-14 flex flex-col gap-3 items-center text-center">
+      <div className={`relative px-8 py-14 flex flex-col gap-3 ${alignClasses(block.style.align)}`}>
         <div
           {...selectableProps(editable, onFieldSelect, "coupleNames")}
           style={fieldStyle(block, "coupleNames")}
@@ -141,24 +141,12 @@ function ArchVariant({
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
+  // The arch silhouette is now drawn by the outer invitation container
+  // (see getCardShapeStyle in InvitationView), so this variant focuses on
+  // typography and lets the parent's rounded top do the visual work.
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <svg
-        className="absolute inset-x-8 top-4 bottom-0 w-[calc(100%-4rem)] h-[calc(100%-1rem)]"
-        viewBox="0 0 100 130"
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <path
-          d="M 10 125 L 10 40 Q 10 5 50 5 Q 90 5 90 40 L 90 125 Z"
-          fill="none"
-          stroke={accent ?? "currentColor"}
-          strokeWidth="0.4"
-          opacity="0.7"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-      <div className="relative px-10 py-14 flex flex-col gap-2 items-center text-center">
+      <div className={`relative px-10 pt-10 pb-12 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         <div
           className="text-5xl italic opacity-40 mb-2"
           style={{ fontFamily: "Merienda, serif", color: accent }}
@@ -210,7 +198,7 @@ function PhotoTopVariant({
         <MediaBackdrop data={block.data} />
         <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-[color:var(--bg,#fff)]" />
       </div>
-      <div className="relative px-8 py-10 flex flex-col items-center text-center gap-2">
+      <div className={`relative px-8 py-10 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         <div
           className="size-12 rounded-full -mt-16 flex items-center justify-center border shadow-sm"
           style={{
@@ -255,22 +243,37 @@ function PhotoTopVariant({
 }
 
 /* ─── Photo full ─── */
+const DEFAULT_PHOTO_FULL =
+  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
+
 function PhotoFullVariant({
   block,
   editable,
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description } = block.data;
+  // Drop block.style.color from the root so the white-on-photo treatment
+  // isn't repainted with the doc's accent (which is usually dark and
+  // becomes unreadable against the photo backdrop).
+  const { color: _omit, ...rootStyle } = styleToCss(block.style);
+  void _omit;
+  // If the block has no explicit photo/media, fall back to a bright
+  // default wedding image so the gradient overlay isn't painting over
+  // black emptiness.
+  const hasMedia = !!(block.data.media?.url || block.data.photoUrl);
+  const data = hasMedia
+    ? block.data
+    : { ...block.data, photoUrl: DEFAULT_PHOTO_FULL };
   return (
     <section
       className="relative overflow-hidden min-h-[420px] text-white"
-      style={styleToCss(block.style)}
+      style={rootStyle}
     >
       <div className="absolute inset-0">
-        <MediaBackdrop data={block.data} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/75" />
+        <MediaBackdrop data={data} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80" />
       </div>
-      <div className="relative px-8 pb-12 pt-40 flex flex-col items-center text-center gap-2">
+      <div className={`relative px-8 pb-12 pt-40 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}
@@ -336,7 +339,7 @@ function FloralCrownVariant({
           ))}
         </g>
       </svg>
-      <div className="relative px-8 py-16 pt-24 flex flex-col items-center text-center gap-2">
+      <div className={`relative px-8 py-16 pt-24 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}
@@ -378,7 +381,7 @@ function MonogramCircleVariant({
   const { brideName, groomName, subtitle, description, accent } = block.data;
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className="relative px-8 py-14 flex flex-col items-center text-center gap-3">
+      <div className={`relative px-8 py-14 flex flex-col gap-3 ${alignClasses(block.style.align)}`}>
         <div
           className="relative w-28 h-28 rounded-full flex items-center justify-center"
           style={{ border: `1px solid ${accent ?? "currentColor"}` }}
@@ -433,9 +436,10 @@ function BoldTypeVariant({
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
+  const align = block.style.align ?? "left";
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className="relative px-6 py-14 flex flex-col gap-3">
+      <div className={`relative px-6 py-14 flex flex-col gap-3 ${alignClasses(align)}`}>
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}
@@ -447,8 +451,11 @@ function BoldTypeVariant({
         ) : null}
         <div
           {...selectableProps(editable, onFieldSelect, "coupleNames")}
-          className="text-left leading-[0.85]"
-          style={fieldStyle(block, "coupleNames")}
+          className="leading-[0.85]"
+          style={{
+            ...fieldStyle(block, "coupleNames"),
+            textAlign: align === "justify" ? "center" : align,
+          }}
         >
           <div className="text-4xl md:text-6xl font-semibold tracking-tight">
             {brideName}
@@ -502,7 +509,7 @@ function BotanicalFrameVariant({
           </g>
         </svg>
       ))}
-      <div className="relative px-14 py-14 flex flex-col items-center text-center gap-2">
+      <div className={`relative px-14 py-14 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}

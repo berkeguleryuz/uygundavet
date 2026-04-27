@@ -1,5 +1,5 @@
 import type { CtaData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 export function CtaView({
   block,
@@ -21,7 +21,10 @@ export function CtaView({
       : {};
 
   return (
-    <section className="px-6 py-8 text-center" style={rootStyle}>
+    <section
+      className={`px-6 py-8 flex flex-col ${alignClasses(block.style.align)}`}
+      style={rootStyle}
+    >
       {href && !editable ? (
         <a
           href={href}

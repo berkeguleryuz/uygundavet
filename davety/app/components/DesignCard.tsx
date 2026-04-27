@@ -20,8 +20,11 @@ export function DesignCard({
 
   return (
     <article className="group flex flex-col">
-      <div className="relative">
-        {/* Theme name pill — top-left */}
+      {/* Outer frame — padded background, the actual invitation sits in
+          the middle so the gallery card mirrors how the invitation will
+          look in the editor / public view (with shape + shadow). */}
+      <div className="relative p-6 rounded-2xl border border-border bg-[#f5f1e7] shadow-sm">
+        {/* Theme name pill — top-left, on the frame */}
         <div
           className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-full bg-white/95 border border-border text-[10px] font-medium tracking-wide text-foreground shadow-sm"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -29,7 +32,7 @@ export function DesignCard({
           {design.name}
         </div>
 
-        {/* Category pill — top-right */}
+        {/* Category pill — top-right, on the frame */}
         <div
           className="absolute top-2 right-2 z-10 px-2.5 py-1 rounded-full bg-foreground text-background text-[10px] font-medium tracking-wide shadow-sm"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -37,10 +40,12 @@ export function DesignCard({
           {categoryLabel(design.category)}
         </div>
 
-        {/* Static invitation card preview (printable front) */}
+        {/* Real invitation card preview (matches editor/public render).
+            Arch shape applied to the outer container when layout is
+            arch — same look as the live invitation. */}
         <InvitationPreview design={design} />
 
-        {/* Optional zarf / box indicator — bottom-left */}
+        {/* Optional zarf / box indicator — bottom-left, on the frame */}
         <div
           className="absolute bottom-2 left-2 z-10 flex items-center gap-1.5"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -145,13 +150,23 @@ function CardShell({
   children: React.ReactNode;
   innerClassName?: string;
 }) {
+  // Mirror the same arch silhouette the editor/public view applies when
+  // the layout is "arch" — subtle dome at the top, flat sides + bottom.
+  const archStyle =
+    design.layout === "arch"
+      ? {
+          borderTopLeftRadius: "50% 32px",
+          borderTopRightRadius: "50% 32px",
+        }
+      : {};
   return (
     <div
-      className="relative w-full overflow-hidden rounded-md border border-border shadow-sm"
+      className="relative w-full overflow-hidden rounded-md border border-border shadow-md"
       style={{
         aspectRatio: "3 / 4",
         background: design.bg,
         color: design.textColor,
+        ...archStyle,
       }}
     >
       <div className={innerClassName ?? "absolute inset-0"}>{children}</div>

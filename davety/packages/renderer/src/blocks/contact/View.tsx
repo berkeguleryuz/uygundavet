@@ -1,5 +1,5 @@
 import type { ContactData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 export function ContactView({
   block,
@@ -21,7 +21,10 @@ export function ContactView({
       : {};
 
   return (
-    <section className="px-6 py-8 text-center" style={rootStyle}>
+    <section
+      className={`px-6 py-8 flex flex-col ${alignClasses(block.style.align)}`}
+      style={rootStyle}
+    >
       {venueName ? (
         <div
           {...click("venueName")}

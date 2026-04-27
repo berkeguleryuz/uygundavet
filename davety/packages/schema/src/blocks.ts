@@ -16,6 +16,7 @@ export const blockTypeSchema = z.enum([
   "cta",
   "contact",
   "footer",
+  "decoration",
 ]);
 export type BlockType = z.infer<typeof blockTypeSchema>;
 
@@ -203,4 +204,15 @@ export interface ContactData {
 
 export interface FooterData {
   text?: string;
+}
+
+export interface DecorationData {
+  /** Catalog id from `@davety/renderer/decorations` (e.g. "heart"). */
+  iconKey: string;
+  /** Render size in CSS px. Defaults to 64. */
+  sizePx?: number;
+  /** Stroke color. Falls back to theme.accentColor when absent. */
+  color?: string;
+  /** Horizontal alignment within the section. */
+  align?: "left" | "center" | "right";
 }

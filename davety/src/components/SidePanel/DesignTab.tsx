@@ -73,16 +73,6 @@ const PRESETS: Preset[] = [
   },
 ];
 
-const PATTERNS = [
-  { id: "none", label: "Düz" },
-  { id: "daisy", label: "Papatya" },
-  { id: "rose", label: "Gül" },
-  { id: "floral", label: "Çiçek" },
-  { id: "leaves", label: "Yaprak" },
-  { id: "waves", label: "Dalga" },
-  { id: "damask", label: "Damask" },
-];
-
 function randomTheme(): Preset {
   const hue = Math.floor(Math.random() * 360);
   const bgSat = 30 + Math.floor(Math.random() * 20);
@@ -119,15 +109,41 @@ function hslToHex(h: number, s: number, l: number): string {
 
 export function DesignTab() {
   const theme = useEditorStore((s) => s.doc?.theme);
+  const applyPatch = useEditorStore((s) => s.applyPatch);
   const updateTheme = useEditorStore((s) => s.updateTheme);
 
   if (!theme) return null;
 
   const applyPreset = (p: Preset) => {
-    updateTheme({
-      bgColor: p.bgColor,
-      accentColor: p.accentColor,
-      envelope: p.envelope,
+    // Apply the preset AND wipe per-block / per-field color overrides so
+    // a previous template's hard-coded dark accent doesn't survive on top
+    // of a new bright theme (e.g. Altın Gece's gold accent was being
+    // overridden by an old #6b5a42 set on the hero block's coupleNames).
+    applyPatch((d) => {
+      d.theme.bgColor = p.bgColor;
+      d.theme.accentColor = p.accentColor;
+      d.theme.envelope = {
+        ...(d.theme.envelope ?? {}),
+        ...p.envelope,
+      };
+      for (const block of d.blocks) {
+        const data = block.data as Record<string, unknown>;
+        if ("accent" in data) {
+          (data as { accent?: string }).accent = p.accentColor;
+        }
+        // Strip stale color from block-level style
+        if (block.style && (block.style as { color?: string }).color) {
+          delete (block.style as { color?: string }).color;
+        }
+        // Strip color from each field override (preserve other style props)
+        const overrides = block.style?.fieldOverrides;
+        if (overrides) {
+          for (const id of Object.keys(overrides)) {
+            const o = overrides[id] as { color?: string };
+            if (o && "color" in o) delete o.color;
+          }
+        }
+      }
     });
   };
 
@@ -191,45 +207,16 @@ export function DesignTab() {
             onChange={(v) => updateTheme({ accentColor: v })}
           />
           <ColorRow
-            label="Zarf"
-            value={theme.envelope.color}
-            onChange={(v) =>
-              updateTheme({ envelope: { ...theme.envelope, color: v } })
-            }
-          />
-          <ColorRow
-            label="Zarf Kapağı"
-            value={theme.envelope.flapColor}
-            onChange={(v) =>
-              updateTheme({ envelope: { ...theme.envelope, flapColor: v } })
-            }
+            label="Sayfa Arka Planı"
+            value={theme.pageBgColor ?? "#252224"}
+            onChange={(v) => updateTheme({ pageBgColor: v })}
           />
         </div>
+        <p className="mt-2 text-[10px] text-muted-foreground">
+          Zarf ve kapak renkleri için &quot;Zarf Tasarımı&quot; sekmesini kullan.
+        </p>
       </div>
 
-      <div>
-        <h3 className="text-sm font-medium mb-2">Desen</h3>
-        <div className="grid grid-cols-3 gap-1.5">
-          {PATTERNS.map((p) => {
-            const active =
-              (theme.pattern ?? "none") === p.id ||
-              (p.id === "none" && !theme.pattern);
-            return (
-              <button
-                key={p.id}
-                onClick={() =>
-                  updateTheme({ pattern: p.id === "none" ? undefined : p.id })
-                }
-                className={`text-[11px] px-2 py-1.5 rounded border cursor-pointer hover:bg-muted ${
-                  active ? "border-primary bg-muted" : "border-border"
-                }`}
-              >
-                {p.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

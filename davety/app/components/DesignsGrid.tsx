@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { useSession } from "@/src/lib/auth-client";
 import { DesignCard } from "./DesignCard";
+import { Calendar, TimePicker } from "./DateTimePicker";
 import {
   CATEGORIES,
   DESIGN_SAMPLES,
@@ -150,57 +151,69 @@ function DesignDateDialog({
     onCreated(data.id as string);
   }
 
+  const summary = formatTrDate(date) + (time ? ` · ${time}` : "");
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto"
       onClick={busy ? undefined : onClose}
     >
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
-        className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
+        className="bg-white rounded-2xl w-full max-w-md shadow-xl my-8"
         style={{ fontFamily: "Space Grotesk, sans-serif" }}
       >
-        <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
-          {design.name} · #{design.code}
+        <div className="px-6 pt-6 pb-4 border-b border-border">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+            {design.name} · #{design.code}
+          </div>
+          <h2
+            className="text-2xl font-medium mb-1"
+            style={{ fontFamily: "Merienda, serif" }}
+          >
+            Etkinlik Tarihini Seç
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Davetiyeni seçtiğin tema ile oluşturacağız. Sonra editörde
+            istediğin gibi değiştirebilirsin.
+          </p>
         </div>
-        <h2
-          className="text-xl font-medium mb-1"
-          style={{ fontFamily: "Merienda, serif" }}
-        >
-          Etkinlik Tarihini Seç
-        </h2>
-        <p className="text-sm text-muted-foreground mb-5">
-          Davetiyeni seçtiğin tema ile oluşturacağız. Sonra editörde
-          istediğin gibi değiştirebilirsin.
-        </p>
 
-        <label className="block mb-4">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
-            Tarih
+        <div className="px-6 py-5 flex flex-col gap-5">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+                Tarih
+              </span>
+              {date ? (
+                <span className="text-[11px] text-foreground">
+                  {formatTrDate(date)}
+                </span>
+              ) : null}
+            </div>
+            <Calendar value={date} onChange={setDate} />
           </div>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-border text-sm"
-            required
-          />
-        </label>
-        <label className="block mb-6">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5">
-            Saat
-          </div>
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-border text-sm"
-            required
-          />
-        </label>
 
-        <div className="flex items-center gap-2">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
+                Saat
+              </span>
+              <span className="text-[11px] text-foreground tabular-nums">
+                {time}
+              </span>
+            </div>
+            <TimePicker value={time} onChange={setTime} />
+          </div>
+
+          <div className="rounded-lg bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground">
+            <span className="font-medium text-foreground">Etkinlik:</span>{" "}
+            {summary}
+          </div>
+        </div>
+
+        <div className="px-6 pb-6 pt-2 flex items-center gap-2">
           <button
             type="button"
             onClick={onClose}
@@ -211,7 +224,7 @@ function DesignDateDialog({
           </button>
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || !date}
             className="flex-1 px-4 py-2.5 rounded-full bg-foreground text-background text-sm hover:bg-foreground/90 cursor-pointer disabled:opacity-70"
           >
             {busy ? "Oluşturuluyor..." : "Editöre Git"}
@@ -220,4 +233,38 @@ function DesignDateDialog({
       </form>
     </div>
   );
+}
+
+const TR_MONTHS_FULL = [
+  "Ocak",
+  "Şubat",
+  "Mart",
+  "Nisan",
+  "Mayıs",
+  "Haziran",
+  "Temmuz",
+  "Ağustos",
+  "Eylül",
+  "Ekim",
+  "Kasım",
+  "Aralık",
+];
+
+const TR_DAYS_FULL = [
+  "Pazar",
+  "Pazartesi",
+  "Salı",
+  "Çarşamba",
+  "Perşembe",
+  "Cuma",
+  "Cumartesi",
+];
+
+function formatTrDate(iso: string): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-").map((p) => parseInt(p, 10));
+  if (!y || !m || !d) return iso;
+  const date = new Date(y, m - 1, d);
+  const dow = TR_DAYS_FULL[date.getDay()];
+  return `${d} ${TR_MONTHS_FULL[m - 1]} ${y} ${dow}`;
 }

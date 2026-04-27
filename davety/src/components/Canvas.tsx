@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import { ArrowDown, ArrowUp, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import {
   FontBoot,
   getBlockView,
   listBlockEntries,
+  getCardShapeStyle,
+  isArchShape,
+  InvitationView,
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
+import { useConfirm } from "@/src/components/ConfirmDialog";
+import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
+import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { cn } from "@/src/lib/utils";
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -40,10 +46,23 @@ export function Canvas() {
   const selectBlock = useUIStore((s) => s.selectBlock);
   const selectField = useUIStore((s) => s.selectField);
   const selectedBlockId = useUIStore((s) => s.selectedBlockId);
+  const designTab = useUIStore((s) => s.designTab);
+  const panelMode = useUIStore((s) => s.panelMode);
+  const confirm = useConfirm();
 
   const [insertingAt, setInsertingAt] = useState<number | null>(null);
 
   if (!doc) return null;
+
+  const archActive = isArchShape(doc);
+
+  // When the user is on the Zarf Tasarımı tab in the side panel, the
+  // canvas swaps to a live envelope preview instead of the invitation
+  // document. Click toggles the envelope open so envelope changes
+  // (color, flap, lining) can be verified end-to-end.
+  if (panelMode === "home" && designTab === "envelope") {
+    return <EnvelopeCanvas />;
+  }
 
   const handlePick = (index: number, type: import("@davety/schema").BlockType) => {
     const entry = listBlockEntries().find((e) => e.type === type);
@@ -63,7 +82,8 @@ export function Canvas() {
 
   return (
     <div
-      className="min-h-0 overflow-auto bg-muted/30 py-8 px-6"
+      className="min-h-0 overflow-auto py-8 px-6"
+      style={{ background: doc.theme.pageBgColor ?? "#252224" }}
       onClick={() => {
         // Click outside any block → deselect + close any open palette
         selectBlock(null);
@@ -72,7 +92,11 @@ export function Canvas() {
     >
       <div
         className="mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
-        style={{ background: doc.theme.bgColor, color: doc.theme.accentColor }}
+        style={{
+          background: doc.theme.bgColor,
+          color: doc.theme.accentColor,
+          ...getCardShapeStyle(doc),
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <FontBoot doc={doc} />
@@ -80,19 +104,25 @@ export function Canvas() {
         {doc.blocks.map((block, i) => {
           const View = getBlockView(block.type);
           const selected = selectedBlockId === block.id;
+          // When the card has an arch silhouette, hide the very first
+          // insert slot — it would sit on top of the rounded dome and
+          // be visually clipped/unreachable.
+          const hideSlot = i === 0 && archActive;
 
           return (
             <div key={block.id} className="relative">
-              <InsertSlot
-                index={i}
-                active={insertingAt === i}
-                // Flip palette upward for the last 3 slots so it doesn't
-                // run off the bottom of the card / canvas.
-                flipUp={i >= doc.blocks.length - 2}
-                onOpen={() => setInsertingAt(i)}
-                onClose={() => setInsertingAt(null)}
-                onPick={(type) => handlePick(i, type)}
-              />
+              {hideSlot ? null : (
+                <InsertSlot
+                  index={i}
+                  active={insertingAt === i}
+                  // Flip palette upward for the last 3 slots so it doesn't
+                  // run off the bottom of the card / canvas.
+                  flipUp={i >= doc.blocks.length - 2}
+                  onOpen={() => setInsertingAt(i)}
+                  onClose={() => setInsertingAt(null)}
+                  onPick={(type) => handlePick(i, type)}
+                />
+              )}
 
               <div
                 className={cn(
@@ -115,7 +145,14 @@ export function Canvas() {
 
                 {selected ? (
                   <div
-                    className="absolute top-2 right-2 flex items-center gap-1 z-20 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1"
+                    // First block + arch shape: push toolbar below the
+                    // dome so move/hide/delete buttons aren't clipped
+                    // by the rounded top corners (overflow-hidden on
+                    // the card cuts off anything sitting in the curve).
+                    className={cn(
+                      "absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1",
+                      i === 0 && archActive ? "top-20" : "top-2"
+                    )}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <IconBtn
@@ -150,9 +187,17 @@ export function Canvas() {
                       }
                       danger
                       disabled={block.locked}
-                      onClick={() => {
+                      onClick={async () => {
                         if (block.locked) return;
-                        if (confirm("Bu bloğu silmek istediğine emin misin?")) {
+                        const ok = await confirm({
+                          title: "Bloğu sil",
+                          description:
+                            "Bu bloğu silmek istediğine emin misin? Bu işlem geri alınabilir (Ctrl+Z).",
+                          confirmLabel: "Sil",
+                          cancelLabel: "Vazgeç",
+                          variant: "danger",
+                        });
+                        if (ok) {
                           deleteBlock(block.id);
                           selectBlock(null);
                         }
@@ -276,6 +321,72 @@ function InsertSlot({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─── Envelope canvas (Zarf Tasarımı) ───
+   Renders a live preview of the envelope using current theme.envelope.
+   The envelope component handles its own click → flap-open animation,
+   so theme tweaks (color, flap, lining) can be verified end-to-end
+   the same way recipients will see them. The card slot inside the
+   envelope holds the FULL InvitationView (every block — hero,
+   countdown, families, program, …) so the editor preview matches what
+   the recipient actually sees. The card frame is a fixed size; the
+   InvitationView scrolls inside it so the user can read every block
+   without leaving the envelope frame. */
+
+function EnvelopeCanvas() {
+  const doc = useEditorStore((s) => s.doc);
+  // Card height tracks the viewport so the envelope preview fills the
+  // available canvas vertically instead of leaving a big empty area
+  // below the scene. The subtracted offset accounts for the editor
+  // header, "Zarf Önizlemesi" label, sceneTopPad, sceneBottomPad and
+  // canvas padding — picked empirically to land the envelope cleanly
+  // inside the visible area on common desktop heights.
+  const [cardHeight, setCardHeight] = useState(780);
+  useEffect(() => {
+    const update = () =>
+      setCardHeight(Math.max(520, window.innerHeight - 260));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  if (!doc) return null;
+
+  const resolved = resolveEnvelopeProps(doc.theme.envelope);
+
+  return (
+    <div
+      className="min-h-0 overflow-auto py-10 px-6 flex flex-col items-center gap-6"
+      style={{ background: doc.theme.pageBgColor ?? "#252224" }}
+    >
+      <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+        Zarf Önizlemesi · Tıkla
+      </div>
+      <WeddingEnvelope
+        guestName="Misafir"
+        envelopeWidth={520}
+        cardWidth={460}
+        cardHeight={cardHeight}
+        layout="replace"
+        {...resolved}
+        cardRender={({ width, height }) => (
+          <div
+            className="relative overflow-auto rounded-md shadow-xl"
+            style={{
+              width,
+              height,
+              background: doc.theme.bgColor,
+              color: doc.theme.accentColor,
+              ...getCardShapeStyle(doc),
+            }}
+          >
+            <InvitationView doc={doc} />
+          </div>
+        )}
+      />
     </div>
   );
 }

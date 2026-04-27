@@ -16,6 +16,7 @@ import { customNoteRegistryEntry } from "./custom_note";
 import { customSectionRegistryEntry } from "./custom_section";
 import { contactRegistryEntry } from "./contact";
 import { footerRegistryEntry } from "./footer";
+import { decorationRegistryEntry } from "./decoration";
 
 import { FallbackView } from "./fallback/View";
 
@@ -35,6 +36,7 @@ const entries: BlockRegistryEntry[] = [
   customSectionRegistryEntry,
   contactRegistryEntry,
   footerRegistryEntry,
+  decorationRegistryEntry,
 ] as BlockRegistryEntry[];
 
 export const registry = Object.fromEntries(

@@ -30,6 +30,7 @@ export function TextStylePanel() {
   const doc = useEditorStore((s) => s.doc);
   const updateFieldStyle = useEditorStore((s) => s.updateFieldStyle);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
+  const applyPatch = useEditorStore((s) => s.applyPatch);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const fieldId = useUIStore((s) => s.selectedFieldId);
 
@@ -40,14 +41,31 @@ export function TextStylePanel() {
   const block = doc.blocks.find((b) => b.id === blockId);
   if (!block) return null;
 
-  const currentField = block.style.fieldOverrides?.[fieldId] ?? {};
+  // For fanout fields (e.g. countdown date), read display values from the
+  // first underlying cell so the inputs show the actual rendered style.
+  const FANOUT_READ: Record<string, string> = {
+    targetIso: "days",
+  };
+  const readFieldId = FANOUT_READ[fieldId] ?? fieldId;
+  const currentField =
+    block.style.fieldOverrides?.[readFieldId] ?? {};
   const fontFamily = currentField.fontFamily ?? block.style.fontFamily ?? "";
   const fontSize = currentField.fontSize ?? block.style.fontSize ?? 24;
   const color = currentField.color ?? block.style.color ?? "#252224";
   const align = block.style.align ?? "center";
 
+  // Some "logical" field IDs map to multiple visual cells. Style edits on
+  // the date field need to fan out to all four countdown numbers
+  // (days/hours/minutes/seconds), since those are what the user sees and
+  // wants to restyle when they pick "Tarihi Değiştir".
+  const FANOUT: Record<string, string[]> = {
+    targetIso: ["days", "hours", "minutes", "seconds"],
+  };
   const update = (patch: Record<string, unknown>) => {
-    updateFieldStyle(blockId, fieldId, patch);
+    const targets = FANOUT[fieldId] ?? [fieldId];
+    for (const id of targets) {
+      updateFieldStyle(blockId, id, patch);
+    }
   };
 
   // Raw text-content editing for the selected field. Reads the current value
@@ -57,7 +75,9 @@ export function TextStylePanel() {
   const fieldValue = isCoupleNames
     ? undefined
     : extractFieldValue(block.data, fieldId);
-  const showContentEditor = isCoupleNames || fieldValue !== undefined;
+  const isDateField = fieldId === "targetIso";
+  const showContentEditor =
+    isCoupleNames || isDateField || fieldValue !== undefined;
   const fieldLabel = fieldLabelFor(fieldId);
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
@@ -70,7 +90,36 @@ export function TextStylePanel() {
     <div className="p-5 flex flex-col gap-5">
       {/* Field content editor — edit the actual text of the selected field */}
       {showContentEditor ? (
-        isCoupleNames ? (
+        isDateField ? (
+          <div>
+            <label className="text-[11px] text-muted-foreground block mb-1">
+              Hedef Tarih ve Saat
+            </label>
+            <input
+              type="datetime-local"
+              value={isoToDatetimeLocal(
+                (block.data["targetIso"] as string) ?? ""
+              )}
+              onChange={(e) => {
+                const iso = datetimeLocalToIso(e.target.value);
+                if (!iso) return;
+                updateBlockData(blockId, { targetIso: iso });
+                // Mirror into doc.meta so the header countdown, public page,
+                // and any envelope-card preview that read meta directly stay
+                // in sync with the canvas countdown the user just edited.
+                const [date, time] = splitIso(e.target.value);
+                applyPatch((d) => {
+                  d.meta.weddingDate = date;
+                  d.meta.weddingTime = time;
+                });
+              }}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            />
+            <p className="mt-1.5 text-[10px] text-muted-foreground">
+              Geri sayım bu zamana göre çalışır.
+            </p>
+          </div>
+        ) : isCoupleNames ? (
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-[11px] text-muted-foreground block mb-1">
@@ -300,4 +349,30 @@ const FIELD_LABELS: Record<string, string> = {
 
 function fieldLabelFor(fieldId: string): string {
   return FIELD_LABELS[fieldId] ?? "Metin İçeriği";
+}
+
+/** Convert "2026-06-15T19:00:00.000Z" → "2026-06-15T19:00" (datetime-local). */
+function isoToDatetimeLocal(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours()
+  )}:${pad(d.getMinutes())}`;
+}
+
+/** Convert "2026-06-15T19:00" → ISO string in local timezone. */
+function datetimeLocalToIso(local: string): string | null {
+  if (!local) return null;
+  const d = new Date(local);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
+
+/** Split "2026-06-15T19:00" into ["2026-06-15", "19:00"] for doc.meta which
+ *  stores date and time as separate fields. */
+function splitIso(local: string): [string, string] {
+  const [date = "", time = ""] = local.split("T");
+  return [date, time.slice(0, 5)];
 }

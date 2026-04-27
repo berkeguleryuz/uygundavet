@@ -8,7 +8,7 @@ export default async function AdminTemplatesPage() {
   });
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
+    <main className="max-w-5xl mx-auto px-2 py-10">
       <header className="flex items-center justify-between mb-6">
         <h1 className="font-display text-3xl">Templateler</h1>
         <Link

@@ -7,6 +7,12 @@ import { PublicInvitation } from "@/src/components/PublicInvitation";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
+// Always render with the freshest doc — without this Next.js caches
+// the prisma read across requests, so a "Save" in the editor doesn't
+// show up in the public preview until the cache invalidates on its
+// own (or on a hard reload).
+export const dynamic = "force-dynamic";
+
 export default async function PublicInvitationPage({
   params,
 }: {
@@ -33,7 +39,16 @@ export default async function PublicInvitationPage({
   const session = await getSession();
   const isOwner = session?.user?.id === design.userId;
 
-  const doc = (design.publishedDoc ?? design.doc) as InvitationDoc | null;
+  // Owner sees their working draft (`doc`) so a Save in the editor is
+  // immediately reflected here. Non-owners only ever see the last
+  // published snapshot (`publishedDoc`) so unpublished WIP doesn't
+  // leak. Without this owners would see the stale published version
+  // even after saving updates.
+  const doc = (
+    isOwner
+      ? design.doc ?? design.publishedDoc
+      : design.publishedDoc ?? design.doc
+  ) as InvitationDoc | null;
   if (!doc) notFound();
 
   const isDraft = design.status !== "published" || !design.publishedDoc;

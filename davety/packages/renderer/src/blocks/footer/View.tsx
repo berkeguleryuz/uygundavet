@@ -1,5 +1,5 @@
 import type { FooterData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 export function FooterView({
   block,
@@ -20,7 +20,10 @@ export function FooterView({
       : {};
 
   return (
-    <footer className="px-6 py-6 text-center text-xs opacity-60" style={rootStyle}>
+    <footer
+      className={`px-6 py-6 text-xs opacity-60 ${alignClasses(block.style.align).split(" ").filter((c) => c.startsWith("text-")).join(" ")}`}
+      style={rootStyle}
+    >
       <div {...click("text")} style={fieldStyle(block, "text")}>
         {block.data.text || "davety ile oluşturuldu"}
       </div>

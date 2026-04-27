@@ -14,16 +14,25 @@ export type FieldStylePatch = Partial<{
   strike: boolean;
 }>;
 
+const HISTORY_LIMIT = 60;
+
 interface EditorState {
   docId: string | null;
   doc: InvitationDoc | null;
   lastAckUpdatedAt: string | null;
   dirty: boolean;
+  past: InvitationDoc[];
+  future: InvitationDoc[];
 
   hydrate(args: { docId: string; doc: InvitationDoc; updatedAt: string }): void;
   setAckUpdatedAt(ts: string): void;
   markClean(): void;
   applyPatch(mutator: (d: Draft<InvitationDoc>) => void): void;
+
+  undo(): void;
+  redo(): void;
+  canUndo(): boolean;
+  canRedo(): boolean;
 
   moveBlock(id: string, newIndex: number): void;
   toggleVisibility(id: string): void;
@@ -35,14 +44,33 @@ interface EditorState {
   deleteBlock(id: string): void;
 }
 
-export const useEditorStore = create<EditorState>((set) => ({
+/** Helper: pushes previous doc to past, clears future, returns new state. */
+function commitChange(
+  state: EditorState,
+  next: InvitationDoc
+): Partial<EditorState> {
+  if (!state.doc) return { doc: next, dirty: true };
+  const past = [...state.past, state.doc].slice(-HISTORY_LIMIT);
+  return { doc: next, dirty: true, past, future: [] };
+}
+
+export const useEditorStore = create<EditorState>((set, get) => ({
   docId: null,
   doc: null,
   lastAckUpdatedAt: null,
   dirty: false,
+  past: [],
+  future: [],
 
   hydrate({ docId, doc, updatedAt }) {
-    set({ docId, doc, lastAckUpdatedAt: updatedAt, dirty: false });
+    set({
+      docId,
+      doc,
+      lastAckUpdatedAt: updatedAt,
+      dirty: false,
+      past: [],
+      future: [],
+    });
   },
   setAckUpdatedAt(ts) {
     set({ lastAckUpdatedAt: ts });
@@ -55,8 +83,34 @@ export const useEditorStore = create<EditorState>((set) => ({
     set((s) => {
       if (!s.doc) return s;
       const next = produce(s.doc, mutator);
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
+  },
+
+  undo() {
+    set((s) => {
+      if (!s.doc || s.past.length === 0) return s;
+      const previous = s.past[s.past.length - 1];
+      const past = s.past.slice(0, -1);
+      const future = [s.doc, ...s.future].slice(0, HISTORY_LIMIT);
+      return { ...s, doc: previous, past, future, dirty: true };
+    });
+  },
+  redo() {
+    set((s) => {
+      if (!s.doc || s.future.length === 0) return s;
+      const next = s.future[0];
+      const future = s.future.slice(1);
+      const past = [...s.past, s.doc].slice(-HISTORY_LIMIT);
+      return { ...s, doc: next, past, future, dirty: true };
+    });
+  },
+  canUndo() {
+    return get().past.length > 0;
+  },
+  canRedo() {
+    return get().future.length > 0;
   },
 
   moveBlock(id, newIndex) {
@@ -72,7 +126,8 @@ export const useEditorStore = create<EditorState>((set) => ({
           block
         );
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   toggleVisibility(id) {
@@ -82,7 +137,8 @@ export const useEditorStore = create<EditorState>((set) => ({
         const b = d.blocks.find((x: Block) => x.id === id);
         if (b) b.visible = !b.visible;
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   updateBlockStyle(id, patch) {
@@ -92,7 +148,8 @@ export const useEditorStore = create<EditorState>((set) => ({
         const b = d.blocks.find((x: Block) => x.id === id);
         if (b) b.style = { ...b.style, ...patch };
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   updateBlockData(id, patch) {
@@ -102,7 +159,8 @@ export const useEditorStore = create<EditorState>((set) => ({
         const b = d.blocks.find((x: Block) => x.id === id);
         if (b) b.data = { ...b.data, ...patch };
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   updateFieldStyle(blockId, fieldId, style) {
@@ -117,7 +175,8 @@ export const useEditorStore = create<EditorState>((set) => ({
           ...style,
         };
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   updateTheme(patch) {
@@ -126,7 +185,8 @@ export const useEditorStore = create<EditorState>((set) => ({
       const next = produce(s.doc, (d) => {
         d.theme = { ...d.theme, ...patch };
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   insertBlock(block, atIndex) {
@@ -139,7 +199,8 @@ export const useEditorStore = create<EditorState>((set) => ({
             : d.blocks.length;
         d.blocks.splice(idx, 0, block);
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
   deleteBlock(id) {
@@ -151,7 +212,8 @@ export const useEditorStore = create<EditorState>((set) => ({
         if (d.blocks[idx].locked) return; // locked blocks cannot be deleted
         d.blocks.splice(idx, 1);
       });
-      return { ...s, doc: next, dirty: true };
+      if (next === s.doc) return s;
+      return { ...s, ...commitChange(s, next) };
     });
   },
 }));

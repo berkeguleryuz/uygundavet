@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { InvitationView, getBlockView } from "@davety/renderer";
-import type { InvitationDoc, Block, HeroData } from "@davety/schema";
+import { InvitationView, getCardShapeStyle } from "@davety/renderer";
+import type { InvitationDoc } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
+import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 
 interface Props {
   doc: InvitationDoc;
@@ -14,9 +15,34 @@ interface Props {
   isDraft: boolean;
 }
 
-function findHero(doc: InvitationDoc): Block<HeroData> | null {
-  const hero = doc.blocks.find((b) => b.type === "hero");
-  return (hero as Block<HeroData>) ?? null;
+/** Pick a readable button palette against the page background — light
+ *  pages get a dark glass button, dark pages get a light glass button.
+ *  Threshold uses perceived luminance, not raw RGB average. */
+function readableButtonStyle(pageBg: string): {
+  border: string;
+  bg: string;
+  bgHover: string;
+  text: string;
+} {
+  const hex = pageBg.replace("#", "");
+  const r = parseInt(hex.slice(0, 2) || "25", 16);
+  const g = parseInt(hex.slice(2, 4) || "22", 16);
+  const b = parseInt(hex.slice(4, 6) || "24", 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (luminance > 0.5) {
+    return {
+      border: "rgba(0,0,0,0.25)",
+      bg: "rgba(0,0,0,0.06)",
+      bgHover: "rgba(0,0,0,0.12)",
+      text: "#1a1a1a",
+    };
+  }
+  return {
+    border: "rgba(255,255,255,0.3)",
+    bg: "rgba(255,255,255,0.1)",
+    bgHover: "rgba(255,255,255,0.2)",
+    text: "#ffffff",
+  };
 }
 
 export function PublicInvitation({
@@ -26,24 +52,61 @@ export function PublicInvitation({
   isOwner,
   isDraft,
 }: Props) {
-  const [revealed, setRevealed] = useState(false);
+  const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
+  const editBtn = readableButtonStyle(doc.theme.pageBgColor ?? "#252224");
 
-  const hero = findHero(doc);
+  // Card slot starts at 640px (envelope's natural top-of-page geometry).
+  // `cardExpandedHeight` is what WeddingEnvelope grows to the moment its
+  // internal `dropping` state flips — same render, same CSS transition
+  // tick as the envelope's translateY, so the two animations are
+  // perfectly synced (no parent setTimeout race).
+  const [cardExpandedHeight, setCardExpandedHeight] = useState(700);
+  // Envelope/card start at viewport width (capped at 400px so the
+  // designed mobile-portrait look is preserved on desktop). This way
+  // the closed envelope fills mobile screens edge-to-edge without
+  // leaving a side band, instead of staying pinned at a fixed 340/360.
+  const [envelopeWidth, setEnvelopeWidth] = useState(360);
+  const [cardWidth, setCardWidth] = useState(340);
 
-  const envelopeColor = doc.theme.envelope?.color ?? "#f5eedb";
-  const liningPattern = (doc.theme.envelope?.liningPattern ?? "daisy") as
-    | "daisy"
-    | "rose"
-    | "gold"
-    | "none"
-    | "chevron";
-  const flapColor = doc.theme.envelope?.flapColor ?? envelopeColor;
+  useEffect(() => {
+    function compute() {
+      setCardExpandedHeight(Math.max(640, window.innerHeight - 48));
+      const w = Math.min(400, window.innerWidth);
+      setEnvelopeWidth(w);
+      setCardWidth(w);
+    }
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
 
   return (
     <main
-      className="min-h-dvh flex flex-col items-center justify-start px-4 py-10"
-      style={{ background: doc.theme.bgColor }}
+      className="relative min-h-dvh flex flex-col items-center justify-start"
+      style={{ background: doc.theme.pageBgColor ?? "#252224" }}
     >
+      {/* Owner edit shortcut — top-right on desktop, bottom-of-page on
+          mobile. Recipients (non-owners) never see this. */}
+      {isOwner ? (
+        <Link
+          href={`/design/invitations/${designId}/editor`}
+          className="hidden md:inline-flex absolute top-4 right-4 items-center text-xs uppercase tracking-[0.25em] rounded-full border px-5 py-2 backdrop-blur cursor-pointer transition-colors"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            zIndex: 50,
+            borderColor: editBtn.border,
+            background: editBtn.bg,
+            color: editBtn.text,
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = editBtn.bgHover)
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.background = editBtn.bg)}
+        >
+          Düzenle
+        </Link>
+      ) : null}
+
       {isDraft && isOwner ? (
         <div className="w-full max-w-2xl mb-6 rounded-lg border border-amber-400/60 bg-amber-50 text-amber-900 px-4 py-2 text-xs text-center">
           Bu davetiye henüz yayınlanmamış — önizleme modundasın. Sadece sen
@@ -57,48 +120,36 @@ export function PublicInvitation({
         </div>
       ) : null}
 
-      {!revealed ? (
-        <div className="flex flex-col items-center gap-6 py-6 w-full">
-          <WeddingEnvelope
-            guestName="Misafir"
-            envelopeWidth={360}
-            cardWidth={340}
-            cardHeight={640}
-            layout="replace"
-            envelopeColor={envelopeColor}
-            flapColor={flapColor}
-            liningPattern={liningPattern}
-            liningBg={doc.theme.accentColor}
-            cardRender={({ width, height }) =>
-              hero ? (
-                <RealHeroCard
-                  doc={doc}
-                  hero={hero}
-                  width={width}
-                  height={height}
-                />
-              ) : null
-            }
-          />
-          <button
-            onClick={() => setRevealed(true)}
-            className="mt-6 text-[11px] uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/70 backdrop-blur hover:bg-white cursor-pointer"
-            style={{ fontFamily: "Space Grotesk, sans-serif" }}
-          >
-            Tüm Davetiyeyi Gör
-          </button>
-        </div>
-      ) : (
-        <div className="w-full max-w-md mx-auto rounded-xl overflow-hidden shadow-2xl animate-in fade-in duration-500">
-          <InvitationView doc={doc} slug={slug} />
-        </div>
-      )}
+      <div className="flex flex-col items-center gap-6 w-full">
+        <WeddingEnvelope
+          guestName="Misafir"
+          envelopeWidth={envelopeWidth}
+          cardWidth={cardWidth}
+          cardHeight={640}
+          cardExpandedHeight={cardExpandedHeight}
+          layout="replace"
+          {...resolvedEnvelope}
+          cardRender={({ width, height }) => (
+            <FullInvitationCard
+              doc={doc}
+              slug={slug}
+              width={width}
+              height={height}
+            />
+          )}
+        />
+      </div>
 
-      {isOwner && revealed ? (
+      {isOwner ? (
         <Link
           href={`/design/invitations/${designId}/editor`}
-          className="mt-8 text-xs uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/80 backdrop-blur hover:bg-white cursor-pointer"
-          style={{ fontFamily: "Space Grotesk, sans-serif" }}
+          className="md:hidden mt-8 mb-6 text-xs uppercase tracking-[0.25em] rounded-full border px-5 py-2 backdrop-blur cursor-pointer transition-colors"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            borderColor: editBtn.border,
+            background: editBtn.bg,
+            color: editBtn.text,
+          }}
         >
           Düzenle
         </Link>
@@ -108,78 +159,44 @@ export function PublicInvitation({
 }
 
 /**
- * What actually slides out of the envelope — the user's real hero block
- * rendered with their chosen variant (arch / photo / floral-crown / …)
- * plus the date row, wrapped in a card-sized frame so it looks like a
- * printable invitation, not a generic placeholder.
+ * Card slot content: the FULL InvitationView (every block — hero,
+ * countdown, families, program, venue, RSVP, …) wrapped in the
+ * envelope's card frame. Width/height are fixed by the envelope's
+ * card slot; the content scrolls inside so the recipient can read the
+ * entire invitation without leaving the envelope frame.
  */
-// Resolve the hero block view once at module scope so React treats it as a
-// stable component (calling getBlockView inside render triggers the
-// "Cannot create components during render" rule).
-const HeroViewComponent = getBlockView("hero") as React.ComponentType<{
-  block: Block<HeroData>;
-  theme: InvitationDoc["theme"];
-  editable?: boolean;
-}>;
-
-function RealHeroCard({
+function FullInvitationCard({
   doc,
-  hero,
+  slug,
   width,
   height,
 }: {
   doc: InvitationDoc;
-  hero: Block<HeroData>;
+  slug: string;
   width: number;
   height: number;
 }) {
   return (
     <div
-      className="relative overflow-hidden rounded-md shadow-xl"
+      className="relative overflow-auto shadow-xl"
       style={{
         width,
         height,
+        // Same trick as the envelope's card slot: a CSS min-height
+        // ensures the rendered card actually grows with the viewport
+        // when the JS-computed `height` (a pixel value captured at
+        // mount) is shorter than the live viewport. Animated in
+        // lockstep with `height` so the card grows smoothly during
+        // the envelope drop instead of jumping.
+        minHeight: "calc(100dvh - 48px)",
         background: doc.theme.bgColor,
         color: doc.theme.accentColor,
+        transition:
+          "height 1.4s cubic-bezier(0.55, 0, 0.2, 1), min-height 1.4s cubic-bezier(0.55, 0, 0.2, 1)",
+        ...getCardShapeStyle(doc),
       }}
     >
-      <HeroViewComponent block={hero} theme={doc.theme} editable={false} />
-      <div
-        className="absolute inset-x-0 bottom-0 px-6 py-4 text-center text-[11px] uppercase tracking-[0.25em] border-t"
-        style={{
-          fontFamily: "Space Grotesk, sans-serif",
-          borderColor: `${doc.theme.accentColor}22`,
-          color: `${doc.theme.accentColor}cc`,
-        }}
-      >
-        <FormattedDate iso={doc.meta.weddingDate} time={doc.meta.weddingTime} />
-      </div>
+      <InvitationView doc={doc} slug={slug} />
     </div>
-  );
-}
-
-function FormattedDate({ iso, time }: { iso?: string; time?: string }) {
-  if (!iso) return null;
-  const d = new Date(`${iso}T${time ?? "00:00"}:00`);
-  if (isNaN(d.getTime())) return null;
-  const months = [
-    "OCAK",
-    "ŞUBAT",
-    "MART",
-    "NİSAN",
-    "MAYIS",
-    "HAZİRAN",
-    "TEMMUZ",
-    "AĞUSTOS",
-    "EYLÜL",
-    "EKİM",
-    "KASIM",
-    "ARALIK",
-  ];
-  return (
-    <span>
-      {d.getDate()} · {months[d.getMonth()]} · {d.getFullYear()}
-      {time ? ` · ${time}` : ""}
-    </span>
   );
 }

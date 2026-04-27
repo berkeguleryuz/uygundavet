@@ -14,7 +14,7 @@ export default async function AdminTemplateDetailPage({
   if (!template) notFound();
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-10">
+    <main className="max-w-3xl mx-auto px-2 py-10">
       <h1 className="font-display text-3xl mb-2">{template.title}</h1>
       <p className="text-sm text-muted-foreground mb-6">/{template.slug}</p>
       <TemplateEditor

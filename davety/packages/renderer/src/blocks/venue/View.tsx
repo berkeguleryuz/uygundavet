@@ -72,7 +72,7 @@ export function VenueView({
       : null);
 
   return (
-    <section className="px-6 py-10 text-center" style={rootStyle}>
+    <section className="px-2 py-10 text-center" style={rootStyle}>
       <h3
         {...click("venueName")}
         className="font-display text-2xl"

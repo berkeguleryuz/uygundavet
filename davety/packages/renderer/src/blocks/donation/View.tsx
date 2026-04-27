@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { DonationData } from "@davety/schema";
-import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
 export function DonationView({
   block,
@@ -32,7 +32,10 @@ export function DonationView({
   }
 
   return (
-    <section className="px-6 py-10 text-center" style={rootStyle}>
+    <section
+      className={`px-2 py-10 flex flex-col ${alignClasses(block.style.align)}`}
+      style={rootStyle}
+    >
       <h3
         {...click("title")}
         className="font-display text-2xl mb-2"

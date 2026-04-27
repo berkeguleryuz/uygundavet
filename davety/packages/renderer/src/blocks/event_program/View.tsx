@@ -21,7 +21,7 @@ export function EventProgramView({
       : {};
 
   return (
-    <section className="px-6 py-10" style={rootStyle}>
+    <section className="px-2 py-10" style={rootStyle}>
       <h3
         {...click("heading")}
         className="font-display text-2xl text-center mb-6"
