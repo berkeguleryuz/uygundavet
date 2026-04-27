@@ -21,7 +21,7 @@ export function FamiliesView({
       : {};
 
   return (
-    <section className="px-6 py-10" style={rootStyle}>
+    <section className="px-2 py-10" style={rootStyle}>
       <div className="grid grid-cols-2 gap-8 max-w-lg mx-auto">
         <Column
           title={bride.title}

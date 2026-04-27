@@ -15,7 +15,7 @@ export default async function KumSaatiPage({
 
   return (
     <main
-      className="min-h-dvh px-6 py-10"
+      className="min-h-dvh px-2 py-10"
       style={{ background: meta.palette.bg, color: meta.palette.ink }}
     >
       <header className="mx-auto mb-6 max-w-5xl">

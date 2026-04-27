@@ -42,9 +42,21 @@ export function PublicInvitation({
 
   return (
     <main
-      className="min-h-dvh flex flex-col items-center justify-start py-10"
+      className="relative min-h-dvh flex flex-col items-center justify-start"
       style={{ background: "#252224" }}
     >
+      {/* Owner edit shortcut — top-right on desktop, bottom-of-page on
+          mobile. Recipients (non-owners) never see this. */}
+      {isOwner ? (
+        <Link
+          href={`/design/invitations/${designId}/editor`}
+          className="hidden md:inline-flex absolute top-4 right-4 items-center text-xs uppercase tracking-[0.25em] rounded-full border border-white/30 px-5 py-2 bg-white/10 text-white backdrop-blur hover:bg-white/20 cursor-pointer"
+          style={{ fontFamily: "Space Grotesk, sans-serif", zIndex: 50 }}
+        >
+          Düzenle
+        </Link>
+      ) : null}
+
       {isDraft && isOwner ? (
         <div className="w-full max-w-2xl mb-6 rounded-lg border border-amber-400/60 bg-amber-50 text-amber-900 px-4 py-2 text-xs text-center">
           Bu davetiye henüz yayınlanmamış — önizleme modundasın. Sadece sen
@@ -58,7 +70,7 @@ export function PublicInvitation({
         </div>
       ) : null}
 
-      <div className="flex flex-col items-center gap-6 pb-6 w-full">
+      <div className="flex flex-col items-center gap-6 w-full">
         <WeddingEnvelope
           guestName="Misafir"
           envelopeWidth={360}
@@ -81,7 +93,7 @@ export function PublicInvitation({
       {isOwner ? (
         <Link
           href={`/design/invitations/${designId}/editor`}
-          className="mt-8 text-xs uppercase tracking-[0.25em] rounded-full border border-foreground/20 px-5 py-2 bg-white/80 backdrop-blur hover:bg-white cursor-pointer"
+          className="md:hidden mt-8 mb-6 text-xs uppercase tracking-[0.25em] rounded-full border border-white/30 px-5 py-2 bg-white/10 text-white backdrop-blur hover:bg-white/20 cursor-pointer"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
           Düzenle

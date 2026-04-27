@@ -11,7 +11,7 @@ export default async function AdminDesignsPage() {
   });
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-10">
+    <main className="max-w-6xl mx-auto px-2 py-10">
       <h1 className="font-display text-3xl mb-6">Davetiyeler</h1>
 
       <div className="border border-border rounded-lg overflow-hidden bg-card">

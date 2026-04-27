@@ -55,7 +55,7 @@ export function SaveScreen({
   }
 
   return (
-    <main className="min-h-dvh max-w-xl mx-auto px-6 py-10">
+    <main className="min-h-dvh max-w-xl mx-auto px-2 py-10">
       <button
         onClick={() => router.push(`/design/invitations/${designId}/editor`)}
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground cursor-pointer"

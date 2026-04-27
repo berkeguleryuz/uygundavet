@@ -10,7 +10,7 @@ export default async function EnvelopesPage({
   setRequestLocale(locale);
 
   return (
-    <main className="min-h-dvh bg-[#f5f6f3] px-6 py-10">
+    <main className="min-h-dvh bg-[#f5f6f3] px-2 py-10">
       <header className="max-w-5xl mx-auto text-center mb-8">
         <h1
           className="text-3xl md:text-4xl mb-2"

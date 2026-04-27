@@ -33,7 +33,7 @@ export function DonationView({
 
   return (
     <section
-      className={`px-6 py-10 flex flex-col ${alignClasses(block.style.align)}`}
+      className={`px-2 py-10 flex flex-col ${alignClasses(block.style.align)}`}
       style={rootStyle}
     >
       <h3

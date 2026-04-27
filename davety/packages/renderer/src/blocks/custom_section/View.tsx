@@ -21,7 +21,7 @@ export function CustomSectionView({
       : {};
 
   return (
-    <section className="px-6 py-10" style={rootStyle}>
+    <section className="px-2 py-10" style={rootStyle}>
       <h3
         {...click("title")}
         className="font-display text-2xl text-center mb-3"

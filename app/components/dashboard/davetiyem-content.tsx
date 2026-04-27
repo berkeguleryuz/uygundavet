@@ -151,7 +151,7 @@ export function DavetiyemContent({ isDemo }: { isDemo?: boolean }) {
               </Badge>
             )}
 
-            <CardContent className="px-5 sm:px-6 py-10 sm:py-14 flex flex-col items-center text-center gap-5">
+            <CardContent className="px-5 sm:px-2 py-10 sm:py-14 flex flex-col items-center text-center gap-5">
               <div className="flex items-center gap-3">
                 <div className="h-px w-12 bg-border" />
                 <Heart className="size-5" style={{ color: accentColor }} />

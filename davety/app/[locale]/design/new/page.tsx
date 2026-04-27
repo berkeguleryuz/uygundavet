@@ -40,7 +40,7 @@ export default async function TemplatePickerPage({
   });
 
   return (
-    <main className="min-h-dvh max-w-6xl mx-auto px-6 py-10">
+    <main className="min-h-dvh max-w-6xl mx-auto px-2 py-10">
       <header className="mb-8 text-center">
         <h1 className="font-display text-4xl mb-2">Şablonunu Seç</h1>
         <p className="text-sm text-muted-foreground">
