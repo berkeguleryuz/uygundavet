@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="floral-corners-6">
+  <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<g transform="translate(180 180) rotate(0)">
+      <path d="M-110 30 Q-50 -20 0 0 Q 30 50 80 90"/>
+      <ellipse cx="-80" cy="20" rx="26" ry="10.4" transform="rotate(-30 -80 20)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="60" cy="70" rx="26" ry="10.4" transform="rotate(40 60 70)" fill="currentColor" opacity="0.32"/>
+      <circle cx="0" cy="0" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="0" cy="0" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="0" cy="0" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M-7.874999999999999 -4.5 Q0 -15.749999999999998 7.874999999999999 -4.5"/>
+      <path d="M0 0 Q6.75 2.25 2.25 9"/>
+    </g>
+    <g transform="translate(720 720) rotate(180)">
+      <path d="M-110 30 Q-50 -20 0 0 Q 30 50 80 90"/>
+      <ellipse cx="-80" cy="20" rx="26" ry="10.4" transform="rotate(-30 -80 20)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="60" cy="70" rx="26" ry="10.4" transform="rotate(40 60 70)" fill="currentColor" opacity="0.32"/>
+      <circle cx="0" cy="0" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="0" cy="0" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="0" cy="0" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M-7.874999999999999 -4.5 Q0 -15.749999999999998 7.874999999999999 -4.5"/>
+      <path d="M0 0 Q6.75 2.25 2.25 9"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-10">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M100 450 Q300 425 450 450 Q600 475 800 450"/>
+    <ellipse cx="200" cy="430" rx="20" ry="8" transform="rotate(-30 200 430)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="300" cy="470" rx="20" ry="8" transform="rotate(30 300 470)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="400" cy="430" rx="20" ry="8" transform="rotate(-30 400 430)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="500" cy="470" rx="20" ry="8" transform="rotate(30 500 470)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="600" cy="430" rx="20" ry="8" transform="rotate(-30 600 430)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="700" cy="470" rx="20" ry="8" transform="rotate(30 700 470)" fill="currentColor" opacity="0.32"/>
+  </g>
+</svg>

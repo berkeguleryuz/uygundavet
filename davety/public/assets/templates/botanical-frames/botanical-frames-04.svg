@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="botanical-frames-4">
+  <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<rect x="160" y="160" width="580" height="580"/>
+    <rect x="180" y="180" width="540" height="540" opacity="0.4"/>
+    <g transform="translate(160 160) rotate(0)">
+        <ellipse cx="40" cy="40" rx="28" ry="11.200000000000001" transform="rotate(45 40 40)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="80" cy="30" rx="22" ry="8.8" transform="rotate(30 80 30)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="30" cy="80" rx="22" ry="8.8" transform="rotate(60 30 80)" fill="currentColor" opacity="0.32"/>
+        <circle cx="55" cy="55" r="8" fill="currentColor" opacity="0.7"/>
+      </g>
+    <g transform="translate(740 160) rotate(90)">
+        <ellipse cx="40" cy="40" rx="28" ry="11.200000000000001" transform="rotate(45 40 40)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="80" cy="30" rx="22" ry="8.8" transform="rotate(30 80 30)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="30" cy="80" rx="22" ry="8.8" transform="rotate(60 30 80)" fill="currentColor" opacity="0.32"/>
+        <circle cx="55" cy="55" r="8" fill="currentColor" opacity="0.7"/>
+      </g>
+    <g transform="translate(740 740) rotate(180)">
+        <ellipse cx="40" cy="40" rx="28" ry="11.200000000000001" transform="rotate(45 40 40)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="80" cy="30" rx="22" ry="8.8" transform="rotate(30 80 30)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="30" cy="80" rx="22" ry="8.8" transform="rotate(60 30 80)" fill="currentColor" opacity="0.32"/>
+        <circle cx="55" cy="55" r="8" fill="currentColor" opacity="0.7"/>
+      </g>
+    <g transform="translate(160 740) rotate(270)">
+        <ellipse cx="40" cy="40" rx="28" ry="11.200000000000001" transform="rotate(45 40 40)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="80" cy="30" rx="22" ry="8.8" transform="rotate(30 80 30)" fill="currentColor" opacity="0.32"/>
+        <ellipse cx="30" cy="80" rx="22" ry="8.8" transform="rotate(60 30 80)" fill="currentColor" opacity="0.32"/>
+        <circle cx="55" cy="55" r="8" fill="currentColor" opacity="0.7"/>
+      </g>
+  </g>
+</svg>

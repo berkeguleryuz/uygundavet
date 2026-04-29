@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="business-luxe-1">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<line x1="100" y1="450" x2="350" y2="450"/>
+    <line x1="550" y1="450" x2="800" y2="450"/>
+    <circle cx="450" cy="450" r="6" fill="currentColor"/>
+  </g>
+</svg>

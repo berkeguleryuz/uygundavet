@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-5">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="100" y1="450" x2="800" y2="450" opacity="0.5"/>
+    <path d="M130 434 L146 450 L130 466 L114 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M220 434 L236 450 L220 466 L204 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M310 434 L326 450 L310 466 L294 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M400 434 L416 450 L400 466 L384 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M490 434 L506 450 L490 466 L474 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M580 434 L596 450 L580 466 L564 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M670 434 L686 450 L670 466 L654 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M760 434 L776 450 L760 466 L744 450 Z" fill="currentColor" opacity="0.4"/>
+  </g>
+</svg>

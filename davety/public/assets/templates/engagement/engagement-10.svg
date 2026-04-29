@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="engagement-10">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<rect x="240" y="240" width="420" height="420" rx="20" stroke="currentColor" stroke-width="3" fill="none"/>
+    <rect x="240" y="240" width="420" height="80" fill="currentColor" opacity="0.4"/>
+    <text x="450" y="295" text-anchor="middle" font-family="Georgia, serif" font-size="32" letter-spacing="6" fill="white">NİŞAN</text>
+    <line x1="240" y1="380" x2="660" y2="380" opacity="0.5"/>
+    <line x1="240" y1="480" x2="660" y2="480" opacity="0.5"/>
+    <line x1="240" y1="580" x2="660" y2="580" opacity="0.5"/>
+    <line x1="380" y1="320" x2="380" y2="660" opacity="0.5"/>
+    <line x1="520" y1="320" x2="520" y2="660" opacity="0.5"/>
+    <circle cx="450" cy="530" r="32" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

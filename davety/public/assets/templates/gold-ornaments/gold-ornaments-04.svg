@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="gold-ornaments-4">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<circle cx="450" cy="450" r="280"/>
+    <circle cx="450" cy="450" r="240" opacity="0.6"/>
+    <circle cx="450" cy="450" r="180" opacity="0.4"/>
+    <circle cx="450" cy="450" r="120" opacity="0.5"/>
+    <circle cx="450" cy="450" r="60" fill="currentColor" opacity="0.4"/>
+    <circle cx="730" cy="450" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="692.4871130596429" cy="590" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="590" cy="692.4871130596428" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="450" cy="730" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="310.00000000000006" cy="692.4871130596429" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="207.51288694035716" cy="590" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="170" cy="450.00000000000006" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="207.51288694035713" cy="310.0000000000001" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="309.9999999999999" cy="207.51288694035722" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="449.99999999999994" cy="170" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="590" cy="207.5128869403572" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="692.4871130596428" cy="309.9999999999999" r="8" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

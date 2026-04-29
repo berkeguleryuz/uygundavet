@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-1">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<g transform="translate(450 450) rotate(0)">
+      <path d="M0 -280 Q196 -196 168 0 Q140 140 0 196 Q-84 140 -56 56 Q-14 0 0 -280 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-84" r="50.4" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-84" r="22.400000000000002" fill="white"/>
+    </g>
+    <circle cx="810" cy="450" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="704.5584412271571" cy="704.5584412271571" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="450" cy="810" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="195.4415587728429" cy="704.5584412271571" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="90" cy="450.00000000000006" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="195.44155877284282" cy="195.4415587728429" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="449.99999999999994" cy="90" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="704.558441227157" cy="195.44155877284282" r="8" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

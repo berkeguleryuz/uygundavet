@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-3">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="280" fill="currentColor" opacity="0.18"/>
+    <circle cx="450" cy="450" r="240" opacity="0.6"/>
+    <circle cx="450" cy="450" r="180" opacity="0.4"/>
+    <text x="450" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="80" fill="currentColor">&amp;</text>
+    <polygon points="690.0,442.0 691.9,447.4 697.6,447.5 693.0,451.0 694.7,456.5 690.0,453.2 685.3,456.5 687.0,451.0 682.4,447.5 688.1,447.4" fill="currentColor" opacity="0.5"/>
+    <polygon points="619.7,611.7 621.6,617.1 627.3,617.2 622.7,620.7 624.4,626.2 619.7,622.9 615.0,626.2 616.7,620.7 612.1,617.2 617.8,617.1" fill="currentColor" opacity="0.5"/>
+    <polygon points="450.0,682.0 451.9,687.4 457.6,687.5 453.0,691.0 454.7,696.5 450.0,693.2 445.3,696.5 447.0,691.0 442.4,687.5 448.1,687.4" fill="currentColor" opacity="0.5"/>
+    <polygon points="280.3,611.7 282.2,617.1 287.9,617.2 283.3,620.7 285.0,626.2 280.3,622.9 275.6,626.2 277.3,620.7 272.7,617.2 278.4,617.1" fill="currentColor" opacity="0.5"/>
+    <polygon points="210.0,442.0 211.9,447.4 217.6,447.5 213.0,451.0 214.7,456.5 210.0,453.2 205.3,456.5 207.0,451.0 202.4,447.5 208.1,447.4" fill="currentColor" opacity="0.5"/>
+    <polygon points="280.3,272.3 282.2,277.7 287.9,277.8 283.3,281.3 285.0,286.8 280.3,283.5 275.6,286.8 277.3,281.3 272.7,277.8 278.4,277.7" fill="currentColor" opacity="0.5"/>
+    <polygon points="450.0,202.0 451.9,207.4 457.6,207.5 453.0,211.0 454.7,216.5 450.0,213.2 445.3,216.5 447.0,211.0 442.4,207.5 448.1,207.4" fill="currentColor" opacity="0.5"/>
+    <polygon points="619.7,272.3 621.6,277.7 627.3,277.8 622.7,281.3 624.4,286.8 619.7,283.5 615.0,286.8 616.7,281.3 612.1,277.8 617.8,277.7" fill="currentColor" opacity="0.5"/>
+  </g>
+</svg>

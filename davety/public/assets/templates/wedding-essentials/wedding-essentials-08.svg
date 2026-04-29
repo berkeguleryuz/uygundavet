@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="wedding-essentials-8">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="540" r="160" fill="none"/>
+    <circle cx="450" cy="540" r="140" fill="none" opacity="0.4"/>
+    <path d="M450 280 L490 360 L450 440 L410 360 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M410 360 L490 360 M450 280 L450 360" stroke="white" stroke-width="2"/>
+    <polygon points="580.0,314.0 584.5,325.5 596.0,330.0 584.5,334.5 580.0,346.0 575.5,334.5 564.0,330.0 575.5,325.5" fill="currentColor" opacity="0.5"/>
+    <polygon points="330.0,366.0 334.0,376.0 344.0,380.0 334.0,384.0 330.0,394.0 326.0,384.0 316.0,380.0 326.0,376.0" fill="currentColor" opacity="0.5"/>
+    <polygon points="620.0,448.0 623.4,456.6 632.0,460.0 623.4,463.4 620.0,472.0 616.6,463.4 608.0,460.0 616.6,456.6" fill="currentColor" opacity="0.5"/>
+    <polygon points="280.0,488.0 283.4,496.6 292.0,500.0 283.4,503.4 280.0,512.0 276.6,503.4 268.0,500.0 276.6,496.6" fill="currentColor" opacity="0.5"/>
+  </g>
+</svg>

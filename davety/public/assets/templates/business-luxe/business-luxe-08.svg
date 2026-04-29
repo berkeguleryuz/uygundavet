@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="business-luxe-8">
+  <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+<rect x="150" y="200" width="600" height="500" fill="none"/>
+    <line x1="479" y1="200" x2="479" y2="700"/>
+    <line x1="150" y1="450" x2="479" y2="450"/>
+    <path d="M479 450 A171 171 0 0 1 308 621" fill="none" opacity="0.5"/>
+  </g>
+</svg>

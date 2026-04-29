@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-2">
+  <g stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" opacity="1">
+<g transform="translate(650 450) rotate(90)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(591.4213562373095 591.4213562373095) rotate(135)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(450 650) rotate(180)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(308.5786437626905 591.4213562373095) rotate(225)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(250 450) rotate(270)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(308.5786437626905 308.5786437626905) rotate(315)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(449.99999999999994 250) rotate(360)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+    <g transform="translate(591.4213562373095 308.5786437626905) rotate(405)">
+      <path d="M0 -100 Q70 -70 60 0 Q50 50 0 70 Q-30 50 -20 20 Q-5 0 0 -100 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-30" r="18" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-30" r="8" fill="white"/>
+    </g>
+  </g>
+</svg>

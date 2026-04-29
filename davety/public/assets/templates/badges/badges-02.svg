@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-2">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M450 200 L700 250 L700 500 Q700 650 450 750 Q200 650 200 500 L200 250 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M450 240 L660 280 L660 500 Q660 620 450 700 Q240 620 240 500 L240 280 Z" opacity="0.7"/>
+    <text x="450" y="490" text-anchor="middle" font-family="Georgia, serif" font-size="120" fill="currentColor">M</text>
+  </g>
+</svg>

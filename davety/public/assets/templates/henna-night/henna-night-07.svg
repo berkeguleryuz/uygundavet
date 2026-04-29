@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-7">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="450" y1="180" x2="450" y2="220"/>
+    <path d="M380 220 L520 220 L500 260 L400 260 Z" fill="currentColor" opacity="0.5"/>
+    <rect x="380" y="260" width="140" height="280" rx="10" fill="currentColor" opacity="0.35"/>
+    <line x1="380" y1="320" x2="520" y2="320" opacity="0.6"/>
+    <line x1="380" y1="480" x2="520" y2="480" opacity="0.6"/>
+    <line x1="430" y1="260" x2="430" y2="540" opacity="0.6"/>
+    <line x1="470" y1="260" x2="470" y2="540" opacity="0.6"/>
+    <path d="M380 540 L520 540 L500 580 L400 580 Z" fill="currentColor" opacity="0.5"/>
+    <circle cx="450" cy="400" r="30" fill="currentColor" opacity="0.7"/>
+    <circle cx="450" cy="400" r="14" fill="white"/>
+  </g>
+</svg>

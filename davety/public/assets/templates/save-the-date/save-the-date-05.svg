@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="save-the-date-5">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M150 360 Q450 300 750 360 L750 540 Q450 480 150 540 Z" fill="currentColor" opacity="0.35"/>
+    <path d="M150 360 L100 410 L150 460" fill="currentColor" opacity="0.6"/>
+    <path d="M750 360 L800 410 L750 460" fill="currentColor" opacity="0.6"/>
+    <text x="450" y="470" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="60" fill="currentColor">save the date</text>
+  </g>
+</svg>

@@ -34,6 +34,7 @@ const BLOCK_LABELS: Record<string, string> = {
   custom_section: "Özel Bölüm",
   contact: "İletişim",
   footer: "Altyazı",
+  decoration: "Süsleme",
 };
 
 export function Canvas() {

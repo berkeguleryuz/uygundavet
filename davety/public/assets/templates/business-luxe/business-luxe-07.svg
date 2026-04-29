@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="business-luxe-7">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<path d="M150 220 L150 150 L220 150"/>
+    <path d="M680 150 L750 150 L750 220"/>
+    <path d="M750 680 L750 750 L680 750"/>
+    <path d="M220 750 L150 750 L150 680"/>
+  </g>
+</svg>

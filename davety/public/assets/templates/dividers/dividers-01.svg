@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-1">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="100" y1="450" x2="400" y2="450"/>
+    <line x1="500" y1="450" x2="800" y2="450"/>
+    <path d="M450 430 L470 450 L450 470 L430 450 Z" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

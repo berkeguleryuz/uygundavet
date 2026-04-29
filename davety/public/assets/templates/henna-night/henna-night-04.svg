@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-4">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M380 700 Q380 540 360 480 Q330 380 350 320 Q360 280 400 280 Q420 280 420 320 L420 420 Q430 280 460 280 Q480 280 480 320 L480 420 Q490 280 520 280 Q540 280 540 320 L540 420 Q550 320 580 320 Q600 320 600 360 Q600 480 580 540 Q540 700 540 720 L380 720 Z" fill="currentColor" opacity="0.4"/>
+    <circle cx="460" cy="480" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="505" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="530" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="555" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="580" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="605" r="5" fill="currentColor" opacity="0.7"/>
+    <circle cx="460" cy="600" r="20" fill="none" stroke="currentColor" stroke-width="3" opacity="0.7"/>
+    <circle cx="460" cy="600" r="6" fill="currentColor" opacity="0.7"/>
+  </g>
+</svg>

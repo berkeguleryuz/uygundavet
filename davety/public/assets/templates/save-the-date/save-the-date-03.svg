@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="save-the-date-3">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<rect x="180" y="180" width="540" height="540" stroke="currentColor" stroke-width="3" fill="none"/>
+    <rect x="540" y="200" width="160" height="200" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="6 4"/>
+    <text x="620" y="260" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="currentColor">SAVE</text>
+    <text x="620" y="290" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="currentColor">THE</text>
+    <text x="620" y="320" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="currentColor">DATE</text>
+    <text x="620" y="370" text-anchor="middle" font-family="Georgia, serif" font-weight="bold" font-size="20" fill="currentColor">15·06</text>
+    <text x="220" y="280" font-family="Georgia, serif" font-style="italic" font-size="40" fill="currentColor" opacity="0.7">Sevgili</text>
+    <line x1="220" y1="310" x2="500" y2="310" opacity="0.5"/>
+    <line x1="220" y1="370" x2="500" y2="370" opacity="0.4"/>
+    <line x1="220" y1="430" x2="500" y2="430" opacity="0.4"/>
+  </g>
+</svg>

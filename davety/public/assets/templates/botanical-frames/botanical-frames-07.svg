@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="botanical-frames-7">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<circle cx="450" cy="450" r="320"/>
+    <ellipse cx="770" cy="450" rx="30" ry="12" transform="rotate(90 770 450)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="738.3100377287742" cy="588.8427965176186" rx="30" ry="12" transform="rotate(115.71428571428572 738.3100377287742 588.8427965176186)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="649.5167365947948" cy="700.1860743897696" rx="30" ry="12" transform="rotate(141.42857142857144 649.5167365947948 700.1860743897696)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="521.2066988660206" cy="761.9769318981836" rx="30" ry="12" transform="rotate(167.14285714285717 521.2066988660206 761.9769318981836)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="378.7933011339794" cy="761.9769318981836" rx="30" ry="12" transform="rotate(192.85714285714286 378.7933011339794 761.9769318981836)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="250.4832634052053" cy="700.1860743897696" rx="30" ry="12" transform="rotate(218.57142857142856 250.4832634052053 700.1860743897696)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="161.6899622712259" cy="588.8427965176186" rx="30" ry="12" transform="rotate(244.2857142857143 161.6899622712259 588.8427965176186)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="130" cy="450.00000000000006" rx="30" ry="12" transform="rotate(270 130 450.00000000000006)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="161.68996227122585" cy="311.1572034823814" rx="30" ry="12" transform="rotate(295.7142857142857 161.68996227122585 311.1572034823814)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="250.4832634052052" cy="199.8139256102305" rx="30" ry="12" transform="rotate(321.42857142857144 250.4832634052052 199.8139256102305)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="378.7933011339793" cy="138.02306810181642" rx="30" ry="12" transform="rotate(347.1428571428571 378.7933011339793 138.02306810181642)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="521.2066988660202" cy="138.02306810181636" rx="30" ry="12" transform="rotate(372.85714285714283 521.2066988660202 138.02306810181636)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="649.5167365947947" cy="199.81392561023043" rx="30" ry="12" transform="rotate(398.5714285714286 649.5167365947947 199.81392561023043)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="738.3100377287742" cy="311.1572034823816" rx="30" ry="12" transform="rotate(424.2857142857144 738.3100377287742 311.1572034823816)" fill="currentColor" opacity="0.32"/>
+    <path d="M420 130 Q400 100 380 110 M480 130 Q500 100 520 110"/>
+  </g>
+</svg>

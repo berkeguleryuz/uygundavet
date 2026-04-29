@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-4">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M150 450 Q200 420 280 450 Q360 480 420 450"/>
+    <path d="M750 450 Q700 420 620 450 Q540 480 480 450"/>
+    <circle cx="150" cy="450" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="750" cy="450" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="450" cy="450" r="35" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="450" r="22.75" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="450" r="15.75" fill="currentColor" opacity="0.55"/>
+      <path d="M444.4875 446.85 Q450 438.975 455.5125 446.85"/>
+      <path d="M450 450 Q454.725 451.575 451.575 456.3"/>
+  </g>
+</svg>

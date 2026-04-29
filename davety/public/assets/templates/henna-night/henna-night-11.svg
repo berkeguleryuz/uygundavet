@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-11">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M340 380 L340 580 Q340 660 450 660 Q560 660 560 580 L560 380 Z" fill="currentColor" opacity="0.4"/>
+    <ellipse cx="450" cy="380" rx="110" ry="20" fill="currentColor" opacity="0.6"/>
+    <path d="M560 440 Q620 440 620 500 Q620 560 560 560" stroke-width="6" fill="none"/>
+    <rect x="280" y="680" width="340" height="20" rx="4" fill="currentColor" opacity="0.6"/>
+    <path d="M400 320 Q380 280 420 240 Q440 220 420 180" opacity="0.5"/>
+    <path d="M450 320 Q470 280 430 240 Q410 220 430 180" opacity="0.5"/>
+    <path d="M500 320 Q480 280 520 240 Q540 220 520 180" opacity="0.5"/>
+  </g>
+</svg>

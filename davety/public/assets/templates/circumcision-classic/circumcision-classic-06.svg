@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="circumcision-classic-6">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<path d="M510.0 450.0 L527.3 460.0" opacity="0.40"/>
+      <path d="M502.0 480.0 L512.0 497.3" opacity="0.40"/>
+      <path d="M480.0 502.0 L480.0 522.0" opacity="0.40"/>
+      <path d="M450.0 510.0 L440.0 527.3" opacity="0.40"/>
+      <path d="M420.0 502.0 L402.7 512.0" opacity="0.40"/>
+      <path d="M398.0 480.0 L378.0 480.0" opacity="0.40"/>
+      <path d="M390.0 450.0 L372.7 440.0" opacity="0.40"/>
+      <path d="M398.0 420.0 L388.0 402.7" opacity="0.40"/>
+      <path d="M420.0 398.0 L420.0 378.0" opacity="0.40"/>
+      <path d="M450.0 390.0 L460.0 372.7" opacity="0.40"/>
+      <path d="M480.0 398.0 L497.3 388.0" opacity="0.40"/>
+      <path d="M502.0 420.0 L522.0 420.0" opacity="0.40"/>
+    <path d="M565.9 481.1 L580.1 495.2" opacity="0.55"/>
+      <path d="M534.9 534.9 L540.0 554.2" opacity="0.55"/>
+      <path d="M481.1 565.9 L475.9 585.2" opacity="0.55"/>
+      <path d="M418.9 565.9 L404.8 580.1" opacity="0.55"/>
+      <path d="M365.1 534.9 L345.8 540.0" opacity="0.55"/>
+      <path d="M334.1 481.1 L314.8 475.9" opacity="0.55"/>
+      <path d="M334.1 418.9 L319.9 404.8" opacity="0.55"/>
+      <path d="M365.1 365.1 L360.0 345.8" opacity="0.55"/>
+      <path d="M418.9 334.1 L424.1 314.8" opacity="0.55"/>
+      <path d="M481.1 334.1 L495.2 319.9" opacity="0.55"/>
+      <path d="M534.9 365.1 L554.2 360.0" opacity="0.55"/>
+      <path d="M565.9 418.9 L585.2 424.1" opacity="0.55"/>
+    <path d="M630.0 450.0 L647.3 460.0" opacity="0.70"/>
+      <path d="M605.9 540.0 L615.9 557.3" opacity="0.70"/>
+      <path d="M540.0 605.9 L540.0 625.9" opacity="0.70"/>
+      <path d="M450.0 630.0 L440.0 647.3" opacity="0.70"/>
+      <path d="M360.0 605.9 L342.7 615.9" opacity="0.70"/>
+      <path d="M294.1 540.0 L274.1 540.0" opacity="0.70"/>
+      <path d="M270.0 450.0 L252.7 440.0" opacity="0.70"/>
+      <path d="M294.1 360.0 L284.1 342.7" opacity="0.70"/>
+      <path d="M360.0 294.1 L360.0 274.1" opacity="0.70"/>
+      <path d="M450.0 270.0 L460.0 252.7" opacity="0.70"/>
+      <path d="M540.0 294.1 L557.3 284.1" opacity="0.70"/>
+      <path d="M605.9 360.0 L625.9 360.0" opacity="0.70"/>
+    <path d="M681.8 512.1 L696.0 526.3" opacity="0.85"/>
+      <path d="M619.7 619.7 L624.9 639.0" opacity="0.85"/>
+      <path d="M512.1 681.8 L506.9 701.1" opacity="0.85"/>
+      <path d="M387.9 681.8 L373.7 696.0" opacity="0.85"/>
+      <path d="M280.3 619.7 L261.0 624.9" opacity="0.85"/>
+      <path d="M218.2 512.1 L198.9 506.9" opacity="0.85"/>
+      <path d="M218.2 387.9 L204.0 373.7" opacity="0.85"/>
+      <path d="M280.3 280.3 L275.1 261.0" opacity="0.85"/>
+      <path d="M387.9 218.2 L393.1 198.9" opacity="0.85"/>
+      <path d="M512.1 218.2 L526.3 204.0" opacity="0.85"/>
+      <path d="M619.7 280.3 L639.0 275.1" opacity="0.85"/>
+      <path d="M681.8 387.9 L701.1 393.1" opacity="0.85"/>
+    <circle cx="450" cy="450" r="20" fill="currentColor" opacity="0.7"/>
+  </g>
+</svg>

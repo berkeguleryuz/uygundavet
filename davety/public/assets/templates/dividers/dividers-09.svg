@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-9">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M100 462 L135 438 L170 462"/>
+    <path d="M170 462 L205 438 L240 462"/>
+    <path d="M240 462 L275 438 L310 462"/>
+    <path d="M310 462 L345 438 L380 462"/>
+    <path d="M380 462 L415 438 L450 462"/>
+    <path d="M450 462 L485 438 L520 462"/>
+    <path d="M520 462 L555 438 L590 462"/>
+    <path d="M590 462 L625 438 L660 462"/>
+    <path d="M660 462 L695 438 L730 462"/>
+    <path d="M730 462 L765 438 L800 462"/>
+  </g>
+</svg>

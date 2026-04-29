@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-10">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="280" fill="none" opacity="0.6"/>
+    <circle cx="450" cy="450" r="220" fill="none" opacity="0.4"/>
+    <circle cx="450" cy="450" r="160" fill="none" opacity="0.5"/>
+    <circle cx="730" cy="450" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="708.6862691031603" cy="557.1513610622251" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="647.9898987322333" cy="647.9898987322333" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="557.1513610622252" cy="708.6862691031603" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="450" cy="730" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="342.84863893777487" cy="708.6862691031603" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="252.01010126776671" cy="647.9898987322333" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="191.31373089683973" cy="557.1513610622252" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="170" cy="450.00000000000006" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="191.31373089683967" cy="342.8486389377749" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="252.01010126776666" cy="252.01010126776671" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="342.8486389377747" cy="191.3137308968398" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="449.99999999999994" cy="170" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="557.1513610622252" cy="191.31373089683973" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="647.9898987322333" cy="252.01010126776666" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="708.6862691031602" cy="342.8486389377747" r="8" fill="currentColor" opacity="0.6"/>
+    <g transform="translate(670 450) rotate(90)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(605.5634918610405 605.5634918610405) rotate(135)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(450 670) rotate(180)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(294.43650813895954 605.5634918610405) rotate(225)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(230 450) rotate(270)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(294.43650813895954 294.43650813895954) rotate(315)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(449.99999999999994 230) rotate(360)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <g transform="translate(605.5634918610403 294.43650813895954) rotate(405)">
+      <path d="M0 -50 Q35 -35 30 0 Q25 25 0 35 Q-15 25 -10 10 Q-2.5 0 0 -50 Z" fill="currentColor" opacity="0.4"/>
+      <circle cx="0" cy="-15" r="9" fill="currentColor" opacity="0.7"/>
+      <circle cx="0" cy="-15" r="4" fill="white"/>
+    </g>
+    <text x="450" y="475" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="56" fill="currentColor">Kına</text>
+  </g>
+</svg>

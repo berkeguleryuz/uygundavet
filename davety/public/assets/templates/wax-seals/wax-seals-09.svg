@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="wax-seal">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="1">
+<path d="M250 450 Q240 320 330 260 Q450 229.99999999999997 560 260 Q660 310 660 450 Q660 580 560 640 Q450 670 330 640 Q240 590 250 450 Z" fill="currentColor" opacity="0.85"/>
+      <circle cx="450" cy="450" r="170" stroke="white" stroke-width="3" opacity="0.35"/>
+    <g stroke="white" fill="white" opacity="0.85"><path d="M450 360 L530 420 L450 540 L370 420 Z" fill="none" stroke="white" stroke-width="10"/>
+     <line x1="370" y1="420" x2="530" y2="420" stroke="white" stroke-width="6"/>
+     <line x1="450" y1="360" x2="450" y2="420" stroke="white" stroke-width="4"/></g>
+  </g>
+</svg>

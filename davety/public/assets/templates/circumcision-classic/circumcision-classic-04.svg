@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="circumcision-classic-4">
+  <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M450 700 L450 440"/>
+    <path d="M380 460 Q360 320 410 260 Q420 380 440 380 Q420 280 470 240 Q500 360 460 400 Q500 280 540 320 Q540 420 460 440 Z" fill="currentColor" opacity="0.45"/>
+    <path d="M450 480 Q380 540 320 540" opacity="0.6"/>
+    <path d="M450 540 Q520 600 580 580" opacity="0.6"/>
+  </g>
+</svg>

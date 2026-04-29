@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 
 const DAY_NAMES = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 const MONTH_NAMES = [
@@ -185,6 +185,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
           value={hh}
           onChange={setHour}
           step={1}
+          max={23}
           format={(n) => n.toString().padStart(2, "0")}
           label="Saat"
         />
@@ -195,6 +196,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
           value={mm}
           onChange={setMinute}
           step={5}
+          max={59}
           format={(n) => n.toString().padStart(2, "0")}
           label="Dakika"
         />
@@ -227,12 +229,14 @@ function Spinner({
   value,
   onChange,
   step,
+  max,
   format,
   label,
 }: {
   value: number;
   onChange: (n: number) => void;
   step: number;
+  max: number;
   format: (n: number) => string;
   label: string;
 }) {
@@ -244,18 +248,30 @@ function Spinner({
         className="size-6 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
         aria-label={`${label} arttır`}
       >
-        <ChevronLeft className="size-3.5 -rotate-90" />
+        <ChevronUp className="size-3.5" />
       </button>
-      <div className="text-2xl font-medium tabular-nums leading-none py-1">
-        {format(value)}
-      </div>
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={format(value)}
+        onChange={(e) => {
+          const raw = e.target.value.replace(/\D/g, "").slice(0, 2);
+          const n = parseInt(raw, 10);
+          if (!Number.isFinite(n)) return;
+          onChange(Math.min(max, Math.max(0, n)));
+        }}
+        onFocus={(e) => e.target.select()}
+        className="w-14 text-center text-2xl font-medium tabular-nums leading-none py-1 bg-transparent border-0 focus:outline-none focus:bg-muted/40 rounded cursor-text"
+        aria-label={label}
+      />
       <button
         type="button"
         onClick={() => onChange(value - step)}
         className="size-6 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
         aria-label={`${label} azalt`}
       >
-        <ChevronLeft className="size-3.5 rotate-90" />
+        <ChevronDown className="size-3.5" />
       </button>
     </div>
   );

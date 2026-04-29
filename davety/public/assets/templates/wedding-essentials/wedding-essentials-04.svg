@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="wedding-essentials-4">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M400 540 Q380 700 360 800"/>
+    <path d="M450 540 Q450 700 450 800" opacity="0.7"/>
+    <path d="M500 540 Q520 700 540 800"/>
+    <circle cx="400" cy="380" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="400" cy="380" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="400" cy="380" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M392.125 375.5 Q400 364.25 407.875 375.5"/>
+      <path d="M400 380 Q406.75 382.25 402.25 389"/>
+    <circle cx="500" cy="380" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="500" cy="380" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="500" cy="380" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M492.125 375.5 Q500 364.25 507.875 375.5"/>
+      <path d="M500 380 Q506.75 382.25 502.25 389"/>
+    <ellipse cx="477.0" cy="320.0" rx="15.7" ry="8.1" transform="rotate(0.0 477.0 320.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="463.5" cy="343.4" rx="15.7" ry="8.1" transform="rotate(60.0 463.5 343.4)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="436.5" cy="343.4" rx="15.7" ry="8.1" transform="rotate(120.0 436.5 343.4)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="423.0" cy="320.0" rx="15.7" ry="8.1" transform="rotate(180.0 423.0 320.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="436.5" cy="296.6" rx="15.7" ry="8.1" transform="rotate(240.0 436.5 296.6)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="463.5" cy="296.6" rx="15.7" ry="8.1" transform="rotate(300.0 463.5 296.6)" fill="currentColor" opacity="0.35"/>
+      <circle cx="450" cy="320" r="14.4" fill="currentColor" opacity="0.7"/>
+    <path d="M380 495 Q359 481 359 446 Q369.5 463.5 380 456.5 Q390.5 463.5 401 446 Q401 481 380 495 Z" fill="currentColor" opacity="0.32"/>
+      <path d="M380 495 L380 530"/>
+      <path d="M380 514.6 Q405.2 502 403.1 488"/>
+    <path d="M520 495 Q499 481 499 446 Q509.5 463.5 520 456.5 Q530.5 463.5 541 446 Q541 481 520 495 Z" fill="currentColor" opacity="0.32"/>
+      <path d="M520 495 L520 530"/>
+      <path d="M520 514.6 Q545.2 502 543.1 488"/>
+    <ellipse cx="340" cy="420" rx="30" ry="12" transform="rotate(-30 340 420)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="560" cy="420" rx="30" ry="12" transform="rotate(30 560 420)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="450" cy="500" rx="28" ry="11.200000000000001" transform="rotate(90 450 500)" fill="currentColor" opacity="0.32"/>
+    <path d="M380 540 L520 540 L520 580 L380 580 Z" fill="currentColor" opacity="0.4"/>
+  </g>
+</svg>

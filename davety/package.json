@@ -9,7 +9,10 @@
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "templates:assets": "node scripts/generate-premium-assets.mjs",
+    "templates:check": "node scripts/check-premium-templates.mjs",
+    "templates:seed": "node scripts/seed-premium-templates.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.670.0",

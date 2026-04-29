@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="monograms-circle">
+  <g stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" opacity="1">
+<circle cx="450" cy="450" r="280" stroke="currentColor" stroke-width="3" fill="none" opacity="0.7"/>
+    <circle cx="450" cy="450" r="240" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4"/>
+    <path d="M250 660 Q450 750 650 660" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+    <text x="350" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="180" fill="currentColor">E</text>
+    <text x="450" y="490" text-anchor="middle" font-family="Georgia, serif" font-size="100" fill="currentColor" opacity="0.7">·</text>
+    <text x="550" y="510" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="180" fill="currentColor">B</text>
+  </g>
+</svg>

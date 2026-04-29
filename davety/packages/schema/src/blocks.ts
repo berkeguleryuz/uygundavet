@@ -207,9 +207,15 @@ export interface FooterData {
 }
 
 export interface DecorationData {
-  /** Catalog id from `@davety/renderer/decorations` (e.g. "heart"). */
-  iconKey: string;
-  /** Render size in CSS px. Defaults to 64. */
+  /** Catalog id from `@davety/renderer/decorations` (e.g. "heart"). When
+   *  present, the small line-icon catalog is used. Mutually exclusive with
+   *  `svgRaw`. */
+  iconKey?: string;
+  /** Inline SVG markup (the contents of an .svg file as a string) for
+   *  decorative templates picked from the Şablonlar gallery. The renderer
+   *  inlines it so `currentColor` recolours all paths. */
+  svgRaw?: string;
+  /** Render size in CSS px. Defaults to 64 for icons, 220 for templates. */
   sizePx?: number;
   /** Stroke color. Falls back to theme.accentColor when absent. */
   color?: string;

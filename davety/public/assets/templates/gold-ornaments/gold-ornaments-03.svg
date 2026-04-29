@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="gold-ornaments-3">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M250 200 Q200 450 250 700"/>
+    <path d="M650 200 Q700 450 650 700"/>
+    <ellipse cx="232.89899283371656" cy="255.55555555555554" rx="26" ry="10.4" transform="rotate(-65 232.89899283371656 255.55555555555554)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="217.86061951567302" cy="311.1111111111111" rx="26" ry="10.4" transform="rotate(-65 217.86061951567302 311.1111111111111)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="206.69872981077808" cy="366.66666666666663" rx="26" ry="10.4" transform="rotate(-65 206.69872981077808 366.66666666666663)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="200.7596123493896" cy="422.2222222222222" rx="26" ry="10.4" transform="rotate(-65 200.7596123493896 422.2222222222222)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="200.7596123493896" cy="477.77777777777777" rx="26" ry="10.4" transform="rotate(-65 200.7596123493896 477.77777777777777)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="206.69872981077805" cy="533.3333333333333" rx="26" ry="10.4" transform="rotate(-65 206.69872981077805 533.3333333333333)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="217.86061951567302" cy="588.8888888888889" rx="26" ry="10.4" transform="rotate(-65 217.86061951567302 588.8888888888889)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="232.89899283371656" cy="644.4444444444443" rx="26" ry="10.4" transform="rotate(-65 232.89899283371656 644.4444444444443)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="667.1010071662835" cy="255.55555555555554" rx="26" ry="10.4" transform="rotate(65 667.1010071662835 255.55555555555554)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="682.1393804843269" cy="311.1111111111111" rx="26" ry="10.4" transform="rotate(65 682.1393804843269 311.1111111111111)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="693.3012701892219" cy="366.66666666666663" rx="26" ry="10.4" transform="rotate(65 693.3012701892219 366.66666666666663)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="699.2403876506104" cy="422.2222222222222" rx="26" ry="10.4" transform="rotate(65 699.2403876506104 422.2222222222222)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="699.2403876506104" cy="477.77777777777777" rx="26" ry="10.4" transform="rotate(65 699.2403876506104 477.77777777777777)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="693.3012701892219" cy="533.3333333333333" rx="26" ry="10.4" transform="rotate(65 693.3012701892219 533.3333333333333)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="682.1393804843269" cy="588.8888888888889" rx="26" ry="10.4" transform="rotate(65 682.1393804843269 588.8888888888889)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="667.1010071662835" cy="644.4444444444443" rx="26" ry="10.4" transform="rotate(65 667.1010071662835 644.4444444444443)" fill="currentColor" opacity="0.32"/>
+    <path d="M250 700 Q450 770 650 700"/>
+  </g>
+</svg>

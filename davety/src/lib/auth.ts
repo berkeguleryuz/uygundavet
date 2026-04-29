@@ -14,7 +14,7 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: !!resend,
+    requireEmailVerification: false,
     async sendResetPassword({ user, url }) {
       if (!resend) return;
       await resend.emails.send({
@@ -26,7 +26,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: !!resend,
+    sendOnSignUp: false,
     autoSignInAfterVerification: true,
     async sendVerificationEmail({ user, url }) {
       if (!resend) return;

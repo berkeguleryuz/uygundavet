@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="circumcision-classic-3">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<ellipse cx="220" cy="278.8888888888889" rx="30" ry="12" transform="rotate(-65 220 278.8888888888889)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="278.8888888888889" rx="30" ry="12" transform="rotate(65 680 278.8888888888889)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="327.77777777777777" rx="30" ry="12" transform="rotate(-65 220 327.77777777777777)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="327.77777777777777" rx="30" ry="12" transform="rotate(65 680 327.77777777777777)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="376.66666666666663" rx="30" ry="12" transform="rotate(-65 220 376.66666666666663)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="376.66666666666663" rx="30" ry="12" transform="rotate(65 680 376.66666666666663)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="425.55555555555554" rx="30" ry="12" transform="rotate(-65 220 425.55555555555554)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="425.55555555555554" rx="30" ry="12" transform="rotate(65 680 425.55555555555554)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="474.44444444444446" rx="30" ry="12" transform="rotate(-65 220 474.44444444444446)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="474.44444444444446" rx="30" ry="12" transform="rotate(65 680 474.44444444444446)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="523.3333333333333" rx="30" ry="12" transform="rotate(-65 220 523.3333333333333)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="523.3333333333333" rx="30" ry="12" transform="rotate(65 680 523.3333333333333)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="572.2222222222222" rx="30" ry="12" transform="rotate(-65 220 572.2222222222222)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="572.2222222222222" rx="30" ry="12" transform="rotate(65 680 572.2222222222222)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="220" cy="621.1111111111111" rx="30" ry="12" transform="rotate(-65 220 621.1111111111111)" fill="currentColor" opacity="0.32"/>
+      <ellipse cx="680" cy="621.1111111111111" rx="30" ry="12" transform="rotate(65 680 621.1111111111111)" fill="currentColor" opacity="0.32"/>
+    <path d="M220 670 Q450 740 680 670"/>
+    <path d="M520 380 A100 100 0 1 0 520 540 A80 80 0 0 1 520 380 Z" fill="currentColor" opacity="0.5"/>
+    <polygon points="620.0,430.0 627.1,450.3 648.5,450.7 631.4,463.7 637.6,484.3 620.0,472.0 602.4,484.3 608.6,463.7 591.5,450.7 612.9,450.3" fill="currentColor" opacity="0.5"/>
+  </g>
+</svg>

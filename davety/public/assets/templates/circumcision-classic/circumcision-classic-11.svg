@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="circumcision-classic-11">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="450" y1="450" x2="770.0" y2="450.0" opacity="0.4"/>
+    <line x1="450" y1="450" x2="745.6" y2="572.5" opacity="0.4"/>
+    <line x1="450" y1="450" x2="676.3" y2="676.3" opacity="0.4"/>
+    <line x1="450" y1="450" x2="572.5" y2="745.6" opacity="0.4"/>
+    <line x1="450" y1="450" x2="450.0" y2="770.0" opacity="0.4"/>
+    <line x1="450" y1="450" x2="327.5" y2="745.6" opacity="0.4"/>
+    <line x1="450" y1="450" x2="223.7" y2="676.3" opacity="0.4"/>
+    <line x1="450" y1="450" x2="154.4" y2="572.5" opacity="0.4"/>
+    <line x1="450" y1="450" x2="130.0" y2="450.0" opacity="0.4"/>
+    <line x1="450" y1="450" x2="154.4" y2="327.5" opacity="0.4"/>
+    <line x1="450" y1="450" x2="223.7" y2="223.7" opacity="0.4"/>
+    <line x1="450" y1="450" x2="327.5" y2="154.4" opacity="0.4"/>
+    <line x1="450" y1="450" x2="450.0" y2="130.0" opacity="0.4"/>
+    <line x1="450" y1="450" x2="572.5" y2="154.4" opacity="0.4"/>
+    <line x1="450" y1="450" x2="676.3" y2="223.7" opacity="0.4"/>
+    <line x1="450" y1="450" x2="745.6" y2="327.5" opacity="0.4"/>
+    <circle cx="450" cy="450" r="120" fill="currentColor" opacity="0.4"/>
+    <polygon points="450.0,370.0 468.8,424.1 526.1,425.3 480.4,459.9 497.0,514.7 450.0,482.0 403.0,514.7 419.6,459.9 373.9,425.3 431.2,424.1" fill="currentColor" opacity="0.5"/>
+  </g>
+</svg>

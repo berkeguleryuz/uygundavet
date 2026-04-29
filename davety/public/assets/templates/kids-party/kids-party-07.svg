@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="kids-party-7">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M100 250 Q450 320 800 250"/>
+    <path d="M130 250 L210 250 L170 350 Z" fill="currentColor" opacity="0.30"/>
+    <path d="M240 270 L320 270 L280 370 Z" fill="currentColor" opacity="0.50"/>
+    <path d="M350 284.6410161513775 L430 284.6410161513775 L390 384.6410161513775 Z" fill="currentColor" opacity="0.70"/>
+    <path d="M460 290 L540 290 L500 390 Z" fill="currentColor" opacity="0.30"/>
+    <path d="M570 284.6410161513775 L650 284.6410161513775 L610 384.6410161513775 Z" fill="currentColor" opacity="0.50"/>
+    <path d="M680 270 L760 270 L720 370 Z" fill="currentColor" opacity="0.70"/>
+    <path d="M790 250 L870 250 L830 350 Z" fill="currentColor" opacity="0.30"/>
+  </g>
+</svg>

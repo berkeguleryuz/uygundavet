@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-12">
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="100" y1="480" x2="800" y2="480"/>
+    <line x1="450" y1="480" x2="390.5" y2="426.5"/>
+    <line x1="450" y1="480" x2="403.0" y2="415.3"/>
+    <line x1="450" y1="480" x2="417.5" y2="406.9"/>
+    <line x1="450" y1="480" x2="433.4" y2="401.7"/>
+    <line x1="450" y1="480" x2="450.0" y2="400.0"/>
+    <line x1="450" y1="480" x2="466.6" y2="401.7"/>
+    <line x1="450" y1="480" x2="482.5" y2="406.9"/>
+    <line x1="450" y1="480" x2="497.0" y2="415.3"/>
+    <line x1="450" y1="480" x2="509.5" y2="426.5"/>
+    <path d="M370 480 Q450 400 530 480" opacity="0.6"/>
+  </g>
+</svg>

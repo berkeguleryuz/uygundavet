@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="kids-party-11">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<ellipse cx="450" cy="430" rx="200" ry="120" fill="currentColor" opacity="0.45"/>
+    <line x1="350" y1="540" x2="350" y2="660" stroke-width="10"/>
+    <line x1="550" y1="540" x2="550" y2="660" stroke-width="10"/>
+    <path d="M280 360 L260 320 L300 320 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M370 360 L350 320 L390 320 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M460 360 L440 320 L480 320 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M550 360 L530 320 L570 320 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M640 360 L620 320 L660 320 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M650 380 Q700 380 700 320" stroke-width="8"/>
+  </g>
+</svg>

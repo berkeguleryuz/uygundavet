@@ -12,6 +12,7 @@ export function CtaView({
   const click = (id: string) =>
     editable && onFieldSelect
       ? {
+          "data-field-id": id,
           onClick: (e: React.MouseEvent) => {
             e.stopPropagation();
             onFieldSelect(id);

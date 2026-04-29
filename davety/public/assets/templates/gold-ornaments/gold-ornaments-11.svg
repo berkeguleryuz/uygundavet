@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="gold-ornaments-11">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M450 200 Q700 250 700 500 Q700 700 450 700 Q300 700 280 600 Q260 500 320 480 Q400 460 380 380 Q360 280 450 200 Z"/>
+    <path d="M450 270 Q620 320 620 500 Q620 630 450 630" opacity="0.5"/>
+    <circle cx="450" cy="460" r="14" fill="currentColor" opacity="0.6"/>
+    <path d="M450 700 L450 800"/>
+    <path d="M420 770 Q450 800 480 770"/>
+  </g>
+</svg>

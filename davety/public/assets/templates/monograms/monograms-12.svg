@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="monograms-12">
+  <g stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" opacity="1">
+<circle cx="450" cy="450" r="260" stroke="currentColor" stroke-width="3" fill="none"/>
+    <text x="320" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="120" fill="currentColor" opacity="0.6">A</text>
+    <text x="450" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="200" fill="currentColor">M</text>
+    <text x="580" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="120" fill="currentColor" opacity="0.6">K</text>
+  </g>
+</svg>

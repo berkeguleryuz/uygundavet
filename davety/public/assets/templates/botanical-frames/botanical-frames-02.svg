@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="botanical-frames-2">
+  <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<path d="M150 800 L150 350 Q150 150 450 150 Q750 150 750 350 L750 800"/>
+    <path d="M150 800 L750 800"/>
+    <path d="M150 360 Q230 305 250 250"/>
+      <ellipse cx="189.2" cy="338.0" rx="20" ry="9" transform="rotate(-137.7 189.2 338.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="218.8" cy="316.0" rx="20" ry="9" transform="rotate(42.3 218.8 316.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="238.8" cy="294.0" rx="20" ry="9" transform="rotate(-137.7 238.8 294.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="249.2" cy="272.0" rx="20" ry="9" transform="rotate(42.3 249.2 272.0)" fill="currentColor" opacity="0.28"/>
+    <path d="M750 360 Q730 305 650 250"/>
+      <ellipse cx="749.2" cy="338.0" rx="20" ry="9" transform="rotate(137.7 749.2 338.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="738.8" cy="316.0" rx="20" ry="9" transform="rotate(-42.3 738.8 316.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="718.8" cy="294.0" rx="20" ry="9" transform="rotate(137.7 718.8 294.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="689.2" cy="272.0" rx="20" ry="9" transform="rotate(-42.3 689.2 272.0)" fill="currentColor" opacity="0.28"/>
+    <path d="M150 760 Q215 730 220 700"/>
+      <ellipse cx="183.2" cy="748.0" rx="16" ry="7.2" transform="rotate(-130.6 183.2 748.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="206.8" cy="736.0" rx="16" ry="7.2" transform="rotate(49.4 206.8 736.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="220.8" cy="724.0" rx="16" ry="7.2" transform="rotate(-130.6 220.8 724.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="225.2" cy="712.0" rx="16" ry="7.2" transform="rotate(49.4 225.2 712.0)" fill="currentColor" opacity="0.28"/>
+    <path d="M750 760 Q745 730 680 700"/>
+      <ellipse cx="755.2" cy="748.0" rx="16" ry="7.2" transform="rotate(130.6 755.2 748.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="750.8" cy="736.0" rx="16" ry="7.2" transform="rotate(-49.4 750.8 736.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="736.8" cy="724.0" rx="16" ry="7.2" transform="rotate(130.6 736.8 724.0)" fill="currentColor" opacity="0.28"/>
+      <ellipse cx="713.2" cy="712.0" rx="16" ry="7.2" transform="rotate(-49.4 713.2 712.0)" fill="currentColor" opacity="0.28"/>
+  </g>
+</svg>

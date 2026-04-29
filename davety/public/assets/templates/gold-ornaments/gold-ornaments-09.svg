@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="gold-ornaments-9">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="80" fill="currentColor" opacity="0.4"/>
+    <circle cx="450" cy="450" r="60" fill="currentColor" opacity="0.6"/>
+    <line x1="550.0" y1="450.0" x2="700.0" y2="450.0"/>
+    <line x1="542.4" y1="488.3" x2="681.0" y2="545.7"/>
+    <line x1="520.7" y1="520.7" x2="626.8" y2="626.8"/>
+    <line x1="488.3" y1="542.4" x2="545.7" y2="681.0"/>
+    <line x1="450.0" y1="550.0" x2="450.0" y2="700.0"/>
+    <line x1="411.7" y1="542.4" x2="354.3" y2="681.0"/>
+    <line x1="379.3" y1="520.7" x2="273.2" y2="626.8"/>
+    <line x1="357.6" y1="488.3" x2="219.0" y2="545.7"/>
+    <line x1="350.0" y1="450.0" x2="200.0" y2="450.0"/>
+    <line x1="357.6" y1="411.7" x2="219.0" y2="354.3"/>
+    <line x1="379.3" y1="379.3" x2="273.2" y2="273.2"/>
+    <line x1="411.7" y1="357.6" x2="354.3" y2="219.0"/>
+    <line x1="450.0" y1="350.0" x2="450.0" y2="200.0"/>
+    <line x1="488.3" y1="357.6" x2="545.7" y2="219.0"/>
+    <line x1="520.7" y1="379.3" x2="626.8" y2="273.2"/>
+    <line x1="542.4" y1="411.7" x2="681.0" y2="354.3"/>
+    <circle cx="708.6862691031603" cy="557.1513610622251" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="557.1513610622252" cy="708.6862691031603" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="342.84863893777487" cy="708.6862691031603" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="191.31373089683973" cy="557.1513610622252" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="191.31373089683967" cy="342.8486389377749" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="342.8486389377747" cy="191.3137308968398" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="557.1513610622252" cy="191.31373089683973" r="7" fill="currentColor" opacity="0.6"/>
+    <circle cx="708.6862691031602" cy="342.8486389377747" r="7" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

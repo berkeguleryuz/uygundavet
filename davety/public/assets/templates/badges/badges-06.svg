@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-6">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M150 350 Q450 280 750 350 L750 550 Q450 480 150 550 Z" fill="currentColor" opacity="0.35"/>
+    <path d="M150 350 Q450 320 750 350" opacity="0.7"/>
+    <path d="M150 550 Q450 520 750 550" opacity="0.7"/>
+    <text x="450" y="465" text-anchor="middle" font-family="Georgia, serif" font-size="48" fill="currentColor">CELEBRATE</text>
+  </g>
+</svg>

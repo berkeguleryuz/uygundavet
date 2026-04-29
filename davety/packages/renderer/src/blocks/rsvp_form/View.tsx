@@ -7,6 +7,7 @@ import { apiUrl, useRendererContext } from "../../context";
 
 export function RsvpFormView({
   block,
+  theme,
   editable,
   onFieldSelect,
 }: BlockViewProps<RsvpFormData>) {
@@ -35,6 +36,7 @@ export function RsvpFormView({
   const click = (id: string) =>
     editable && onFieldSelect
       ? {
+          "data-field-id": id,
           onClick: (e: React.MouseEvent) => {
             e.stopPropagation();
             onFieldSelect(id);
@@ -104,8 +106,16 @@ export function RsvpFormView({
           e.stopPropagation();
           setOpen(true);
         }}
-        className="inline-flex items-center justify-center rounded-full bg-current/90 text-white px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90"
-        style={fieldStyle(block, "buttonLabel")}
+        className="inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90 transition-opacity"
+        style={{
+          // Read from theme directly so the button always contrasts with
+          // the section. Earlier we used `bg-current text-white` which
+          // collapsed to a near-invisible button on light themes (current
+          // resolved to the cream accent and white text disappeared).
+          background: theme.accentColor,
+          color: theme.bgColor,
+          ...fieldStyle(block, "buttonLabel"),
+        }}
       >
         {buttonLabel}
       </button>

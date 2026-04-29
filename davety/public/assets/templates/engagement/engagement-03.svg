@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="engagement-3">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="160" fill="none"/>
+    <circle cx="280" cy="280" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="280" cy="280" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="280" cy="280" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M272.125 275.5 Q280 264.25 287.875 275.5"/>
+      <path d="M280 280 Q286.75 282.25 282.25 289"/>
+    <circle cx="620" cy="620" r="50" fill="currentColor" opacity="0.18"/>
+      <circle cx="620" cy="620" r="32.5" fill="currentColor" opacity="0.30"/>
+      <circle cx="620" cy="620" r="22.5" fill="currentColor" opacity="0.55"/>
+      <path d="M612.125 615.5 Q620 604.25 627.875 615.5"/>
+      <path d="M620 620 Q626.75 622.25 622.25 629"/>
+    <ellipse cx="644.0" cy="280.0" rx="14.0" ry="7.2" transform="rotate(0.0 644.0 280.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="632.0" cy="300.8" rx="14.0" ry="7.2" transform="rotate(60.0 632.0 300.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="608.0" cy="300.8" rx="14.0" ry="7.2" transform="rotate(120.0 608.0 300.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="596.0" cy="280.0" rx="14.0" ry="7.2" transform="rotate(180.0 596.0 280.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="608.0" cy="259.2" rx="14.0" ry="7.2" transform="rotate(240.0 608.0 259.2)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="632.0" cy="259.2" rx="14.0" ry="7.2" transform="rotate(300.0 632.0 259.2)" fill="currentColor" opacity="0.35"/>
+      <circle cx="620" cy="280" r="12.8" fill="currentColor" opacity="0.7"/>
+    <ellipse cx="304.0" cy="620.0" rx="14.0" ry="7.2" transform="rotate(0.0 304.0 620.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="292.0" cy="640.8" rx="14.0" ry="7.2" transform="rotate(60.0 292.0 640.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="268.0" cy="640.8" rx="14.0" ry="7.2" transform="rotate(120.0 268.0 640.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="256.0" cy="620.0" rx="14.0" ry="7.2" transform="rotate(180.0 256.0 620.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="268.0" cy="599.2" rx="14.0" ry="7.2" transform="rotate(240.0 268.0 599.2)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="292.0" cy="599.2" rx="14.0" ry="7.2" transform="rotate(300.0 292.0 599.2)" fill="currentColor" opacity="0.35"/>
+      <circle cx="280" cy="620" r="12.8" fill="currentColor" opacity="0.7"/>
+    <ellipse cx="340" cy="250" rx="28" ry="11.200000000000001" transform="rotate(-30 340 250)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="560" cy="650" rx="28" ry="11.200000000000001" transform="rotate(-30 560 650)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="650" cy="340" rx="28" ry="11.200000000000001" transform="rotate(60 650 340)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="250" cy="560" rx="28" ry="11.200000000000001" transform="rotate(60 250 560)" fill="currentColor" opacity="0.32"/>
+  </g>
+</svg>

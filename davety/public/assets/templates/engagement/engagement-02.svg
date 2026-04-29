@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="engagement-2">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<rect x="240" y="540" width="420" height="160" rx="40" fill="currentColor" opacity="0.3"/>
+    <rect x="240" y="540" width="420" height="160" rx="40" fill="none"/>
+    <circle cx="450" cy="450" r="100" fill="none"/>
+    <circle cx="450" cy="450" r="84" fill="none" opacity="0.5"/>
+    <path d="M450 290 L490 360 L450 410 L410 360 Z" fill="currentColor" opacity="0.7"/>
+  </g>
+</svg>

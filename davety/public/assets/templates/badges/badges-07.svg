@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-7">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<polygon points="450,180 720,330 720,570 450,720 180,570 180,330" fill="currentColor" opacity="0.3"/>
+    <polygon points="450,220 680,345 680,555 450,680 220,555 220,345" opacity="0.7"/>
+    <text x="450" y="490" text-anchor="middle" font-family="Georgia, serif" font-size="100" fill="currentColor">&amp;</text>
+  </g>
+</svg>

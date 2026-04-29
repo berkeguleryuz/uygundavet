@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="gold-ornaments-5">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="450" y1="100" x2="450" y2="800"/>
+    <circle cx="450" cy="150" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="150" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="150" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M443.7 146.4 Q450 137.4 456.3 146.4"/>
+      <path d="M450 150 Q455.4 151.8 451.8 157.2"/>
+      <path d="M380 150 Q420 120 450 150"/>
+      <path d="M520 150 Q480 120 450 150"/>
+    <circle cx="450" cy="300" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="300" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="300" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M443.7 296.4 Q450 287.4 456.3 296.4"/>
+      <path d="M450 300 Q455.4 301.8 451.8 307.2"/>
+      <path d="M380 300 Q420 270 450 300"/>
+      <path d="M520 300 Q480 270 450 300"/>
+    <circle cx="450" cy="450" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="450" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="450" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M443.7 446.4 Q450 437.4 456.3 446.4"/>
+      <path d="M450 450 Q455.4 451.8 451.8 457.2"/>
+      <path d="M380 450 Q420 420 450 450"/>
+      <path d="M520 450 Q480 420 450 450"/>
+    <circle cx="450" cy="600" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="600" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="600" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M443.7 596.4 Q450 587.4 456.3 596.4"/>
+      <path d="M450 600 Q455.4 601.8 451.8 607.2"/>
+      <path d="M380 600 Q420 570 450 600"/>
+      <path d="M520 600 Q480 570 450 600"/>
+    <circle cx="450" cy="750" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="450" cy="750" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="450" cy="750" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M443.7 746.4 Q450 737.4 456.3 746.4"/>
+      <path d="M450 750 Q455.4 751.8 451.8 757.2"/>
+      <path d="M380 750 Q420 720 450 750"/>
+      <path d="M520 750 Q480 720 450 750"/>
+  </g>
+</svg>

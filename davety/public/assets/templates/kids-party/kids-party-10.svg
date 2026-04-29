@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="kids-party-10">
+  <g stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M250 600 A200 200 0 0 1 650 600" stroke="currentColor" stroke-width="36" fill="none" opacity="0.60"/>
+    <path d="M230 600 A220 220 0 0 1 670 600" stroke="currentColor" stroke-width="36" fill="none" opacity="0.50"/>
+    <path d="M210 600 A240 240 0 0 1 690 600" stroke="currentColor" stroke-width="36" fill="none" opacity="0.40"/>
+    <path d="M190 600 A260 260 0 0 1 710 600" stroke="currentColor" stroke-width="36" fill="none" opacity="0.30"/>
+  </g>
+</svg>

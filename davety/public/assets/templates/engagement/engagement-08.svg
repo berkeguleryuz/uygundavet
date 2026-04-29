@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="engagement-8">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="160" fill="none"/>
+    <path d="M450 290 L470 320 L450 350 L430 320 Z" fill="currentColor" opacity="0.7"/>
+    <polygon points="200.0,182.0 205.1,194.9 218.0,200.0 205.1,205.1 200.0,218.0 194.9,205.1 182.0,200.0 194.9,194.9" fill="currentColor" opacity="0.5"/>
+    <polygon points="700.0,182.0 705.1,194.9 718.0,200.0 705.1,205.1 700.0,218.0 694.9,205.1 682.0,200.0 694.9,194.9" fill="currentColor" opacity="0.5"/>
+    <polygon points="180.0,582.0 185.1,594.9 198.0,600.0 185.1,605.1 180.0,618.0 174.9,605.1 162.0,600.0 174.9,594.9" fill="currentColor" opacity="0.5"/>
+    <polygon points="720.0,682.0 725.1,694.9 738.0,700.0 725.1,705.1 720.0,718.0 714.9,705.1 702.0,700.0 714.9,694.9" fill="currentColor" opacity="0.5"/>
+    <polygon points="300.0,732.0 305.1,744.9 318.0,750.0 305.1,755.1 300.0,768.0 294.9,755.1 282.0,750.0 294.9,744.9" fill="currentColor" opacity="0.5"/>
+    <polygon points="600.0,712.0 605.1,724.9 618.0,730.0 605.1,735.1 600.0,748.0 594.9,735.1 582.0,730.0 594.9,724.9" fill="currentColor" opacity="0.5"/>
+    <circle cx="150" cy="400" r="5" fill="currentColor" opacity="0.6"/>
+    <circle cx="780" cy="480" r="5" fill="currentColor" opacity="0.6"/>
+    <circle cx="250" cy="250" r="5" fill="currentColor" opacity="0.6"/>
+    <circle cx="680" cy="350" r="5" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

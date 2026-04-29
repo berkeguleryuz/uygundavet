@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="save-the-date-6">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M250 380 Q300 360 350 380 Q400 400 450 380 Q500 360 550 380 Q600 400 650 380" stroke-width="2" opacity="0.6"/>
+    <text x="450" y="490" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="80" fill="currentColor">save the date</text>
+    <path d="M250 540 Q300 560 350 540 Q400 520 450 540 Q500 560 550 540 Q600 520 650 540" stroke-width="2" opacity="0.6"/>
+    <text x="450" y="600" text-anchor="middle" font-family="Georgia, serif" font-size="36" letter-spacing="8" fill="currentColor" opacity="0.7">15·06·2026</text>
+  </g>
+</svg>

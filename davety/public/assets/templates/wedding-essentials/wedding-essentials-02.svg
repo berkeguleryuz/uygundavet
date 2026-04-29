@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="wedding-essentials-2">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M450 720 C200 540 180 320 320 280 C400 260 440 320 450 360 C460 320 500 260 580 280 C720 320 700 540 450 720 Z" fill="currentColor" opacity="0.32"/>
+    <path d="M380 460 Q450 420 520 460 Q540 470 530 490 Q470 510 410 510 Q380 510 380 460 Z" fill="currentColor" opacity="0.7"/>
+    <path d="M520 460 L560 440 L555 470 Z" fill="currentColor" opacity="0.7"/>
+    <circle cx="540" cy="460" r="3" fill="white"/>
+    <path d="M380 460 Q360 480 350 510" opacity="0.7"/>
+  </g>
+</svg>

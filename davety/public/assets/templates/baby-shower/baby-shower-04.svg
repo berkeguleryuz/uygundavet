@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="baby-shower-4">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M540 280 A140 140 0 1 0 660 540 A180 180 0 0 1 540 280 Z" fill="currentColor" opacity="0.5"/>
+    <polygon points="280.0,260.0 294.1,300.6 337.1,301.5 302.8,327.4 315.3,368.5 280.0,344.0 244.7,368.5 257.2,327.4 222.9,301.5 265.9,300.6" fill="currentColor" opacity="0.5"/>
+    <polygon points="360.0,565.0 368.2,588.7 393.3,589.2 373.3,604.3 380.6,628.3 360.0,614.0 339.4,628.3 346.7,604.3 326.7,589.2 351.8,588.7" fill="currentColor" opacity="0.5"/>
+    <circle cx="640" cy="220" r="8" fill="currentColor" opacity="0.6"/>
+    <circle cx="720" cy="380" r="6" fill="currentColor" opacity="0.6"/>
+    <circle cx="280" cy="560" r="6" fill="currentColor" opacity="0.6"/>
+  </g>
+</svg>

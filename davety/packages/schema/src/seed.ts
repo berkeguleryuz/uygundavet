@@ -80,7 +80,11 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
             : de
             ? "Familie der Braut"
             : "Bride's Family",
-          members: [],
+          members: tr
+            ? ["Anne Adı Soyadı", "Baba Adı Soyadı"]
+            : de
+              ? ["Mutter Name", "Vater Name"]
+              : ["Mother's Name", "Father's Name"],
         },
         groom: {
           title: tr
@@ -88,7 +92,11 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
             : de
             ? "Familie des Bräutigams"
             : "Groom's Family",
-          members: [],
+          members: tr
+            ? ["Anne Adı Soyadı", "Baba Adı Soyadı"]
+            : de
+              ? ["Mutter Name", "Vater Name"]
+              : ["Mother's Name", "Father's Name"],
         },
       },
     },

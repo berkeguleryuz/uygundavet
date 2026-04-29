@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="save-the-date-10">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="450" y1="180" x2="450" y2="720" stroke-width="2" opacity="0.5"/>
+    <text x="450" y="280" text-anchor="middle" font-family="Georgia, serif" font-size="40" letter-spacing="8" fill="currentColor">15</text>
+    <text x="450" y="340" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="28" fill="currentColor" opacity="0.7">JUN</text>
+    <text x="450" y="500" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="60" fill="currentColor">save</text>
+    <text x="450" y="560" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="60" fill="currentColor">the date</text>
+    <text x="450" y="680" text-anchor="middle" font-family="Georgia, serif" font-size="32" letter-spacing="8" fill="currentColor" opacity="0.7">2026</text>
+  </g>
+</svg>

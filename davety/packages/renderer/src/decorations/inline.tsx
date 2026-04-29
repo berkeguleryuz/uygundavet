@@ -18,8 +18,14 @@ const MARKER_RE = /\{\{([a-z0-9-]+)\}\}/gi;
 export interface ParseInlineOptions {
   /** Override stroke colour. Defaults to `currentColor`. */
   color?: string;
-  /** Override icon size. Defaults to `1em` (matches surrounding font). */
+  /** Override icon size. Defaults to `1.4em` so the icon reads as
+   *  comparable in weight to surrounding glyphs without overpowering the
+   *  line. */
   size?: number | string;
+  /** Stroke width in viewBox units. Defaults to 1.8 — heavier than the
+   *  decoration-block default so the icon stays legible at body-text
+   *  sizes. */
+  strokeWidth?: number;
 }
 
 export function parseInlineDecorations(
@@ -43,18 +49,18 @@ export function parseInlineDecorations(
         <svg
           key={`${m.index}-${key}`}
           viewBox="0 0 24 24"
-          width={opts.size ?? "1em"}
-          height={opts.size ?? "1em"}
+          width={opts.size ?? "1.4em"}
+          height={opts.size ?? "1.4em"}
           fill="none"
           stroke={opts.color ?? "currentColor"}
-          strokeWidth={1.4}
+          strokeWidth={opts.strokeWidth ?? 1.8}
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
           style={{
             display: "inline-block",
-            verticalAlign: "-0.15em",
-            margin: "0 0.15em",
+            verticalAlign: "-0.3em",
+            margin: "0 0.2em",
           }}
           dangerouslySetInnerHTML={{ __html: icon.svg }}
         />,

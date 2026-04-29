@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-10">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M380 150 L520 150 L520 600 L450 700 L380 600 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M390 200 L510 200" opacity="0.7"/>
+    <text x="450" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="56" fill="currentColor">A</text>
+    <text x="450" y="460" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="currentColor" opacity="0.8">&amp;</text>
+    <text x="450" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="56" fill="currentColor">K</text>
+  </g>
+</svg>

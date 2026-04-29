@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="circumcision-classic-5">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M280 540 L620 540 L600 360 Q450 320 300 360 Z" fill="currentColor" opacity="0.5"/>
+    <path d="M260 540 L640 540 L660 600 L240 600 Z" fill="currentColor" opacity="0.7"/>
+    <path d="M450 360 Q470 240 530 220 Q510 320 470 360" fill="currentColor" opacity="0.6"/>
+    <circle cx="380" cy="440" r="14" fill="currentColor" opacity="0.7"/>
+    <circle cx="520" cy="440" r="14" fill="currentColor" opacity="0.7"/>
+  </g>
+</svg>

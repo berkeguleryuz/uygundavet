@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-12">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="450" r="240" stroke="currentColor" stroke-width="4" fill="none" opacity="0.6"/>
+    <circle cx="450" cy="450" r="200" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4"/>
+    <circle cx="450" cy="450" r="14" fill="currentColor" opacity="0.8"/>
+    <polygon points="690.0,438.0 692.8,446.1 701.4,446.3 694.6,451.5 697.1,459.7 690.0,454.8 682.9,459.7 685.4,451.5 678.6,446.3 687.2,446.1" fill="currentColor" opacity="0.5"/>
+    <polygon points="450.0,678.0 452.8,686.1 461.4,686.3 454.6,691.5 457.1,699.7 450.0,694.8 442.9,699.7 445.4,691.5 438.6,686.3 447.2,686.1" fill="currentColor" opacity="0.5"/>
+    <polygon points="210.0,438.0 212.8,446.1 221.4,446.3 214.6,451.5 217.1,459.7 210.0,454.8 202.9,459.7 205.4,451.5 198.6,446.3 207.2,446.1" fill="currentColor" opacity="0.5"/>
+    <polygon points="450.0,198.0 452.8,206.1 461.4,206.3 454.6,211.5 457.1,219.7 450.0,214.8 442.9,219.7 445.4,211.5 438.6,206.3 447.2,206.1" fill="currentColor" opacity="0.5"/>
+  </g>
+</svg>

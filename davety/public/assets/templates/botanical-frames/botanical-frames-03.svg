@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="botanical-frames-3">
+  <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
+<ellipse cx="450" cy="450" rx="320" ry="380"/>
+    <ellipse cx="450" cy="450" rx="290" ry="350" opacity="0.5"/>
+    <path d="M450 70 Q380 130 360 200"/>
+    <path d="M450 70 Q520 130 540 200"/>
+    <ellipse cx="390" cy="140" rx="22" ry="8.8" transform="rotate(-40 390 140)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="510" cy="140" rx="22" ry="8.8" transform="rotate(40 510 140)" fill="currentColor" opacity="0.32"/>
+    <path d="M450 830 Q400 770 380 700"/>
+    <path d="M450 830 Q500 770 520 700"/>
+    <ellipse cx="395" cy="760" rx="22" ry="8.8" transform="rotate(40 395 760)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="505" cy="760" rx="22" ry="8.8" transform="rotate(-40 505 760)" fill="currentColor" opacity="0.32"/>
+  </g>
+</svg>

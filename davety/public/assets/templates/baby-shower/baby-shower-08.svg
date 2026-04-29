@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="baby-shower-8">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<rect x="380" y="280" width="140" height="40" rx="20" fill="currentColor" opacity="0.6"/>
+    <rect x="370" y="320" width="160" height="60" fill="currentColor" opacity="0.4"/>
+    <path d="M370 380 Q360 400 360 440 L360 660 Q360 700 400 700 L500 700 Q540 700 540 660 L540 440 Q540 400 530 380 Z" fill="currentColor" opacity="0.3"/>
+    <line x1="380" y1="500" x2="520" y2="500" opacity="0.5"/>
+    <line x1="380" y1="560" x2="520" y2="560" opacity="0.5"/>
+    <line x1="380" y1="620" x2="520" y2="620" opacity="0.5"/>
+  </g>
+</svg>

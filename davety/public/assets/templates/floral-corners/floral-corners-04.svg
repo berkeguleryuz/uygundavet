@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="floral-corners-4">
+  <g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+<path d="M120 800 Q300 700 480 760 Q650 810 800 720"/>
+    <circle cx="180" cy="770" r="40" fill="currentColor" opacity="0.18"/>
+      <circle cx="180" cy="770" r="26" fill="currentColor" opacity="0.30"/>
+      <circle cx="180" cy="770" r="18" fill="currentColor" opacity="0.55"/>
+      <path d="M173.7 766.4 Q180 757.4 186.3 766.4"/>
+      <path d="M180 770 Q185.4 771.8 181.8 777.2"/>
+    <ellipse cx="474.0" cy="740.0" rx="14.0" ry="7.2" transform="rotate(0.0 474.0 740.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="462.0" cy="760.8" rx="14.0" ry="7.2" transform="rotate(60.0 462.0 760.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="438.0" cy="760.8" rx="14.0" ry="7.2" transform="rotate(120.0 438.0 760.8)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="426.0" cy="740.0" rx="14.0" ry="7.2" transform="rotate(180.0 426.0 740.0)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="438.0" cy="719.2" rx="14.0" ry="7.2" transform="rotate(240.0 438.0 719.2)" fill="currentColor" opacity="0.35"/>
+      <ellipse cx="462.0" cy="719.2" rx="14.0" ry="7.2" transform="rotate(300.0 462.0 719.2)" fill="currentColor" opacity="0.35"/>
+      <circle cx="450" cy="740" r="12.8" fill="currentColor" opacity="0.7"/>
+    <path d="M700 765 Q679 751 679 716 Q689.5 733.5 700 726.5 Q710.5 733.5 721 716 Q721 751 700 765 Z" fill="currentColor" opacity="0.32"/>
+      <path d="M700 765 L700 800"/>
+      <path d="M700 784.6 Q725.2 772 723.1 758"/>
+    <ellipse cx="290" cy="750" rx="24" ry="9.600000000000001" transform="rotate(-10 290 750)" fill="currentColor" opacity="0.32"/>
+    <ellipse cx="580" cy="745" rx="24" ry="9.600000000000001" transform="rotate(10 580 745)" fill="currentColor" opacity="0.32"/>
+  </g>
+</svg>

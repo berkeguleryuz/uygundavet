@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="dividers-11">
+  <g stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<line x1="100" y1="450" x2="370" y2="450"/>
+    <line x1="530" y1="450" x2="800" y2="450"/>
+    <circle cx="450" cy="450" r="22"/>
+    <circle cx="450" cy="450" r="14" opacity="0.6"/>
+    <circle cx="450" cy="450" r="6" fill="currentColor" opacity="0.8"/>
+  </g>
+</svg>

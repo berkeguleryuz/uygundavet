@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="henna-night-6">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<circle cx="450" cy="500" r="200" fill="currentColor" opacity="0.4"/>
+    <path d="M420 320 L440 280 L440 320 M460 320 L460 280 M480 320 L480 280" stroke-width="6"/>
+    <circle cx="450" cy="320" r="10" fill="currentColor" opacity="0.7"/>
+    <circle cx="360" cy="440" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="420" cy="440" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="480" cy="440" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="540" cy="440" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="360" cy="500" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="420" cy="500" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="480" cy="500" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="540" cy="500" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="360" cy="560" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="420" cy="560" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="480" cy="560" r="12" fill="currentColor" opacity="0.7"/>
+    <circle cx="540" cy="560" r="12" fill="currentColor" opacity="0.7"/>
+  </g>
+</svg>

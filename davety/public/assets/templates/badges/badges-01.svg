@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none" role="img" aria-label="badges-1">
+  <g stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+<path d="M150 380 L750 380 L720 450 L750 520 L150 520 L180 450 Z" fill="currentColor" opacity="0.4"/>
+    <path d="M150 380 L100 420 L150 460 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M750 380 L800 420 L750 460 Z" fill="currentColor" opacity="0.6"/>
+    <path d="M150 460 L100 500 L150 540 Z" fill="currentColor" opacity="0.5"/>
+    <path d="M750 460 L800 500 L750 540 Z" fill="currentColor" opacity="0.5"/>
+    <text x="450" y="465" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="currentColor" opacity="0.85">SAVE THE DATE</text>
+  </g>
+</svg>
