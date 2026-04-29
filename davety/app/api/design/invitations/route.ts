@@ -4,7 +4,10 @@ import { buildDefaultDoc } from "@davety/schema";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { generateShortSlug } from "@/src/lib/slug";
-import { DESIGN_SAMPLES } from "@/app/components/designSamples";
+import {
+  DESIGN_SAMPLES,
+  LEGACY_DESIGN_SAMPLES,
+} from "@/app/components/designSamples";
 import { buildDesignDoc } from "@/app/components/buildDesignDoc";
 
 const createSchema = z.object({
@@ -73,8 +76,12 @@ export async function POST(req: Request) {
   // 1) Frontend design sample (homepage grid) — uses the layout variant
   //    baked into hero + theme from DesignSample. Takes precedence over
   //    theme/template since it's a complete template.
+  // Önce yeni V2 listesinden ara, bulunamazsa eski koleksiyona düş —
+  // böylece geçişten önce eski bir designId kaydetmiş kullanıcılar
+  // hâlâ kendi tasarımlarını yükleyebilir.
   const designSample = parsed.data.designId
-    ? DESIGN_SAMPLES.find((d) => d.id === parsed.data.designId)
+    ? DESIGN_SAMPLES.find((d) => d.id === parsed.data.designId) ??
+      LEGACY_DESIGN_SAMPLES.find((d) => d.id === parsed.data.designId)
     : null;
 
   if (designSample) {

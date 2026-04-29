@@ -1,7 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import type { DesignSample } from "./designSamples";
+import type { CSSProperties } from "react";
+import type { DesignCardShape, DesignSample } from "./designSamples";
+import { shapeFor } from "./designSamples";
+
+/** CSS for each card silhouette. Keep in lockstep with `shapeCss` in
+ *  the renderer package — when one moves, the other must follow so the
+ *  gallery preview and the editor canvas always agree on the look. */
+function cardShapeCss(shape: DesignCardShape): CSSProperties {
+  switch (shape) {
+    case "arch":
+      return {
+        borderTopLeftRadius: "50% 32px",
+        borderTopRightRadius: "50% 32px",
+      };
+    case "tall-arch":
+      return {
+        borderTopLeftRadius: "50% 60px",
+        borderTopRightRadius: "50% 60px",
+      };
+    case "rounded":
+      return {
+        borderTopLeftRadius: "24px",
+        borderTopRightRadius: "24px",
+      };
+    case "peaked":
+      return {
+        clipPath: "polygon(0% 7%, 50% 0%, 100% 7%, 100% 100%, 0% 100%)",
+      };
+    case "chevron":
+      return {
+        clipPath: "polygon(0% 0%, 50% 6%, 100% 0%, 100% 100%, 0% 100%)",
+      };
+    case "tag":
+      return {
+        clipPath:
+          "polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%, 0 16px)",
+      };
+    case "flat":
+    default:
+      return {};
+  }
+}
 
 interface Props {
   design: DesignSample;
@@ -145,32 +186,88 @@ function CardShell({
   design,
   children,
   innerClassName,
+  templatePosition = "top",
 }: {
   design: DesignSample;
   children: React.ReactNode;
   innerClassName?: string;
+  /** Where the asset SVG should sit. `"top"` (default) → above the
+   *  names; `"bottom"` → flourish under the names; `"none"` → suppress
+   *  (e.g. when the layout already crowds the corners). */
+  templatePosition?: "top" | "bottom" | "none";
 }) {
-  // Mirror the same arch silhouette the editor/public view applies when
-  // the layout is "arch" — subtle dome at the top, flat sides + bottom.
-  const archStyle =
-    design.layout === "arch"
-      ? {
-          borderTopLeftRadius: "50% 32px",
-          borderTopRightRadius: "50% 32px",
-        }
-      : {};
+  // Apply the card silhouette decided by the sample (or its layout-based
+  // default). Only the top edge varies; sides and bottom stay flat. The
+  // editor canvas pulls from the same vocabulary so gallery + canvas
+  // always show the same outer dress.
+  const shape = shapeFor(design);
+  const baseRadius =
+    shape === "peaked" || shape === "chevron" || shape === "tag"
+      ? {} // clip-path handles the silhouette; no border-radius needed
+      : { borderRadius: "6px" };
   return (
     <div
-      className="relative w-full overflow-hidden rounded-md border border-border shadow-md"
+      className="relative w-full overflow-hidden border border-border shadow-md"
       style={{
         aspectRatio: "3 / 4",
         background: design.bg,
         color: design.textColor,
-        ...archStyle,
+        ...baseRadius,
+        ...cardShapeCss(shape),
       }}
     >
+      {design.decorationTemplate && templatePosition !== "none" ? (
+        <TemplateOverlay
+          assetKey={design.decorationTemplate}
+          color={design.accent}
+          position={templatePosition}
+        />
+      ) : null}
       <div className={innerClassName ?? "absolute inset-0"}>{children}</div>
     </div>
+  );
+}
+
+/** SVG asset overlay that recolors via CSS `mask-image`. The asset
+ *  itself uses `currentColor` strokes on a transparent background;
+ *  using it as a mask lets the underlying `background-color` (set to
+ *  the design's accent) show through, so each sample's top flourish
+ *  inherits its theme palette automatically. */
+function TemplateOverlay({
+  assetKey,
+  color,
+  position,
+}: {
+  assetKey: string;
+  color: string;
+  position: "top" | "bottom";
+}) {
+  // Doğrudan `/assets/templates/...` yerine sanitize eden API route'u
+  // kullanıyoruz. Asset dosyalarının bir kısmında sabit harfler ya da
+  // tarihler (S · E, EST. 2026) gömülü ve CSS `mask-image` bunları
+  // mask'e dahil ediyor — endpoint metin node'larını temizleyip
+  // ulaştırıyor.
+  const url = `/api/decorations/clean/${assetKey}.svg`;
+  const placement =
+    position === "top"
+      ? "top-2 left-1/2 -translate-x-1/2"
+      : "bottom-3 left-1/2 -translate-x-1/2";
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute ${placement} w-[36%] aspect-square opacity-70 z-[1]`}
+      style={{
+        backgroundColor: color,
+        WebkitMaskImage: `url(${url})`,
+        maskImage: `url(${url})`,
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+      }}
+    />
   );
 }
 
@@ -187,16 +284,24 @@ function CoupleNames({
       : size === "lg"
       ? "text-xl md:text-2xl lg:text-3xl"
       : "text-lg md:text-xl lg:text-2xl";
+  // Single-celebrant categories (birthday, business) ship with an empty
+  // sampleGroom — collapse the "&" + second name so the gallery card
+  // doesn't render a ghost ampersand under the name.
+  const hasSecond = !!design.sampleGroom?.trim();
   return (
     <div className="leading-[0.95] font-medium" style={{ fontFamily: "Merienda, serif" }}>
       <div className={cls}>{design.sampleBride}</div>
-      <div
-        className="my-1 text-xs md:text-sm italic opacity-60"
-        style={{ color: design.accent }}
-      >
-        &amp;
-      </div>
-      <div className={cls}>{design.sampleGroom}</div>
+      {hasSecond ? (
+        <>
+          <div
+            className="my-1 text-xs md:text-sm italic opacity-60"
+            style={{ color: design.accent }}
+          >
+            &amp;
+          </div>
+          <div className={cls}>{design.sampleGroom}</div>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -231,14 +336,13 @@ function DateRow({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Classic — simple framed card ─── */
+/* ─── Classic — simple centered card. Inner border frame intentionally
+   removed: the live invitation render doesn't draw it, so the gallery
+   was over-promising. The decorative top/bottom ornament still maps to
+   a real {{...}} marker injected in buildDesignDoc. */
 function ClassicLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design}>
-      <div
-        className="absolute inset-3 md:inset-4 rounded-sm pointer-events-none"
-        style={{ border: `1px solid ${design.accent}55` }}
-      />
       <DecorOrnament position="top" kind={design.decorative} color={design.accent} />
       <DecorOrnament position="bottom" kind={design.decorative} color={design.accent} />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 md:px-7 py-10 md:py-12">
@@ -255,41 +359,23 @@ function ClassicLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Arch — cathedral/arched frame behind the names ─── */
+/* ─── Arch — silhouette only; no inner frame (the outer card shape
+   already provides the arch). The inner SVG used to draw a second arched
+   line inside the card, but that frame doesn't render in the actual
+   invitation editor/public view, so the gallery would over-promise. */
 function ArchLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design}>
-      {/* Arched frame */}
-      <svg
-        className="absolute inset-0 w-full h-full"
-        viewBox="0 0 100 130"
-        preserveAspectRatio="none"
-        aria-hidden
-      >
-        <path
-          d="M 18 115 L 18 45 Q 18 10 50 10 Q 82 10 82 45 L 82 115 Z"
-          fill="none"
-          stroke={design.accent}
-          strokeWidth="0.5"
-          opacity="0.55"
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          d="M 21 113 L 21 46 Q 21 13 50 13 Q 79 13 79 46 L 79 113 Z"
-          fill="none"
-          stroke={design.accent}
-          strokeWidth="0.25"
-          opacity="0.35"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
       <DecorOrnament position="bottom" kind={design.decorative} color={design.accent} />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8 md:px-10 pt-8 md:pt-12 pb-10">
         <div
           className="text-[20px] md:text-2xl font-semibold italic mb-2 opacity-60"
           style={{ fontFamily: "Merienda, serif", color: design.accent }}
         >
-          {design.sampleBride[0]} &nbsp;|&nbsp; {design.sampleGroom[0]}
+          {design.sampleBride[0]}
+          {design.sampleGroom?.trim() ? (
+            <>&nbsp;|&nbsp; {design.sampleGroom[0]}</>
+          ) : null}
         </div>
         <SubtitleLine design={design} />
         <div className="mt-3">
@@ -304,11 +390,15 @@ function ArchLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Photo top — photo occupies the top ~55% ─── */
+/* ─── Photo top — photo occupies the top ~55%, monogram bridges the
+   photo/text boundary, text section lives strictly in the bottom 45%.
+   Earlier the text container was pinned to bottom:0 and grew upward,
+   which pushed the subtitle behind the photo's bottom edge whenever the
+   content was tall (subtitle + 2 names + date). Pinning to top:55%
+   instead keeps the layout aligned with the editor's PhotoTopVariant. */
 function PhotoTopLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
-      {/* Photo band */}
+    <CardShell design={design} templatePosition="bottom">
       <div
         className="absolute top-0 left-0 right-0 h-[55%] overflow-hidden"
         style={{ background: `${design.accent}33` }}
@@ -334,18 +424,28 @@ function PhotoTopLayout({ design }: { design: DesignSample }) {
           style={{ background: `linear-gradient(to bottom, transparent, ${design.bg})` }}
         />
       </div>
+      {/* Monogram centered on the photo/text boundary (top of monogram
+          sits 24px above the 55% line so its midpoint lands on it). */}
       <div
-        className="absolute top-[54%] left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center"
-        style={{ background: design.bg, border: `1px solid ${design.accent}55` }}
+        className="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center z-10"
+        style={{
+          top: "calc(55% - 1.5rem)",
+          background: design.bg,
+          border: `1px solid ${design.accent}55`,
+        }}
       >
         <span
           className="text-xs font-semibold italic"
           style={{ fontFamily: "Merienda, serif", color: design.accent }}
         >
-          {design.sampleBride[0]}&amp;{design.sampleGroom[0]}
+          {design.sampleBride[0]}
+          {design.sampleGroom?.trim() ? <>&amp;{design.sampleGroom[0]}</> : null}
         </span>
       </div>
-      <div className="absolute inset-x-0 bottom-0 pt-10 pb-6 px-5 flex flex-col items-center text-center">
+      <div
+        className="absolute inset-x-0 bottom-0 pt-8 pb-5 px-5 flex flex-col items-center text-center"
+        style={{ top: "55%" }}
+      >
         <SubtitleLine design={design} />
         <div className="mt-2">
           <CoupleNames design={design} size="sm" />
@@ -362,7 +462,7 @@ function PhotoTopLayout({ design }: { design: DesignSample }) {
 /* ─── Photo full — photo fills card with overlay text ─── */
 function PhotoFullLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
+    <CardShell design={design} templatePosition="none">
       <div className="absolute inset-0 overflow-hidden">
         {design.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -392,10 +492,14 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
           <div className="text-xl md:text-2xl font-medium">
             {design.sampleBride}
           </div>
-          <div className="text-xs italic my-0.5 opacity-80">&amp;</div>
-          <div className="text-xl md:text-2xl font-medium">
-            {design.sampleGroom}
-          </div>
+          {design.sampleGroom?.trim() ? (
+            <>
+              <div className="text-xs italic my-0.5 opacity-80">&amp;</div>
+              <div className="text-xl md:text-2xl font-medium">
+                {design.sampleGroom}
+              </div>
+            </>
+          ) : null}
         </div>
         <div className="mt-3 mx-auto h-px w-10 bg-white/60" />
         <div
@@ -416,7 +520,7 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
 /* ─── Floral crown — arc of florals across top ─── */
 function FloralCrownLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
+    <CardShell design={design} templatePosition="bottom">
       {/* Crown */}
       <svg
         className="absolute top-4 md:top-5 left-1/2 -translate-x-1/2 w-[75%]"
@@ -478,8 +582,12 @@ function MonogramCircleLayout({ design }: { design: DesignSample }) {
             style={{ fontFamily: "Merienda, serif", color: design.accent }}
           >
             {design.sampleBride[0]}
-            <span className="mx-1 opacity-50">·</span>
-            {design.sampleGroom[0]}
+            {design.sampleGroom?.trim() ? (
+              <>
+                <span className="mx-1 opacity-50">·</span>
+                {design.sampleGroom[0]}
+              </>
+            ) : null}
           </div>
         </div>
         <div className="mt-4">
@@ -515,15 +623,19 @@ function BoldTypeLayout({ design }: { design: DesignSample }) {
           <div className="text-2xl md:text-4xl font-semibold tracking-tight">
             {design.sampleBride}
           </div>
-          <div
-            className="text-sm md:text-lg italic my-1 opacity-70"
-            style={{ color: design.accent }}
-          >
-            &amp;
-          </div>
-          <div className="text-2xl md:text-4xl font-semibold tracking-tight">
-            {design.sampleGroom}
-          </div>
+          {design.sampleGroom?.trim() ? (
+            <>
+              <div
+                className="text-sm md:text-lg italic my-1 opacity-70"
+                style={{ color: design.accent }}
+              >
+                &amp;
+              </div>
+              <div className="text-2xl md:text-4xl font-semibold tracking-tight">
+                {design.sampleGroom}
+              </div>
+            </>
+          ) : null}
         </div>
         <div className="flex items-center justify-between">
           <DateRow design={design} />

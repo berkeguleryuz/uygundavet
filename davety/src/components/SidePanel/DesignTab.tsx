@@ -1,6 +1,6 @@
 "use client";
 
-import { Wand2 } from "lucide-react";
+import { Wand2, Check } from "lucide-react";
 import { useEditorStore } from "@/src/store/editor-store";
 
 interface Preset {
@@ -194,6 +194,18 @@ export function DesignTab() {
       </div>
 
       <div>
+        <h3 className="text-sm font-medium mb-2">Kart Şekli</h3>
+        <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+          Davetiyenin üst kenarının silüetini seç. Yan ve alt kenarlar her
+          zaman düz kalır.
+        </p>
+        <CardShapePicker
+          value={theme.cardShape ?? "flat"}
+          onChange={(s) => updateTheme({ cardShape: s })}
+        />
+      </div>
+
+      <div>
         <h3 className="text-sm font-medium mb-2">Renkler</h3>
         <div className="space-y-2">
           <ColorRow
@@ -219,6 +231,118 @@ export function DesignTab() {
 
     </div>
   );
+}
+
+const CARD_SHAPES: {
+  key: NonNullable<import("@davety/schema").Theme["cardShape"]>;
+  label: string;
+}[] = [
+  { key: "flat", label: "Düz" },
+  { key: "arch", label: "Klasik Kemer" },
+  { key: "tall-arch", label: "Yüksek Kemer" },
+  { key: "rounded", label: "Yuvarlak" },
+  { key: "peaked", label: "Üçgen" },
+  { key: "chevron", label: "V Kesim" },
+  { key: "tag", label: "Etiket" },
+];
+
+/** Visual silhouette picker — each thumbnail mirrors the actual shape
+ *  the renderer applies, so the user picks by sight rather than label. */
+function CardShapePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (
+    shape: NonNullable<import("@davety/schema").Theme["cardShape"]>,
+  ) => void;
+}) {
+  return (
+    <div className="grid grid-cols-4 gap-1.5">
+      {CARD_SHAPES.map((s) => {
+        const active = value === s.key;
+        return (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => onChange(s.key)}
+            title={s.label}
+            aria-pressed={active}
+            className={`relative flex flex-col items-center gap-1 rounded-md border-2 p-2 cursor-pointer transition-colors ${
+              active
+                ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                : "border-border bg-background hover:border-foreground/40"
+            }`}
+          >
+            {active ? (
+              <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 rounded-full bg-primary text-primary-foreground shadow">
+                <Check className="size-2.5" strokeWidth={3} />
+              </span>
+            ) : null}
+            <div
+              className="w-full h-12"
+              style={{
+                aspectRatio: "1 / 1.4",
+                background: active
+                  ? "color-mix(in oklab, var(--primary) 35%, var(--muted))"
+                  : "var(--muted)",
+                ...thumbStyle(s.key),
+              }}
+            />
+            <span
+              className={`text-[10px] leading-none ${active ? "font-semibold text-primary" : ""}`}
+            >
+              {s.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function thumbStyle(
+  shape: NonNullable<import("@davety/schema").Theme["cardShape"]>,
+): React.CSSProperties {
+  switch (shape) {
+    case "arch":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        borderTopLeftRadius: "50% 12px",
+        borderTopRightRadius: "50% 12px",
+      };
+    case "tall-arch":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        borderTopLeftRadius: "50% 22px",
+        borderTopRightRadius: "50% 22px",
+      };
+    case "rounded":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        borderTopLeftRadius: "10px",
+        borderTopRightRadius: "10px",
+      };
+    case "peaked":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        clipPath: "polygon(0% 12%, 50% 0%, 100% 12%, 100% 100%, 0% 100%)",
+      };
+    case "chevron":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        clipPath: "polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%)",
+      };
+    case "tag":
+      return {
+        background: "var(--muted, #e5e5e5)",
+        clipPath:
+          "polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%, 0 8px)",
+      };
+    case "flat":
+    default:
+      return { background: "var(--muted, #e5e5e5)" };
+  }
 }
 
 function ColorRow({

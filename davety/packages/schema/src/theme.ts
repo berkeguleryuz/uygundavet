@@ -22,6 +22,22 @@ export const envelopeThemeSchema = z.object({
 });
 export type EnvelopeTheme = z.infer<typeof envelopeThemeSchema>;
 
+/** Outer card silhouette — only the top edge varies. The user picks one
+ *  of these from "Kart Şekli" in the design tab; the value is rendered
+ *  by the InvitationView wrapper via CSS (border-radius or clip-path)
+ *  and applies to gallery previews + editor canvas + public page so the
+ *  invitation always wears the same outer dress. */
+export const cardShapeSchema = z.enum([
+  "flat",
+  "arch",
+  "tall-arch",
+  "rounded",
+  "peaked",
+  "chevron",
+  "tag",
+]);
+export type CardShape = z.infer<typeof cardShapeSchema>;
+
 export const themeSchema = z.object({
   bgColor: z.string().default("#f5f6f3"),
   accentColor: z.string().default("#252224"),
@@ -30,6 +46,8 @@ export const themeSchema = z.object({
    *  background) so the recipient sees a clear contrast between the
    *  page chrome and the invitation itself. */
   pageBgColor: z.string().default("#252224"),
+  /** Outer card top silhouette. Defaults to flat (square corners). */
+  cardShape: cardShapeSchema.default("flat"),
   pattern: z.string().optional(),
   bgMusicUrl: z.string().optional(),
   envelope: envelopeThemeSchema.default({
@@ -47,6 +65,7 @@ export const defaultTheme: Theme = {
   bgColor: "#f5f6f3",
   accentColor: "#252224",
   pageBgColor: "#252224",
+  cardShape: "flat",
   envelope: {
     color: "#f5eedb",
     liningPattern: "daisy",

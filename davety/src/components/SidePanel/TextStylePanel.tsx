@@ -17,15 +17,18 @@ import {
 } from "lucide-react";
 import {
   DECORATION_ICONS,
-  fontCatalog,
   fontCategories,
   filterByCategory,
-  parseInlineDecorations,
   type FontCategory,
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { cn } from "@/src/lib/utils";
+import { getEventLabels } from "@/src/lib/event-labels";
+import {
+  InlineDecorationField,
+  type InlineDecorationFieldHandle,
+} from "./InlineDecorationField";
 
 export function TextStylePanel() {
   const t = useTranslations("Editor.textPanel");
@@ -40,9 +43,10 @@ export function TextStylePanel() {
   const [category, setCategory] = useState<FontCategory>("all");
   const [query, setQuery] = useState("");
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
-  const fieldInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
-    null,
-  );
+  /** Inline süsleme ikonlarını DOM'da gösteren contentEditable alanın
+   *  imperative tutamağı — "Süsleme Ekle" butonu cursor pozisyonuna
+   *  ikon eklemek için bu API'yi kullanıyor. */
+  const inlineFieldRef = useRef<InlineDecorationFieldHandle | null>(null);
   // Computed font-size of the actually-rendered field — measured from the
   // canvas DOM so the panel reflects what the user sees, not the override
   // default (which would otherwise read 24 even when Tailwind has scaled
@@ -147,7 +151,7 @@ export function TextStylePanel() {
   const isFamiliesField = familiesSide !== null;
   const showContentEditor =
     isCoupleNames || isDateField || isFamiliesField || fieldValue !== undefined;
-  const fieldLabel = fieldLabelFor(fieldId);
+  const fieldLabel = fieldLabelFor(fieldId, doc?.meta.eventCategory);
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
 
@@ -196,75 +200,64 @@ export function TextStylePanel() {
             </p>
           </div>
         ) : isCoupleNames ? (
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">
-                Gelin Adı
-              </label>
-              <input
-                value={(block.data["brideName"] as string) ?? ""}
-                onChange={(e) =>
-                  updateBlockData(blockId, { brideName: e.target.value })
-                }
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">
-                Damat Adı
-              </label>
-              <input
-                value={(block.data["groomName"] as string) ?? ""}
-                onChange={(e) =>
-                  updateBlockData(blockId, { groomName: e.target.value })
-                }
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-            </div>
-          </div>
+          (() => {
+            const labels = getEventLabels(doc?.meta.eventCategory);
+            const showSecond = labels.secondName !== null;
+            return (
+              <div className={showSecond ? "grid grid-cols-2 gap-2" : ""}>
+                <div>
+                  <label className="text-[11px] text-muted-foreground block mb-1">
+                    {labels.firstName}
+                  </label>
+                  <input
+                    value={(block.data["brideName"] as string) ?? ""}
+                    onChange={(e) =>
+                      updateBlockData(blockId, { brideName: e.target.value })
+                    }
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                {showSecond ? (
+                  <div>
+                    <label className="text-[11px] text-muted-foreground block mb-1">
+                      {labels.secondName}
+                    </label>
+                    <input
+                      value={(block.data["groomName"] as string) ?? ""}
+                      onChange={(e) =>
+                        updateBlockData(blockId, { groomName: e.target.value })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                ) : null}
+              </div>
+            );
+          })()
         ) : (
           <div>
             <label className="text-[11px] text-muted-foreground block mb-1">
               {fieldLabel}
             </label>
-            {isLongText ? (
-              <textarea
-                ref={(el) => {
-                  fieldInputRef.current = el;
-                }}
-                value={(fieldValue as string) ?? ""}
-                onChange={(e) =>
-                  updateBlockData(blockId, { [fieldId]: e.target.value })
-                }
-                rows={4}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-y"
-              />
-            ) : (
-              <input
-                ref={(el) => {
-                  fieldInputRef.current = el;
-                }}
-                value={(fieldValue as string) ?? ""}
-                onChange={(e) =>
-                  updateBlockData(blockId, { [fieldId]: e.target.value })
-                }
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-            )}
+            <InlineDecorationField
+              ref={inlineFieldRef}
+              value={(fieldValue as string) ?? ""}
+              onChange={(next) =>
+                updateBlockData(blockId, { [fieldId]: next })
+              }
+              multiline={isLongText}
+            />
             <InlineDecorationButton
               open={iconPickerOpen}
               onToggle={() => setIconPickerOpen((v) => !v)}
               onPick={(key) => {
-                insertAtCursor(
-                  fieldInputRef.current,
-                  `{{${key}}}`,
-                  (next) =>
-                    updateBlockData(blockId, { [fieldId]: next }),
-                  (fieldValue as string) ?? "",
-                );
+                // Inline alan ikonu cursor pozisyonuna ekler ve kendi
+                // onChange'ini tetikler — DecorationPreview'a artık
+                // ihtiyaç yok, çünkü ikonun kendisi text alanında zaten
+                // gözüküyor.
+                inlineFieldRef.current?.insertIcon(key);
               }}
             />
-            <DecorationPreview value={(fieldValue as string) ?? ""} />
           </div>
         )
       ) : null}
@@ -447,8 +440,31 @@ const FIELD_LABELS: Record<string, string> = {
   groomMembers: "Damat Tarafı Üyeleri",
 };
 
-function fieldLabelFor(fieldId: string): string {
-  return FIELD_LABELS[fieldId] ?? "Metin İçeriği";
+function fieldLabelFor(
+  fieldId: string,
+  category?: import("@davety/schema").EventCategory,
+): string {
+  // Couple-name + family-title fields swap to category-specific copy so a
+  // birthday or business invitation doesn't show "Gelin Adı" / "Damat
+  // Adı" / "Gelinin Ailesi" etc.
+  const labels = getEventLabels(category);
+  switch (fieldId) {
+    case "coupleNames":
+    case "brideName":
+      return labels.firstName;
+    case "groomName":
+      return labels.secondName ?? labels.firstName;
+    case "brideTitle":
+      return labels.family1;
+    case "groomTitle":
+      return labels.family2;
+    case "brideMembers":
+      return `${labels.family1} – Üyeler`;
+    case "groomMembers":
+      return `${labels.family2} – Üyeler`;
+    default:
+      return FIELD_LABELS[fieldId] ?? "Metin İçeriği";
+  }
 }
 
 /** Convert "2026-06-15T19:00:00.000Z" → "2026-06-15T19:00" (datetime-local). */
@@ -623,54 +639,6 @@ function FamiliesFieldEditor({
       >
         + Üye Ekle
       </button>
-    </div>
-  );
-}
-
-/**
- * Insert `marker` at the input/textarea's current cursor position. If no
- * input ref is available, falls back to appending at the end. After
- * inserting we restore focus and place the cursor right after the inserted
- * marker so the user can keep typing.
- */
-function insertAtCursor(
-  el: HTMLInputElement | HTMLTextAreaElement | null,
-  marker: string,
-  write: (next: string) => void,
-  fallbackValue: string,
-) {
-  if (!el) {
-    write(`${fallbackValue}${marker}`);
-    return;
-  }
-  const value = el.value;
-  const start = el.selectionStart ?? value.length;
-  const end = el.selectionEnd ?? value.length;
-  const next = value.slice(0, start) + marker + value.slice(end);
-  write(next);
-  // Restore selection on next tick after React has re-rendered.
-  requestAnimationFrame(() => {
-    if (!el || !document.body.contains(el)) return;
-    el.focus();
-    const cursor = start + marker.length;
-    el.setSelectionRange(cursor, cursor);
-  });
-}
-
-/**
- * Tiny live preview rendered just under the textarea/input that shows
- * what the field's `{{iconKey}}` markers will look like once they're
- * actually inlined on the canvas. Without this the user sees raw
- * `{{daisy}}` text in the editor and can't tell what icon they picked.
- */
-function DecorationPreview({ value }: { value: string }) {
-  if (!value || !value.includes("{{")) return null;
-  return (
-    <div className="mt-2 rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-xs leading-relaxed text-foreground/80">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-        Önizleme
-      </div>
-      <div className="break-words">{parseInlineDecorations(value)}</div>
     </div>
   );
 }

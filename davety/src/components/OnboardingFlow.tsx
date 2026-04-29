@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
+import { getOnboardingIcon } from "./OnboardingIcons";
 
 const STORAGE_KEY = "davety.onboarding.v1";
 
@@ -73,7 +74,9 @@ export function OnboardingFlow() {
             </button>
 
             <div className="text-center">
-              <div className="text-4xl mb-3">{content.emoji}</div>
+              <div className="mb-3 flex items-center justify-center">
+                {getOnboardingIcon(step)}
+              </div>
               {content.title ? (
                 <h3 className="font-display text-2xl mb-2">{content.title}</h3>
               ) : null}
@@ -119,20 +122,20 @@ export function OnboardingFlow() {
 function stepContent(
   step: number,
   t: (k: string) => string
-): { emoji: string; title?: string; body: string } | null {
+): { title?: string; body: string } | null {
   switch (step) {
     case 0:
-      return { emoji: "🎉", title: t("congrats"), body: t("firstStep") };
+      return { title: t("congrats"), body: t("firstStep") };
     case 1:
-      return { emoji: "✏️", body: t("editHint") };
+      return { body: t("editHint") };
     case 2:
-      return { emoji: "❓", body: t("buttonsHint") + "\n\n" + t("hideButton") };
+      return { body: t("buttonsHint") + "\n\n" + t("hideButton") };
     case 3:
-      return { emoji: "ℹ️", body: t("infoButton") };
+      return { body: t("infoButton") };
     case 4:
-      return { emoji: "🔤", body: t("styleButton") };
+      return { body: t("styleButton") };
     case 5:
-      return { emoji: "↕️", body: t("spacingButtons") + "\n\n" + t("yellowHint") };
+      return { body: t("spacingButtons") + "\n\n" + t("yellowHint") };
     default:
       return null;
   }

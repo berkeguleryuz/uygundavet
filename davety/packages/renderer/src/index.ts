@@ -1,4 +1,4 @@
-export { InvitationView, renderInvitation, getCardShapeStyle, isArchShape } from "./InvitationView";
+export { InvitationView, renderInvitation, getCardShapeStyle, getCardShapePadding, shapeCss, isArchShape } from "./InvitationView";
 export { FontBoot, ensureFont, collectFontFamilies } from "./fonts/loader";
 export {
   fontCatalog,

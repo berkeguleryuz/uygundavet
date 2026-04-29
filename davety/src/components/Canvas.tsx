@@ -8,6 +8,7 @@ import {
   getBlockView,
   listBlockEntries,
   getCardShapeStyle,
+  getCardShapePadding,
   isArchShape,
   InvitationView,
 } from "@davety/renderer";
@@ -97,6 +98,7 @@ export function Canvas() {
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
           ...getCardShapeStyle(doc),
+          ...getCardShapePadding(doc),
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -382,6 +384,7 @@ function EnvelopeCanvas() {
               background: doc.theme.bgColor,
               color: doc.theme.accentColor,
               ...getCardShapeStyle(doc),
+              ...getCardShapePadding(doc),
             }}
           >
             <InvitationView doc={doc} />

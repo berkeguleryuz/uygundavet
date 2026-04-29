@@ -52,13 +52,38 @@ function selectableProps(
     : { className: "" };
 }
 
-function AndSpacer({ accent }: { accent?: string }) {
+function AndSpacer({ accent, second }: { accent?: string; second?: string }) {
+  // Single-celebrant events (birthday, business launch) carry an empty
+  // groomName. Hiding the spacer in that case avoids the awkward "Mira
+  // & " ghost row a few users hit on doğum günü templates.
+  if (second !== undefined && !second.trim()) return null;
   return (
     <div className="opacity-70 text-[0.8em] italic" style={{ color: accent }}>
       &amp;
     </div>
   );
 }
+
+/** Renders the second name only when it carries content; mirror of the
+ *  AndSpacer guard so the layout collapses cleanly for single-celebrant
+ *  events. */
+function SecondName({
+  name,
+  className,
+  style,
+}: {
+  name: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  if (!name?.trim()) return null;
+  return (
+    <div className={className} style={style}>
+      {name}
+    </div>
+  );
+}
+
 
 function MediaBackdrop({ data }: { data: HeroData }) {
   if (data.media?.url) {
@@ -109,8 +134,8 @@ function ClassicVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={block.data.accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={block.data.accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {subtitle ? (
           <h2
@@ -142,9 +167,10 @@ function ArchVariant({
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
-  // The arch silhouette is now drawn by the outer invitation container
-  // (see getCardShapeStyle in InvitationView), so this variant focuses on
-  // typography and lets the parent's rounded top do the visual work.
+  // The arch silhouette is drawn by the outer invitation container
+  // (see getCardShapeStyle in InvitationView) — adding an inner arch
+  // overlay creates a layered/nested look and squeezes the text, so we
+  // intentionally keep this variant typography-only.
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
       <div className={`relative px-10 pt-10 pb-12 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
@@ -152,7 +178,8 @@ function ArchVariant({
           className="text-5xl italic opacity-40 mb-2"
           style={{ fontFamily: "Merienda, serif", color: accent }}
         >
-          {brideName[0]} &nbsp;|&nbsp; {groomName[0]}
+          {brideName[0]}
+          {groomName?.trim() ? <>&nbsp;|&nbsp; {groomName[0]}</> : null}
         </div>
         {subtitle ? (
           <div
@@ -169,8 +196,8 @@ function ArchVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {description ? (
           <p
@@ -209,7 +236,8 @@ function PhotoTopVariant({
             fontFamily: "Merienda, serif",
           }}
         >
-          {brideName[0]}&amp;{groomName[0]}
+          {brideName[0]}
+          {groomName?.trim() ? <>&amp;{groomName[0]}</> : null}
         </div>
         {subtitle ? (
           <div
@@ -226,8 +254,8 @@ function PhotoTopVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {description ? (
           <p
@@ -290,8 +318,12 @@ function PhotoFullVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <div className="text-sm italic my-1 opacity-80">&amp;</div>
-          <div>{groomName}</div>
+          {groomName?.trim() ? (
+            <>
+              <div className="text-sm italic my-1 opacity-80">&amp;</div>
+              <div>{groomName}</div>
+            </>
+          ) : null}
         </div>
         {description ? (
           <p
@@ -356,8 +388,8 @@ function FloralCrownVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {description ? (
           <p
@@ -395,7 +427,13 @@ function MonogramCircleVariant({
             className="text-2xl italic"
             style={{ fontFamily: "Merienda, serif", color: accent }}
           >
-            {brideName[0]} <span className="mx-1 opacity-50">·</span> {groomName[0]}
+            {brideName[0]}
+            {groomName?.trim() ? (
+              <>
+                {" "}
+                <span className="mx-1 opacity-50">·</span> {groomName[0]}
+              </>
+            ) : null}
           </div>
         </div>
         {subtitle ? (
@@ -413,8 +451,8 @@ function MonogramCircleVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {description ? (
           <p
@@ -461,12 +499,19 @@ function BoldTypeVariant({
           <div className="text-4xl md:text-6xl font-semibold tracking-tight">
             {brideName}
           </div>
-          <div className="text-lg italic my-2 opacity-70" style={{ color: accent }}>
-            &amp;
-          </div>
-          <div className="text-4xl md:text-6xl font-semibold tracking-tight">
-            {groomName}
-          </div>
+          {groomName?.trim() ? (
+            <>
+              <div
+                className="text-lg italic my-2 opacity-70"
+                style={{ color: accent }}
+              >
+                &amp;
+              </div>
+              <div className="text-4xl md:text-6xl font-semibold tracking-tight">
+                {groomName}
+              </div>
+            </>
+          ) : null}
         </div>
         {description ? (
           <p
@@ -526,8 +571,8 @@ function BotanicalFrameVariant({
           style={fieldStyle(block, "coupleNames")}
         >
           <div>{brideName}</div>
-          <AndSpacer accent={accent} />
-          <div>{groomName}</div>
+          <AndSpacer accent={accent} second={groomName} />
+          <SecondName name={groomName} />
         </div>
         {description ? (
           <p
