@@ -113,7 +113,7 @@ export function Canvas() {
           const hideSlot = i === 0 && archActive;
 
           return (
-            <div key={block.id} className="relative">
+            <div key={block.id} className="relative group/block">
               {hideSlot ? null : (
                 <InsertSlot
                   index={i}
@@ -121,6 +121,10 @@ export function Canvas() {
                   // Flip palette upward for the last 3 slots so it doesn't
                   // run off the bottom of the card / canvas.
                   flipUp={i >= doc.blocks.length - 2}
+                  // Force-show the slot when the adjacent block is the
+                  // selected one so mobile users (no hover) can still
+                  // reach it after tapping a block.
+                  forceVisible={selected || selectedBlockId === doc.blocks[i - 1]?.id}
                   onOpen={() => setInsertingAt(i)}
                   onClose={() => setInsertingAt(null)}
                   onPick={(type) => handlePick(i, type)}
@@ -215,12 +219,17 @@ export function Canvas() {
           );
         })}
 
-        {/* Tail insert slot — palette always opens upward since there's
-             nothing below it inside the card. */}
-        <InsertSlot
-          index={doc.blocks.length}
+      </div>
+
+      {/* Tail insert slot — sits OUTSIDE the card so it never appears in
+           the invitation itself (so the user can screenshot/preview the
+           card cleanly). Always visible, palette opens downward. */}
+      <div
+        className="mx-auto w-full max-w-md mt-4 flex justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <TailInsertSlot
           active={insertingAt === doc.blocks.length}
-          flipUp
           onOpen={() => setInsertingAt(doc.blocks.length)}
           onClose={() => setInsertingAt(null)}
           onPick={(type) => handlePick(doc.blocks.length, type)}
@@ -262,6 +271,7 @@ function InsertSlot({
   index: _i,
   active,
   flipUp,
+  forceVisible,
   onOpen,
   onClose,
   onPick,
@@ -271,23 +281,30 @@ function InsertSlot({
   /** Open the palette above the button instead of below (used for slots
    *  near the bottom of the card so it doesn't get clipped). */
   flipUp: boolean;
+  /** Show the button regardless of hover state — used on touch devices
+   *  (no :hover) and when the adjacent block is selected, so mobile
+   *  users have a deterministic way to reveal "+ Blok Ekle". */
+  forceVisible: boolean;
   onOpen: () => void;
   onClose: () => void;
   onPick: (type: import("@davety/schema").BlockType) => void;
 }) {
-  const entries = listBlockEntries();
-
-  // Palette positions itself centered horizontally so it stays inside the
-  // card frame even when the trigger sits at the very edge. Vertical
-  // direction flips based on flipUp so the menu never falls off the
-  // visible canvas — bottom slots open upward.
+  // Inline insert slot is absolute-positioned and hover-only on desktop.
+  // On touch devices (`(hover: none)`) the slot is always visible since
+  // there is no hover trigger to reveal it. It also stays visible when
+  // the adjacent block is selected, so a tap-then-add flow works on
+  // mobile.
   const paletteCls = flipUp
     ? "absolute bottom-full mb-2 left-1/2 -translate-x-1/2"
     : "absolute top-full mt-2 left-1/2 -translate-x-1/2";
 
   return (
     <div
-      className="relative flex items-center justify-center h-6"
+      className={cn(
+        "absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-0 z-20",
+        "opacity-0 group-hover/block:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity",
+        (active || forceVisible) && "opacity-100"
+      )}
       onClick={(e) => e.stopPropagation()}
     >
       {!active ? (
@@ -298,32 +315,80 @@ function InsertSlot({
           <Plus className="size-3" /> Blok Ekle
         </button>
       ) : (
-        <div
-          className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between mb-1 px-1 sticky top-0 bg-card pb-1">
-            <span className="text-[11px] font-medium">Blok ekle</span>
-            <button
-              onClick={onClose}
-              className="text-[10px] text-muted-foreground hover:underline cursor-pointer"
-            >
-              Kapat
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-1">
-            {entries.map((e) => (
-              <button
-                key={e.type}
-                onClick={() => onPick(e.type)}
-                className="text-[11px] text-left px-2 py-1.5 rounded hover:bg-muted cursor-pointer"
-              >
-                {BLOCK_LABELS[e.type] ?? e.type}
-              </button>
-            ))}
-          </div>
-        </div>
+        <BlockPalette flipUp={flipUp} paletteCls={paletteCls} onClose={onClose} onPick={onPick} />
       )}
+    </div>
+  );
+}
+
+function TailInsertSlot({
+  active,
+  onOpen,
+  onClose,
+  onPick,
+}: {
+  active: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onPick: (type: import("@davety/schema").BlockType) => void;
+}) {
+  return (
+    <div className="relative" onClick={(e) => e.stopPropagation()}>
+      {!active ? (
+        <button
+          onClick={onOpen}
+          className="flex items-center gap-1.5 text-xs bg-card border border-border rounded-full px-4 py-2 shadow-sm hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Plus className="size-3.5" /> Blok Ekle
+        </button>
+      ) : (
+        <BlockPalette
+          flipUp={false}
+          paletteCls="absolute top-full mt-2 left-1/2 -translate-x-1/2"
+          onClose={onClose}
+          onPick={onPick}
+        />
+      )}
+    </div>
+  );
+}
+
+function BlockPalette({
+  paletteCls,
+  onClose,
+  onPick,
+}: {
+  flipUp: boolean;
+  paletteCls: string;
+  onClose: () => void;
+  onPick: (type: import("@davety/schema").BlockType) => void;
+}) {
+  const entries = listBlockEntries();
+  return (
+    <div
+      className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between mb-1 px-1 sticky top-0 bg-card pb-1">
+        <span className="text-[11px] font-medium">Blok ekle</span>
+        <button
+          onClick={onClose}
+          className="text-[10px] text-muted-foreground hover:underline cursor-pointer"
+        >
+          Kapat
+        </button>
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        {entries.map((e) => (
+          <button
+            key={e.type}
+            onClick={() => onPick(e.type)}
+            className="text-[11px] text-left px-2 py-1.5 rounded hover:bg-muted cursor-pointer"
+          >
+            {BLOCK_LABELS[e.type] ?? e.type}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

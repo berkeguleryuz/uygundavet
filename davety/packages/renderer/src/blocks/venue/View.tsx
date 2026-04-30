@@ -73,7 +73,14 @@ export function VenueView({
       : null);
 
   return (
-    <section className="px-2 py-10 text-center" style={rootStyle}>
+    <section className="px-2 py-4 text-center" style={rootStyle}>
+      <p
+        {...click("venueLabel")}
+        className="font-sans text-xs uppercase tracking-[0.25em] opacity-70 mb-2"
+        style={fieldStyle(block, "venueLabel")}
+      >
+        Etkinlik Alanı
+      </p>
       <h3
         {...click("venueName")}
         className="font-display text-2xl"

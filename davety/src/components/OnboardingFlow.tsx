@@ -6,25 +6,35 @@ import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { getOnboardingIcon } from "./OnboardingIcons";
 
-const STORAGE_KEY = "davety.onboarding.v1";
-
 const STEPS = 6;
 
-export function OnboardingFlow() {
+/**
+ * Onboarding "done" flag is scoped per-invitation so that creating a new
+ * invitation re-triggers the walkthrough — once the user dismissed it on
+ * any single invitation we used to never show it again, which made the
+ * flow effectively invisible the second time someone visited the editor.
+ */
+function storageKey(docId?: string): string {
+  return docId
+    ? `davety.onboarding.v1.${docId}`
+    : "davety.onboarding.v1";
+}
+
+export function OnboardingFlow({ docId }: { docId?: string }) {
   const t = useTranslations("Editor.onboarding");
   const [step, setStep] = useState<number | null>(null);
 
   useEffect(() => {
     try {
-      if (localStorage.getItem(STORAGE_KEY) !== "done") setStep(0);
+      if (localStorage.getItem(storageKey(docId)) !== "done") setStep(0);
     } catch {
       // ignore
     }
-  }, []);
+  }, [docId]);
 
   function dismiss() {
     try {
-      localStorage.setItem(STORAGE_KEY, "done");
+      localStorage.setItem(storageKey(docId), "done");
     } catch {
       // ignore
     }
@@ -36,7 +46,7 @@ export function OnboardingFlow() {
       if (s === null) return null;
       if (s + 1 >= STEPS) {
         try {
-          localStorage.setItem(STORAGE_KEY, "done");
+          localStorage.setItem(storageKey(docId), "done");
         } catch {}
         return null;
       }
@@ -91,14 +101,14 @@ export function OnboardingFlow() {
                   onClick={prev}
                   className="text-xs rounded-full bg-warning/20 text-warning px-5 py-2.5 font-chakra uppercase tracking-[0.2em] cursor-pointer"
                 >
-                  ← Geri Git
+                  ← {t("back")}
                 </button>
               ) : null}
               <button
                 onClick={next}
                 className="text-xs rounded-full bg-primary text-primary-foreground px-5 py-2.5 font-chakra uppercase tracking-[0.2em] cursor-pointer"
               >
-                → İlerle
+                {step === STEPS - 1 ? t("letsStart") : `→ ${t("next")}`}
               </button>
             </div>
 

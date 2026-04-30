@@ -27,7 +27,7 @@ export function DecorationView({ block }: BlockViewProps<DecorationData>) {
     const size = sizePx ?? 220;
     return (
       <div
-        className="px-2 py-6 flex"
+        className="px-2 py-3 flex"
         style={{
           ...rootStyle,
           justifyContent: justify,
@@ -49,7 +49,7 @@ export function DecorationView({ block }: BlockViewProps<DecorationData>) {
   const size = sizePx ?? 64;
   return (
     <div
-      className="px-2 py-6 flex"
+      className="px-2 py-3 flex"
       style={{ ...rootStyle, justifyContent: justify }}
     >
       <svg

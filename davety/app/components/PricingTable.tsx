@@ -136,14 +136,14 @@ const FEATURES: FeatureRow[] = [
   // Yayın
   {
     section: "Yayın & Marka",
-    label: "davetli.com altında link",
-    description: "davetli.com/i/your-wedding",
+    label: "davetyolla.com altında link",
+    description: "davetyolla.com/i/your-wedding",
     values: { free: true, basic: true, pro: true, premium: true },
   },
   {
     section: "Yayın & Marka",
     label: "Özel kısa link",
-    description: "davetli.com/your-name",
+    description: "davetyolla.com/your-name",
     values: { free: false, basic: true, pro: true, premium: true },
   },
   {

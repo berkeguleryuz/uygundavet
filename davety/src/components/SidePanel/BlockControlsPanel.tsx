@@ -14,6 +14,7 @@ import { DECORATION_ICONS } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
+import { SpacingControl } from "./controls/SpacingControl";
 
 export function BlockControlsPanel() {
   const t = useTranslations("Editor.block");
@@ -22,6 +23,7 @@ export function BlockControlsPanel() {
   const docId = useEditorStore((s) => s.docId);
   const toggleVisibility = useEditorStore((s) => s.toggleVisibility);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
+  const updateBlockStyle = useEditorStore((s) => s.updateBlockStyle);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const selectField = useUIStore((s) => s.selectField);
 
@@ -77,7 +79,7 @@ export function BlockControlsPanel() {
         <Chip
           icon={<MapPin className="size-4" />}
           label={t("chooseLocation")}
-          disabled={!["venue", "event_program", "contact"].includes(block.type)}
+          disabled={!["venue", "contact"].includes(block.type)}
           onClick={() => selectField(blockId, "venueAddress")}
         />
         <Chip
@@ -124,9 +126,16 @@ export function BlockControlsPanel() {
           highlight
         />
       </div>
+
+      <SpacingControl
+        paddingTop={block.style.paddingTop}
+        paddingBottom={block.style.paddingBottom}
+        onChange={(patch) => updateBlockStyle(blockId, patch)}
+      />
     </div>
   );
 }
+
 
 /**
  * Returns the field id that best represents the block's "primary" editable
@@ -139,8 +148,14 @@ function primaryFieldFor(blockType: string): string {
       return "description";
     case "memory_book":
       return "prompt";
-    case "venue":
     case "event_program":
+      // Etkinlik programı için "ana içerik" satır listesidir — saat ve
+      // etiketleri buradan düzenlenir.
+      return "items";
+    case "gallery":
+      // Galeri için ana içerik medya listesi — yükle/sil/sırala buradan.
+      return "items";
+    case "venue":
     case "contact":
       return "venueName";
     case "countdown":

@@ -77,7 +77,7 @@ export function RsvpFormView({
     (block.data as { buttonLabel?: string }).buttonLabel ?? "Katılım Bilgisi";
 
   return (
-    <section className="px-2 py-10 text-center" style={rootStyle}>
+    <section className="px-2 py-4 text-center" style={rootStyle}>
       <h3
         {...click("heading")}
         className="font-display text-2xl mb-2"

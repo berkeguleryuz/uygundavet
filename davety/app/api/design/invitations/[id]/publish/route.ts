@@ -6,6 +6,7 @@ import { validateVanityPath } from "@/src/lib/slug";
 
 const publishSchema = z.object({
   vanityPath: z.string().optional(),
+  tier: z.enum(["free", "basic", "pro", "premium"]).optional(),
 });
 
 type Params = Promise<{ id: string }>;
@@ -49,14 +50,24 @@ export async function POST(req: Request, ctx: { params: Params }) {
     }
   }
 
+  const tier = parsed.data.tier;
+  const existingMeta = (existing.doc as { meta?: { tier?: string } }).meta ?? {};
   const publishedDoc = {
     ...(existing.doc as object),
     meta: {
-      ...((existing.doc as { meta?: object }).meta ?? {}),
+      ...existingMeta,
       status: "published",
       updatedAt: new Date().toISOString(),
+      ...(tier ? { tier } : existingMeta.tier ? { tier: existingMeta.tier } : {}),
     },
   };
+
+  const docWithTier = tier
+    ? {
+        ...(existing.doc as object),
+        meta: { ...existingMeta, tier },
+      }
+    : null;
 
   const updated = await prisma.invitationDesign.update({
     where: { id },
@@ -65,6 +76,7 @@ export async function POST(req: Request, ctx: { params: Params }) {
       publishedDoc,
       publishedAt: new Date(),
       ...(vanity ? { vanityPath: vanity } : {}),
+      ...(docWithTier ? { doc: docWithTier } : {}),
     },
     select: { slug: true, vanityPath: true, publishedAt: true },
   });

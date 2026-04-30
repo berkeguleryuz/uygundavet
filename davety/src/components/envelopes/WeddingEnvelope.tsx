@@ -587,7 +587,7 @@ export function WeddingEnvelope({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-gold-transparent.png"
-            alt="uygundavet"
+            alt="davetyolla"
             width={56}
             height={56}
             className="block transition-opacity duration-500 ease-in-out"

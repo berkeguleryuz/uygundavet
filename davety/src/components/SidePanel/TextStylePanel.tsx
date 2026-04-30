@@ -23,19 +23,23 @@ import {
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
+import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { cn } from "@/src/lib/utils";
 import { getEventLabels } from "@/src/lib/event-labels";
 import {
   InlineDecorationField,
   type InlineDecorationFieldHandle,
 } from "./InlineDecorationField";
+import { SpacingControl } from "./controls/SpacingControl";
 
 export function TextStylePanel() {
   const t = useTranslations("Editor.textPanel");
 
   const doc = useEditorStore((s) => s.doc);
+  const docId = useEditorStore((s) => s.docId);
   const updateFieldStyle = useEditorStore((s) => s.updateFieldStyle);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
+  const updateBlockStyle = useEditorStore((s) => s.updateBlockStyle);
   const applyPatch = useEditorStore((s) => s.applyPatch);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const fieldId = useUIStore((s) => s.selectedFieldId);
@@ -149,8 +153,31 @@ export function TextStylePanel() {
       : "title"
     : null;
   const isFamiliesField = familiesSide !== null;
+  // Etkinlik programının "items" alanı saat+etiket dizisidir — düz metin
+  // editörüyle düzenlenemez, kendi list editörü vardır.
+  const isEventItemsField =
+    block.type === "event_program" && fieldId === "items";
+  // Galeri "items" alanı MediaRef dizisidir — kendi yükle/sil/sırala
+  // editörü vardır.
+  const isGalleryItemsField =
+    block.type === "gallery" && fieldId === "items";
+  // event_program / venue / contact bloklarındaki konum bilgileri
+  // schema'da OPTIONAL — kullanıcı henüz girmediğinde data alanı
+  // undefined olur ve generic extractFieldValue editör göstermez. Bu
+  // bayrak sayesinde alan boş bile olsa input açılıp kullanıcı doldurabilir.
+  const isOptionalLocationField =
+    (block.type === "venue" || block.type === "contact") &&
+    (fieldId === "venueName" ||
+      fieldId === "venueAddress" ||
+      fieldId === "mapUrl");
   const showContentEditor =
-    isCoupleNames || isDateField || isFamiliesField || fieldValue !== undefined;
+    isCoupleNames ||
+    isDateField ||
+    isFamiliesField ||
+    isEventItemsField ||
+    isGalleryItemsField ||
+    isOptionalLocationField ||
+    fieldValue !== undefined;
   const fieldLabel = fieldLabelFor(fieldId, doc?.meta.eventCategory);
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
@@ -163,7 +190,49 @@ export function TextStylePanel() {
     <div className="p-5 flex flex-col gap-5">
       {/* Field content editor — edit the actual text of the selected field */}
       {showContentEditor ? (
-        isFamiliesField && familiesSide && familiesPart ? (
+        isEventItemsField ? (
+          <EventProgramItemsEditor
+            items={
+              ((block.data as { items?: import("@davety/schema").EventProgramItem[] }).items) ??
+              []
+            }
+            onChange={(items) => updateBlockData(blockId, { items })}
+          />
+        ) : isGalleryItemsField ? (
+          <GalleryItemsEditor
+            docId={docId}
+            items={
+              ((block.data as { items?: import("@davety/schema").MediaRef[] }).items) ??
+              []
+            }
+            onChange={(items) => updateBlockData(blockId, { items })}
+          />
+        ) : isOptionalLocationField ? (
+          <div>
+            <label className="text-[11px] text-muted-foreground block mb-1">
+              {fieldLabel}
+            </label>
+            <input
+              value={(block.data[fieldId] as string) ?? ""}
+              placeholder={
+                fieldId === "venueName"
+                  ? "Mekan adı"
+                  : fieldId === "venueAddress"
+                  ? "Mekan adresi"
+                  : "https://..."
+              }
+              onChange={(e) =>
+                updateBlockData(blockId, { [fieldId]: e.target.value })
+              }
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            />
+            {fieldId === "venueAddress" ? (
+              <p className="mt-1.5 text-[10px] text-muted-foreground">
+                Boş bırakırsan adres satırı görünmez.
+              </p>
+            ) : null}
+          </div>
+        ) : isFamiliesField && familiesSide && familiesPart ? (
           <FamiliesFieldEditor
             block={block}
             side={familiesSide}
@@ -402,6 +471,16 @@ export function TextStylePanel() {
           ) : null}
         </ul>
       </div>
+
+      {/* Block-level spacing — surfaced here too so the user can adjust
+          the section's top/bottom padding without leaving the text panel
+          (the hero & other "tall" blocks open this panel directly when
+          their main field is clicked, never the BlockControlsPanel). */}
+      <SpacingControl
+        paddingTop={block.style.paddingTop}
+        paddingBottom={block.style.paddingBottom}
+        onChange={(patch) => updateBlockStyle(blockId, patch)}
+      />
     </div>
   );
 }
@@ -429,6 +508,7 @@ const FIELD_LABELS: Record<string, string> = {
   title: "Başlık",
   venueName: "Mekan Adı",
   venueAddress: "Mekan Adresi",
+  mapUrl: "Harita Bağlantısı",
   prompt: "Soru / Yönlendirme",
   note: "Not",
   body: "İçerik",
@@ -638,6 +718,236 @@ function FamiliesFieldEditor({
         className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
       >
         + Üye Ekle
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Editor for event_program block's `items` array — saat + etiket
+ * satırlarını ekleme/çıkarma/sıralama. Düğün dışı etkinliklerde (doğum
+ * günü, kurumsal vs.) kullanıcının kendi içeriğini yazabilmesi için
+ * default seed verisinin üstüne tamamen yazılabilir olmalı.
+ */
+function EventProgramItemsEditor({
+  items,
+  onChange,
+}: {
+  items: import("@davety/schema").EventProgramItem[];
+  onChange: (next: import("@davety/schema").EventProgramItem[]) => void;
+}) {
+  function update(idx: number, patch: Partial<import("@davety/schema").EventProgramItem>) {
+    const next = items.slice();
+    next[idx] = { ...next[idx], ...patch };
+    onChange(next);
+  }
+  function remove(idx: number) {
+    const next = items.slice();
+    next.splice(idx, 1);
+    onChange(next);
+  }
+  function move(idx: number, dir: -1 | 1) {
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    const next = items.slice();
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+  function add() {
+    onChange([...items, { time: "", label: "" }]);
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-[11px] text-muted-foreground">
+          Program Satırları
+        </label>
+        <span className="text-[10px] text-muted-foreground">
+          {items.length} satır
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border p-4 text-center text-[11px] text-muted-foreground">
+          Henüz satır yok. &quot;Satır Ekle&quot; ile başla.
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-1.5">
+          {items.map((it, i) => (
+            <li
+              key={i}
+              className="flex items-center gap-1 rounded-md border border-border bg-background pl-2"
+            >
+              <input
+                type="time"
+                value={it.time}
+                onChange={(e) => update(i, { time: e.target.value })}
+                className="w-[88px] bg-transparent py-2 text-sm tabular-nums focus:outline-none"
+              />
+              <input
+                value={it.label}
+                onChange={(e) => update(i, { label: e.target.value })}
+                placeholder={`${i + 1}. etkinlik`}
+                className="flex-1 bg-transparent py-2 text-sm focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => move(i, -1)}
+                disabled={i === 0}
+                className="size-7 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded transition-colors"
+                aria-label="Yukarı"
+                title="Yukarı taşı"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                onClick={() => move(i, 1)}
+                disabled={i === items.length - 1}
+                className="size-7 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded transition-colors"
+                aria-label="Aşağı"
+                title="Aşağı taşı"
+              >
+                ↓
+              </button>
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="size-7 inline-flex items-center justify-center text-destructive hover:bg-destructive/10 cursor-pointer rounded transition-colors mr-1"
+                aria-label="Sil"
+                title="Satırı sil"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <button
+        type="button"
+        onClick={add}
+        className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
+      >
+        + Satır Ekle
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Editor for gallery block's `items` array — yükle/sil/sırala.
+ * Galeriye birden fazla görsel/video eklenebilir; her parçanın küçük
+ * önizlemesi gösterilir, kullanıcı silebilir veya sıraya alabilir.
+ * Yükleme `useAssetUpload` üzerinden geçer (orjinalde
+ * BlockControlsPanel'in chip'i de aynı hook'u kullanıyor).
+ */
+function GalleryItemsEditor({
+  docId,
+  items,
+  onChange,
+}: {
+  docId: string | null;
+  items: import("@davety/schema").MediaRef[];
+  onChange: (next: import("@davety/schema").MediaRef[]) => void;
+}) {
+  const { pick, busy } = useAssetUpload(docId);
+
+  async function add() {
+    const media = await pick("image/*,video/*");
+    if (!media) return;
+    onChange([...items, media]);
+  }
+  function remove(idx: number) {
+    const next = items.slice();
+    next.splice(idx, 1);
+    onChange(next);
+  }
+  function move(idx: number, dir: -1 | 1) {
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    const next = items.slice();
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-[11px] text-muted-foreground">
+          Galeri Medyaları
+        </label>
+        <span className="text-[10px] text-muted-foreground">
+          {items.length} parça
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border p-4 text-center text-[11px] text-muted-foreground">
+          Henüz medya yok. &quot;Görsel/Video Ekle&quot; ile başla.
+        </div>
+      ) : (
+        <ul className="grid grid-cols-3 gap-1.5">
+          {items.map((m, i) => (
+            <li
+              key={i}
+              className="relative aspect-square rounded-md overflow-hidden border border-border bg-muted group"
+            >
+              {m.mediaType === "video" ? (
+                <video
+                  src={m.url}
+                  className="w-full h-full object-cover"
+                  muted
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={m.variants?.thumb ?? m.url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => move(i, -1)}
+                  disabled={i === 0}
+                  className="size-6 rounded bg-white/90 text-black text-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  title="Geri al"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(i, 1)}
+                  disabled={i === items.length - 1}
+                  className="size-6 rounded bg-white/90 text-black text-xs disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  title="İleri al"
+                >
+                  →
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  className="size-6 rounded bg-destructive text-white text-xs cursor-pointer"
+                  title="Sil"
+                >
+                  ×
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <button
+        type="button"
+        onClick={add}
+        disabled={busy || !docId}
+        className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {busy ? "Yükleniyor..." : "+ Görsel/Video Ekle"}
       </button>
     </div>
   );

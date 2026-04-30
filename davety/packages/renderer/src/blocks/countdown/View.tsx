@@ -34,6 +34,20 @@ export function CountdownView({
 
   const rootStyle = styleToCss(block.style);
   const labels = block.data.labels;
+  const targetDate = new Date(block.data.targetIso);
+  const dateStr = Number.isNaN(targetDate.getTime())
+    ? ""
+    : targetDate.toLocaleDateString("tr-TR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+  const timeStr = Number.isNaN(targetDate.getTime())
+    ? ""
+    : targetDate.toLocaleTimeString("tr-TR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
   const clickable = (id: string) =>
     editable && onFieldSelect
@@ -47,13 +61,20 @@ export function CountdownView({
       : {};
 
   return (
-    <section className="px-6 py-8" style={rootStyle}>
+    <section className="px-6 py-4" style={rootStyle}>
       <div className={`grid grid-cols-4 gap-3 max-w-md mx-auto ${alignClasses(block.style.align)}`}>
         <Cell value={parts.d} label={labels.days} editable={editable} labelId="days" clickable={clickable} style={fieldStyle(block, "days")} />
         <Cell value={parts.h} label={labels.hours} editable={editable} labelId="hours" clickable={clickable} style={fieldStyle(block, "hours")} />
         <Cell value={parts.m} label={labels.minutes} editable={editable} labelId="minutes" clickable={clickable} style={fieldStyle(block, "minutes")} />
         <Cell value={parts.s} label={labels.seconds} editable={editable} labelId="seconds" clickable={clickable} style={fieldStyle(block, "seconds")} />
       </div>
+      {dateStr ? (
+        <div className="mt-4 text-center text-sm font-sans opacity-70 tabular-nums">
+          {dateStr}
+          {timeStr ? <span className="mx-2">·</span> : null}
+          {timeStr}
+        </div>
+      ) : null}
     </section>
   );
 }

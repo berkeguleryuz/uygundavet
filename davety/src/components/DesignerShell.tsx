@@ -216,7 +216,7 @@ function DesignerShellInner({
         saving={saving}
         dirty={dirty}
       />
-      <OnboardingFlow />
+      <OnboardingFlow docId={docId} />
       <PreviewOverlay />
     </div>
   );

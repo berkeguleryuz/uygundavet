@@ -23,11 +23,21 @@ export default async function SavePage({ params }: { params: Params }) {
       vanityPath: true,
       status: true,
       userId: true,
+      doc: true,
+      publishedDoc: true,
     },
   });
   if (!design || design.userId !== session.user.id) {
     notFound();
   }
+
+  const readTier = (d: unknown): string | null => {
+    if (!d || typeof d !== "object") return null;
+    const meta = (d as { meta?: { tier?: unknown } }).meta;
+    if (meta && typeof meta.tier === "string") return meta.tier;
+    return null;
+  };
+  const tier = readTier(design.publishedDoc) ?? readTier(design.doc);
 
   return (
     <SaveScreen
@@ -35,6 +45,7 @@ export default async function SavePage({ params }: { params: Params }) {
       slug={design.slug}
       vanityPath={design.vanityPath}
       status={design.status as "draft" | "published"}
+      tier={(tier as "free" | "basic" | "pro" | "premium" | null) ?? null}
     />
   );
 }

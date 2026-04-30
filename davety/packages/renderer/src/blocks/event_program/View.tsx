@@ -8,7 +8,7 @@ export function EventProgramView({
   onFieldSelect,
 }: BlockViewProps<EventProgramData>) {
   const rootStyle = styleToCss(block.style);
-  const { items, venueName, venueAddress, mapUrl } = block.data;
+  const { items } = block.data;
 
   const click = (id: string) =>
     editable && onFieldSelect
@@ -23,7 +23,7 @@ export function EventProgramView({
       : {};
 
   return (
-    <section className="px-2 py-10" style={rootStyle}>
+    <section className="px-2 py-4" style={rootStyle}>
       <h3
         {...click("heading")}
         className="font-display text-2xl text-center mb-6"
@@ -47,29 +47,6 @@ export function EventProgramView({
           </li>
         ))}
       </ul>
-
-      {venueName ? (
-        <div className="mt-6 text-center max-w-md mx-auto">
-          <div className="font-display text-lg" style={fieldStyle(block, "venueName")}>
-            {parseInlineDecorations(venueName)}
-          </div>
-          {venueAddress ? (
-            <div className="text-sm opacity-80 mt-1" style={fieldStyle(block, "venueAddress")}>
-              {parseInlineDecorations(venueAddress)}
-            </div>
-          ) : null}
-          {mapUrl ? (
-            <a
-              href={mapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-3 text-xs px-4 py-2 rounded-full border border-current/30 hover:bg-current/5"
-            >
-              Yol Tarifi Al
-            </a>
-          ) : null}
-        </div>
-      ) : null}
     </section>
   );
 }
