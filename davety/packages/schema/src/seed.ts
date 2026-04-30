@@ -209,6 +209,26 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
+    // 11. CUSTOM NOTE — etkinlik notu, davetiyenin sonunda ek bilgi
+    // (kıyafet kodu, hediyeler, çocuk politikası vs.) için hazır slot.
+    {
+      id: nanoid(8),
+      type: "custom_note",
+      visible: true,
+      style: { align: "center" },
+      data: {
+        title: tr
+          ? "Etkinlik Notu"
+          : de
+          ? "Hinweise"
+          : "Event Notes",
+        body: tr
+          ? "Bu alanda etkinlik ile ilgili ek bilgiler, özel istekler veya kuralları yazabilirsin."
+          : de
+          ? "Hier kannst du zusätzliche Hinweise zur Veranstaltung mitteilen."
+          : "Use this space for any extra information or special requests.",
+      },
+    },
     // (Önceden burada hardcoded "davety.app" footer'ı vardı; tanıtım
     // bloğu artık sadece free tier için yayınlama anında 4. sıraya
     // injekt ediliyor — burada bir daha çıkmıyor.)

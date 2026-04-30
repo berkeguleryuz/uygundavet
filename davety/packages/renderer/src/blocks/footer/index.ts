@@ -5,7 +5,7 @@ import { FooterView } from "./View";
 export const footerRegistryEntry: BlockRegistryEntry<FooterData> = {
   type: "footer",
   View: FooterView,
-  defaultData: { text: "davety ile oluşturuldu" },
+  defaultData: { text: "DavetYolla.com" },
   defaultStyle: { align: "center" },
   labelKey: "Blocks.hero.title",
 };

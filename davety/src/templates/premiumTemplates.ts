@@ -220,6 +220,19 @@ export function buildPremiumTemplateDoc(
       prompt: memoryPrompt(template.category),
     }, { align: "center" }, true),
     block(template, "gallery", { items: [] }, { align: "center" }, true),
+    // Etkinlik notu davetiyenin sonunda ek bilgi (kıyafet kodu, hediye
+    // tercihi vs.) için bırakılan açık slot. Tüm hazır temalar bunu
+    // sonda taşıyor — kullanıcı isterse silebilir, isterse ön plana
+    // çıkartabilir.
+    block(
+      template,
+      "custom_note",
+      {
+        title: "Etkinlik Notu",
+        body: "Bu alanda etkinlik ile ilgili ek bilgiler, özel istekler veya kuralları yazabilirsin.",
+      },
+      { align: "center" }
+    ),
     // Footer tanıtım satırı kaldırıldı; free tier davetiyelerinde 4.
     // sıraya yayın anında DavetYolla.com tanıtım bloğu injekt ediliyor
     // (publish/route.ts -> applyTierToDoc).

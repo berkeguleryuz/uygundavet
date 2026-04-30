@@ -181,9 +181,14 @@ function primaryFieldFor(blockType: string): string {
     case "custom_section":
       return "title";
     case "donation":
-      return "title";
+      // Bağış için ana editör IBAN — kullanıcı para göndermesi için
+      // bunu yazmadan blok eksik kalır.
+      return "iban";
     case "rsvp_form":
       return "note";
+    case "story_timeline":
+      // Hikayemiz items list — bu olmadan render edilecek bir şey yok.
+      return "items";
     default:
       return "body";
   }

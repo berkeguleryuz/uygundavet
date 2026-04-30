@@ -167,16 +167,21 @@ export function TextStylePanel() {
   // undefined olur ve generic extractFieldValue editör göstermez. Bu
   // bayrak sayesinde alan boş bile olsa input açılıp kullanıcı doldurabilir.
   const isOptionalLocationField =
-    (block.type === "venue" || block.type === "contact") &&
-    (fieldId === "venueName" ||
-      fieldId === "venueAddress" ||
-      fieldId === "mapUrl");
+    ((block.type === "venue" || block.type === "contact") &&
+      (fieldId === "venueName" ||
+        fieldId === "venueAddress" ||
+        fieldId === "mapUrl")) ||
+    (block.type === "contact" && fieldId === "phone") ||
+    (block.type === "donation" && fieldId === "iban");
+  const isStoryItemsField =
+    block.type === "story_timeline" && fieldId === "items";
   const showContentEditor =
     isCoupleNames ||
     isDateField ||
     isFamiliesField ||
     isEventItemsField ||
     isGalleryItemsField ||
+    isStoryItemsField ||
     isOptionalLocationField ||
     fieldValue !== undefined;
   const fieldLabel = fieldLabelFor(fieldId, doc?.meta.eventCategory);
@@ -209,6 +214,14 @@ export function TextStylePanel() {
             }
             onChange={(items) => updateBlockData(blockId, { items })}
           />
+        ) : isStoryItemsField ? (
+          <StoryTimelineItemsEditor
+            items={
+              ((block.data as { items?: import("@davety/schema").StoryMilestone[] }).items) ??
+              []
+            }
+            onChange={(items) => updateBlockData(blockId, { items })}
+          />
         ) : isOptionalLocationField ? (
           <div>
             <label className="text-[11px] text-muted-foreground block mb-1">
@@ -221,6 +234,10 @@ export function TextStylePanel() {
                   ? "Mekan adı"
                   : fieldId === "venueAddress"
                   ? "Mekan adresi"
+                  : fieldId === "phone"
+                  ? "+90 555 000 00 00"
+                  : fieldId === "iban"
+                  ? "TR00 0000 0000 0000 0000 0000 00"
                   : "https://..."
               }
               onChange={(e) =>
@@ -231,6 +248,10 @@ export function TextStylePanel() {
             {fieldId === "venueAddress" ? (
               <p className="mt-1.5 text-[10px] text-muted-foreground">
                 Boş bırakırsan adres satırı görünmez.
+              </p>
+            ) : fieldId === "iban" ? (
+              <p className="mt-1.5 text-[10px] text-muted-foreground">
+                Misafirlerin görüp para gönderebilmesi için IBAN&apos;ını yaz.
               </p>
             ) : null}
           </div>
@@ -511,6 +532,9 @@ const FIELD_LABELS: Record<string, string> = {
   venueName: "Mekan Adı",
   venueAddress: "Mekan Adresi",
   mapUrl: "Harita Bağlantısı",
+  phone: "Telefon",
+  iban: "IBAN",
+  items: "Satırlar",
   prompt: "Soru / Yönlendirme",
   note: "Not",
   body: "İçerik",
@@ -833,6 +857,127 @@ function EventProgramItemsEditor({
         className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
       >
         + Satır Ekle
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Hikayemiz (story_timeline) blok editörü — `StoryMilestone[]` listesine
+ * tarih + başlık + açıklama girişi. Default seed boş geldiği için
+ * kullanıcı buradan satır eklemeden render edilecek bir şey olmuyordu.
+ */
+function StoryTimelineItemsEditor({
+  items,
+  onChange,
+}: {
+  items: import("@davety/schema").StoryMilestone[];
+  onChange: (next: import("@davety/schema").StoryMilestone[]) => void;
+}) {
+  function update(idx: number, patch: Partial<import("@davety/schema").StoryMilestone>) {
+    const next = items.slice();
+    next[idx] = { ...next[idx], ...patch };
+    onChange(next);
+  }
+  function remove(idx: number) {
+    const next = items.slice();
+    next.splice(idx, 1);
+    onChange(next);
+  }
+  function move(idx: number, dir: -1 | 1) {
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    const next = items.slice();
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+  function add() {
+    onChange([
+      ...items,
+      { date: "", title: "", description: "" },
+    ]);
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label className="text-[11px] text-muted-foreground">
+          Hikaye Anları
+        </label>
+        <span className="text-[10px] text-muted-foreground">
+          {items.length} an
+        </span>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border p-4 text-center text-[11px] text-muted-foreground">
+          Henüz an yok. &quot;An Ekle&quot; ile ilk hikayeni yaz.
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {items.map((it, i) => (
+            <li
+              key={i}
+              className="rounded-md border border-border bg-background p-2 flex flex-col gap-1.5"
+            >
+              <div className="flex items-center gap-1">
+                <input
+                  type="date"
+                  value={it.date}
+                  onChange={(e) => update(i, { date: e.target.value })}
+                  className="flex-1 bg-transparent py-1 px-1 text-[11px] tabular-nums focus:outline-none border border-border rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => move(i, -1)}
+                  disabled={i === 0}
+                  className="size-6 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded"
+                  title="Yukarı"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(i, 1)}
+                  disabled={i === items.length - 1}
+                  className="size-6 inline-flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer rounded"
+                  title="Aşağı"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  className="size-6 inline-flex items-center justify-center text-destructive hover:bg-destructive/10 cursor-pointer rounded"
+                  title="Sil"
+                >
+                  ×
+                </button>
+              </div>
+              <input
+                value={it.title}
+                onChange={(e) => update(i, { title: e.target.value })}
+                placeholder="Başlık (örn. İlk Tanışma)"
+                className="bg-transparent py-1 px-1.5 text-sm focus:outline-none border border-border rounded"
+              />
+              <textarea
+                value={it.description}
+                onChange={(e) => update(i, { description: e.target.value })}
+                placeholder="Açıklama"
+                rows={2}
+                className="bg-transparent py-1 px-1.5 text-[12px] focus:outline-none border border-border rounded resize-none"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <button
+        type="button"
+        onClick={add}
+        className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
+      >
+        + An Ekle
       </button>
     </div>
   );

@@ -18,8 +18,6 @@ import { useConfirm } from "@/src/components/ConfirmDialog";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { cn } from "@/src/lib/utils";
-import { planLimitsFor, nextTierLabel } from "@/src/lib/plan-limits";
-import { toast } from "sonner";
 import type { BlockType, PlanTier } from "@davety/schema";
 
 const BLOCK_LABELS: Record<string, string> = {
@@ -70,19 +68,11 @@ export function Canvas() {
   }
 
   const tier = doc.meta.tier;
-  const limits = planLimitsFor(tier);
 
   const handlePick = (index: number, type: BlockType) => {
-    // Tier gating: memory_book sadece Klasik+ paketlerinde. Free
-    // kullanıcı buton görse de tıklayınca eklenmiyor, upgrade toast
-    // çıkıyor.
-    if (type === "memory_book" && !limits.memoryBookEnabled) {
-      toast.warning(
-        `Hatıra Defteri ${nextTierLabel(tier)} paketinde. Yükseltmek için Yayınla ekranına git.`
-      );
-      setInsertingAt(null);
-      return;
-    }
+    // Hatıra Defteri planlama sırasında her tier'da eklenebilir;
+    // free pakette publish anında server-side trim ediliyor (block
+    // yayında görünmez). Bu UX kullanıcıyı denemeden alıkoymuyor.
     const entry = listBlockEntries().find((e) => e.type === type);
     if (!entry) return;
     insertBlock(
@@ -378,7 +368,6 @@ function TailInsertSlot({
 
 function BlockPalette({
   paletteCls,
-  tier,
   onClose,
   onPick,
 }: {
@@ -388,8 +377,10 @@ function BlockPalette({
   onClose: () => void;
   onPick: (type: BlockType) => void;
 }) {
-  const entries = listBlockEntries();
-  const limits = planLimitsFor(tier);
+  // CTA / "Buton" bloğu palette'ten gizlendi — kullanıcı için
+  // anlamlı değil (link/işlev karmaşası). Renderer hala destekliyor
+  // ki eski davetiyelerde varsa görünmeye devam etsin.
+  const entries = listBlockEntries().filter((e) => e.type !== "cta");
   return (
     <div
       className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
@@ -405,29 +396,15 @@ function BlockPalette({
         </button>
       </div>
       <div className="grid grid-cols-2 gap-1">
-        {entries.map((e) => {
-          const locked = e.type === "memory_book" && !limits.memoryBookEnabled;
-          return (
-            <button
-              key={e.type}
-              onClick={() => onPick(e.type)}
-              title={locked ? `${nextTierLabel(tier)} paketinde açılır` : undefined}
-              className={cn(
-                "text-[11px] text-left px-2 py-1.5 rounded cursor-pointer flex items-center justify-between gap-1",
-                locked
-                  ? "text-muted-foreground bg-muted/40 hover:bg-muted/60"
-                  : "hover:bg-muted"
-              )}
-            >
-              <span>{BLOCK_LABELS[e.type] ?? e.type}</span>
-              {locked ? (
-                <span className="text-[9px] uppercase tracking-wider rounded-full bg-amber-200 text-amber-900 px-1.5 py-0.5">
-                  🔒 {nextTierLabel(tier)}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
+        {entries.map((e) => (
+          <button
+            key={e.type}
+            onClick={() => onPick(e.type)}
+            className="text-[11px] text-left px-2 py-1.5 rounded cursor-pointer hover:bg-muted"
+          >
+            {BLOCK_LABELS[e.type] ?? e.type}
+          </button>
+        ))}
       </div>
     </div>
   );

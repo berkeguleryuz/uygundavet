@@ -45,9 +45,23 @@ export function ContactView({
         </p>
       ) : null}
       {phone ? (
-        <a href={`tel:${phone}`} className="inline-block mt-3 text-sm underline">
-          {phone}
-        </a>
+        editable ? (
+          <span
+            {...click("phone")}
+            className="inline-block mt-3 text-sm underline cursor-pointer hover:bg-yellow-100/30 rounded px-1"
+            style={fieldStyle(block, "phone")}
+          >
+            {phone}
+          </span>
+        ) : (
+          <a
+            href={`tel:${phone}`}
+            className="inline-block mt-3 text-sm underline"
+            style={fieldStyle(block, "phone")}
+          >
+            {phone}
+          </a>
+        )
       ) : null}
     </section>
   );
