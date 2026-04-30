@@ -466,7 +466,7 @@ export function TextStylePanel() {
           ))}
           {fonts.length === 0 ? (
             <li className="px-3 py-4 text-center text-muted-foreground text-xs">
-              —
+              Sonuç yok
             </li>
           ) : null}
         </ul>
