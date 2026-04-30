@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import { Check, X, Star, Flame } from "lucide-react";
 import { resolveActiveOffer, applyOffer, type ActiveOffer } from "./pricingOffers";
+import {
+  TierIconStyles,
+  SparkleIcon,
+  StarIcon as DrawStarIcon,
+  ZapIcon,
+  CrownIcon,
+} from "@/src/components/tier-icons";
 
 type Tier = {
   id: "free" | "basic" | "pro" | "premium";
@@ -111,14 +118,14 @@ const FEATURES: FeatureRow[] = [
   {
     section: "Misafir Etkileşimi",
     label: "Katılım formu (RSVP)",
-    description: "Misafirlerden katılım bilgisi",
-    values: { free: false, basic: false, pro: true, premium: true },
+    description: "Misafirler katılım gönderebilir",
+    values: { free: true, basic: true, pro: true, premium: true },
   },
   {
     section: "Misafir Etkileşimi",
     label: "Anı defteri",
     description: "Misafirler mesaj bırakır",
-    values: { free: false, basic: false, pro: true, premium: true },
+    values: { free: false, basic: true, pro: true, premium: true },
   },
   {
     section: "Misafir Etkileşimi",
@@ -130,7 +137,7 @@ const FEATURES: FeatureRow[] = [
     section: "Misafir Etkileşimi",
     label: "Misafir listesi & takip",
     description: "RSVP yanıtlarını dashboardda gör",
-    values: { free: false, basic: false, pro: true, premium: true },
+    values: { free: false, basic: true, pro: true, premium: true },
   },
 
   // Yayın
@@ -204,8 +211,12 @@ export function PricingTable() {
       className="w-full"
       style={{ fontFamily: "Space Grotesk, sans-serif" }}
     >
-      {/* Active-offer banner */}
-      <OfferBanner offer={offer} />
+      {/* Animasyon sınıfları + keyframes — sayfada bir kez tanımlanır. */}
+      <TierIconStyles />
+
+      {/* Active-offer note (countdown moved into each tier card so the
+          urgency sits next to the price it applies to, not at the top). */}
+      <OfferNote offer={offer} />
 
       {/* Pricing cards row — sticky at top for long feature tables */}
       <div className="sticky top-20 z-20 bg-background/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-3 border-b border-border">
@@ -301,10 +312,45 @@ function TierHeader({
         </div>
       ) : null}
 
+      {/* Tier ikonu — her kartta sıralı olarak çiziliyor (draw-from-0).
+           SaveScreen TierPicker'la aynı ikon yapısı kullanılıyor.
+           Switch ile direkt JSX render — `tierIconFor` helper'ı linter
+           tarafından "render sırasında component yaratıyor" diye
+           uyardığı için inline yapıyoruz. */}
+      <div
+        className={`mb-2 size-9 inline-flex items-center justify-center rounded-xl border ${
+          tier.highlight
+            ? "border-background/30 text-background"
+            : "border-border text-foreground"
+        }`}
+      >
+        {tier.id === "free" ? (
+          <SparkleIcon className="size-5" />
+        ) : tier.id === "basic" ? (
+          <DrawStarIcon className="size-5" />
+        ) : tier.id === "pro" ? (
+          <ZapIcon className="size-5" />
+        ) : (
+          <CrownIcon className="size-5" />
+        )}
+      </div>
+
       {percent > 0 && !isFree ? (
         <div className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500 text-white shadow">
           <Flame className="size-3" /> %{percent}
         </div>
+      ) : null}
+
+      {/* Per-card countdown — only renders when there's an active
+          discount AND this tier benefits from it. Free tier never has a
+          countdown (no discount applies to free). Sits inside the card
+          so the urgency lives right next to the price it gates. */}
+      {percent > 0 && !isFree && offer ? (
+        <Countdown
+          targetIso={offer.endsAtIso}
+          variant={tier.highlight ? "light" : "dark"}
+          compact
+        />
       ) : null}
 
       <div
@@ -362,57 +408,38 @@ function TierHeader({
   );
 }
 
-/* ─── Offer banner with 24h countdown ─────────────────────────────────── */
-function OfferBanner({ offer }: { offer: ActiveOffer | null }) {
+/* ─── Offer note (no countdown — countdown lives in tier cards) ───────── */
+function OfferNote({ offer }: { offer: ActiveOffer | null }) {
   if (!offer) {
-    // Server render or pre-hydration — keep a reserved space so cards
-    // below don't jump when the banner populates.
-    return <div className="h-10 mb-6" aria-hidden />;
+    return <div className="h-2" aria-hidden />;
   }
-  if (offer.percent <= 0) {
-    return (
-      <div className="mb-6 rounded-full border border-border bg-white px-4 py-2 text-center text-xs text-muted-foreground">
+  // Subtle one-line note when an offer is active. The actionable
+  // urgency (countdown timer) is rendered inside each affected tier
+  // card by `Countdown` so the user sees it right next to the price.
+  return (
+    <div className="mb-4 text-center">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-rose-50 text-rose-700 px-3 py-1 text-[11px] font-medium">
+        <Flame className="size-3" />
         {offer.label}
         {offer.sublabel ? (
-          <span className="ml-2 opacity-70">— {offer.sublabel}</span>
+          <span className="opacity-80">· {offer.sublabel}</span>
         ) : null}
-      </div>
-    );
-  }
-
-  const isFlash = offer.promotionCode === "MONTHLY_FLASH_60";
-  return (
-    <div
-      className={`mb-6 rounded-2xl px-4 md:px-5 py-3 md:py-3.5 flex items-center gap-3 flex-wrap ${
-        isFlash
-          ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white"
-          : "bg-foreground text-background"
-      }`}
-    >
-      <div className="inline-flex items-center gap-2 shrink-0">
-        <Flame className="size-5" />
-        <span className="text-xs md:text-sm uppercase tracking-[0.2em] font-semibold">
-          {offer.label}
-        </span>
-        <span className="inline-flex items-center justify-center rounded-full bg-white/20 text-[11px] md:text-xs font-bold px-2 py-0.5">
-          %{offer.percent}
-        </span>
-      </div>
-
-      {offer.sublabel ? (
-        <div className="text-[11px] md:text-xs opacity-90">
-          {offer.sublabel}
-        </div>
-      ) : null}
-
-      <div className="flex-1" />
-
-      <Countdown targetIso={offer.endsAtIso} />
+      </span>
     </div>
   );
 }
 
-function Countdown({ targetIso }: { targetIso: string }) {
+function Countdown({
+  targetIso,
+  variant = "dark",
+  compact = false,
+}: {
+  targetIso: string;
+  /** "dark" = bg-black/20 (white card); "light" = bg-white/20 (highlighted dark card). */
+  variant?: "dark" | "light";
+  /** Tighter padding/typography for use inside small tier cards. */
+  compact?: boolean;
+}) {
   const [left, setLeft] = useState<{ h: number; m: number; s: number } | null>(
     null
   );
@@ -433,9 +460,15 @@ function Countdown({ targetIso }: { targetIso: string }) {
   }, [targetIso]);
 
   if (!left) return null;
+  const bg = variant === "light" ? "bg-white/15" : "bg-rose-500/10";
+  const fg = variant === "light" ? "text-current" : "text-rose-700";
   return (
-    <div className="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tabular-nums bg-black/20 rounded-full px-3 py-1">
-      <span className="opacity-70 uppercase tracking-widest text-[10px]">
+    <div
+      className={`mt-2 inline-flex items-center gap-1.5 rounded-full ${bg} ${fg} ${
+        compact ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs"
+      } font-semibold tabular-nums`}
+    >
+      <span className="opacity-70 uppercase tracking-widest text-[9px]">
         Kalan
       </span>
       <span>

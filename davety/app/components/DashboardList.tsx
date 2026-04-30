@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Eye,
   Heart,
+  Lock,
   MapPin,
   MessageCircle,
   Pencil,
@@ -17,13 +18,18 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
+import type { PlanTier } from "@davety/schema";
 import { Link, useRouter } from "@/i18n/navigation";
+import { planLimitsFor, nextTierLabel } from "@/src/lib/plan-limits";
 
 export interface DashboardDesign {
   id: string;
   slug: string;
   vanityPath: string | null;
   status: string;
+  /** Tier the invitation was published with. null/undefined = not yet
+   *  published, treated as "free" for paywall purposes. */
+  tier?: PlanTier | null;
   updatedAt: string;
   createdAt: string;
   publishedAt: string | null;
@@ -64,7 +70,12 @@ export function DashboardList({ designs: initial, locale, publicBase }: Props) {
         if (d.status === "published") acc.published += 1;
         else acc.draft += 1;
         acc.guests += d.guestCount;
-        acc.rsvpHeads += d.rsvpYesHeads;
+        // RSVP yanıt toplamı sadece okuma yetkisi olan tier'lardan
+        // toplanır. Free davetlerin RSVP'leri summary'de gözükmez —
+        // kullanıcı yanıtları görmek için upgrade etmedi.
+        if (planLimitsFor(d.tier).rsvpReadEnabled) {
+          acc.rsvpHeads += d.rsvpYesHeads;
+        }
         acc.memories += d.memoryCount;
         return acc;
       },
@@ -293,6 +304,9 @@ function DesignCard({
   publicBase: string;
   onDelete: () => void;
 }) {
+  // Router was missing in this component — onClick paywalls in the
+  // QuickAction grid below need it to navigate to the upgrade screen.
+  const router = useRouter();
   const handle = d.vanityPath ?? d.slug;
   const publicUrl = `${publicBase}/i/${handle}`;
   const isPublished = d.status === "published";
@@ -316,20 +330,22 @@ function DesignCard({
 
   return (
     <article className="group relative flex flex-col rounded-2xl border border-border bg-card overflow-hidden hover:border-foreground/20 transition-colors">
-      {/* Theme color band — gives each card a quick visual identity */}
-      <div
-        className="h-20 relative"
-        style={{
-          background: `linear-gradient(135deg, ${pageSwatch} 0%, ${bgSwatch} 100%)`,
-        }}
-      >
-        <div className="absolute top-3 left-3 flex gap-1">
-          <ColorChip color={bgSwatch} />
-          <ColorChip color={accentSwatch} />
+      {/* Top meta strip — tier badge + status + theme swatches in a single
+          neutral row. Önceden kafa karıştıran tema-renk gradyanı vardı;
+          kullanıcılar bunun ne olduğunu anlamadı, kaldırdık. Tema renkleri
+          artık küçük noktalar olarak göründüğü için karta hala bakışta
+          tematik kimlik veriyor ama "ne bu büyük renkli alan" sorusunu
+          tetiklemiyor. */}
+      <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2 border-b border-border/60">
+        <div className="flex items-center gap-2 min-w-0">
+          <TierBadge tier={d.tier} />
+          <div className="flex gap-1 shrink-0" title="Tema renkleri">
+            <ColorChip color={bgSwatch} />
+            <ColorChip color={accentSwatch} />
+            <ColorChip color={pageSwatch} />
+          </div>
         </div>
-        <div className="absolute top-3 right-3">
-          <StatusBadge published={isPublished} />
-        </div>
+        <StatusBadge published={isPublished} />
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-3">
@@ -379,6 +395,9 @@ function DesignCard({
           </button>
         </div>
 
+        {/* Sayılar her zaman görünür — paywall sadece detay sayfasında.
+             Free tier kullanıcı kaç kişinin geleceğini özet olarak görsün
+             ama tek tek listeyi görmek için upgrade etmesi gereksin. */}
         <div className="grid grid-cols-3 gap-2 mt-1">
           <Stat icon={Users} value={d.guestCount} label="Misafir" />
           <Stat
@@ -412,16 +431,51 @@ function DesignCard({
                 href={`/design/invitations/${d.id}/save`}
               />
             )}
-            <QuickAction
-              icon={Users}
-              label="Misafir"
-              href={`/dashboard/${d.id}/guests`}
-            />
-            <QuickAction
-              icon={MessageCircle}
-              label="Hatıra"
-              href={`/dashboard/${d.id}/memories`}
-            />
+            {/* Misafir / Hatıra detay sayfaları premium feature. Free
+                kullanıcı sayıyı kart üstünde görüyor ama listeyi
+                açabilmek için Klasik+ paketine geçmek zorunda. */}
+            {planLimitsFor(d.tier).rsvpReadEnabled ? (
+              <QuickAction
+                icon={Users}
+                label="Misafir"
+                href={`/dashboard/${d.id}/guests`}
+              />
+            ) : (
+              <QuickAction
+                icon={Lock}
+                label="Misafir"
+                onClick={() => {
+                  toast.warning(
+                    `Misafir listesi ${nextTierLabel(d.tier)} paketinde açılır.`
+                  );
+                  router.push(
+                    `/design/invitations/${d.id}/save` as never
+                  );
+                }}
+                locked
+              />
+            )}
+            {planLimitsFor(d.tier).memoryBookEnabled ? (
+              <QuickAction
+                icon={MessageCircle}
+                label="Hatıra"
+                href={`/dashboard/${d.id}/memories`}
+              />
+            ) : (
+              <QuickAction
+                icon={Lock}
+                label="Hatıra"
+                onClick={() => {
+                  toast.warning(
+                    `Hatıra defteri ${nextTierLabel(d.tier)} paketinde açılır.`
+                  );
+                  router.push(
+                    `/design/invitations/${d.id}/save` as never
+                  );
+                }}
+                locked
+              />
+            )}
             <QuickAction
               icon={Trash2}
               label="Sil"
@@ -490,6 +544,54 @@ function Stat({
   );
 }
 
+/**
+ * Stat slot that hides the actual number behind a paywall. Free-tier
+ * users see this where the RSVP "Gelecek" count would normally be.
+ * Clicking it routes to the publish/save screen where they can pick a
+ * higher tier — that's the existing upgrade entry point so we don't
+ * fork the upgrade flow per surface.
+ */
+/**
+ * Tier rozeti — kullanıcı kart üstünde davetiyenin hangi paketle
+ * yayınlandığını/oluşturulduğunu görüyor. Davetiye-bazlı satış
+ * yaptığımız için her kart kendi tier'ını gösteriyor (kullanıcının
+ * global "üyelik" durumu yok).
+ */
+function TierBadge({
+  tier,
+}: {
+  tier: PlanTier | undefined | null;
+}) {
+  const t = tier ?? "free";
+  const meta: Record<PlanTier, { label: string; cls: string }> = {
+    free: {
+      label: "Free",
+      cls: "bg-muted text-foreground/70 border-border",
+    },
+    basic: {
+      label: "Klasik",
+      cls: "bg-sky-50 text-sky-700 border-sky-200",
+    },
+    pro: {
+      label: "Pro",
+      cls: "bg-violet-50 text-violet-700 border-violet-200",
+    },
+    premium: {
+      label: "Premium",
+      cls: "bg-amber-50 text-amber-800 border-amber-300",
+    },
+  };
+  const m = meta[t];
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${m.cls}`}
+      title={`Bu davetiye ${m.label} paketinde`}
+    >
+      {m.label}
+    </span>
+  );
+}
+
 function QuickAction({
   icon: Icon,
   label,
@@ -497,6 +599,7 @@ function QuickAction({
   external,
   onClick,
   destructive,
+  locked,
 }: {
   icon: LucideIcon;
   label: string;
@@ -504,12 +607,17 @@ function QuickAction({
   external?: boolean;
   onClick?: () => void;
   destructive?: boolean;
+  /** Premium feature — buton görsel olarak kilitli görünür ve onClick
+   *  upgrade sayfasına yönlendirir. */
+  locked?: boolean;
 }) {
   const base =
-    "inline-flex flex-col items-center justify-center gap-1 rounded-lg border border-border py-2 px-1 text-[10px] font-medium uppercase tracking-wider cursor-pointer transition-colors";
+    "inline-flex flex-col items-center justify-center gap-1 rounded-lg border py-2 px-1 text-[10px] font-medium uppercase tracking-wider cursor-pointer transition-colors";
   const tone = destructive
-    ? "text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-    : "text-muted-foreground hover:bg-muted hover:text-foreground hover:border-foreground/30";
+    ? "border-border text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+    : locked
+    ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
+    : "border-border text-muted-foreground hover:bg-muted hover:text-foreground hover:border-foreground/30";
   const className = `${base} ${tone}`;
   const inner = (
     <>

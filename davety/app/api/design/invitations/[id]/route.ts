@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
+import { deleteR2Prefix } from "@/src/lib/r2";
 
 const patchSchema = z.object({
   doc: z.unknown(),
@@ -87,6 +88,35 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+
+  // 1) R2 temizliği — davetiyeye ait tüm medyalar (orijinal + thumb/md/lg
+  //    varyantları + DB'de iz bırakmamış olası orphan dosyalar)
+  //    `users/{userId}/designs/{designId}/` prefix'i altında olduğu için
+  //    tek prefix-delete çağrısıyla siliniyor. Şimdiye kadar bu adım
+  //    yoktu; o yüzden DB'den silinen davetiyelerin görselleri R2'de
+  //    askıda kalıyordu.
+  // 2) DB temizliği — Asset rows da silinmeli; schema'da relation
+  //    onDelete: SetNull olduğu için davetiye silindiğinde row kalır
+  //    (sadece designId null'a düşer). Bu rows şişme yaratıyor; davetiye
+  //    bazlı sattığımız için davetiye gidince asset de gitmeli.
+  // 3) Asıl davetiye silme — diğer alt kayıtlar (Guest, MemoryEntry,
+  //    EditEvent) zaten cascade ile temizleniyor.
+  const r2Prefix = `users/${session.user.id}/designs/${id}/`;
+  try {
+    const res = await deleteR2Prefix(r2Prefix);
+    if (!res.ok) {
+      console.warn("[delete invitation] R2 cleanup partial:", {
+        designId: id,
+        deleted: res.deleted,
+        errors: res.errors.slice(0, 5),
+      });
+    }
+  } catch (err) {
+    // R2 erişimi düşse bile davetiye silinmeli — kullanıcı işlemi
+    // tamamlanır, R2 orphan'ları sonra cron ile süpürülebilir.
+    console.error("[delete invitation] R2 cleanup failed:", err);
+  }
+  await prisma.asset.deleteMany({ where: { designId: id } });
   await prisma.invitationDesign.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

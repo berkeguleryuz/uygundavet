@@ -26,6 +26,7 @@ import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { cn } from "@/src/lib/utils";
 import { getEventLabels } from "@/src/lib/event-labels";
+import { planLimitsFor, nextTierLabel } from "@/src/lib/plan-limits";
 import {
   InlineDecorationField,
   type InlineDecorationFieldHandle,
@@ -201,6 +202,7 @@ export function TextStylePanel() {
         ) : isGalleryItemsField ? (
           <GalleryItemsEditor
             docId={docId}
+            tier={doc.meta.tier}
             items={
               ((block.data as { items?: import("@davety/schema").MediaRef[] }).items) ??
               []
@@ -840,24 +842,34 @@ function EventProgramItemsEditor({
  * Editor for gallery block's `items` array — yükle/sil/sırala.
  * Galeriye birden fazla görsel/video eklenebilir; her parçanın küçük
  * önizlemesi gösterilir, kullanıcı silebilir veya sıraya alabilir.
- * Yükleme `useAssetUpload` üzerinden geçer (orjinalde
- * BlockControlsPanel'in chip'i de aynı hook'u kullanıyor).
+ * Multi-select destekli: kullanıcı 5–10 dosya seçip toplu yükleyebilir.
+ *
+ * Tier gating: free pakette galeri 1 medya ile sınırlı. Limite ulaşınca
+ * "+ Görsel/Video Ekle" butonu kilitleniyor ve "Klasik+ ile daha fazla"
+ * uyarısı çıkıyor. Yayınlama anında server-side tekrar trim ediyor (UI
+ * bypass'lansa bile koruma var).
  */
 function GalleryItemsEditor({
   docId,
+  tier,
   items,
   onChange,
 }: {
   docId: string | null;
+  tier: import("@davety/schema").PlanTier | undefined;
   items: import("@davety/schema").MediaRef[];
   onChange: (next: import("@davety/schema").MediaRef[]) => void;
 }) {
-  const { pick, busy } = useAssetUpload(docId);
+  const { pickMany, busy } = useAssetUpload(docId);
+  const limits = planLimitsFor(tier);
+  const remaining = Math.max(0, limits.galleryMaxItems - items.length);
+  const atLimit = remaining === 0;
 
   async function add() {
-    const media = await pick("image/*,video/*");
-    if (!media) return;
-    onChange([...items, media]);
+    if (atLimit) return;
+    const next = await pickMany("image/*,video/*", remaining);
+    if (next.length === 0) return;
+    onChange([...items, ...next]);
   }
   function remove(idx: number) {
     const next = items.slice();
@@ -879,7 +891,7 @@ function GalleryItemsEditor({
           Galeri Medyaları
         </label>
         <span className="text-[10px] text-muted-foreground">
-          {items.length} parça
+          {items.length} / {limits.galleryMaxItems}
         </span>
       </div>
 
@@ -944,11 +956,24 @@ function GalleryItemsEditor({
       <button
         type="button"
         onClick={add}
-        disabled={busy || !docId}
+        disabled={busy || !docId || atLimit}
         className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-dashed border-border py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {busy ? "Yükleniyor..." : "+ Görsel/Video Ekle"}
+        {busy
+          ? "Yükleniyor..."
+          : atLimit
+          ? `Sınıra ulaşıldı (${limits.galleryMaxItems})`
+          : "+ Görsel/Video Ekle"}
       </button>
+
+      {limits.galleryMaxItems <= 1 ? (
+        <div className="mt-2 rounded-md border border-amber-300/60 bg-amber-50/60 p-2.5 text-[11px] text-amber-900">
+          <strong className="font-medium">Free pakette galeri 1 medya ile sınırlı.</strong>{" "}
+          Daha fazla fotoğraf/video eklemek için paketini{" "}
+          <span className="font-semibold">{nextTierLabel(tier)}</span>{" "}
+          paketine yükselt.
+        </div>
+      ) : null}
     </div>
   );
 }

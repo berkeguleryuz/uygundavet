@@ -56,10 +56,47 @@ export async function GET() {
   return NextResponse.json({ designs });
 }
 
+// DB'nin şişmemesi için kullanıcı başına davetiye taban kapasitesi.
+// Premium satın alma geçmişi olan hesaplar daha yüksek tavanı görür —
+// yani "para getiren" kullanıcılara daha fazla alan veriyoruz, geri
+// kalanlar 2 ile sınırlı.
+const FREE_USER_INVITATION_CAP = 2;
+const PREMIUM_USER_INVITATION_CAP = 5;
+
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Mevcut davetiye sayısı + premium-tier yayın geçmişi kontrolü.
+  // Tier bilgisi doc.meta.tier altında JSON olarak duruyor; raw SQL
+  // yerine prisma.findMany ile tüm kayıtları çekip hesaplıyoruz çünkü
+  // kullanıcı başına davetiye sayısı küçük (max ~5) ve sorguyu her
+  // create'de bir kez yapıyoruz.
+  const myDesigns = await prisma.invitationDesign.findMany({
+    where: { userId: session.user.id },
+    select: { id: true, doc: true },
+  });
+  const hasPremiumHistory = myDesigns.some((d) => {
+    const tier = (d.doc as { meta?: { tier?: string } }).meta?.tier;
+    return tier === "premium";
+  });
+  const cap = hasPremiumHistory
+    ? PREMIUM_USER_INVITATION_CAP
+    : FREE_USER_INVITATION_CAP;
+  if (myDesigns.length >= cap) {
+    return NextResponse.json(
+      {
+        error: "InvitationCapReached",
+        cap,
+        currentCount: myDesigns.length,
+        message: hasPremiumHistory
+          ? `Aynı anda en fazla ${cap} davetiye tutabilirsin. Yenisini oluşturmadan önce eskilerden birini sil.`
+          : `Free hesapla aynı anda en fazla ${cap} davetiye oluşturabilirsin. Premium pakete geçtiğinde bu sınır ${PREMIUM_USER_INVITATION_CAP}'e çıkıyor. Yeni bir tane oluşturmak için eski davetiyelerden birini sil.`,
+      },
+      { status: 409 }
+    );
   }
 
   const body = await req.json().catch(() => null);

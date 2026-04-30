@@ -18,6 +18,9 @@ import { useConfirm } from "@/src/components/ConfirmDialog";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { cn } from "@/src/lib/utils";
+import { planLimitsFor, nextTierLabel } from "@/src/lib/plan-limits";
+import { toast } from "sonner";
+import type { BlockType, PlanTier } from "@davety/schema";
 
 const BLOCK_LABELS: Record<string, string> = {
   hero: "Başlık",
@@ -66,7 +69,20 @@ export function Canvas() {
     return <EnvelopeCanvas />;
   }
 
-  const handlePick = (index: number, type: import("@davety/schema").BlockType) => {
+  const tier = doc.meta.tier;
+  const limits = planLimitsFor(tier);
+
+  const handlePick = (index: number, type: BlockType) => {
+    // Tier gating: memory_book sadece Klasik+ paketlerinde. Free
+    // kullanıcı buton görse de tıklayınca eklenmiyor, upgrade toast
+    // çıkıyor.
+    if (type === "memory_book" && !limits.memoryBookEnabled) {
+      toast.warning(
+        `Hatıra Defteri ${nextTierLabel(tier)} paketinde. Yükseltmek için Yayınla ekranına git.`
+      );
+      setInsertingAt(null);
+      return;
+    }
     const entry = listBlockEntries().find((e) => e.type === type);
     if (!entry) return;
     insertBlock(
@@ -125,6 +141,7 @@ export function Canvas() {
                   // selected one so mobile users (no hover) can still
                   // reach it after tapping a block.
                   forceVisible={selected || selectedBlockId === doc.blocks[i - 1]?.id}
+                  tier={tier}
                   onOpen={() => setInsertingAt(i)}
                   onClose={() => setInsertingAt(null)}
                   onPick={(type) => handlePick(i, type)}
@@ -230,6 +247,7 @@ export function Canvas() {
       >
         <TailInsertSlot
           active={insertingAt === doc.blocks.length}
+          tier={tier}
           onOpen={() => setInsertingAt(doc.blocks.length)}
           onClose={() => setInsertingAt(null)}
           onPick={(type) => handlePick(doc.blocks.length, type)}
@@ -272,6 +290,7 @@ function InsertSlot({
   active,
   flipUp,
   forceVisible,
+  tier,
   onOpen,
   onClose,
   onPick,
@@ -285,9 +304,10 @@ function InsertSlot({
    *  (no :hover) and when the adjacent block is selected, so mobile
    *  users have a deterministic way to reveal "+ Blok Ekle". */
   forceVisible: boolean;
+  tier: PlanTier | undefined;
   onOpen: () => void;
   onClose: () => void;
-  onPick: (type: import("@davety/schema").BlockType) => void;
+  onPick: (type: BlockType) => void;
 }) {
   // Inline insert slot is absolute-positioned and hover-only on desktop.
   // On touch devices (`(hover: none)`) the slot is always visible since
@@ -315,7 +335,7 @@ function InsertSlot({
           <Plus className="size-3" /> Blok Ekle
         </button>
       ) : (
-        <BlockPalette flipUp={flipUp} paletteCls={paletteCls} onClose={onClose} onPick={onPick} />
+        <BlockPalette flipUp={flipUp} paletteCls={paletteCls} tier={tier} onClose={onClose} onPick={onPick} />
       )}
     </div>
   );
@@ -323,14 +343,16 @@ function InsertSlot({
 
 function TailInsertSlot({
   active,
+  tier,
   onOpen,
   onClose,
   onPick,
 }: {
   active: boolean;
+  tier: PlanTier | undefined;
   onOpen: () => void;
   onClose: () => void;
-  onPick: (type: import("@davety/schema").BlockType) => void;
+  onPick: (type: BlockType) => void;
 }) {
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -345,6 +367,7 @@ function TailInsertSlot({
         <BlockPalette
           flipUp={false}
           paletteCls="absolute top-full mt-2 left-1/2 -translate-x-1/2"
+          tier={tier}
           onClose={onClose}
           onPick={onPick}
         />
@@ -355,15 +378,18 @@ function TailInsertSlot({
 
 function BlockPalette({
   paletteCls,
+  tier,
   onClose,
   onPick,
 }: {
   flipUp: boolean;
   paletteCls: string;
+  tier: PlanTier | undefined;
   onClose: () => void;
-  onPick: (type: import("@davety/schema").BlockType) => void;
+  onPick: (type: BlockType) => void;
 }) {
   const entries = listBlockEntries();
+  const limits = planLimitsFor(tier);
   return (
     <div
       className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
@@ -379,15 +405,29 @@ function BlockPalette({
         </button>
       </div>
       <div className="grid grid-cols-2 gap-1">
-        {entries.map((e) => (
-          <button
-            key={e.type}
-            onClick={() => onPick(e.type)}
-            className="text-[11px] text-left px-2 py-1.5 rounded hover:bg-muted cursor-pointer"
-          >
-            {BLOCK_LABELS[e.type] ?? e.type}
-          </button>
-        ))}
+        {entries.map((e) => {
+          const locked = e.type === "memory_book" && !limits.memoryBookEnabled;
+          return (
+            <button
+              key={e.type}
+              onClick={() => onPick(e.type)}
+              title={locked ? `${nextTierLabel(tier)} paketinde açılır` : undefined}
+              className={cn(
+                "text-[11px] text-left px-2 py-1.5 rounded cursor-pointer flex items-center justify-between gap-1",
+                locked
+                  ? "text-muted-foreground bg-muted/40 hover:bg-muted/60"
+                  : "hover:bg-muted"
+              )}
+            >
+              <span>{BLOCK_LABELS[e.type] ?? e.type}</span>
+              {locked ? (
+                <span className="text-[9px] uppercase tracking-wider rounded-full bg-amber-200 text-amber-900 px-1.5 py-0.5">
+                  🔒 {nextTierLabel(tier)}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

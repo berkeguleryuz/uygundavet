@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Eye,
@@ -10,11 +11,13 @@ import {
   Sliders,
   Info,
 } from "lucide-react";
-import { DECORATION_ICONS } from "@davety/renderer";
+import { toast } from "sonner";
+import { DECORATION_ICONS, DECORATION_CATEGORIES } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { SpacingControl } from "./controls/SpacingControl";
+import { DECORATION_TEMPLATE_CATEGORIES } from "@/src/components/decorations/templateManifest";
 
 export function BlockControlsPanel() {
   const t = useTranslations("Editor.block");
@@ -66,12 +69,24 @@ export function BlockControlsPanel() {
           data={
             block.data as {
               iconKey?: string;
+              svgRaw?: string;
               sizePx?: number;
               color?: string;
               align?: "left" | "center" | "right";
             }
           }
-          onChange={(patch) => updateBlockData(blockId, patch)}
+          onChange={(patch) => {
+            // DecorationView öncelik sırası: svgRaw > iconKey. Mini ikon
+            // seçilince svgRaw'ı sıfırla, template seçilince iconKey'i
+            // sıfırla — böylece picker'lar arası geçiş bekleneni yapar.
+            if (patch.iconKey !== undefined) {
+              updateBlockData(blockId, { ...patch, svgRaw: undefined });
+            } else if (patch.svgRaw !== undefined) {
+              updateBlockData(blockId, { ...patch, iconKey: undefined });
+            } else {
+              updateBlockData(blockId, patch);
+            }
+          }}
         />
       ) : null}
 
@@ -220,12 +235,14 @@ function DecorationBlockEditor({
 }: {
   data: {
     iconKey?: string;
+    svgRaw?: string;
     sizePx?: number;
     color?: string;
     align?: "left" | "center" | "right";
   };
   onChange: (patch: Partial<{
     iconKey: string;
+    svgRaw: string;
     sizePx: number;
     color: string;
     align: "left" | "center" | "right";
@@ -238,10 +255,12 @@ function DecorationBlockEditor({
       <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
         Süsleme
       </div>
-      <DecorationIconPicker
-        value={data.iconKey ?? "heart"}
+
+      <UnifiedDecorationPicker
+        selectedIconKey={data.iconKey}
         color={data.color}
-        onChange={(iconKey) => onChange({ iconKey })}
+        onPickIcon={(iconKey) => onChange({ iconKey })}
+        onPickTemplate={(svgRaw) => onChange({ svgRaw, sizePx: 220 })}
       />
       <label className="flex items-center gap-2 text-[11px]">
         <span className="w-12 text-muted-foreground">Boyut</span>
@@ -295,41 +314,172 @@ function DecorationBlockEditor({
   );
 }
 
-function DecorationIconPicker({
-  value,
+/**
+ * Tüm süslemeler tek bir picker'da — eski "Mini İkonlar / Hazır Şablonlar"
+ * iki sekmeli yapı kaldırıldı. SVG'ler nasılsa aynı boyda render edildiği
+ * için ayırmaya gerek yok; "Hepsi" + kategori chip'leriyle filtreleniyor.
+ *
+ * İki kaynaktan gelen item'lar tek listeye birleştiriliyor:
+ *   - inline catalog ikonları (`DECORATION_ICONS`) → onPickIcon(iconKey)
+ *   - public şablonlar (`DECORATION_TEMPLATE_CATEGORIES`) → fetch → onPickTemplate(svgRaw)
+ */
+type UnifiedItem =
+  | {
+      kind: "icon";
+      id: string;
+      label: string;
+      categoryKey: string;
+      categoryLabel: string;
+      svg: string;
+    }
+  | {
+      kind: "template";
+      id: string;
+      categoryKey: string;
+      categoryLabel: string;
+      url: string;
+    };
+
+function UnifiedDecorationPicker({
+  selectedIconKey,
   color,
-  onChange,
+  onPickIcon,
+  onPickTemplate,
 }: {
-  value: string;
-  color?: string;
-  onChange: (id: string) => void;
+  selectedIconKey: string | undefined;
+  color: string | undefined;
+  onPickIcon: (iconKey: string) => void;
+  onPickTemplate: (svgRaw: string) => void;
 }) {
+  const [activeKey, setActiveKey] = useState<string>("all");
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // Tek liste — her chip kategori üzerinden filtre, "all" hepsini gösterir.
+  const items = useMemo<UnifiedItem[]>(() => {
+    const iconCatLabel = (key: string) =>
+      DECORATION_CATEGORIES.find((c) => c.key === key)?.label ?? key;
+    const iconItems: UnifiedItem[] = DECORATION_ICONS.map((i) => ({
+      kind: "icon",
+      id: i.id,
+      label: i.label,
+      categoryKey: `icon:${i.category}`,
+      categoryLabel: iconCatLabel(i.category),
+      svg: i.svg,
+    }));
+    const templateItems: UnifiedItem[] = DECORATION_TEMPLATE_CATEGORIES.flatMap(
+      (c) =>
+        c.items.map<UnifiedItem>((it) => ({
+          kind: "template",
+          id: it.id,
+          categoryKey: `tpl:${c.key}`,
+          categoryLabel: c.label,
+          url: it.url,
+        }))
+    );
+    return [...iconItems, ...templateItems];
+  }, []);
+
+  // Chip listesi: "Hepsi" + her kaynaktan kategoriler. Sıra: önce mini icon
+  // kategorileri (kısa), sonra template kategorileri.
+  const chips = useMemo(() => {
+    const seen = new Set<string>();
+    const out: { key: string; label: string }[] = [
+      { key: "all", label: "Hepsi" },
+    ];
+    for (const it of items) {
+      if (seen.has(it.categoryKey)) continue;
+      seen.add(it.categoryKey);
+      out.push({ key: it.categoryKey, label: it.categoryLabel });
+    }
+    return out;
+  }, [items]);
+
+  const filtered =
+    activeKey === "all"
+      ? items
+      : items.filter((it) => it.categoryKey === activeKey);
+
+  async function handlePick(it: UnifiedItem) {
+    if (it.kind === "icon") {
+      onPickIcon(it.id);
+      return;
+    }
+    setBusyId(it.id);
+    try {
+      const res = await fetch(it.url);
+      if (!res.ok) throw new Error("fetch failed");
+      const svgRaw = await res.text();
+      onPickTemplate(svgRaw);
+    } catch {
+      toast.error("Şablon yüklenemedi");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
-    <div className="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto pr-1">
-      {DECORATION_ICONS.map((i) => (
-        <button
-          key={i.id}
-          type="button"
-          onClick={() => onChange(i.id)}
-          title={i.label}
-          className={`aspect-square rounded border flex items-center justify-center cursor-pointer transition-colors ${
-            value === i.id
-              ? "border-primary bg-primary/10"
-              : "border-border bg-background hover:border-foreground/40"
-          }`}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={color ?? "currentColor"}
-            strokeWidth={1.4}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-4"
-            dangerouslySetInnerHTML={{ __html: i.svg }}
-          />
-        </button>
-      ))}
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto pr-1">
+        {chips.map((c) => (
+          <button
+            key={c.key}
+            type="button"
+            onClick={() => setActiveKey(c.key)}
+            className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full border cursor-pointer transition-colors ${
+              activeKey === c.key
+                ? "bg-foreground text-background border-foreground"
+                : "bg-background text-muted-foreground border-border hover:border-foreground/40"
+            }`}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      <div
+        className="grid grid-cols-5 gap-1 max-h-44 overflow-y-auto pr-1"
+        style={{ color: color ?? "currentColor" }}
+      >
+        {filtered.map((it) => {
+          const isSelected =
+            it.kind === "icon" && it.id === selectedIconKey;
+          return (
+            <button
+              key={`${it.kind}:${it.id}`}
+              type="button"
+              onClick={() => handlePick(it)}
+              disabled={it.kind === "template" && busyId === it.id}
+              title={it.kind === "icon" ? it.label : it.id}
+              className={`aspect-square rounded border flex items-center justify-center cursor-pointer transition-colors p-0.5 disabled:opacity-50 ${
+                isSelected
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-background hover:border-foreground/40"
+              }`}
+            >
+              {it.kind === "icon" ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={color ?? "currentColor"}
+                  strokeWidth={1.4}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-5"
+                  dangerouslySetInnerHTML={{ __html: it.svg }}
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={it.url}
+                  alt={it.id}
+                  className="w-full h-full object-contain"
+                  style={{ color: color ?? "currentColor" }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

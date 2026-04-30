@@ -209,16 +209,9 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 10. FOOTER
-    {
-      id: nanoid(8),
-      type: "footer",
-      visible: true,
-      style: { align: "center" },
-      data: {
-        text: "davety.app",
-      },
-    },
+    // (Önceden burada hardcoded "davety.app" footer'ı vardı; tanıtım
+    // bloğu artık sadece free tier için yayınlama anında 4. sıraya
+    // injekt ediliyor — burada bir daha çıkmıyor.)
   ];
 
   return {

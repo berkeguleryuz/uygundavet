@@ -1,13 +1,85 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { validateVanityPath } from "@/src/lib/slug";
+import { planLimitsFor, tierOrFree } from "@/src/lib/plan-limits";
+import type { Block, PlanTier } from "@davety/schema";
 
 const publishSchema = z.object({
   vanityPath: z.string().optional(),
   tier: z.enum(["free", "basic", "pro", "premium"]).optional(),
 });
+
+/**
+ * Apply tier-based mutations to the doc snapshot before persisting it as
+ * the published version. Server-side gate: even if the editor UI is
+ * bypassed (developer tools, malicious client), the publishedDoc never
+ * leaks paid-tier features to free users.
+ *
+ * Mutations applied:
+ *   1. Trim gallery items to the tier's max (1 for free, larger for paid).
+ *   2. Drop disallowed blocks (memory_book on free).
+ *   3. Inject a branded promo block at the 4th position (index 3) for
+ *      free tier so every published free invitation carries our advert.
+ *      Idempotent — running twice doesn't duplicate the block.
+ *
+ * The branding block uses a lightweight custom_note with a recognisable
+ * id prefix so we can detect and replace it on subsequent publishes.
+ */
+const BRANDING_BLOCK_ID_PREFIX = "davetyolla-brand-";
+
+function applyTierToDoc(doc: object, tier: PlanTier): object {
+  const limits = planLimitsFor(tier);
+  const docTyped = doc as { blocks?: Block[]; meta?: Record<string, unknown> };
+  let blocks = (docTyped.blocks ?? []).slice();
+
+  // 1. Trim gallery items
+  blocks = blocks.map((b) => {
+    if (b.type !== "gallery") return b;
+    const items = ((b.data as { items?: unknown[] }).items ?? []).slice(
+      0,
+      limits.galleryMaxItems
+    );
+    return { ...b, data: { ...b.data, items } };
+  });
+
+  // 2. Drop disallowed blocks
+  if (!limits.memoryBookEnabled) {
+    blocks = blocks.filter((b) => b.type !== "memory_book");
+  }
+
+  // 3. Branding block: free shows it permanently at index 3, paid tiers
+  //    have it removed if it leaked in.
+  blocks = blocks.filter(
+    (b) => !b.id.startsWith(BRANDING_BLOCK_ID_PREFIX)
+  );
+  if (limits.showsBranding) {
+    const branding: Block = {
+      id: `${BRANDING_BLOCK_ID_PREFIX}${nanoid(6)}`,
+      type: "custom_note",
+      visible: true,
+      locked: true,
+      data: {
+        title: "DavetYolla.com",
+        body: "Bu davetiye DavetYolla.com ile ücretsiz hazırlandı. Sen de kendi davetiyeni dakikalar içinde oluştur.",
+      },
+      style: { align: "center" },
+    };
+    const insertAt = Math.min(3, blocks.length);
+    blocks = [
+      ...blocks.slice(0, insertAt),
+      branding,
+      ...blocks.slice(insertAt),
+    ];
+  }
+
+  return {
+    ...docTyped,
+    blocks,
+  };
+}
 
 type Params = Promise<{ id: string }>;
 
@@ -51,23 +123,32 @@ export async function POST(req: Request, ctx: { params: Params }) {
   }
 
   const tier = parsed.data.tier;
-  const existingMeta = (existing.doc as { meta?: { tier?: string } }).meta ?? {};
+  const existingMeta =
+    (existing.doc as { meta?: { tier?: string } }).meta ?? {};
+  const effectiveTier = tierOrFree(
+    (tier ?? (existingMeta.tier as PlanTier | undefined)) ?? null
+  );
+
+  // Tier mutations (gallery trim + branding block) before stamping
+  // status=published. publishedDoc is what guests see; doc is what the
+  // owner keeps editing — we apply the same trim to both so the editor
+  // shows the actual published state.
+  const tierApplied = applyTierToDoc(existing.doc as object, effectiveTier);
   const publishedDoc = {
-    ...(existing.doc as object),
+    ...tierApplied,
     meta: {
       ...existingMeta,
+      ...(tierApplied as { meta?: object }).meta,
       status: "published",
       updatedAt: new Date().toISOString(),
-      ...(tier ? { tier } : existingMeta.tier ? { tier: existingMeta.tier } : {}),
+      tier: effectiveTier,
     },
   };
 
-  const docWithTier = tier
-    ? {
-        ...(existing.doc as object),
-        meta: { ...existingMeta, tier },
-      }
-    : null;
+  const docWithTier = {
+    ...tierApplied,
+    meta: { ...existingMeta, tier: effectiveTier },
+  };
 
   const updated = await prisma.invitationDesign.update({
     where: { id },
@@ -76,7 +157,7 @@ export async function POST(req: Request, ctx: { params: Params }) {
       publishedDoc,
       publishedAt: new Date(),
       ...(vanity ? { vanityPath: vanity } : {}),
-      ...(docWithTier ? { doc: docWithTier } : {}),
+      doc: docWithTier,
     },
     select: { slug: true, vanityPath: true, publishedAt: true },
   });

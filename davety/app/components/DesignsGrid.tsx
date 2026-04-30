@@ -143,7 +143,9 @@ function DesignDateDialog({
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      toast.error(body.error ?? "Oluşturulamadı");
+      // Cap aşımı için kullanıcıya net mesaj göster — yoksa raw error
+      // kodu ("InvitationCapReached") çıkıyordu.
+      toast.error(body.message ?? body.error ?? "Oluşturulamadı");
       setBusy(false);
       return;
     }

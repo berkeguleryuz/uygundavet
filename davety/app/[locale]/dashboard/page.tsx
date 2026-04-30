@@ -73,6 +73,7 @@ export default async function DashboardPage({
       slug: d.slug,
       vanityPath: d.vanityPath,
       status: d.status,
+      tier: summary.tier,
       updatedAt: d.updatedAt.toISOString(),
       createdAt: d.createdAt.toISOString(),
       publishedAt: d.publishedAt ? d.publishedAt.toISOString() : null,
@@ -142,6 +143,7 @@ interface DocSummary {
   bgColor: string | null;
   accentColor: string | null;
   pageBgColor: string | null;
+  tier: import("@davety/schema").PlanTier | null;
 }
 
 const HERO_VARIANT_LABELS: Record<string, string> = {
@@ -164,12 +166,17 @@ function summariseDoc(doc: unknown): DocSummary {
     bgColor: null,
     accentColor: null,
     pageBgColor: null,
+    tier: null,
   };
   if (!doc || typeof doc !== "object") return empty;
 
   const d = doc as {
     blocks?: Array<{ type?: string; data?: Record<string, unknown> }>;
-    meta?: { weddingDate?: string; weddingTime?: string };
+    meta?: {
+      weddingDate?: string;
+      weddingTime?: string;
+      tier?: import("@davety/schema").PlanTier;
+    };
     theme?: { bgColor?: string; accentColor?: string; pageBgColor?: string };
   };
 
@@ -196,5 +203,6 @@ function summariseDoc(doc: unknown): DocSummary {
     bgColor: d.theme?.bgColor ?? null,
     accentColor: d.theme?.accentColor ?? null,
     pageBgColor: d.theme?.pageBgColor ?? null,
+    tier: d.meta?.tier ?? null,
   };
 }

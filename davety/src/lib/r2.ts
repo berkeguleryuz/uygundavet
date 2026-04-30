@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} from "@aws-sdk/client-s3";
 
 const accountId = process.env.R2_ACCOUNT_ID;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -43,4 +48,82 @@ export async function uploadToR2(args: {
 export function r2PublicUrl(key: string): string {
   if (!publicBase) throw new Error("R2_PUBLIC_URL not set");
   return `${publicBase.replace(/\/$/, "")}/${key}`;
+}
+
+/**
+ * Toplu silme — verilen anahtarları tek bir DeleteObjects çağrısıyla
+ * temizler. R2/S3 API'si tek istekte 1000 anahtara izin veriyor; daha
+ * büyük listeler için chunk'lara bölüyoruz.
+ *
+ * Hata durumunda throw ETMEZ — silinemeyenleri döndürür ki çağıran
+ * tarafta loglanabilsin. R2 silmesi başarısız olsa bile DB temizliği
+ * (davetiye silme) durmasın.
+ */
+export async function deleteR2Keys(keys: string[]): Promise<{
+  ok: boolean;
+  deleted: number;
+  errors: { key: string; message: string }[];
+}> {
+  if (!R2_ENABLED || !r2 || keys.length === 0) {
+    return { ok: true, deleted: 0, errors: [] };
+  }
+  const errors: { key: string; message: string }[] = [];
+  let deleted = 0;
+  for (let i = 0; i < keys.length; i += 1000) {
+    const chunk = keys.slice(i, i + 1000);
+    try {
+      const res = await r2.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: {
+            Objects: chunk.map((k) => ({ Key: k })),
+            Quiet: true,
+          },
+        })
+      );
+      deleted += chunk.length - (res.Errors?.length ?? 0);
+      for (const e of res.Errors ?? []) {
+        errors.push({ key: e.Key ?? "?", message: e.Message ?? "unknown" });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "unknown";
+      for (const k of chunk) errors.push({ key: k, message: msg });
+    }
+  }
+  return { ok: errors.length === 0, deleted, errors };
+}
+
+/**
+ * Bir prefix altındaki TÜM nesneleri sil. Davetiye silindiğinde
+ * `users/{userId}/designs/{designId}/` prefix'i altında ne varsa
+ * (orijinal + thumb/md/lg varyantları + DB'de Asset row'u kalmamış
+ * olası orphan dosyalar) tek seferde temizlenir.
+ *
+ * Pagination: ListObjectsV2 bir seferde max 1000 anahtar veriyor;
+ * NextContinuationToken ile döngüde tüm sayfaları topluyoruz.
+ */
+export async function deleteR2Prefix(prefix: string): Promise<{
+  ok: boolean;
+  deleted: number;
+  errors: { key: string; message: string }[];
+}> {
+  if (!R2_ENABLED || !r2 || !prefix) {
+    return { ok: true, deleted: 0, errors: [] };
+  }
+  const allKeys: string[] = [];
+  let continuationToken: string | undefined;
+  do {
+    const res = await r2.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      })
+    );
+    for (const obj of res.Contents ?? []) {
+      if (obj.Key) allKeys.push(obj.Key);
+    }
+    continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+  } while (continuationToken);
+  return deleteR2Keys(allKeys);
 }

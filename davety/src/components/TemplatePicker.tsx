@@ -39,7 +39,7 @@ export function TemplatePicker({
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      toast.error(body.error ?? "Oluşturulamadı");
+      toast.error(body.message ?? body.error ?? "Oluşturulamadı");
       setBusy(null);
       return;
     }

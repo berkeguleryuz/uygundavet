@@ -36,6 +36,13 @@ function XIcon({ className }: { className?: string }) {
 }
 import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  TierIconStyles,
+  SparkleIcon,
+  StarIcon,
+  ZapIcon,
+  CrownIcon,
+} from "@/src/components/tier-icons";
 
 type TierId = "free" | "basic" | "pro" | "premium";
 
@@ -54,145 +61,7 @@ interface TierMeta {
   icon: TierIconComponent;
 }
 
-/* ─── Animated tier icons ──────────────────────────────────────────────
-   Self-contained inline SVGs whose keyframes live in <TierIconStyles/>.
-   All class names are prefixed `ssp-` (SaveScreen Picker) to avoid
-   bleeding into the global stylesheet. */
-
-function TierIconStyles() {
-  return (
-    <style>{`
-      @keyframes ssp-spk-pulse { 0%,100% { transform: scale(0.92); } 50% { transform: scale(1.08); } }
-      @keyframes ssp-spk-blink { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
-      @keyframes ssp-star-bob   { 0%,100% { transform: rotate(-3deg) scale(0.96); } 50% { transform: rotate(3deg) scale(1.05); } }
-      @keyframes ssp-zap-flash  { 0%,42%,100% { opacity: 1; } 48% { opacity: 0.45; } 56% { opacity: 1; } 62% { opacity: 0.55; } 70% { opacity: 1; } }
-      @keyframes ssp-zap-spark  { 0%,100% { opacity: 0; transform: scale(0.4); } 35%,55% { opacity: 1; transform: scale(1); } }
-      @keyframes ssp-crown-bob  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
-      @keyframes ssp-gem-twinkle{ 0%,100% { opacity: 0.15; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.1); } }
-
-      .ssp-spk-main { transform-box: fill-box; transform-origin: center; animation: ssp-spk-pulse 2.4s ease-in-out infinite; }
-      .ssp-spk-tl   { animation: ssp-spk-blink 1.8s ease-in-out 0.2s infinite; }
-      .ssp-spk-br   { animation: ssp-spk-blink 1.8s ease-in-out 0.9s infinite; }
-
-      .ssp-star-body { transform-box: fill-box; transform-origin: center; animation: ssp-star-bob 3.6s ease-in-out infinite; }
-
-      .ssp-zap-bolt { transform-box: fill-box; transform-origin: center; animation: ssp-zap-flash 2.6s ease-in-out infinite; }
-      .ssp-zap-sp1, .ssp-zap-sp2, .ssp-zap-sp3 { transform-box: fill-box; transform-origin: center; }
-      .ssp-zap-sp1  { animation: ssp-zap-spark 1.8s ease-in-out 0s infinite; }
-      .ssp-zap-sp2  { animation: ssp-zap-spark 1.8s ease-in-out 0.6s infinite; }
-      .ssp-zap-sp3  { animation: ssp-zap-spark 1.8s ease-in-out 1.2s infinite; }
-
-      .ssp-crown-body { transform-box: fill-box; transform-origin: center; animation: ssp-crown-bob 2.4s ease-in-out infinite; }
-      .ssp-gem-1, .ssp-gem-2, .ssp-gem-3 { transform-box: fill-box; transform-origin: center; }
-      .ssp-gem-1    { animation: ssp-gem-twinkle 2.4s ease-in-out 0s infinite; }
-      .ssp-gem-2    { animation: ssp-gem-twinkle 2.4s ease-in-out 0.8s infinite; }
-      .ssp-gem-3    { animation: ssp-gem-twinkle 2.4s ease-in-out 1.6s infinite; }
-
-      @media (prefers-reduced-motion: reduce) {
-        .ssp-spk-main, .ssp-spk-tl, .ssp-spk-br,
-        .ssp-star-body,
-        .ssp-zap-bolt, .ssp-zap-sp1, .ssp-zap-sp2, .ssp-zap-sp3,
-        .ssp-crown-body, .ssp-gem-1, .ssp-gem-2, .ssp-gem-3 {
-          animation: none;
-        }
-      }
-    `}</style>
-  );
-}
-
-function AnimatedSparkleIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path
-        className="ssp-spk-main"
-        d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
-      />
-      <g className="ssp-spk-tl">
-        <path d="M20 3v4" />
-        <path d="M22 5h-4" />
-      </g>
-      <g className="ssp-spk-br">
-        <path d="M4 17v2" />
-        <path d="M5 18H3" />
-      </g>
-    </svg>
-  );
-}
-
-function AnimatedStarIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path
-        className="ssp-star-body"
-        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755A2.122 2.122 0 0 0 9.213 6.974z"
-      />
-    </svg>
-  );
-}
-
-function AnimatedZapIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path
-        className="ssp-zap-bolt"
-        d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
-      />
-      <circle className="ssp-zap-sp1" cx="20.5" cy="4" r="0.8" fill="currentColor" stroke="none" />
-      <circle className="ssp-zap-sp2" cx="3" cy="20" r="0.7" fill="currentColor" stroke="none" />
-      <circle className="ssp-zap-sp3" cx="21" cy="21" r="0.6" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function AnimatedCrownIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <g className="ssp-crown-body">
-        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.518L7.09 9.165a1 1 0 0 0 1.517-.294z" />
-        <path d="M5 21h14" />
-      </g>
-      <circle className="ssp-gem-1" cx="12" cy="3.6" r="0.9" fill="currentColor" stroke="none" />
-      <circle className="ssp-gem-2" cx="3" cy="6" r="0.7" fill="currentColor" stroke="none" />
-      <circle className="ssp-gem-3" cx="21" cy="6" r="0.7" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
+/* Tier ikonları + animasyon sınıfları paylaşımlı module'a taşındı. */
 
 const TIERS: TierMeta[] = [
   {
@@ -201,7 +70,7 @@ const TIERS: TierMeta[] = [
     basePrice: 0,
     tagline: "Önce dene, sonra karar ver.",
     bestFor: "Hızlıca paylaşmak isteyenler için",
-    icon: AnimatedSparkleIcon,
+    icon: SparkleIcon,
     muted: true,
   },
   {
@@ -210,7 +79,7 @@ const TIERS: TierMeta[] = [
     basePrice: 2000,
     tagline: "Kendi fotoğrafların, kendi renklerin.",
     bestFor: "Kişisel dokunuş arayanlar için",
-    icon: AnimatedStarIcon,
+    icon: StarIcon,
   },
   {
     id: "pro",
@@ -219,7 +88,7 @@ const TIERS: TierMeta[] = [
     tagline: "Tüm özellikler açık, sınırsız özgürlük.",
     bestFor: "Misafirleriyle etkileşim kuranlar için",
     highlight: true,
-    icon: AnimatedZapIcon,
+    icon: ZapIcon,
   },
   {
     id: "premium",
@@ -227,7 +96,7 @@ const TIERS: TierMeta[] = [
     basePrice: 12500,
     tagline: "Markalaşmış davetiye deneyimi.",
     bestFor: "Profesyonel görünüm isteyenler için",
-    icon: AnimatedCrownIcon,
+    icon: CrownIcon,
   },
 ];
 
@@ -386,6 +255,11 @@ export function SaveScreen({
   const [step, setStep] = useState<"intro" | "tier">("intro");
   const [selectedTier, setSelectedTier] = useState<TierId | null>(initialTier);
   const [activeTier, setActiveTier] = useState<TierId | null>(initialTier);
+  // Pending tier the user clicked "Yayınla" with — shows the
+  // confirmation/payment modal until they confirm or cancel. Free tier
+  // sees a warning about gallery trim + DavetYolla.com banner; paid
+  // tiers see the payment placeholder (Stripe wiring comes later).
+  const [confirmingTier, setConfirmingTier] = useState<TierId | null>(null);
 
   const davetiyeBase =
     process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "https://davetyolla.com";
@@ -497,7 +371,7 @@ export function SaveScreen({
             selectedTier={selectedTier}
             onSelect={setSelectedTier}
             onCancel={() => setStep("intro")}
-            onConfirm={() => selectedTier && handlePublish(selectedTier)}
+            onConfirm={() => selectedTier && setConfirmingTier(selectedTier)}
             publishing={publishing}
           />
         ) : (
@@ -547,7 +421,114 @@ export function SaveScreen({
       <div id="share-qr" className="hidden">
         <QRCodeCanvas value={shareUrl} size={512} includeMargin />
       </div>
+
+      {confirmingTier ? (
+        <ConfirmTierModal
+          tierId={confirmingTier}
+          publishing={publishing}
+          onCancel={() => setConfirmingTier(null)}
+          onConfirm={async () => {
+            await handlePublish(confirmingTier);
+            setConfirmingTier(null);
+          }}
+        />
+      ) : null}
     </main>
+  );
+}
+
+/**
+ * Confirmation modal shown after a tier is picked and "Bu Paketle Yayınla"
+ * is clicked. Two flavours:
+ *   - free: explains that extra gallery items get trimmed to 1 and a
+ *     DavetYolla.com promo block will appear in the invitation.
+ *   - paid: payment placeholder. Real Stripe wiring lives in a future
+ *     iteration; for now we just say "ödeme yakında" and let the user
+ *     proceed (handlePublish marks the doc as that tier).
+ */
+function ConfirmTierModal({
+  tierId,
+  publishing,
+  onCancel,
+  onConfirm,
+}: {
+  tierId: TierId;
+  publishing: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const isFree = tierId === "free";
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      onClick={onCancel}
+    >
+      <div
+        className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-display text-xl sm:text-2xl mb-3">
+          {isFree ? "Free pakette yayınla" : "Ödeme"}
+        </h3>
+        {isFree ? (
+          <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+            <p>
+              Free pakette davetiyene <strong>tek bir görsel</strong>{" "}
+              eklenebilir. Galerinde birden fazla medya varsa diğerleri
+              yayınlama sırasında otomatik olarak kaldırılacak.
+            </p>
+            <p>
+              Ayrıca davetiyene{" "}
+              <strong>DavetYolla.com tanıtım bölümü</strong> eklenecek. Bunlar olmadan yayınlamak
+              için bir üst pakete geçebilirsin.
+            </p>
+            <p>Devam etmek istediğine emin misin?</p>
+          </div>
+        ) : (
+          <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+            {/* Payment placeholder — Stripe wiring will land here.
+                Until then we let the publish proceed so the rest of the
+                flow can be developed without a payment provider. */}
+            <p>
+              Ödeme ekranı yakında bağlanacak. Şimdilik bu pencereden
+              <strong> &quot;Devam Et&quot; </strong>
+              dediğinde paketin başarılı kabul edilip davetiyen
+              yayınlanacak.
+            </p>
+            <p className="text-[11px] text-muted-foreground/80">
+              (Geliştirme sürecindeyiz; gerçek ödeme entegrasyonu
+              eklendiğinde bu adım Stripe ile değiştirilecek.)
+            </p>
+          </div>
+        )}
+        <div className="mt-6 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={publishing}
+            className="text-sm px-5 py-2.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer disabled:opacity-50"
+          >
+            İptal
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={publishing}
+            className={`text-sm px-5 py-2.5 rounded-full font-medium cursor-pointer disabled:opacity-50 ${
+              isFree
+                ? "bg-amber-500 text-white hover:bg-amber-600"
+                : "bg-foreground text-background hover:bg-foreground/90"
+            }`}
+          >
+            {publishing
+              ? "Yayınlanıyor..."
+              : isFree
+              ? "Anladım, Yayınla"
+              : "Devam Et"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -659,15 +640,25 @@ function TierPicker({
     return () => window.clearInterval(id);
   }, []);
 
+  const selectedMeta = selectedTier
+    ? TIERS.find((t) => t.id === selectedTier) ?? null
+    : null;
+  const selectedPercent =
+    selectedMeta && offer && selectedMeta.basePrice > 0 ? offer.percent ?? 0 : 0;
+  const selectedDiscounted =
+    selectedMeta && selectedPercent > 0
+      ? applyOffer(selectedMeta.basePrice, selectedPercent)
+      : selectedMeta?.basePrice ?? 0;
+
   return (
-    <section className="rounded-[1.75rem] border border-border/60 bg-white p-6 sm:p-9 mb-6">
+    <section className="rounded-[1.75rem] border border-border/60 bg-white p-4 sm:p-6 lg:p-9 mb-6">
       <TierIconStyles />
       <div>
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           <span className="inline-flex items-center gap-1.5 rounded-full text-[10px] uppercase tracking-[0.28em] px-3 py-1 font-medium font-mono border bg-amber-500/10 text-amber-700 border-amber-500/30">
             Adım 2 / 2
           </span>
-          <h2 className="font-display text-2xl sm:text-4xl mt-4 leading-tight">
+          <h2 className="font-display text-2xl sm:text-4xl mt-3 leading-tight">
             Paketini seç
           </h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
@@ -676,9 +667,77 @@ function TierPicker({
           </p>
         </div>
 
-        <OfferBanner offer={offer} />
+        <OfferNote offer={offer} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
+        {/* Sticky publish bar — kullanıcı uzun feature listelerini geçmek
+             zorunda kalmadan üstten direkt yayına basabilsin diye kart
+             grid'inin üstünde duruyor. Mobilde de aynı yer, sticky =
+             scroll sırasında ekranın tepesinde tutuyor. */}
+        <div
+          className={`sticky top-2 z-20 mb-4 flex items-center justify-between gap-3 rounded-2xl border px-3 sm:px-4 py-2 sm:py-2.5 transition-colors ${
+            selectedTier
+              ? "bg-foreground text-background border-foreground shadow-md"
+              : "bg-muted/40 text-muted-foreground border-border"
+          }`}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={onCancel}
+              disabled={publishing}
+              className="shrink-0 size-8 inline-flex items-center justify-center rounded-full border border-current/30 hover:bg-current/10 cursor-pointer disabled:opacity-50"
+              aria-label="Geri dön"
+              title="Geri dön"
+            >
+              <ArrowLeft className="size-4" />
+            </button>
+            <div className="min-w-0">
+              {selectedMeta ? (
+                <>
+                  <div className="text-[10px] uppercase tracking-[0.2em] opacity-70">
+                    Seçili paket
+                  </div>
+                  <div className="text-xs sm:text-sm font-semibold truncate">
+                    {selectedMeta.name}
+                    {selectedMeta.basePrice > 0 ? (
+                      <span className="ml-2 opacity-80 tabular-nums">
+                        {formatTry(
+                          selectedPercent > 0
+                            ? selectedDiscounted
+                            : selectedMeta.basePrice
+                        )}
+                      </span>
+                    ) : (
+                      <span className="ml-2 opacity-80">Ücretsiz</span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="text-xs sm:text-sm">
+                  Aşağıdan bir paket seç
+                </div>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={onConfirm}
+            disabled={!selectedTier || publishing}
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-background text-foreground px-4 sm:px-6 py-2 sm:py-2.5 font-mono uppercase tracking-[0.2em] text-[10px] sm:text-xs disabled:opacity-40 cursor-pointer hover:bg-background/90 transition-colors"
+          >
+            <Sparkles className="size-3.5" />
+            <span className="hidden sm:inline">
+              {publishing
+                ? "Yayınlanıyor..."
+                : selectedTier
+                  ? "Bu Paketle Yayınla"
+                  : "Paket seç"}
+            </span>
+            <span className="sm:hidden">
+              {publishing ? "..." : "Yayınla"}
+            </span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
           {TIERS.map((tier) => (
             <TierCard
               key={tier.id}
@@ -690,32 +749,10 @@ function TierPicker({
           ))}
         </div>
 
-        <p className="mt-5 text-[11px] text-muted-foreground text-center">
+        <p className="mt-4 text-[11px] text-muted-foreground text-center">
           Fiyatlar Türk Lirası cinsinden, tek seferlik etkinlik ödemesidir, KDV
-          dahildir. İstediğin zaman üst pakete geçebilirsin.
+          dahildir.
         </p>
-
-        <div className="mt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
-          <button
-            onClick={onCancel}
-            disabled={publishing}
-            className="text-sm text-muted-foreground hover:text-foreground cursor-pointer disabled:opacity-50"
-          >
-            ← Geri dön
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={!selectedTier || publishing}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background px-7 py-3.5 font-mono uppercase tracking-[0.22em] text-xs disabled:opacity-40 cursor-pointer hover:bg-foreground/90 transition-colors"
-          >
-            <Sparkles className="size-3.5" />
-            {publishing
-              ? "Yayınlanıyor..."
-              : selectedTier
-                ? "Bu Paketle Yayınla"
-                : "Paket seç"}
-          </button>
-        </div>
       </div>
     </section>
   );
@@ -742,16 +779,25 @@ function TierCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`relative h-full text-left rounded-2xl border p-4 flex flex-col transition-colors cursor-pointer ${
+      className={`relative h-full text-left rounded-2xl border-2 p-3 sm:p-4 flex flex-col transition-all cursor-pointer ${
         tier.muted ? "bg-muted/30" : "bg-white"
       } ${
         selected
-          ? "border-foreground"
+          ? "border-foreground ring-4 ring-foreground/15 -translate-y-0.5 shadow-lg"
           : tier.muted
-            ? "border-border/60 hover:border-foreground/30"
-            : "border-border hover:border-foreground/40"
+            ? "border-border/60 hover:border-foreground/40 hover:shadow-md hover:-translate-y-0.5"
+            : "border-border hover:border-foreground/50 hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
+      {/* Selected check rozeti — hover/select durumunu kart üstünde
+           kesin görünür yapar. Border + ring tek başına bazı renklerde
+           silikti. */}
+      {selected ? (
+        <div className="absolute -top-2 -right-2 size-6 rounded-full bg-foreground text-background inline-flex items-center justify-center shadow-md ring-2 ring-background z-10">
+          <Check className="size-3.5" strokeWidth={3} />
+        </div>
+      ) : null}
+
       {tier.highlight ? (
         <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-foreground text-background px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] font-mono">
           <Star className="size-2.5 fill-current" /> Popüler
@@ -761,6 +807,15 @@ function TierCard({
       {percent > 0 && !isFree ? (
         <div className="absolute -top-2 left-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500 text-white shadow">
           <Flame className="size-3" /> %{percent}
+        </div>
+      ) : null}
+
+      {/* Discount countdown lives inside each tier card so the urgency
+          appears next to the price the discount applies to (free tier
+          never gets a countdown — no discount applies to it). */}
+      {percent > 0 && !isFree && offer ? (
+        <div className="absolute top-3 right-3">
+          <Countdown targetIso={offer.endsAtIso} compact />
         </div>
       ) : null}
 
@@ -905,54 +960,32 @@ function FeatureRow({
   );
 }
 
-function OfferBanner({ offer }: { offer: ActiveOffer | null }) {
-  if (!offer) {
-    return <div className="h-10" aria-hidden />;
+function OfferNote({ offer }: { offer: ActiveOffer | null }) {
+  if (!offer || offer.percent <= 0) {
+    return <div className="h-2" aria-hidden />;
   }
-  if (offer.percent <= 0) {
-    return (
-      <div className="rounded-full border border-border bg-white px-4 py-2 text-center text-xs text-muted-foreground">
+  // Slim banner — countdown moved to the affected tier cards.
+  return (
+    <div className="mb-4 text-center">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-rose-50 text-rose-700 px-3 py-1 text-[11px] font-medium">
+        <Flame className="size-3" />
         {offer.label}
         {offer.sublabel ? (
-          <span className="ml-2 opacity-70">— {offer.sublabel}</span>
+          <span className="opacity-80">· {offer.sublabel}</span>
         ) : null}
-      </div>
-    );
-  }
-
-  const isFlash = offer.promotionCode === "MONTHLY_FLASH_60";
-  return (
-    <div
-      className={`rounded-2xl px-4 md:px-5 py-3 md:py-3.5 flex items-center gap-3 flex-wrap ${
-        isFlash
-          ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white"
-          : "bg-foreground text-background"
-      }`}
-    >
-      <div className="inline-flex items-center gap-2 shrink-0">
-        <Flame className="size-5" />
-        <span className="text-xs md:text-sm uppercase tracking-[0.2em] font-semibold">
-          {offer.label}
-        </span>
-        <span className="inline-flex items-center justify-center rounded-full bg-white/20 text-[11px] md:text-xs font-bold px-2 py-0.5">
-          %{offer.percent}
-        </span>
-      </div>
-
-      {offer.sublabel ? (
-        <div className="text-[11px] md:text-xs opacity-90">
-          {offer.sublabel}
-        </div>
-      ) : null}
-
-      <div className="flex-1" />
-
-      <Countdown targetIso={offer.endsAtIso} />
+      </span>
     </div>
   );
 }
 
-function Countdown({ targetIso }: { targetIso: string }) {
+function Countdown({
+  targetIso,
+  compact = false,
+}: {
+  targetIso: string;
+  /** Compact = sıkı padding/küçük font; tier kartının köşesinde durur. */
+  compact?: boolean;
+}) {
   const [left, setLeft] = useState<{ h: number; m: number; s: number } | null>(
     null,
   );
@@ -975,8 +1008,12 @@ function Countdown({ targetIso }: { targetIso: string }) {
   if (!left) return null;
   const pad = (n: number) => n.toString().padStart(2, "0");
   return (
-    <div className="inline-flex items-center gap-1.5 text-xs md:text-sm font-semibold tabular-nums bg-black/20 rounded-full px-3 py-1">
-      <span className="opacity-70 uppercase tracking-widest text-[10px]">
+    <div
+      className={`inline-flex items-center gap-1 rounded-full bg-rose-500/10 text-rose-700 font-semibold tabular-nums ${
+        compact ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-xs"
+      }`}
+    >
+      <span className="opacity-70 uppercase tracking-widest text-[9px]">
         Kalan
       </span>
       <span>

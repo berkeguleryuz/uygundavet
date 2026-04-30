@@ -220,7 +220,9 @@ export function buildPremiumTemplateDoc(
       prompt: memoryPrompt(template.category),
     }, { align: "center" }, true),
     block(template, "gallery", { items: [] }, { align: "center" }, true),
-    block(template, "footer", { text: "davety.app" }, { align: "center" }),
+    // Footer tanıtım satırı kaldırıldı; free tier davetiyelerinde 4.
+    // sıraya yayın anında DavetYolla.com tanıtım bloğu injekt ediliyor
+    // (publish/route.ts -> applyTierToDoc).
   ];
 
   return {
