@@ -7,6 +7,12 @@ export interface RendererContextValue {
   publicBase?: string;
   /** Public slug for the currently-rendered invitation. Required for memory/RSVP endpoints. */
   slug?: string;
+  /** Wedding start time as ISO 8601 (used for calendar deep-links). */
+  startIso?: string;
+  /** Public share URL of the invitation, embedded in calendar invites. */
+  publicUrl?: string;
+  /** Personalised guest token, when the visitor came in via /i/[slug]/[token]. */
+  guestToken?: string;
 }
 
 const Ctx = createContext<RendererContextValue>({});

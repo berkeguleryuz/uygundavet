@@ -4,9 +4,12 @@ import sharp from "sharp";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { R2_ENABLED, uploadToR2 } from "@/src/lib/r2";
+import { verifyMime, maxBytesFor } from "@/src/lib/file-sniff";
+import { rateLimit } from "@/src/lib/rate-limit";
+import { assertWithinStorageQuota } from "@/src/lib/storage-quota";
 
-const MAX_BYTES = 20 * 1024 * 1024;
-const ALLOWED = [
+const HARD_MAX_BYTES = 120 * 1024 * 1024;
+const ALLOWED = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
@@ -17,7 +20,9 @@ const ALLOWED = [
   "audio/mp4",
   "audio/ogg",
   "audio/wav",
-];
+]);
+
+const MAX_PIXELS = 4096 * 4096;
 
 const IMAGE_VARIANTS: { suffix: string; width: number }[] = [
   { suffix: "thumb", width: 400 },
@@ -31,6 +36,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const limited = await rateLimit({
+    key: `upload:${session.user.id}`,
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "Too many uploads, please slow down." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+    );
+  }
+
   if (!R2_ENABLED) {
     return NextResponse.json(
       { error: "R2 storage is not configured on this server" },
@@ -38,20 +55,29 @@ export async function POST(req: Request) {
     );
   }
 
-  const form = await req.formData();
+  let form: FormData;
+  try {
+    form = await req.formData();
+  } catch {
+    return NextResponse.json({ error: "Invalid form payload" }, { status: 400 });
+  }
   const file = form.get("file");
   const designId = form.get("designId");
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file" }, { status: 400 });
   }
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "File too large" }, { status: 413 });
-  }
-  if (!ALLOWED.includes(file.type)) {
+  if (!ALLOWED.has(file.type)) {
     return NextResponse.json(
       { error: `Unsupported: ${file.type}` },
       { status: 415 }
+    );
+  }
+  const perTypeLimit = maxBytesFor(file.type);
+  if (file.size > Math.min(perTypeLimit, HARD_MAX_BYTES)) {
+    return NextResponse.json(
+      { error: `File too large for ${file.type}` },
+      { status: 413 }
     );
   }
 
@@ -65,7 +91,22 @@ export async function POST(req: Request) {
     }
   }
 
+  try {
+    await assertWithinStorageQuota(session.user.id, file.size);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Quota exceeded";
+    return NextResponse.json({ error: msg }, { status: 402 });
+  }
+
   const bytes = Buffer.from(await file.arrayBuffer());
+
+  if (!verifyMime(bytes, file.type)) {
+    return NextResponse.json(
+      { error: "File content does not match its declared type" },
+      { status: 415 }
+    );
+  }
+
   const id = nanoid(12);
   const baseKey = `users/${session.user.id}/${
     designId && typeof designId === "string" ? `designs/${designId}/` : "uploads/"
@@ -74,27 +115,59 @@ export async function POST(req: Request) {
   let width: number | undefined;
   let height: number | undefined;
   const variants: Record<string, string> = {};
+  let totalUploadedBytes = 0;
 
   const isImage = file.type.startsWith("image/");
 
   if (isImage && file.type !== "image/gif") {
-    // Pre-render sized variants + a canonical webp original
-    const source = sharp(bytes, { failOn: "error" });
-    const meta = await source.metadata();
+    let source: sharp.Sharp;
+    try {
+      source = sharp(bytes, {
+        failOn: "error",
+        limitInputPixels: MAX_PIXELS,
+      });
+    } catch {
+      return NextResponse.json(
+        { error: "Image rejected (too large or malformed)" },
+        { status: 415 }
+      );
+    }
+    let meta;
+    try {
+      meta = await source.metadata();
+    } catch {
+      return NextResponse.json(
+        { error: "Image metadata could not be read" },
+        { status: 415 }
+      );
+    }
     width = meta.width;
     height = meta.height;
+    if (width && height && width * height > MAX_PIXELS) {
+      return NextResponse.json(
+        { error: "Image dimensions too large" },
+        { status: 413 }
+      );
+    }
 
-    // Original (webp, quality 85)
     const originalKey = `${baseKey}.webp`;
-    const originalBytes = await source.clone().webp({ quality: 85 }).toBuffer();
+    let originalBytes: Buffer;
+    try {
+      originalBytes = await source.clone().webp({ quality: 85 }).toBuffer();
+    } catch {
+      return NextResponse.json(
+        { error: "Image could not be processed" },
+        { status: 415 }
+      );
+    }
     await uploadToR2({
       key: originalKey,
       body: originalBytes,
       contentType: "image/webp",
     });
     variants.original = originalKey;
+    totalUploadedBytes += originalBytes.length;
 
-    // Responsive variants
     for (const v of IMAGE_VARIANTS) {
       if (width && width <= v.width) continue;
       const vkey = `${baseKey}-${v.suffix}.webp`;
@@ -109,15 +182,16 @@ export async function POST(req: Request) {
         contentType: "image/webp",
       });
       variants[v.suffix] = vkey;
+      totalUploadedBytes += vbuf.length;
     }
   } else {
-    // Video / audio / gif: store as-is
     const ext =
       file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ??
       "bin";
     const key = `${baseKey}.${ext}`;
     await uploadToR2({ key, body: bytes, contentType: file.type });
     variants.original = key;
+    totalUploadedBytes += bytes.length;
   }
 
   const publicBase = (process.env.R2_PUBLIC_URL ?? "").replace(/\/$/, "");
@@ -133,7 +207,7 @@ export async function POST(req: Request) {
       url: primaryUrl,
       key: variants.original,
       mimeType: isImage && file.type !== "image/gif" ? "image/webp" : file.type,
-      sizeBytes: file.size,
+      sizeBytes: totalUploadedBytes,
       width: width ?? null,
       height: height ?? null,
     },

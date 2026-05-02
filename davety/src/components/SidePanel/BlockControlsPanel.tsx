@@ -78,7 +78,7 @@ export function BlockControlsPanel() {
           onChange={(patch) => {
             // DecorationView öncelik sırası: svgRaw > iconKey. Mini ikon
             // seçilince svgRaw'ı sıfırla, template seçilince iconKey'i
-            // sıfırla — böylece picker'lar arası geçiş bekleneni yapar.
+            // sıfırla, böylece picker'lar arası geçiş bekleneni yapar.
             if (patch.iconKey !== undefined) {
               updateBlockData(blockId, { ...patch, svgRaw: undefined });
             } else if (patch.svgRaw !== undefined) {
@@ -154,7 +154,7 @@ export function BlockControlsPanel() {
 
 /**
  * Returns the field id that best represents the block's "primary" editable
- * text content — used by the Bilgileri Gir / Ayarları Değiştir chips so
+ * text content, used by the Bilgileri Gir / Ayarları Değiştir chips so
  * those buttons always open a useful editing surface, not an empty panel.
  */
 function primaryFieldFor(blockType: string): string {
@@ -164,11 +164,11 @@ function primaryFieldFor(blockType: string): string {
     case "memory_book":
       return "prompt";
     case "event_program":
-      // Etkinlik programı için "ana içerik" satır listesidir — saat ve
+      // Etkinlik programı için "ana içerik" satır listesidir, saat ve
       // etiketleri buradan düzenlenir.
       return "items";
     case "gallery":
-      // Galeri için ana içerik medya listesi — yükle/sil/sırala buradan.
+      // Galeri için ana içerik medya listesi, yükle/sil/sırala buradan.
       return "items";
     case "venue":
     case "contact":
@@ -181,13 +181,13 @@ function primaryFieldFor(blockType: string): string {
     case "custom_section":
       return "title";
     case "donation":
-      // Bağış için ana editör IBAN — kullanıcı para göndermesi için
+      // Bağış için ana editör IBAN, kullanıcı para göndermesi için
       // bunu yazmadan blok eksik kalır.
       return "iban";
     case "rsvp_form":
       return "note";
     case "story_timeline":
-      // Hikayemiz items list — bu olmadan render edilecek bir şey yok.
+      // Hikayemiz items list, bu olmadan render edilecek bir şey yok.
       return "items";
     default:
       return "body";
@@ -320,7 +320,7 @@ function DecorationBlockEditor({
 }
 
 /**
- * Tüm süslemeler tek bir picker'da — eski "Mini İkonlar / Hazır Şablonlar"
+ * Tüm süslemeler tek bir picker'da, eski "Mini İkonlar / Hazır Şablonlar"
  * iki sekmeli yapı kaldırıldı. SVG'ler nasılsa aynı boyda render edildiği
  * için ayırmaya gerek yok; "Hepsi" + kategori chip'leriyle filtreleniyor.
  *
@@ -359,7 +359,7 @@ function UnifiedDecorationPicker({
   const [activeKey, setActiveKey] = useState<string>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  // Tek liste — her chip kategori üzerinden filtre, "all" hepsini gösterir.
+  // Tek liste, her chip kategori üzerinden filtre, "all" hepsini gösterir.
   const items = useMemo<UnifiedItem[]>(() => {
     const iconCatLabel = (key: string) =>
       DECORATION_CATEGORIES.find((c) => c.key === key)?.label ?? key;

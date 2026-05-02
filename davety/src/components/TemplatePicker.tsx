@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- preview thumbnails are
+ * pre-rendered SVGs/PNGs from /public/templates, optimisation is
+ * handled at build time. */
 "use client";
 
 import { useState } from "react";

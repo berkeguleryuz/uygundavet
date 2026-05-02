@@ -6,7 +6,7 @@ import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { ENVELOPE_PRESETS } from "@/src/components/envelopes/envelopePresets";
 import { deriveLiningBg } from "@/src/components/envelopes/resolveEnvelope";
 
-/** Serializable subset of an envelope preset — only colors + lining pattern
+/** Serializable subset of an envelope preset, only colors + lining pattern
  *  end up persisted in theme.envelope. JSX-only decorations (twine, window
  *  cutout, wax seal components) cannot be saved as theme data, so they are
  *  intentionally skipped when applying a preset. liningBg is derived from
@@ -126,7 +126,7 @@ export function EnvelopeTab() {
 
       <ColorRow
         label="Kapak Rengi"
-        hint="Kapağın dış (kağıt) rengi — açıldığında kenarlarda görünür."
+        hint="Kapağın dış (kağıt) rengi, açıldığında kenarlarda görünür."
         value={env.flapColor}
         onChange={(v) => merge({ flapColor: v })}
       />
@@ -193,7 +193,7 @@ export function EnvelopeTab() {
               />
               {stampImage ? (
                 <p className="mt-1 text-[10px] text-muted-foreground">
-                  Görsel seçili — yazı görünmüyor.
+                  Görsel seçili, yazı görünmüyor.
                 </p>
               ) : null}
             </div>

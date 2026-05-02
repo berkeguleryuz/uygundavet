@@ -3,7 +3,7 @@ import type { EventCategory } from "@davety/schema";
 /**
  * Per-category vocabulary for the editor side panel. The default doc
  * uses Gelin/Damat which doesn't make sense for a birthday or a
- * business launch — this helper swaps in the right words so the
+ * business launch, this helper swaps in the right words so the
  * panel and family block reflect the actual event type.
  *
  * `secondName` of `null` means the category only has one celebrant

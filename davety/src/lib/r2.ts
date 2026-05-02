@@ -32,7 +32,7 @@ export async function uploadToR2(args: {
   contentType: string;
 }): Promise<{ url: string; key: string }> {
   if (!R2_ENABLED || !r2) {
-    throw new Error("R2 not configured — set R2_* env variables");
+    throw new Error("R2 not configured. Set R2_* env variables.");
   }
   await r2.send(
     new PutObjectCommand({
@@ -51,11 +51,11 @@ export function r2PublicUrl(key: string): string {
 }
 
 /**
- * Toplu silme — verilen anahtarları tek bir DeleteObjects çağrısıyla
- * temizler. R2/S3 API'si tek istekte 1000 anahtara izin veriyor; daha
+ * Toplu silme. Verilen anahtarları tek bir DeleteObjects çağrısıyla
+ * temizler. R2/S3 API'si tek istekte 1000 anahtara izin veriyor, daha
  * büyük listeler için chunk'lara bölüyoruz.
  *
- * Hata durumunda throw ETMEZ — silinemeyenleri döndürür ki çağıran
+ * Hata durumunda throw ETMEZ, silinemeyenleri döndürür ki çağıran
  * tarafta loglanabilsin. R2 silmesi başarısız olsa bile DB temizliği
  * (davetiye silme) durmasın.
  */

@@ -4,7 +4,17 @@ import { useEffect, useState } from "react";
 import type { CountdownData } from "@davety/schema";
 import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../types";
 
-function computeParts(target: number) {
+interface Parts {
+  d: number;
+  h: number;
+  m: number;
+  s: number;
+  done: boolean;
+}
+
+const ZERO_PARTS: Parts = { d: 0, h: 0, m: 0, s: 0, done: false };
+
+function computeParts(target: number): Parts {
   const now = Date.now();
   const diff = target - now;
   if (Number.isNaN(diff) || diff <= 0) {
@@ -25,9 +35,17 @@ export function CountdownView({
   onFieldSelect,
 }: BlockViewProps<CountdownData>) {
   const target = new Date(block.data.targetIso).getTime();
-  const [parts, setParts] = useState(() => computeParts(target));
+  // SSR/CSR'de Date.now() farklı sonuç ürettiği için ilk render'da
+  // hep sıfır gösteriyoruz, gerçek değerleri client mount'ta useEffect
+  // ile dolduruyoruz. Aksi halde "saniye 04 vs 03" gibi hydration
+  // mismatch warning'i çıkıyor.
+  const [parts, setParts] = useState<Parts>(ZERO_PARTS);
 
   useEffect(() => {
+    // Time is an external system; first sample right after mount to
+    // avoid showing all zeros for one frame, then tick every second.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setParts(computeParts(target));
     const id = setInterval(() => setParts(computeParts(target)), 1000);
     return () => clearInterval(id);
   }, [target]);

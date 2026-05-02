@@ -38,7 +38,7 @@ export function PreviewOverlay() {
             </div>
           </div>
 
-          {/* Body — mirrors the public invitation page exactly (same
+          {/* Body, mirrors the public invitation page exactly (same
               pageBgColor, same envelope-drop flow, same card growth). */}
           <div
             className="min-h-[calc(100dvh-3.25rem)]"

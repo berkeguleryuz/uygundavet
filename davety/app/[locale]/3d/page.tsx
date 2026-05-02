@@ -28,7 +28,7 @@ export default async function Envelope3DPage({
           className="text-sm max-w-xl mx-auto opacity-70"
           style={{ fontFamily: "Space Grotesk, sans-serif", color: "#555670" }}
         >
-          Zarfa tıkla — kapak menteşeden açılsın, davetiye zarfın içinden
+          Zarfa tıkla, kapak menteşeden açılsın, davetiye zarfın içinden
           süzülerek sana doğru uçsun. Mouse&apos;unu gezdirerek sahneyi
           eğebilirsin.
         </p>

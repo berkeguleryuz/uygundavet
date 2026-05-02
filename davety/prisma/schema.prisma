@@ -89,9 +89,17 @@ model InvitationDesign {
   slug            String   @unique
   vanityPath      String?  @unique
   customDomain    String?  @unique
-  status          String   @default("draft") // "draft" | "published"
+  status          String   @default("draft") // "draft" | "published" | "archived"
   doc             Json
   publishedDoc    Json?
+  // Optional bcrypt hash. When set, the public render gates entry behind a
+  // password prompt. Null means open access (default behaviour).
+  passwordHash    String?
+  // When the invitation should be auto-archived. Set on publish based on
+  // plan tier (free: +30 days, paid: configurable). archivedAt is the
+  // timestamp the archive job actually ran.
+  expiresAt       DateTime?
+  archivedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   lastAutosavedAt DateTime @default(now())
@@ -104,6 +112,8 @@ model InvitationDesign {
   memories MemoryEntry[]
 
   @@index([userId])
+  @@index([expiresAt])
+  @@index([customDomain])
   @@map("invitation_design")
 }
 
@@ -123,16 +133,20 @@ model EditEvent {
 }
 
 model Asset {
-  id        String   @id @default(cuid())
-  userId    String
-  designId  String?
-  url       String
-  key       String   @unique
-  mimeType  String
-  sizeBytes Int
-  width     Int?
-  height    Int?
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  designId    String?
+  url         String
+  key         String   @unique
+  // For images, keys for the responsive variants (thumb/md/lg). Null for
+  // video/audio/gif. Used for precise R2 cleanup on asset deletion so we
+  // do not need to ListObjects to find the variants.
+  variantKeys Json?
+  mimeType    String
+  sizeBytes   Int
+  width       Int?
+  height      Int?
+  createdAt   DateTime @default(now())
 
   user   User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   design InvitationDesign? @relation(fields: [designId], references: [id], onDelete: SetNull)
@@ -148,15 +162,29 @@ model Guest {
   name        String
   phone       String?
   email       String?
-  attending   String   // "yes" | "no"
+  attending   String   // "yes" | "no" | "maybe"
   guestCount  Int      @default(1)
   note        String?
-  source      String?  // "whatsapp" | "qr" | "link"
+  source      String?  // "whatsapp" | "qr" | "link" | "token"
+  // Personalization token used in /i/[slug]/[token] links. nanoid(16),
+  // unique per design. Optional because legacy guests created before the
+  // feature shipped will not have one.
+  token       String?  @unique
+  // Plus-one allowance for this guest. When > 1 the RSVP form lets the
+  // guest bring up to N companions.
+  plusOneMax  Int      @default(1)
+  // Group label ("aile", "iş arkadaşları", "üniversite") for filtering
+  // and per-group event invitation.
+  groupLabel  String?
+  // Which event days the guest is invited to. Empty array means all
+  // events (the default for backwards compatibility).
+  eventDays   String[] @default([])
   createdAt   DateTime @default(now())
 
   design InvitationDesign @relation(fields: [designId], references: [id], onDelete: Cascade)
 
   @@index([designId, createdAt])
+  @@index([designId, attending])
   @@map("guest")
 }
 
@@ -206,4 +234,32 @@ model DesignTemplate {
 
   @@index([published, updatedAt])
   @@map("design_template")
+}
+
+/// Curated background music catalog. Hosts pick a track during the editor
+/// music tab and the published invitation auto-plays it (muted by default
+/// with a small unmute control). All entries must be license-cleared, the
+/// `licensor` and `licenseUrl` fields exist so we can prove provenance.
+model MusicTrack {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  artist      String
+  url         String
+  /// Curated mood tags ("romantic", "joyful", "elegant"). Used by the
+  /// music picker for filtering. Stored as plain string array for now,
+  /// a junction table is overkill at catalog size.
+  moods       String[] @default([])
+  /// Tier gate: which plan can use this track. "free" means available to
+  /// everyone. Higher tiers may unlock premium tracks later.
+  tier        String   @default("free")
+  durationSec Int?
+  licensor    String?
+  licenseUrl  String?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled, tier])
+  @@map("music_track")
 }

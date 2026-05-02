@@ -19,7 +19,7 @@ export default async function EnvelopesPage({
           Zarf Tasarımı Seç
         </h1>
         <p className="text-sm text-muted-foreground">
-          10 farklı stil — pill üzerinden seç, zarfa tıklayarak aç/kapat.
+          10 farklı stil, pill üzerinden seç, zarfa tıklayarak aç/kapat.
           Beğendiğini söyle, onu kullanalım.
         </p>
       </header>

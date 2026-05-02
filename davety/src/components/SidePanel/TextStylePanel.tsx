@@ -49,10 +49,10 @@ export function TextStylePanel() {
   const [query, setQuery] = useState("");
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   /** Inline süsleme ikonlarını DOM'da gösteren contentEditable alanın
-   *  imperative tutamağı — "Süsleme Ekle" butonu cursor pozisyonuna
+   *  imperative tutamağı, "Süsleme Ekle" butonu cursor pozisyonuna
    *  ikon eklemek için bu API'yi kullanıyor. */
   const inlineFieldRef = useRef<InlineDecorationFieldHandle | null>(null);
-  // Computed font-size of the actually-rendered field — measured from the
+  // Computed font-size of the actually-rendered field, measured from the
   // canvas DOM so the panel reflects what the user sees, not the override
   // default (which would otherwise read 24 even when Tailwind has scaled
   // the field to e.g. text-3xl=30px). Without this the +/- buttons can
@@ -66,7 +66,7 @@ export function TextStylePanel() {
   };
   const readFieldId = FANOUT_READ[fieldId ?? ""] ?? fieldId ?? "";
   // Re-measure whenever the user picks a different field/block. Skip the
-  // measurement when the user has an explicit override — the override is
+  // measurement when the user has an explicit override, the override is
   // the source of truth in that case.
   useEffect(() => {
     if (!blockId || !readFieldId) return;
@@ -154,16 +154,16 @@ export function TextStylePanel() {
       : "title"
     : null;
   const isFamiliesField = familiesSide !== null;
-  // Etkinlik programının "items" alanı saat+etiket dizisidir — düz metin
+  // Etkinlik programının "items" alanı saat+etiket dizisidir, düz metin
   // editörüyle düzenlenemez, kendi list editörü vardır.
   const isEventItemsField =
     block.type === "event_program" && fieldId === "items";
-  // Galeri "items" alanı MediaRef dizisidir — kendi yükle/sil/sırala
+  // Galeri "items" alanı MediaRef dizisidir, kendi yükle/sil/sırala
   // editörü vardır.
   const isGalleryItemsField =
     block.type === "gallery" && fieldId === "items";
   // event_program / venue / contact bloklarındaki konum bilgileri
-  // schema'da OPTIONAL — kullanıcı henüz girmediğinde data alanı
+  // schema'da OPTIONAL, kullanıcı henüz girmediğinde data alanı
   // undefined olur ve generic extractFieldValue editör göstermez. Bu
   // bayrak sayesinde alan boş bile olsa input açılıp kullanıcı doldurabilir.
   const isOptionalLocationField =
@@ -194,7 +194,7 @@ export function TextStylePanel() {
 
   return (
     <div className="p-5 flex flex-col gap-5">
-      {/* Field content editor — edit the actual text of the selected field */}
+      {/* Field content editor, edit the actual text of the selected field */}
       {showContentEditor ? (
         isEventItemsField ? (
           <EventProgramItemsEditor
@@ -344,7 +344,7 @@ export function TextStylePanel() {
               onToggle={() => setIconPickerOpen((v) => !v)}
               onPick={(key) => {
                 // Inline alan ikonu cursor pozisyonuna ekler ve kendi
-                // onChange'ini tetikler — DecorationPreview'a artık
+                // onChange'ini tetikler, DecorationPreview'a artık
                 // ihtiyaç yok, çünkü ikonun kendisi text alanında zaten
                 // gözüküyor.
                 inlineFieldRef.current?.insertIcon(key);
@@ -495,7 +495,7 @@ export function TextStylePanel() {
         </ul>
       </div>
 
-      {/* Block-level spacing — surfaced here too so the user can adjust
+      {/* Block-level spacing, surfaced here too so the user can adjust
           the section's top/bottom padding without leaving the text panel
           (the hero & other "tall" blocks open this panel directly when
           their main field is clicked, never the BlockControlsPanel). */}
@@ -512,7 +512,7 @@ function extractFieldValue(
   data: Record<string, unknown>,
   fieldId: string
 ): string | undefined {
-  // Hero "coupleNames" is a composite of brideName + groomName — surface
+  // Hero "coupleNames" is a composite of brideName + groomName, surface
   // the bride's name and let groomName edit through its own field.
   if (fieldId === "coupleNames") {
     const v = data["brideName"];
@@ -600,7 +600,7 @@ function splitIso(local: string): [string, string] {
 }
 
 /**
- * Editor for the families block — handles the nested
+ * Editor for the families block, handles the nested
  * `data.bride.{title,members}` / `data.groom.{title,members}` shape that the
  * generic content editor can't reach with a flat extractFieldValue.
  *
@@ -750,7 +750,7 @@ function FamiliesFieldEditor({
 }
 
 /**
- * Editor for event_program block's `items` array — saat + etiket
+ * Editor for event_program block's `items` array, saat + etiket
  * satırlarını ekleme/çıkarma/sıralama. Düğün dışı etkinliklerde (doğum
  * günü, kurumsal vs.) kullanıcının kendi içeriğini yazabilmesi için
  * default seed verisinin üstüne tamamen yazılabilir olmalı.
@@ -863,7 +863,7 @@ function EventProgramItemsEditor({
 }
 
 /**
- * Hikayemiz (story_timeline) blok editörü — `StoryMilestone[]` listesine
+ * Hikayemiz (story_timeline) blok editörü, `StoryMilestone[]` listesine
  * tarih + başlık + açıklama girişi. Default seed boş geldiği için
  * kullanıcı buradan satır eklemeden render edilecek bir şey olmuyordu.
  */
@@ -984,7 +984,7 @@ function StoryTimelineItemsEditor({
 }
 
 /**
- * Editor for gallery block's `items` array — yükle/sil/sırala.
+ * Editor for gallery block's `items` array, yükle/sil/sırala.
  * Galeriye birden fazla görsel/video eklenebilir; her parçanın küçük
  * önizlemesi gösterilir, kullanıcı silebilir veya sıraya alabilir.
  * Multi-select destekli: kullanıcı 5–10 dosya seçip toplu yükleyebilir.

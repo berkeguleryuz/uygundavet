@@ -4,7 +4,7 @@ import { alignClasses, fieldStyle, styleToCss, type BlockViewProps } from "../ty
 
 /** Pick a readable text color (black or white) for a given hex bg.
  *  Earlier the button used `bg-current/90 text-white`, but field-level
- *  style overrides set `color` on the button — Tailwind's `text-white`
+ *  style overrides set `color` on the button, Tailwind's `text-white`
  *  loses to inline style and the label collapses into the background
  *  (kullanıcının "buton + yazı aynı renk oldu" şikayeti). Calculating
  *  contrast keeps the label legible whatever bg the user picks. */
@@ -21,7 +21,7 @@ function readableOn(bg: string | undefined): string {
   const r = parseInt(full.slice(0, 2), 16);
   const g = parseInt(full.slice(2, 4), 16);
   const b = parseInt(full.slice(4, 6), 16);
-  // Relative luminance — middle-of-the-range threshold flips text.
+  // Relative luminance, middle-of-the-range threshold flips text.
   const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return lum > 0.55 ? "#1a1a1a" : "#ffffff";
 }

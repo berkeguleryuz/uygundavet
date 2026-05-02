@@ -26,14 +26,14 @@ interface HintCue {
   body: string;
   /** Which bottom-toolbar slot to point at: 0=Tasarla 1=Blok 2=Önizle 3=Kaydet, or null for none. */
   pointAt: 0 | 1 | 2 | 3 | null;
-  /** Tone — affects accent colour. */
+  /** Tone, affects accent colour. */
   tone: "info" | "success" | "warn";
 }
 
 /**
  * Persistent contextual coach mark that sits just above the mobile bottom
- * toolbar. The message updates based on the current editor state — what
- * the user just selected, whether there are unsaved changes, etc. — and
+ * toolbar. The message updates based on the current editor state, what
+ * the user just selected, whether there are unsaved changes, etc., and
  * an animated arrow points at the toolbar button they should tap next.
  *
  * Hidden permanently once the user dismisses with X (per-device).
@@ -149,7 +149,7 @@ function HintCard({
         <X className="size-3" />
       </button>
 
-      {/* Pointing arrow + ripple — guides the eye to the relevant toolbar slot */}
+      {/* Pointing arrow + ripple, guides the eye to the relevant toolbar slot */}
       {arrowLeft ? (
         <div
           className="absolute -bottom-2 -translate-x-1/2"
@@ -189,7 +189,7 @@ function computeCue({
   blockLabel: string | null;
   fieldLabel: string | null;
 }): HintCue {
-  // 1) Highest priority — text/field is selected → push them to "Metin"
+  // 1) Highest priority, text/field is selected → push them to "Metin"
   if (panelMode === "text" && selectedFieldId) {
     return {
       id: "field-selected",
@@ -225,7 +225,7 @@ function computeCue({
     };
   }
 
-  // 4) Default home — guide user to start editing
+  // 4) Default home, guide user to start editing
   if (panelMode === "home") {
     return {
       id: "home",

@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import {
   MonogramSeal,
   PillSeal,
@@ -199,7 +198,7 @@ function KraftTexture() {
   );
 }
 
-/* ─── 16 base presets (flat) — katlı variants derived below ─────────── */
+/* ─── 16 base presets (flat), katlı variants derived below ─────────── */
 
 const BASE_PRESETS: EnvelopePreset[] = [
   // ── Original 11 ─────────────────────────────────────────────────────

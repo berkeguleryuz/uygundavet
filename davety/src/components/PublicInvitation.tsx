@@ -7,15 +7,24 @@ import type { InvitationDoc } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 
+export interface GuestContext {
+  name: string;
+  plusOneMax: number;
+  groupLabel?: string | null;
+  eventDays?: string[];
+  token?: string;
+}
+
 interface Props {
   doc: InvitationDoc;
   slug: string;
   designId: string;
   isOwner: boolean;
   isDraft: boolean;
+  guest?: GuestContext;
 }
 
-/** Pick a readable button palette against the page background — light
+/** Pick a readable button palette against the page background, light
  *  pages get a dark glass button, dark pages get a light glass button.
  *  Threshold uses perceived luminance, not raw RGB average. */
 function readableButtonStyle(pageBg: string): {
@@ -51,13 +60,14 @@ export function PublicInvitation({
   designId,
   isOwner,
   isDraft,
+  guest,
 }: Props) {
   const resolvedEnvelope = resolveEnvelopeProps(doc.theme.envelope);
   const editBtn = readableButtonStyle(doc.theme.pageBgColor ?? "#252224");
 
   // Card slot starts at 640px (envelope's natural top-of-page geometry).
   // `cardExpandedHeight` is what WeddingEnvelope grows to the moment its
-  // internal `dropping` state flips — same render, same CSS transition
+  // internal `dropping` state flips, same render, same CSS transition
   // tick as the envelope's translateY, so the two animations are
   // perfectly synced (no parent setTimeout race).
   const [cardExpandedHeight, setCardExpandedHeight] = useState(700);
@@ -85,7 +95,7 @@ export function PublicInvitation({
       className="relative min-h-dvh flex flex-col items-center justify-start"
       style={{ background: doc.theme.pageBgColor ?? "#252224" }}
     >
-      {/* Owner edit shortcut — top-right on desktop, bottom-of-page on
+      {/* Owner edit shortcut. Top-right on desktop, bottom-of-page on
           mobile. Recipients (non-owners) never see this. */}
       {isOwner ? (
         <Link
@@ -109,7 +119,7 @@ export function PublicInvitation({
 
       {isDraft && isOwner ? (
         <div className="w-full max-w-2xl mb-6 rounded-lg border border-amber-400/60 bg-amber-50 text-amber-900 px-4 py-2 text-xs text-center">
-          Bu davetiye henüz yayınlanmamış — önizleme modundasın. Sadece sen
+          Bu davetiye henüz yayınlanmamış, önizleme modundasın. Sadece sen
           görebilirsin.{" "}
           <Link
             href={`/design/invitations/${designId}/save`}
@@ -122,7 +132,7 @@ export function PublicInvitation({
 
       <div className="flex flex-col items-center gap-6 w-full">
         <WeddingEnvelope
-          guestName="Misafir"
+          guestName={guest?.name ?? "Misafir"}
           envelopeWidth={envelopeWidth}
           cardWidth={cardWidth}
           cardHeight={640}
@@ -135,6 +145,7 @@ export function PublicInvitation({
               slug={slug}
               width={width}
               height={height}
+              guest={guest}
             />
           )}
         />
@@ -159,7 +170,7 @@ export function PublicInvitation({
 }
 
 /**
- * Card slot content: the FULL InvitationView (every block — hero,
+ * Card slot content: the FULL InvitationView (every block, hero,
  * countdown, families, program, venue, RSVP, …) wrapped in the
  * envelope's card frame. Width/height are fixed by the envelope's
  * card slot; the content scrolls inside so the recipient can read the
@@ -170,11 +181,13 @@ function FullInvitationCard({
   slug,
   width,
   height,
+  guest,
 }: {
   doc: InvitationDoc;
   slug: string;
   width: number;
   height: number;
+  guest?: GuestContext;
 }) {
   return (
     <div
@@ -196,6 +209,23 @@ function FullInvitationCard({
         ...getCardShapeStyle(doc),
       }}
     >
+      {guest?.name ? (
+        <div
+          className="text-center pt-6 pb-2 px-4"
+          style={{ fontFamily: "Merienda, serif" }}
+        >
+          <span style={{ opacity: 0.85 }}>Sevgili</span>{" "}
+          <strong>{guest.name}</strong>
+          {guest.plusOneMax > 1 ? (
+            <div
+              className="text-[11px] tracking-[0.2em] uppercase mt-1"
+              style={{ fontFamily: "Space Grotesk, sans-serif", opacity: 0.7 }}
+            >
+              {guest.plusOneMax - 1} yakının ile birlikte
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <InvitationView doc={doc} slug={slug} />
     </div>
   );

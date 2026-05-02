@@ -1,5 +1,5 @@
 /**
- * Stock image library — curated references users can drop into their
+ * Stock image library, curated references users can drop into their
  * invitation designs. Images live on Unsplash's public CDN; replace with
  * self-hosted URLs once you run `scripts/import-stock-images.ts` which
  * downloads these into public/stock and rewrites the `url` field.
@@ -30,7 +30,7 @@ export type StockCategory =
 
 export interface StockImage {
   id: string;
-  /** Full Unsplash CDN URL — 1200 wide, 80% quality. */
+  /** Full Unsplash CDN URL, 1200 wide, 80% quality. */
   url: string;
   /** 400-wide thumbnail for pickers. */
   thumb: string;
@@ -64,7 +64,7 @@ function img(
 /* ──────────────────────────────────────────────────────────────
    100 curated images across the categories we need.
    Unsplash photo IDs picked for wedding/event-adjacent content.
-   Replace any entry you don't like — category-based editor pickers
+   Replace any entry you don't like, category-based editor pickers
    will surface whatever is in the list.
    ────────────────────────────────────────────────────────────── */
 export const STOCK_IMAGES: StockImage[] = [

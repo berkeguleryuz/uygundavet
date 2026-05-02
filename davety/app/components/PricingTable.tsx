@@ -14,7 +14,7 @@ import {
 type Tier = {
   id: "free" | "basic" | "pro" | "premium";
   name: string;
-  basePrice: number; // TRY — locked
+  basePrice: number; // TRY, locked
   tagline: string;
   highlight?: boolean;
   cta: string;
@@ -200,7 +200,7 @@ export function PricingTable() {
   useEffect(() => {
     const tick = () => setOffer(resolveActiveOffer(new Date()));
     tick();
-    // Re-resolve every minute — catches midnight rollover and the window
+    // Re-resolve every minute, catches midnight rollover and the window
     // into/out of the monthly flash sale without a page refresh.
     const int = window.setInterval(tick, 60_000);
     return () => window.clearInterval(int);
@@ -211,14 +211,17 @@ export function PricingTable() {
       className="w-full"
       style={{ fontFamily: "Space Grotesk, sans-serif" }}
     >
-      {/* Animasyon sınıfları + keyframes — sayfada bir kez tanımlanır. */}
+      {/* Animasyon sınıfları + keyframes, sayfada bir kez tanımlanır. */}
       <TierIconStyles />
 
       {/* Active-offer note (countdown moved into each tier card so the
           urgency sits next to the price it applies to, not at the top). */}
       <OfferNote offer={offer} />
 
-      {/* Pricing cards row — sticky at top for long feature tables */}
+      {/* Pricing cards row, sticky at top for long feature tables.
+          items-stretch + h-full on cards equalises heights, so the
+          CTA buttons land on the same baseline regardless of whether
+          a tier shows a countdown / strikethrough / promo badge. */}
       <div className="sticky top-20 z-20 bg-background/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-3 border-b border-border">
         <div className="grid grid-cols-[minmax(140px,1.2fr)_repeat(4,1fr)] gap-3 items-stretch">
           <div className="hidden md:block" />
@@ -300,39 +303,55 @@ function TierHeader({
 
   return (
     <div
-      className={`relative rounded-2xl border p-3 md:p-4 flex flex-col items-center text-center transition-all ${
+      className={`relative rounded-2xl border p-3 md:p-4 flex flex-col items-center text-center transition-all h-full ${
         tier.highlight
           ? "bg-foreground text-background border-foreground shadow-lg"
           : "bg-white border-border"
       }`}
     >
-      {tier.highlight ? (
-        <div className="mb-1 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest">
-          <Star className="size-3 fill-current" /> En Popüler
-        </div>
-      ) : null}
+      {/* Top badge slot — sabit yükseklik, "En Popüler" / boş için aynı
+          dikey alan ayrılır ki tüm kartlar hizalı kalsın. */}
+      <div className="h-5 mb-1 flex items-center justify-center">
+        {tier.highlight ? (
+          <div className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest">
+            <Star className="size-3 fill-current" /> En Popüler
+          </div>
+        ) : null}
+      </div>
 
-      {/* Tier ikonu — her kartta sıralı olarak çiziliyor (draw-from-0).
-           SaveScreen TierPicker'la aynı ikon yapısı kullanılıyor.
-           Switch ile direkt JSX render — `tierIconFor` helper'ı linter
-           tarafından "render sırasında component yaratıyor" diye
-           uyardığı için inline yapıyoruz. */}
-      <div
-        className={`mb-2 size-9 inline-flex items-center justify-center rounded-xl border ${
-          tier.highlight
-            ? "border-background/30 text-background"
-            : "border-border text-foreground"
-        }`}
-      >
-        {tier.id === "free" ? (
-          <SparkleIcon className="size-5" />
-        ) : tier.id === "basic" ? (
-          <DrawStarIcon className="size-5" />
-        ) : tier.id === "pro" ? (
-          <ZapIcon className="size-5" />
-        ) : (
-          <CrownIcon className="size-5" />
-        )}
+      {/* Tier ikonu + sağ alt köşede mini "Seç" pill butonu, ikinci
+           CTA: bilmeyen kullanıcının kart başında bir tıklanabilir
+           öğe görmesi için. Asıl uzun CTA butonu hâlâ kartın altında.
+           Animasyon sürekli tier-icons.tsx'teki keyframes ile loop'lar. */}
+      <div className="relative mb-2">
+        <div
+          className={`size-12 inline-flex items-center justify-center rounded-xl border ${
+            tier.highlight
+              ? "border-background/30 text-background"
+              : "border-border text-foreground"
+          }`}
+        >
+          {tier.id === "free" ? (
+            <SparkleIcon className="size-7" />
+          ) : tier.id === "basic" ? (
+            <DrawStarIcon className="size-7" />
+          ) : tier.id === "pro" ? (
+            <ZapIcon className="size-7" />
+          ) : (
+            <CrownIcon className="size-7" />
+          )}
+        </div>
+        <a
+          href={tier.ctaHref}
+          aria-label={`${tier.name} paketini seç`}
+          className={`absolute -bottom-2 -right-3 inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] shadow-sm transition-colors cursor-pointer ${
+            tier.highlight
+              ? "bg-background text-foreground hover:bg-background/90"
+              : "bg-foreground text-background hover:bg-foreground/90"
+          }`}
+        >
+          Seç
+        </a>
       </div>
 
       {percent > 0 && !isFree ? (
@@ -341,17 +360,17 @@ function TierHeader({
         </div>
       ) : null}
 
-      {/* Per-card countdown — only renders when there's an active
-          discount AND this tier benefits from it. Free tier never has a
-          countdown (no discount applies to free). Sits inside the card
-          so the urgency lives right next to the price it gates. */}
-      {percent > 0 && !isFree && offer ? (
-        <Countdown
-          targetIso={offer.endsAtIso}
-          variant={tier.highlight ? "light" : "dark"}
-          compact
-        />
-      ) : null}
+      {/* Countdown slot — sabit yükseklik. İndirim olan kartlarda timer,
+          olmayanlarda boş ama aynı alan ayrılır. */}
+      <div className="h-6 mb-1 flex items-center justify-center">
+        {percent > 0 && !isFree && offer ? (
+          <Countdown
+            targetIso={offer.endsAtIso}
+            variant={tier.highlight ? "light" : "dark"}
+            compact
+          />
+        ) : null}
+      </div>
 
       <div
         className={`text-sm md:text-base font-semibold ${
@@ -361,7 +380,9 @@ function TierHeader({
         {tier.name}
       </div>
 
-      <div className="mt-1 leading-none">
+      {/* Fiyat slot — sabit yükseklik. Hem strikethrough+yeni-fiyat
+          (iki satır) hem tek-fiyat hem "Ücretsiz" aynı alana sığsın. */}
+      <div className="mt-1 leading-none min-h-[3rem] flex items-center justify-center">
         {isFree ? (
           <span className="text-xl md:text-2xl font-bold tabular-nums">
             Ücretsiz
@@ -394,21 +415,36 @@ function TierHeader({
         {tier.tagline}
       </div>
 
-      <a
-        href={tier.ctaHref}
-        className={`mt-2 md:mt-3 w-full px-3 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-medium transition-colors ${
-          tier.highlight
-            ? "bg-background text-foreground hover:bg-background/90"
-            : "bg-foreground text-background hover:bg-foreground/90"
-        }`}
-      >
-        {tier.cta}
-      </a>
+      {/* Free kartında reklam uyarısı, butonun hemen üstünde dikkat
+          çeken sarı/amber etiketle. Diğer kartlarda boş slot, hizalama
+          için aynı yer ayrılır. */}
+      <div className="mt-auto pt-3 w-full flex flex-col items-stretch gap-2">
+        {isFree ? (
+          <div
+            className="flex items-center gap-1.5 rounded-md bg-amber-100 border border-amber-300 text-amber-900 px-2 py-1.5 text-[10px] md:text-[11px] leading-snug font-medium text-left"
+            role="note"
+          >
+            <span className="text-base leading-none">⚠️</span>
+            <span>Davetiyende DavetYolla reklamı görünür.</span>
+          </div>
+        ) : null}
+
+        <a
+          href={tier.ctaHref}
+          className={`w-full px-3 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-medium transition-colors ${
+            tier.highlight
+              ? "bg-background text-foreground hover:bg-background/90"
+              : "bg-foreground text-background hover:bg-foreground/90"
+          }`}
+        >
+          {tier.cta}
+        </a>
+      </div>
     </div>
   );
 }
 
-/* ─── Offer note (no countdown — countdown lives in tier cards) ───────── */
+/* ─── Offer note (no countdown, countdown lives in tier cards) ───────── */
 function OfferNote({ offer }: { offer: ActiveOffer | null }) {
   if (!offer) {
     return <div className="h-2" aria-hidden />;

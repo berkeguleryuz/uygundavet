@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter, Link } from "@/i18n/navigation";
 import { signIn } from "@/src/lib/auth-client";
+import { translateAuthError } from "@/src/lib/auth-errors";
 
 export function LoginForm() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function LoginForm() {
     });
     setBusy(false);
     if (res.error) {
-      toast.error(res.error.message ?? "Giriş başarısız");
+      toast.error(translateAuthError(res.error, "Giriş başarısız"));
       return;
     }
     router.push(returnTo);

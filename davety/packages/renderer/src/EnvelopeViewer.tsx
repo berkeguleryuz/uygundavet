@@ -123,7 +123,7 @@ export function EnvelopeViewer({
           style={{ background: color, zIndex: 1 }}
         />
 
-        {/* Card inside pocket — slides up when open */}
+        {/* Card inside pocket, slides up when open */}
         <motion.div
           className="absolute rounded-md bg-white shadow-xl overflow-hidden"
           style={{
@@ -177,7 +177,7 @@ export function EnvelopeViewer({
               boxShadow: "inset 0 -8px 12px rgba(0,0,0,0.06)",
             }}
           />
-          {/* Back face (visible when open — daisy lining) */}
+          {/* Back face (visible when open, daisy lining) */}
           <div
             className="absolute inset-0"
             style={{

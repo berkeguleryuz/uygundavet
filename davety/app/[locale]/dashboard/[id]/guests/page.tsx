@@ -62,7 +62,7 @@ export default async function GuestsPage({ params }: { params: Params }) {
               {guests.map((g) => (
                 <tr key={g.id}>
                   <td className="px-4 py-2 font-medium">{g.name}</td>
-                  <td className="px-4 py-2 text-muted-foreground">{g.phone ?? "—"}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{g.phone ?? ","}</td>
                   <td className="px-4 py-2">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${
@@ -76,7 +76,7 @@ export default async function GuestsPage({ params }: { params: Params }) {
                   </td>
                   <td className="px-4 py-2">{g.guestCount}</td>
                   <td className="px-4 py-2 text-muted-foreground max-w-xs truncate">
-                    {g.note ?? "—"}
+                    {g.note ?? ","}
                   </td>
                   <td className="px-4 py-2 text-xs text-muted-foreground">
                     {new Date(g.createdAt).toLocaleDateString(locale)}

@@ -13,7 +13,7 @@ import { findDecoration } from "@davety/renderer";
  * Tek/çok satırlı düzenlenebilir alan; storage formatı `"{{daisy}} ... "`
  * gibi metin marker'ları taşıyor ama kullanıcı text alanında doğrudan
  * süsleme ikonunun kendisini görüyor. Marker'lar `contenteditable=false`
- * span'ler olarak render ediliyor — backspace ile bütün ikon tek seferde
+ * span'ler olarak render ediliyor, backspace ile bütün ikon tek seferde
  * siliniyor, ikon ekle butonu cursor pozisyonuna ekliyor.
  *
  * Çift senkron:
@@ -82,7 +82,7 @@ export const InlineDecorationField = forwardRef<
         svg.setAttribute("stroke-linecap", "round");
         svg.setAttribute("stroke-linejoin", "round");
         // Catalog svg payload is the inner contents of the SVG, not a
-        // full <svg> wrapper — innerHTML works because element is in
+        // full <svg> wrapper, innerHTML works because element is in
         // the SVG namespace via createElementNS.
         svg.innerHTML = icon.svg;
         span.appendChild(svg);
@@ -144,7 +144,7 @@ export const InlineDecorationField = forwardRef<
         const icon = findDecoration(iconKey);
         if (!icon) return;
 
-        // Span oluştur — buildDom ile aynı şablon.
+        // Span oluştur, buildDom ile aynı şablon.
         const span = document.createElement("span");
         span.dataset.icon = iconKey;
         span.setAttribute("contenteditable", "false");

@@ -21,7 +21,7 @@ function activeKeyFromPath(pathname: string): TabKey | null {
   return null;
 }
 
-/** Routes that manage their own full-page chrome — Nav shouldn't render there. */
+/** Routes that manage their own full-page chrome, Nav shouldn't render there. */
 const HIDDEN_ON = [
   "/login",
   "/signup",
@@ -62,7 +62,7 @@ export function Nav() {
 
         <span className="hidden md:block w-px h-6 bg-border" aria-hidden />
 
-        {/* Desktop tabs — pills inside the pill nav */}
+        {/* Desktop tabs, pills inside the pill nav */}
         <nav className="hidden md:flex items-center gap-1">
           {TABS.map((tab) => {
             const active = tab.key === activeKey;
@@ -159,7 +159,7 @@ export function Nav() {
         )}
       </div>
 
-      {/* Mobile tabs row — also pills, below the nav pill */}
+      {/* Mobile tabs row, also pills, below the nav pill */}
       <div className="pointer-events-auto md:hidden mt-2 flex items-center gap-1.5 overflow-x-auto px-1">
         {TABS.map((tab) => {
           const active = tab.key === activeKey;

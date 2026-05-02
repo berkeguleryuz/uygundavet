@@ -6,7 +6,12 @@
     "next": "İlerle",
     "back": "Geri Git",
     "continue": "Devam Et",
-    "loading": "Yükleniyor"
+    "loading": "Yükleniyor",
+    "remove": "Kaldır",
+    "add": "Ekle",
+    "edit": "Düzenle",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı"
   },
   "Landing": {
     "title": "Dijital Davetiyeni Sen Yarat",
@@ -98,7 +103,10 @@
     "customLink": "Özel Link Tanımla",
     "customLinkDesc": "Etkinliğinize özel link oluşturarak, okunabilir daha prestijli bir link oluşturabilirsiniz.",
     "currentLink": "Mevcut Link",
-    "customize": "Linkinizi Özelleştirin"
+    "customize": "Linkinizi Özelleştirin",
+    "expires": "Yayın süresi",
+    "expiresFree": "Bu davetiye 30 gün sonra arşivlenecek. Premium ile süresiz tutabilirsin.",
+    "expiresPaid": "Bu davetiye {date} tarihinde arşivlenecek."
   },
   "Envelope": {
     "view": "Görüntüle",
@@ -121,13 +129,148 @@
       "groomFamily": "Damadın Ailesi"
     },
     "eventProgram": {
-      "title": "Etkinlik Programı"
+      "title": "Etkinlik Programı",
+      "chainTitle": "Etkinlik Zinciri",
+      "addDay": "Yeni Gün Ekle",
+      "dayLabel": "Etkinlik Adı",
+      "dayDate": "Tarih",
+      "dayTime": "Saat",
+      "removeDay": "Bu Günü Kaldır"
     },
     "memoryBook": {
       "title": "Hatıra Defteri"
     },
     "donation": {
       "title": "Bizlere Destek Olun"
+    },
+    "venue": {
+      "title": "Mekan",
+      "address": "Adres",
+      "directions": "Yol Tarifi Al",
+      "addToCalendar": "Takvime Ekle",
+      "googleCalendar": "Google Takvime Ekle",
+      "appleCalendar": "Apple / Outlook (.ics)"
+    }
+  },
+  "DressCode": {
+    "label": "Kıyafet Kodu",
+    "preset": "Hazır Seçenek",
+    "note": "Açıklama",
+    "presets": {
+      "smart-casual": "Smart Casual",
+      "formal": "Formal",
+      "black-tie": "Black Tie",
+      "white-tie": "White Tie",
+      "beach": "Plaj / Açık Hava",
+      "boho": "Boho",
+      "henna-traditional": "Geleneksel (Kına)",
+      "white-banned": "Beyaz / krem giyilmemesi rica olunur"
+    }
+  },
+  "Hotels": {
+    "title": "Otel Önerileri",
+    "addHotel": "Otel Ekle",
+    "name": "Otel Adı",
+    "distance": "Mekana Uzaklık (km)",
+    "stars": "Yıldız",
+    "price": "Fiyat (₺/gece)",
+    "bookingUrl": "Rezervasyon Linki",
+    "book": "Rezervasyon",
+    "affiliateNote": "Booking.com / partner linklerinden ücretsiz komisyon alabilirsin."
+  },
+  "Transport": {
+    "title": "Ulaşım",
+    "shuttleEnabled": "Mekana özel servis var mı?",
+    "shuttleNote": "Servis Notu",
+    "shuttleTimes": "Servis Saatleri",
+    "parkingNote": "Otopark Bilgisi",
+    "publicTransitNote": "Toplu Taşıma"
+  },
+  "Music": {
+    "title": "Arkaplan Müziği",
+    "library": "Kütüphane",
+    "ownMusic": "Kendi Müziğin",
+    "uploadMusic": "Müzik Yükle",
+    "selected": "Seçili",
+    "noMatch": "Bu ruh haline uygun parça bulunamadı.",
+    "moods": {
+      "all": "Tümü",
+      "romantic": "Romantik",
+      "joyful": "Neşeli",
+      "elegant": "Zarif",
+      "traditional": "Geleneksel",
+      "celebration": "Kutlama",
+      "dramatic": "Etkileyici"
+    }
+  },
+  "GuestToken": {
+    "greeting": "Sevgili {name}",
+    "plusOne": "{count} yakının ile birlikte",
+    "manageTitle": "Misafir Listesi",
+    "addGuest": "Misafir Ekle",
+    "importCsv": "CSV İçe Aktar",
+    "shareLink": "Davet Linkini Paylaş",
+    "noGuests": "Henüz misafir eklemedin."
+  },
+  "PasswordGate": {
+    "title": "Davetiye Korumalı",
+    "subtitle": "Bu davetiye şifre ile korunuyor. Davet eden tarafından sana verilen şifreyi gir.",
+    "input": "Şifre",
+    "submit": "Davetiyeyi Aç",
+    "checking": "Kontrol ediliyor...",
+    "wrong": "Şifre yanlış.",
+    "tooMany": "Çok fazla deneme, biraz bekle.",
+    "networkError": "Bağlantı hatası."
+  },
+  "Archive": {
+    "title": "Bu davetiye arşivlenmiş",
+    "subtitle": "Etkinlik tarihi geçtiği için davetiye otomatik arşive alınmış. Etkinlik sahibi yeniden yayına alabilir.",
+    "restore": "Yeniden Yayınla",
+    "restoreFreeLimit": "Free planda her davetiye yalnızca 1 kez yeniden yayınlanabilir."
+  },
+  "Rsvp": {
+    "yes": "Geleceğim",
+    "no": "Gelemiyorum",
+    "maybe": "Belki",
+    "name": "Ad Soyad",
+    "phone": "Telefon",
+    "guestCount": "Kişi Sayısı",
+    "note": "Not (opsiyonel)",
+    "submit": "Gönder",
+    "thanks": "Teşekkürler",
+    "success": "Cevabın kaydedildi.",
+    "deadlinePassed": "Cevap tarihi geçti.",
+    "tooMany": "Çok fazla deneme. Birkaç dakika sonra tekrar dene.",
+    "saveError": "Cevap kaydedilemedi. Daha sonra tekrar dene.",
+    "networkError": "Bağlantı hatası. İnternetini kontrol et."
+  },
+  "CustomDomain": {
+    "title": "Özel Alan Adı",
+    "subtitle": "Davetiyene `gulin-ahmet-2026.com` gibi kendi domain'ini bağlayabilirsin.",
+    "domainLabel": "Domain (örn. gulinahmet2026.com)",
+    "save": "Domain Bağla",
+    "remove": "Bağlantıyı Kaldır",
+    "alreadyTaken": "Bu domain zaten başka bir davetiyeye bağlı.",
+    "reserved": "Bu domain rezerve edilmiş."
+  },
+  "Story": {
+    "title": "Hikayemiz",
+    "addMilestone": "Yeni An Ekle",
+    "tone": "Anlatım Tonu",
+    "tones": {
+      "warm": "Sıcak / Samimi",
+      "playful": "Eğlenceli",
+      "elegant": "Zarif",
+      "modern": "Modern / Kısa"
+    },
+    "suggestions": {
+      "first-meet": "İlk karşılaşma",
+      "first-date": "İlk randevu",
+      "i-knew-it": "Bunun o olduğunu anladığım an",
+      "first-trip": "İlk seyahat",
+      "meet-family": "Aileyle ilk tanışma",
+      "proposal": "Evlilik teklifi",
+      "engagement": "Nişan"
     }
   }
 }

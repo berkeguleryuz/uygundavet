@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useRouter, Link } from "@/i18n/navigation";
 import { signUp } from "@/src/lib/auth-client";
+import { translateAuthError } from "@/src/lib/auth-errors";
 
 export function SignupForm() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export function SignupForm() {
     });
     setBusy(false);
     if (res.error) {
-      toast.error(res.error.message ?? "Kayıt başarısız");
+      toast.error(translateAuthError(res.error, "Kayıt başarısız"));
       return;
     }
     toast.success("Hesabın oluşturuldu");

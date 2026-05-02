@@ -1,5 +1,5 @@
 /**
- * Discount schedule — decided centrally so server + client agree, and so the
+ * Discount schedule, decided centrally so server + client agree, and so the
  * Stripe layer (coupon / promotion-code selection) can read from the same
  * source of truth later. Percentages are whole integers.
  *
@@ -15,11 +15,11 @@ export interface ActiveOffer {
   label: string;
   /** Longer description / badge secondary text */
   sublabel?: string;
-  /** UTC ISO end timestamp — countdown target */
+  /** UTC ISO end timestamp, countdown target */
   endsAtIso: string;
   /**
    * Stripe promotion code name we'd bind this window to. Kept here so the
-   * client never tries to apply a custom discount to amounts — it always
+   * client never tries to apply a custom discount to amounts, it always
    * defers to Stripe by sending { promotionCode } at checkout time.
    */
   promotionCode: string | null;
@@ -45,7 +45,7 @@ export function resolveActiveOffer(now: Date): ActiveOffer {
   const month = now.getMonth();
   const date = now.getDate();
 
-  // 1) Monthly 3-day flash sale — days 5, 6, 7 (inclusive). Ends at the
+  // 1) Monthly 3-day flash sale, days 5, 6, 7 (inclusive). Ends at the
   //    start of the 8th (local midnight) and therefore spans whatever 3
   //    weekdays those dates fall on in a given month.
   if (date >= 5 && date <= 7) {
@@ -59,7 +59,7 @@ export function resolveActiveOffer(now: Date): ActiveOffer {
     };
   }
 
-  // 2) Weekday rotation — all countdowns end at local midnight.
+  // 2) Weekday rotation, all countdowns end at local midnight.
   const endsAt = new Date(year, month, date + 1, 0, 0, 0, 0);
   const dow = now.getDay(); // 0=Sun … 6=Sat
 
@@ -100,7 +100,7 @@ export function resolveActiveOffer(now: Date): ActiveOffer {
         endsAtIso: endsAt.toISOString(),
         promotionCode: "WEEKDAY_SAT_20",
       };
-    // Tuesday (2) and Sunday (0) — no discount. Still carry a valid
+    // Tuesday (2) and Sunday (0), no discount. Still carry a valid
     // endsAt so the banner can show "Yarın %X indirim" if we want.
     default:
       return {

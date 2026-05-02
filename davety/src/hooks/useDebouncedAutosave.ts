@@ -7,7 +7,7 @@ import { useEditorStore } from "@/src/store/editor-store";
  * Hook is intentionally a no-op for network persistence.
  *
  * Earlier this hook PATCHed the design every 800ms, which silently
- * destroyed user state — if a session edit went bad, the draft was
+ * destroyed user state, if a session edit went bad, the draft was
  * already in the DB and there was no way to roll back. Persistence
  * now happens ONLY on explicit Save (see useManualSave). This hook is
  * kept so existing call sites compile and to leave a hook anchor for

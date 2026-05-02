@@ -187,7 +187,7 @@ function TemplateLibrary() {
       const cat = DECORATION_TEMPLATE_CATEGORIES.find((c) => c.key === activeKey);
       return cat ? [cat] : [];
     }
-    // Across categories — match id or category label
+    // Across categories, match id or category label
     return DECORATION_TEMPLATE_CATEGORIES.map((c) => ({
       ...c,
       items: c.items.filter(

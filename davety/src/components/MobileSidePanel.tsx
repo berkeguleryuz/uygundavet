@@ -20,14 +20,14 @@ interface Props {
 }
 
 /**
- * Persistent mobile bottom toolbar — replaces the old single-button FAB
+ * Persistent mobile bottom toolbar, replaces the old single-button FAB
  * with four equal-width quick actions:
  *  - Tasarla  → opens the design home drawer
  *  - Düzenle  → opens the contextual block / text drawer
  *  - Önizle   → toggles the full-screen preview overlay
  *  - Kaydet   → saves; lights up amber when there are unsaved changes
  *
- * On md+ this whole bar is hidden — desktop uses the right side panel.
+ * On md+ this whole bar is hidden, desktop uses the right side panel.
  */
 export function MobileSidePanel({ onPreview, onSave, saving, dirty }: Props) {
   const panelMode = useUIStore((s) => s.panelMode);

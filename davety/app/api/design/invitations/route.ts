@@ -57,7 +57,7 @@ export async function GET() {
 }
 
 // DB'nin şişmemesi için kullanıcı başına davetiye taban kapasitesi.
-// Premium satın alma geçmişi olan hesaplar daha yüksek tavanı görür —
+// Premium satın alma geçmişi olan hesaplar daha yüksek tavanı görür,
 // yani "para getiren" kullanıcılara daha fazla alan veriyoruz, geri
 // kalanlar 2 ile sınırlı.
 const FREE_USER_INVITATION_CAP = 2;
@@ -110,10 +110,10 @@ export async function POST(req: Request) {
 
   let doc: ReturnType<typeof buildDefaultDoc>;
 
-  // 1) Frontend design sample (homepage grid) — uses the layout variant
+  // 1) Frontend design sample (homepage grid), uses the layout variant
   //    baked into hero + theme from DesignSample. Takes precedence over
   //    theme/template since it's a complete template.
-  // Önce yeni V2 listesinden ara, bulunamazsa eski koleksiyona düş —
+  // Önce yeni V2 listesinden ara, bulunamazsa eski koleksiyona düş,
   // böylece geçişten önce eski bir designId kaydetmiş kullanıcılar
   // hâlâ kendi tasarımlarını yükleyebilir.
   const designSample = parsed.data.designId

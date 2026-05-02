@@ -25,7 +25,7 @@ export function makeInvitationTexture(palette: Palette): THREE.CanvasTexture {
   ctx.fillText("Hilal & İbrahim", 210, 290);
   ctx.font = "20px Space Grotesk, sans-serif";
   ctx.fillText("15 Haziran 2026", 210, 360);
-  ctx.fillText("19:00 — Boğaz Terası", 210, 395);
+  ctx.fillText("19:00, Boğaz Terası", 210, 395);
   ctx.font = "italic 18px Merienda, serif";
   ctx.fillText("~ bize katılın ~", 210, 510);
   const tex = new THREE.CanvasTexture(canvas);

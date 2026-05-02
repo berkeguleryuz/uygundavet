@@ -1,10 +1,12 @@
 "use client";
 
 /**
- * Paylaşımlı tier ikonları — hem SaveScreen TierPicker'da hem de
- * homepage PricingTable'da aynı görünüp aynı "draw from 0" animasyon
- * ile çiziliyor. Tek bir yapıdan beslendikleri için fiyatlandırma UI'ı
- * her yerde tutarlı.
+ * Tier ikonları, paket-bazlı sıfırdan tasarlanmış sürekli animasyonlu
+ * SVG'ler. Hem PricingTable hem SaveScreen'de aynı yapıyı kullanıyor.
+ *
+ * Tasarım prensibi: animasyonlar her zaman görünür olsun, kullanıcı ilk
+ * paint'i kaçırsa bile pakete bakınca hareket fark etmeli. Her ikon
+ * birden fazla animasyon katmanı içerir (motion + scale + opacity).
  *
  * Kullanım:
  *   <TierIconStyles />              // sayfada bir kez
@@ -23,52 +25,226 @@ export type TierIconComponent = (props: {
 export function TierIconStyles() {
   return (
     <style>{`
-      @keyframes ssp-draw {
-        from { stroke-dashoffset: 100; }
-        to   { stroke-dashoffset: 0; }
+      /* ── Free, parıltı + yörünge ────────────────────────────────── */
+      @keyframes tier-sparkle-pulse {
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        50%      { transform: scale(1.25) rotate(15deg); opacity: 0.85; }
       }
-      @keyframes ssp-fadein {
-        from { opacity: 0; transform: scale(0.6); }
-        to   { opacity: 1; transform: scale(1); }
+      @keyframes tier-orbit-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
       }
-      @keyframes ssp-idle {
-        0%,100% { transform: translateY(0); }
-        50%     { transform: translateY(-1px); }
+      @keyframes tier-orbit-counter-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(-360deg); }
+      }
+      @keyframes tier-particle-burst {
+        0%   { opacity: 0; r: 0.3; }
+        25%  { opacity: 1; r: 1.3; }
+        70%  { opacity: 1; r: 1.0; }
+        100% { opacity: 0; r: 0.3; }
+      }
+      .tier-sparkle-core {
+        transform-origin: 12px 12px;
+        animation: tier-sparkle-pulse 1.6s ease-in-out infinite;
+      }
+      .tier-sparkle-orbit-cw {
+        transform-origin: 12px 12px;
+        animation: tier-orbit-spin 6s linear infinite;
+      }
+      .tier-sparkle-orbit-ccw {
+        transform-origin: 12px 12px;
+        animation: tier-orbit-counter-spin 8s linear infinite;
+      }
+      .tier-particle {
+        animation: tier-particle-burst 1.8s ease-in-out infinite;
+      }
+      .tier-particle-d1 { animation-delay: 0.0s; }
+      .tier-particle-d2 { animation-delay: 0.3s; }
+      .tier-particle-d3 { animation-delay: 0.6s; }
+      .tier-particle-d4 { animation-delay: 0.9s; }
+      .tier-particle-d5 { animation-delay: 1.2s; }
+
+      /* ── Basic, yıldız twinkle + halo + dolan ışık ──────────────── */
+      @keyframes tier-star-fill {
+        0%, 100% { fill-opacity: 0.15; }
+        50%      { fill-opacity: 0.55; }
+      }
+      @keyframes tier-star-bob {
+        0%, 100% { transform: translateY(0) rotate(-4deg); }
+        50%      { transform: translateY(-1px) rotate(4deg); }
+      }
+      @keyframes tier-star-halo {
+        0%, 100% { opacity: 0.1;  transform: scale(0.85); }
+        50%      { opacity: 0.45; transform: scale(1.15); }
+      }
+      @keyframes tier-star-flash {
+        0%, 90%, 100% { opacity: 0; transform: translateX(-14px) skewX(-20deg); }
+        45%           { opacity: 0.85; transform: translateX(14px) skewX(-20deg); }
+      }
+      .tier-star-host {
+        transform-origin: 12px 12px;
+        animation: tier-star-bob 2.2s ease-in-out infinite;
+      }
+      .tier-star-fill {
+        animation: tier-star-fill 1.6s ease-in-out infinite;
+      }
+      .tier-star-halo {
+        transform-origin: 12px 12px;
+        animation: tier-star-halo 1.8s ease-in-out infinite;
+      }
+      .tier-star-flash {
+        animation: tier-star-flash 2.4s ease-in-out infinite;
       }
 
-      .ssp-draw-1, .ssp-draw-2, .ssp-draw-3, .ssp-draw-4 {
-        stroke-dasharray: 100;
-        stroke-dashoffset: 100;
-        animation:
-          ssp-draw 1.4s ease-out forwards,
-          ssp-idle 3.2s ease-in-out 1.6s infinite;
+      /* ── Pro, yıldırım flash + arc'lar + titreme ────────────────── */
+      @keyframes tier-bolt-shake {
+        0%, 100% { transform: translate(0, 0); }
+        10%      { transform: translate(-0.5px, 0.5px); }
+        30%      { transform: translate(0.5px, -0.5px); }
+        50%      { transform: translate(-0.3px, -0.5px); }
+        70%      { transform: translate(0.5px, 0.3px); }
+        90%      { transform: translate(-0.5px, 0.5px); }
       }
-      .ssp-draw-1 { animation-delay: 0s, 1.4s; }
-      .ssp-draw-2 { animation-delay: 0.25s, 1.65s; }
-      .ssp-draw-3 { animation-delay: 0.5s, 1.9s; }
-      .ssp-draw-4 { animation-delay: 0.75s, 2.15s; }
-
-      .ssp-dot {
+      @keyframes tier-bolt-glow {
+        0%, 100% { fill-opacity: 0.2; filter: drop-shadow(0 0 0px currentColor); }
+        50%      { fill-opacity: 0.6; filter: drop-shadow(0 0 4px currentColor); }
+      }
+      @keyframes tier-bolt-arc {
+        0%   { stroke-dashoffset: 30; opacity: 0; }
+        15%  { opacity: 1; }
+        70%  { opacity: 1; }
+        100% { stroke-dashoffset: -30; opacity: 0; }
+      }
+      @keyframes tier-bolt-spark {
+        0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+        30%  { opacity: 1; }
+        100% { opacity: 0; transform: var(--spark-end) scale(1.5); }
+      }
+      .tier-bolt-host {
+        transform-origin: 12px 12px;
+        animation: tier-bolt-shake 0.4s ease-in-out infinite;
+      }
+      .tier-bolt-fill {
+        animation: tier-bolt-glow 1s ease-in-out infinite;
+      }
+      .tier-bolt-arc-1 {
+        stroke-dasharray: 30;
+        animation: tier-bolt-arc 1.4s ease-in-out infinite;
+      }
+      .tier-bolt-arc-2 {
+        stroke-dasharray: 30;
+        animation: tier-bolt-arc 1.4s ease-in-out 0.45s infinite;
+      }
+      .tier-bolt-arc-3 {
+        stroke-dasharray: 30;
+        animation: tier-bolt-arc 1.4s ease-in-out 0.9s infinite;
+      }
+      .tier-bolt-spark {
         transform-box: fill-box;
         transform-origin: center;
-        opacity: 0;
-        animation: ssp-fadein 0.4s ease-out forwards;
+        animation: tier-bolt-spark 1.4s ease-out infinite;
       }
-      .ssp-dot-1 { animation-delay: 1.0s; }
-      .ssp-dot-2 { animation-delay: 1.2s; }
-      .ssp-dot-3 { animation-delay: 1.4s; }
+      .tier-bolt-spark-1 { --spark-end: translate(-3px, -3px); animation-delay: 0s;    }
+      .tier-bolt-spark-2 { --spark-end: translate(3px, -3px);  animation-delay: 0.2s; }
+      .tier-bolt-spark-3 { --spark-end: translate(-3px, 3px);  animation-delay: 0.4s; }
+      .tier-bolt-spark-4 { --spark-end: translate(3px, 3px);   animation-delay: 0.7s; }
+      .tier-bolt-spark-5 { --spark-end: translate(0, -4px);    animation-delay: 1.0s; }
+
+      /* ── Premium, taç + ışın + mücevherler + pırıltılar ─────────── */
+      @keyframes tier-crown-float {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        25%      { transform: translateY(-1.2px) rotate(0deg); }
+        50%      { transform: translateY(-1.8px) rotate(2deg); }
+        75%      { transform: translateY(-1.2px) rotate(0deg); }
+      }
+      @keyframes tier-crown-gem-pulse {
+        0%, 100% { opacity: 0.65; transform: scale(0.85); }
+        50%      { opacity: 1;    transform: scale(1.4); }
+      }
+      @keyframes tier-crown-rays {
+        0%, 100% { opacity: 0;    transform: scale(0.4) rotate(0deg); }
+        40%      { opacity: 0.6;  transform: scale(1.2) rotate(45deg); }
+        70%      { opacity: 0.4;  transform: scale(1.4) rotate(90deg); }
+        100%     { opacity: 0;    transform: scale(1.6) rotate(180deg); }
+      }
+      @keyframes tier-crown-shimmer {
+        0%   { opacity: 0; transform: translateX(-16px) skewX(-25deg); }
+        50%  { opacity: 0.85; }
+        100% { opacity: 0; transform: translateX(16px) skewX(-25deg); }
+      }
+      @keyframes tier-crown-sparkle {
+        0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+        40%      { opacity: 1; transform: scale(1.3) rotate(45deg); }
+        80%      { opacity: 0.5; transform: scale(0.8) rotate(90deg); }
+      }
+      .tier-crown-host {
+        transform-origin: 12px 18px;
+        animation: tier-crown-float 2.6s ease-in-out infinite;
+      }
+      .tier-crown-rays {
+        transform-origin: 12px 12px;
+        animation: tier-crown-rays 2.4s ease-out infinite;
+      }
+      .tier-crown-gem-1 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-gem-pulse 1.4s ease-in-out infinite;
+      }
+      .tier-crown-gem-2 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-gem-pulse 1.4s ease-in-out 0.35s infinite;
+      }
+      .tier-crown-gem-3 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-gem-pulse 1.4s ease-in-out 0.7s infinite;
+      }
+      .tier-crown-shimmer {
+        animation: tier-crown-shimmer 2.2s ease-in-out infinite;
+      }
+      .tier-crown-sparkle-1 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-sparkle 2.0s ease-in-out infinite;
+      }
+      .tier-crown-sparkle-2 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-sparkle 2.0s ease-in-out 0.6s infinite;
+      }
+      .tier-crown-sparkle-3 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-sparkle 2.0s ease-in-out 1.2s infinite;
+      }
+      .tier-crown-sparkle-4 {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: tier-crown-sparkle 2.0s ease-in-out 1.6s infinite;
+      }
 
       @media (prefers-reduced-motion: reduce) {
-        .ssp-draw-1, .ssp-draw-2, .ssp-draw-3, .ssp-draw-4 {
-          stroke-dashoffset: 0;
-          animation: none;
+        .tier-sparkle-core, .tier-sparkle-orbit-cw, .tier-sparkle-orbit-ccw,
+        .tier-particle,
+        .tier-star-host, .tier-star-fill, .tier-star-halo, .tier-star-flash,
+        .tier-bolt-host, .tier-bolt-fill,
+        .tier-bolt-arc-1, .tier-bolt-arc-2, .tier-bolt-arc-3,
+        .tier-bolt-spark,
+        .tier-crown-host, .tier-crown-rays,
+        .tier-crown-gem-1, .tier-crown-gem-2, .tier-crown-gem-3,
+        .tier-crown-shimmer,
+        .tier-crown-sparkle-1, .tier-crown-sparkle-2,
+        .tier-crown-sparkle-3, .tier-crown-sparkle-4 {
+          animation: none !important;
         }
-        .ssp-dot { opacity: 1; animation: none; }
       }
     `}</style>
   );
 }
 
+/* Free, başlangıç paketi: pulse eden elmas + 2 yönde dönen yörüngeler + parçacık burst'leri */
 export function SparkleIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -76,22 +252,70 @@ export function SparkleIcon({ className }: { className?: string }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path
-        className="ssp-draw-1"
-        pathLength={100}
-        d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
-      />
-      <path className="ssp-draw-2" pathLength={100} d="M20 3v4" />
-      <path className="ssp-draw-3" pathLength={100} d="M22 5h-4" />
+      <g className="tier-sparkle-core">
+        <path
+          d="M12 4 L13.6 10.4 L20 12 L13.6 13.6 L12 20 L10.4 13.6 L4 12 L10.4 10.4 Z"
+          fill="currentColor"
+          fillOpacity="0.25"
+        />
+        <path d="M12 4 L13.6 10.4 L20 12 L13.6 13.6 L12 20 L10.4 13.6 L4 12 L10.4 10.4 Z" />
+      </g>
+      {/* Saat yönünde dönen iç yörünge */}
+      <g className="tier-sparkle-orbit-cw">
+        <circle
+          className="tier-particle tier-particle-d1"
+          cx="20"
+          cy="6"
+          r="0.8"
+          fill="currentColor"
+          stroke="none"
+        />
+        <circle
+          className="tier-particle tier-particle-d3"
+          cx="4"
+          cy="6"
+          r="0.7"
+          fill="currentColor"
+          stroke="none"
+        />
+      </g>
+      {/* Saat tersine dönen dış yörünge */}
+      <g className="tier-sparkle-orbit-ccw">
+        <circle
+          className="tier-particle tier-particle-d2"
+          cx="21"
+          cy="20"
+          r="0.7"
+          fill="currentColor"
+          stroke="none"
+        />
+        <circle
+          className="tier-particle tier-particle-d4"
+          cx="3"
+          cy="20"
+          r="0.8"
+          fill="currentColor"
+          stroke="none"
+        />
+        <circle
+          className="tier-particle tier-particle-d5"
+          cx="12"
+          cy="2"
+          r="0.6"
+          fill="currentColor"
+          stroke="none"
+        />
+      </g>
     </svg>
   );
 }
 
+/* Basic, klasik paketi: sallanan yıldız + nefes alan halo + dolup boşalan iç + yatay flash ışığı */
 export function StarIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -99,20 +323,49 @@ export function StarIcon({ className }: { className?: string }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path
-        className="ssp-draw-1"
-        pathLength={100}
-        d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755A2.122 2.122 0 0 0 9.213 6.974z"
+      <defs>
+        <clipPath id="tier-star-clip">
+          <path d="M12 3 L14.6 9.3 L21.4 9.9 L16.2 14.4 L17.8 21 L12 17.4 L6.2 21 L7.8 14.4 L2.6 9.9 L9.4 9.3 Z" />
+        </clipPath>
+      </defs>
+      <circle
+        className="tier-star-halo"
+        cx="12"
+        cy="12"
+        r="10"
+        fill="currentColor"
+        fillOpacity="0.18"
+        stroke="none"
       />
+      <g className="tier-star-host">
+        <path
+          className="tier-star-fill"
+          d="M12 3 L14.6 9.3 L21.4 9.9 L16.2 14.4 L17.8 21 L12 17.4 L6.2 21 L7.8 14.4 L2.6 9.9 L9.4 9.3 Z"
+          fill="currentColor"
+        />
+        <path d="M12 3 L14.6 9.3 L21.4 9.9 L16.2 14.4 L17.8 21 L12 17.4 L6.2 21 L7.8 14.4 L2.6 9.9 L9.4 9.3 Z" />
+        <rect
+          className="tier-star-flash"
+          x="-4"
+          y="2"
+          width="6"
+          height="20"
+          fill="currentColor"
+          fillOpacity="0.9"
+          stroke="none"
+          clipPath="url(#tier-star-clip)"
+        />
+      </g>
     </svg>
   );
 }
 
+/* Pro, profesyonel paketi: titreyen yıldırım + glow + 3 elektrik arc + dışa fırlayan kıvılcımlar */
 export function ZapIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -120,23 +373,82 @@ export function ZapIcon({ className }: { className?: string }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
+      <g className="tier-bolt-host">
+        <path
+          className="tier-bolt-fill"
+          d="M13 2 L4 13 L10 13 L9 22 L20 9 L13 9 L14 2 Z"
+          fill="currentColor"
+        />
+        <path d="M13 2 L4 13 L10 13 L9 22 L20 9 L13 9 L14 2 Z" />
+      </g>
       <path
-        className="ssp-draw-1"
-        pathLength={100}
-        d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"
+        className="tier-bolt-arc-1"
+        d="M2 7 Q 5 8 6 5"
+        stroke="currentColor"
+        strokeWidth="1.2"
       />
-      <circle className="ssp-dot ssp-dot-1" cx="20.5" cy="4" r="0.8" fill="currentColor" stroke="none" />
-      <circle className="ssp-dot ssp-dot-2" cx="3" cy="20" r="0.7" fill="currentColor" stroke="none" />
-      <circle className="ssp-dot ssp-dot-3" cx="21" cy="21" r="0.6" fill="currentColor" stroke="none" />
+      <path
+        className="tier-bolt-arc-2"
+        d="M22 17 Q 19 16 18 19"
+        stroke="currentColor"
+        strokeWidth="1.2"
+      />
+      <path
+        className="tier-bolt-arc-3"
+        d="M2 18 Q 4 16 6 18"
+        stroke="currentColor"
+        strokeWidth="1.2"
+      />
+      <circle
+        className="tier-bolt-spark tier-bolt-spark-1"
+        cx="3"
+        cy="3"
+        r="0.8"
+        fill="currentColor"
+        stroke="none"
+      />
+      <circle
+        className="tier-bolt-spark tier-bolt-spark-2"
+        cx="21"
+        cy="3"
+        r="0.8"
+        fill="currentColor"
+        stroke="none"
+      />
+      <circle
+        className="tier-bolt-spark tier-bolt-spark-3"
+        cx="3"
+        cy="21"
+        r="0.7"
+        fill="currentColor"
+        stroke="none"
+      />
+      <circle
+        className="tier-bolt-spark tier-bolt-spark-4"
+        cx="21"
+        cy="21"
+        r="0.9"
+        fill="currentColor"
+        stroke="none"
+      />
+      <circle
+        className="tier-bolt-spark tier-bolt-spark-5"
+        cx="12"
+        cy="1"
+        r="0.7"
+        fill="currentColor"
+        stroke="none"
+      />
     </svg>
   );
 }
 
+/* Premium: süzülen taç + dönen ışın halkası + 3 mücevher pulse + 4 köşe pırıltısı + altın shimmer */
 export function CrownIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -144,20 +456,95 @@ export function CrownIcon({ className }: { className?: string }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
     >
+      <defs>
+        <clipPath id="tier-crown-clip">
+          <path d="M3 8 L7 13 L12 5 L17 13 L21 8 L19 18 L5 18 Z" />
+        </clipPath>
+      </defs>
+      {/* Arka plan ışın halkası, dönerek genişler */}
+      <g className="tier-crown-rays">
+        <line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <line x1="2" y1="12" x2="5" y2="12" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <line x1="22" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <line x1="5" y1="5" x2="7" y2="7" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <line x1="19" y1="5" x2="17" y2="7" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+      </g>
+      <g className="tier-crown-host">
+        <path
+          d="M3 8 L7 13 L12 5 L17 13 L21 8 L19 18 L5 18 Z"
+          fill="currentColor"
+          fillOpacity="0.22"
+        />
+        <path d="M3 8 L7 13 L12 5 L17 13 L21 8 L19 18 L5 18 Z" />
+        <path d="M5 21 L19 21" />
+        {/* Altın shimmer çizgi, sağa-sola süzülür */}
+        <rect
+          className="tier-crown-shimmer"
+          x="-5"
+          y="6"
+          width="6"
+          height="14"
+          fill="currentColor"
+          fillOpacity="0.9"
+          stroke="none"
+          clipPath="url(#tier-crown-clip)"
+        />
+        {/* 3 mücevher staggered pulse */}
+        <circle
+          className="tier-crown-gem-1"
+          cx="12"
+          cy="11"
+          r="1.4"
+          fill="currentColor"
+          stroke="none"
+        />
+        <circle
+          className="tier-crown-gem-2"
+          cx="6.5"
+          cy="13"
+          r="1.0"
+          fill="currentColor"
+          stroke="none"
+        />
+        <circle
+          className="tier-crown-gem-3"
+          cx="17.5"
+          cy="13"
+          r="1.0"
+          fill="currentColor"
+          stroke="none"
+        />
+      </g>
+      {/* 4 köşe pırıltısı, küçük yıldız şeklinde */}
       <path
-        className="ssp-draw-1"
-        pathLength={100}
-        d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.518L7.09 9.165a1 1 0 0 0 1.517-.294z"
+        className="tier-crown-sparkle-1"
+        d="M2 4 L2.4 5 L3.4 5.4 L2.4 5.8 L2 6.8 L1.6 5.8 L0.6 5.4 L1.6 5 Z"
+        fill="currentColor"
+        stroke="none"
       />
-      <path className="ssp-draw-2" pathLength={100} d="M5 21h14" />
-      <circle className="ssp-dot ssp-dot-1" cx="12" cy="3.6" r="0.9" fill="currentColor" stroke="none" />
-      <circle className="ssp-dot ssp-dot-2" cx="3" cy="6" r="0.7" fill="currentColor" stroke="none" />
-      <circle className="ssp-dot ssp-dot-3" cx="21" cy="6" r="0.7" fill="currentColor" stroke="none" />
+      <path
+        className="tier-crown-sparkle-2"
+        d="M22 4 L22.3 4.8 L23.1 5.1 L22.3 5.4 L22 6.2 L21.7 5.4 L20.9 5.1 L21.7 4.8 Z"
+        fill="currentColor"
+        stroke="none"
+      />
+      <path
+        className="tier-crown-sparkle-3"
+        d="M21 22 L21.3 22.6 L22 22.9 L21.3 23.2 L21 23.8 L20.7 23.2 L20 22.9 L20.7 22.6 Z"
+        fill="currentColor"
+        stroke="none"
+      />
+      <path
+        className="tier-crown-sparkle-4"
+        d="M3 22 L3.3 22.6 L4 22.9 L3.3 23.2 L3 23.8 L2.7 23.2 L2 22.9 L2.7 22.6 Z"
+        fill="currentColor"
+        stroke="none"
+      />
     </svg>
   );
 }

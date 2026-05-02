@@ -4,7 +4,7 @@ import type { ComponentType, CSSProperties } from "react";
 export interface BlockViewProps<T = unknown> {
   block: Block<T>;
   theme: Theme;
-  /** Optional hook for editor — called when a text slot is clicked */
+  /** Optional hook for editor, called when a text slot is clicked */
   onFieldSelect?: (fieldId: string) => void;
   /** When true the block is rendered in the editor (yellow highlights allowed) */
   editable?: boolean;

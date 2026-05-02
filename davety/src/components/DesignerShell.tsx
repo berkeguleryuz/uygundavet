@@ -104,7 +104,7 @@ function DesignerShellInner({
   async function handlePublish() {
     if (dirty) {
       const ok = await save();
-      if (!ok) return; // save failed — stay in editor
+      if (!ok) return; // save failed, stay in editor
     }
     router.push(`/design/invitations/${docId}/save`);
   }
@@ -119,7 +119,7 @@ function DesignerShellInner({
 
   return (
     <div className="h-dvh grid grid-rows-[56px_1fr] bg-background overflow-hidden">
-      {/* Top bar — responsive: compact on mobile, rich on desktop */}
+      {/* Top bar, responsive: compact on mobile, rich on desktop */}
       <header className="border-b border-border flex items-center justify-between gap-2 px-3 sm:px-4">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <button
@@ -152,7 +152,7 @@ function DesignerShellInner({
           ) : null}
         </div>
 
-        {/* Countdown — only desktop, takes too much room on mobile */}
+        {/* Countdown, only desktop, takes too much room on mobile */}
         <div className="hidden lg:block shrink-0">
           <HeaderCountdown targetIso={resolveCountdownIso(doc)} />
         </div>
@@ -176,7 +176,7 @@ function DesignerShellInner({
           >
             <Redo2 className="size-3.5" />
           </button>
-          {/* Önizle / Kaydet — desktop only; mobile gets these in the bottom toolbar */}
+          {/* Önizle / Kaydet, desktop only; mobile gets these in the bottom toolbar */}
           <button
             onClick={togglePreview}
             className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-border text-foreground text-xs px-3 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:bg-muted"
@@ -199,7 +199,7 @@ function DesignerShellInner({
         </div>
       </header>
 
-      {/* Workspace — desktop: side-by-side, mobile: full-canvas + bottom sheet.
+      {/* Workspace, desktop: side-by-side, mobile: full-canvas + bottom sheet.
           Mobile reserves 64px at the bottom so the toolbar doesn't overlap
           canvas content. */}
       <div className="min-h-0 grid md:grid-cols-[1fr_380px] pb-16 md:pb-0">

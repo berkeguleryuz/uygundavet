@@ -14,7 +14,7 @@ interface SeedArgs {
 }
 
 /**
- * Full rich default template — mirrors the reference invitations
+ * Full rich default template, mirrors the reference invitations
  * (decorative hero + countdown + date row + families + venue with
  * action buttons + event program + gallery + memory book + RSVP).
  */
@@ -101,7 +101,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 4. VENUE — locked (action buttons are functional, non-deletable section)
+    // 4. VENUE, locked (action buttons are functional, non-deletable section)
     {
       id: nanoid(8),
       type: "venue",
@@ -142,7 +142,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 6. RSVP FORM — locked (guests press this button to submit)
+    // 6. RSVP FORM, locked (guests press this button to submit)
     {
       id: nanoid(8),
       type: "rsvp_form",
@@ -159,7 +159,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 7. GALLERY — locked (guests upload their photos here)
+    // 7. GALLERY, locked (guests upload their photos here)
     {
       id: nanoid(8),
       type: "gallery",
@@ -171,7 +171,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 8. MEMORY BOOK — locked (guests leave memories here)
+    // 8. MEMORY BOOK, locked (guests leave memories here)
     {
       id: nanoid(8),
       type: "memory_book",
@@ -209,7 +209,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       },
     },
 
-    // 11. CUSTOM NOTE — etkinlik notu, davetiyenin sonunda ek bilgi
+    // 11. CUSTOM NOTE, etkinlik notu, davetiyenin sonunda ek bilgi
     // (kıyafet kodu, hediyeler, çocuk politikası vs.) için hazır slot.
     {
       id: nanoid(8),
@@ -231,7 +231,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
     },
     // (Önceden burada hardcoded "davety.app" footer'ı vardı; tanıtım
     // bloğu artık sadece free tier için yayınlama anında 4. sıraya
-    // injekt ediliyor — burada bir daha çıkmıyor.)
+    // injekt ediliyor, burada bir daha çıkmıyor.)
   ];
 
   return {

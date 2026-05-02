@@ -31,7 +31,7 @@ export function resolveEnvelopeProps(
   // IMPORTANT: strip preset.cardProps before spreading. The preset bundles
   // a placeholder invitation styling (accent / bg / decorative) used when
   // showing the envelope in the /envelopes playground. In our editor the
-  // user already has a real invitation design — we never want the
+  // user already has a real invitation design, we never want the
   // envelope choice to retroactively change their card colors. cardRender
   // overrides on consumers also helps, but defense-in-depth here.
   const { cardProps: _stripCardProps, ...presetProps } = preset?.props ?? {};

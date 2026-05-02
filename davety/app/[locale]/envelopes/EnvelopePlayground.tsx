@@ -125,7 +125,7 @@ export function EnvelopePlayground() {
                   type="text"
                   value={stampImage}
                   onChange={(e) => setStampImage(e.target.value)}
-                  placeholder="(opsiyonel — yazının yerine gelir)"
+                  placeholder="(opsiyonel, yazının yerine gelir)"
                   className="flex-1 px-2 py-1 text-sm border border-border rounded"
                 />
               </label>

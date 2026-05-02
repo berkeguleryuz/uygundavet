@@ -4,7 +4,7 @@ import { buildImgProps } from "../../media";
 import { parseInlineDecorations } from "../../decorations/inline";
 
 /**
- * Hero — branches on data.variant so each design sample from the homepage
+ * Hero, branches on data.variant so each design sample from the homepage
  * grid materialises into the editor with the visual structure the user
  * picked (arch / photo / floral crown / monogram, etc.) while keeping all
  * fields (brideName, groomName, subtitle, description) editable.
@@ -168,7 +168,7 @@ function ArchVariant({
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent } = block.data;
   // The arch silhouette is drawn by the outer invitation container
-  // (see getCardShapeStyle in InvitationView) — adding an inner arch
+  // (see getCardShapeStyle in InvitationView), adding an inner arch
   // overlay creates a layered/nested look and squeezes the text, so we
   // intentionally keep this variant typography-only.
   return (

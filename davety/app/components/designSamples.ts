@@ -91,11 +91,11 @@ export interface DesignSample {
   sampleBride: string;
   sampleGroom: string;
   subtitle: string;
-  /** Asset key inside `/public/assets/templates/` — e.g.
+  /** Asset key inside `/public/assets/templates/`, e.g.
    *  `"wedding-essentials/wedding-essentials-01"`. Galeri kartı bu SVG'yi
    *  CSS `mask-image` ile tema vurgu rengine boyayarak isimlerin üstüne
    *  süsleme olarak yerleştirir. `buildDesignDoc` aynı dosyayı disk'ten
-   *  okuyup hero'nun altına bir `decoration` block'u olarak ekler — yani
+   *  okuyup hero'nun altına bir `decoration` block'u olarak ekler, yani
    *  galeri ile editör aynı süsü gösterir. */
   decorationTemplate?: string;
 }
@@ -106,7 +106,7 @@ function photo(id: string): string {
 }
 
 /** Resolve the card silhouette for a sample. Samples that don't pin a
- *  `cardShape` fall back to a sensible default per layout — arch layouts
+ *  `cardShape` fall back to a sensible default per layout, arch layouts
  *  get an arched silhouette, monogram circles get rounded corners, photo
  *  layouts stay flat so the photo isn't clipped, etc. */
 export function shapeFor(sample: DesignSample): DesignCardShape {
@@ -136,7 +136,7 @@ export const CARD_SHAPE_LABELS: Record<DesignCardShape, string> = {
   tag: "Etiket",
 };
 
-/** Eski tasarım koleksiyonu — yeni V2 setine geçilmeden önceki kayıtlar.
+/** Eski tasarım koleksiyonu, yeni V2 setine geçilmeden önceki kayıtlar.
  *  Hâlâ doc'unda eski bir id taşıyan kullanıcılar için lookup fallback'i
  *  olarak duruyor (`/api/design/invitations` route'u önce yeni listeye,
  *  bulamazsa buraya bakar). UI'a artık servis edilmiyor. */
@@ -710,7 +710,7 @@ export const LEGACY_DESIGN_SAMPLES: DesignSample[] = [
     envelopeColor: "#243250",
     liningBg: "#0a1124",
     liningPattern: "gold",
-    sampleBride: "—",
+    sampleBride: ",",
     sampleGroom: "Yusuf",
     subtitle: "Maşallah Bu Güne",
   },
@@ -728,14 +728,14 @@ export const LEGACY_DESIGN_SAMPLES: DesignSample[] = [
     envelopeColor: "#d3ebe2",
     liningBg: "#1d4a3f",
     liningPattern: "daisy",
-    sampleBride: "—",
+    sampleBride: ",",
     sampleGroom: "Mira",
     subtitle: "Mevlüde Davetlisin",
   },
 ];
 
 /**
- * Yeni V2 tasarım koleksiyonu — ana sayfada gösterilen aktif liste.
+ * Yeni V2 tasarım koleksiyonu, ana sayfada gösterilen aktif liste.
  *
  *  Her tasarım beş şeyin tutarlı olmasına dikkat eder:
  *   - `category` ↔ `sampleBride/sampleGroom` (tek-aday kategorilerde
@@ -1085,7 +1085,7 @@ export const DESIGN_SAMPLES: DesignSample[] = [
     decorationTemplate: "floral-corners/floral-corners-07",
   },
 
-  // ─── Sünnet Düğünü (8) — sampleGroom: "" ───────────────────────
+  // ─── Sünnet Düğünü (8), sampleGroom: "" ───────────────────────
   {
     id: "v2-c-1",
     code: "CCLA",
@@ -1250,7 +1250,7 @@ export const DESIGN_SAMPLES: DesignSample[] = [
     decorationTemplate: "circumcision-classic/circumcision-classic-12",
   },
 
-  // ─── Çocuk Doğum Günü (8) — sampleGroom: "" ────────────────────
+  // ─── Çocuk Doğum Günü (8), sampleGroom: "" ────────────────────
   {
     id: "v2-b-1",
     code: "BCLA",
@@ -1413,7 +1413,7 @@ export const DESIGN_SAMPLES: DesignSample[] = [
     decorationTemplate: "kids-party/kids-party-11",
   },
 
-  // ─── İşyeri Açılışı (8) — sampleGroom: "" ──────────────────────
+  // ─── İşyeri Açılışı (8), sampleGroom: "" ──────────────────────
   {
     id: "v2-x-1",
     code: "XBLD",

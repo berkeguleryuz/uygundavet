@@ -5,6 +5,7 @@ import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { validateVanityPath } from "@/src/lib/slug";
 import { planLimitsFor, tierOrFree } from "@/src/lib/plan-limits";
+import { computeExpiresAt } from "@/src/lib/archive";
 import type { Block, PlanTier } from "@davety/schema";
 
 const publishSchema = z.object({
@@ -23,7 +24,7 @@ const publishSchema = z.object({
  *   2. Drop disallowed blocks (memory_book on free).
  *   3. Inject a branded promo block at the 4th position (index 3) for
  *      free tier so every published free invitation carries our advert.
- *      Idempotent — running twice doesn't duplicate the block.
+ *      Idempotent, running twice doesn't duplicate the block.
  *
  * The branding block uses a lightweight custom_note with a recognisable
  * id prefix so we can detect and replace it on subsequent publishes.
@@ -131,7 +132,7 @@ export async function POST(req: Request, ctx: { params: Params }) {
 
   // Tier mutations (gallery trim + branding block) before stamping
   // status=published. publishedDoc is what guests see; doc is what the
-  // owner keeps editing — we apply the same trim to both so the editor
+  // owner keeps editing, we apply the same trim to both so the editor
   // shows the actual published state.
   const tierApplied = applyTierToDoc(existing.doc as object, effectiveTier);
   const publishedDoc = {
@@ -150,17 +151,63 @@ export async function POST(req: Request, ctx: { params: Params }) {
     meta: { ...existingMeta, tier: effectiveTier },
   };
 
-  const updated = await prisma.invitationDesign.update({
-    where: { id },
-    data: {
-      status: "published",
-      publishedDoc,
-      publishedAt: new Date(),
-      ...(vanity ? { vanityPath: vanity } : {}),
-      doc: docWithTier,
-    },
-    select: { slug: true, vanityPath: true, publishedAt: true },
-  });
+  const publishedAt = new Date();
+  const expiresAt = computeExpiresAt(effectiveTier, publishedAt);
+
+  // Yeni alanlar (expiresAt, archivedAt) auto-archive feature'ı için
+  // eklendi. Migration veya prisma generate henüz çalıştırılmadıysa
+  // Prisma "Unknown arg" hatası fırlatır. O senaryoda eski path'e
+  // düşüp kullanıcı yayınlamaya devam edebilsin.
+  let updated: {
+    slug: string;
+    vanityPath: string | null;
+    publishedAt: Date | null;
+    expiresAt: Date | null;
+  };
+  try {
+    updated = await prisma.invitationDesign.update({
+      where: { id },
+      data: {
+        status: "published",
+        publishedDoc,
+        publishedAt,
+        expiresAt,
+        archivedAt: null,
+        ...(vanity ? { vanityPath: vanity } : {}),
+        doc: docWithTier,
+      },
+      select: {
+        slug: true,
+        vanityPath: true,
+        publishedAt: true,
+        expiresAt: true,
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (
+      /Unknown arg|Unknown field|column .* does not exist/i.test(msg) ||
+      /expiresAt|archivedAt/.test(msg)
+    ) {
+      console.warn(
+        "[publish] new columns not migrated yet, falling back without expiresAt/archivedAt"
+      );
+      const fallback = await prisma.invitationDesign.update({
+        where: { id },
+        data: {
+          status: "published",
+          publishedDoc,
+          publishedAt,
+          ...(vanity ? { vanityPath: vanity } : {}),
+          doc: docWithTier,
+        },
+        select: { slug: true, vanityPath: true, publishedAt: true },
+      });
+      updated = { ...fallback, expiresAt: null };
+    } else {
+      throw err;
+    }
+  }
 
   const shareUrl = updated.vanityPath
     ? `/i/${updated.vanityPath}`
@@ -171,5 +218,6 @@ export async function POST(req: Request, ctx: { params: Params }) {
     slug: updated.slug,
     vanityPath: updated.vanityPath,
     url: shareUrl,
+    expiresAt: updated.expiresAt,
   });
 }

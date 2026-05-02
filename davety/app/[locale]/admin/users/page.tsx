@@ -34,7 +34,7 @@ export default async function AdminUsersPage() {
               <tr key={u.id}>
                 <td className="px-4 py-2 font-medium">{u.email}</td>
                 <td className="px-4 py-2 text-muted-foreground">
-                  {u.name || "—"}
+                  {u.name || ","}
                 </td>
                 <td className="px-4 py-2">
                   <span

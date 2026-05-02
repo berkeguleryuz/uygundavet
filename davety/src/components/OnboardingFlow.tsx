@@ -10,7 +10,7 @@ const STEPS = 6;
 
 /**
  * Onboarding "done" flag is scoped per-invitation so that creating a new
- * invitation re-triggers the walkthrough — once the user dismissed it on
+ * invitation re-triggers the walkthrough, once the user dismissed it on
  * any single invitation we used to never show it again, which made the
  * flow effectively invisible the second time someone visited the editor.
  */
@@ -25,7 +25,11 @@ export function OnboardingFlow({ docId }: { docId?: string }) {
   const [step, setStep] = useState<number | null>(null);
 
   useEffect(() => {
+    // localStorage is the external system here, the deferred read pattern
+    // matches React's "useEffect for external stores" guidance. The lint
+    // rule still flags it, suppressed below.
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (localStorage.getItem(storageKey(docId)) !== "done") setStep(0);
     } catch {
       // ignore

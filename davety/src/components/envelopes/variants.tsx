@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import { InvitationCard } from "./InvitationCard";
 
 /* =====================================================================
- * FourFlapStage — Pseudo-3D envelope via 4 clip-path triangles.
+ * FourFlapStage, Pseudo-3D envelope via 4 clip-path triangles.
  *
  * All 4 triangles meet at center (50%, 50%). Slight shade differences
  * between triangles create the folded-paper depth illusion.
@@ -70,7 +70,7 @@ function FourFlapStage({
       className="relative cursor-pointer select-none"
       style={{ width, height, background: bg }}
     >
-      {/* Card behind flaps — slides up when open */}
+      {/* Card behind flaps, slides up when open */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center"
         style={{
@@ -84,7 +84,7 @@ function FourFlapStage({
         {cardContent ?? <InvitationCard />}
       </div>
 
-      {/* Wax seal / medallion — fades + scales + rotates out */}
+      {/* Wax seal / medallion, fades + scales + rotates out */}
       {seal ? (
         <div
           className="absolute"
@@ -103,7 +103,7 @@ function FourFlapStage({
         </div>
       ) : null}
 
-      {/* Top flap — animated: collapses to a line on open */}
+      {/* Top flap, animated: collapses to a line on open */}
       <div
         className="absolute inset-0"
         style={{
@@ -224,7 +224,7 @@ function PillSeal({
 }
 
 /* =====================================================================
- * V1 — Klasik V (classic beige with wax seal)
+ * V1, Klasik V (classic beige with wax seal)
  * ===================================================================== */
 export function Envelope01Classic({ width = 320, cardContent }: FourFlapProps) {
   return (
@@ -245,7 +245,7 @@ export function Envelope01Classic({ width = 320, cardContent }: FourFlapProps) {
 }
 
 /* =====================================================================
- * V2 — Modern Yatay (two-tone clean, no seal)
+ * V2, Modern Yatay (two-tone clean, no seal)
  * ===================================================================== */
 export function Envelope02Horizontal({
   width = 320,
@@ -268,7 +268,7 @@ export function Envelope02Horizontal({
 }
 
 /* =====================================================================
- * V3 — Mum Mühürü (red wax seal, cream flaps)
+ * V3, Mum Mühürü (red wax seal, cream flaps)
  * ===================================================================== */
 export function Envelope03WaxSeal({
   width = 320,
@@ -292,7 +292,7 @@ export function Envelope03WaxSeal({
 }
 
 /* =====================================================================
- * V4 — Pencereli (window effect — small pale patch on bottom flap)
+ * V4, Pencereli (window effect, small pale patch on bottom flap)
  * ===================================================================== */
 export function Envelope04Window({
   width = 320,
@@ -330,7 +330,7 @@ export function Envelope04Window({
 }
 
 /* =====================================================================
- * V5 — Kraft + İp (kraft paper + twine across middle)
+ * V5, Kraft + İp (kraft paper + twine across middle)
  * ===================================================================== */
 export function Envelope05Kraft({ width = 320, cardContent }: FourFlapProps) {
   return (
@@ -380,7 +380,7 @@ export function Envelope05Kraft({ width = 320, cardContent }: FourFlapProps) {
 }
 
 /* =====================================================================
- * V6 — Asimetrik (high contrast dark flaps + cream pocket)
+ * V6, Asimetrik (high contrast dark flaps + cream pocket)
  * ===================================================================== */
 export function Envelope06Diagonal({
   width = 320,
@@ -403,7 +403,7 @@ export function Envelope06Diagonal({
 }
 
 /* =====================================================================
- * V7 — Posta Pulu (stamp in top-right + postmark)
+ * V7, Posta Pulu (stamp in top-right + postmark)
  * ===================================================================== */
 export function Envelope07Postal({
   width = 320,
@@ -470,7 +470,7 @@ export function Envelope07Postal({
 }
 
 /* =====================================================================
- * V8 — Kurdela (ribbon strip across middle + bow at center)
+ * V8, Kurdela (ribbon strip across middle + bow at center)
  * ===================================================================== */
 export function Envelope08Ribbon({
   width = 320,
@@ -521,7 +521,7 @@ export function Envelope08Ribbon({
 }
 
 /* =====================================================================
- * V9 — Monogram (dark navy + gold D seal)
+ * V9, Monogram (dark navy + gold D seal)
  * ===================================================================== */
 export function Envelope09Monogram({
   width = 320,
@@ -564,7 +564,7 @@ export function Envelope09Monogram({
 }
 
 /* =====================================================================
- * V10 — Hava Postası (red/blue stripe border)
+ * V10, Hava Postası (red/blue stripe border)
  * ===================================================================== */
 export function Envelope10AirMail({
   width = 320,
@@ -620,7 +620,7 @@ export function Envelope10AirMail({
 }
 
 /* =====================================================================
- * V11 — Dört Kanat (original reference: black + orange wax seal)
+ * V11, Dört Kanat (original reference: black + orange wax seal)
  * Exact structure from user's OnChain Win reference.
  * ===================================================================== */
 export function Envelope11FourFlap({

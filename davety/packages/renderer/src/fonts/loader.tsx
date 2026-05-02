@@ -44,12 +44,13 @@ export function collectFontFamilies(doc: InvitationDoc): string[] {
  */
 export function FontBoot({ doc }: { doc: InvitationDoc }) {
   const families = collectFontFamilies(doc);
+  const familiesKey = families.join(",");
 
   useEffect(() => {
-    for (const family of families) {
+    for (const family of familiesKey.split(",").filter(Boolean)) {
       ensureFont(family);
     }
-  }, [families.join(",")]);
+  }, [familiesKey]);
 
   return (
     <>

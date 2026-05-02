@@ -31,7 +31,7 @@ export default async function DashboardPage({
     },
   });
 
-  // RSVP "yes" tally per design — done in one grouped query so the page
+  // RSVP "yes" tally per design, done in one grouped query so the page
   // doesn't fan out to N+1 queries when the user has many invitations.
   const rsvpGroups =
     designs.length > 0
@@ -109,7 +109,7 @@ export default async function DashboardPage({
                   Davetiyelerim
                 </h1>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xl">
-                  Tüm davetiyelerini buradan yönet — yayınla, düzenle, misafir
+                  Tüm davetiyelerini buradan yönet, yayınla, düzenle, misafir
                   ve RSVP&apos;leri takip et.
                 </p>
               </div>

@@ -15,8 +15,10 @@ export function MemoryBookView({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const [hp, setHp] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const click = (id: string) =>
     editable && onFieldSelect
@@ -36,6 +38,7 @@ export function MemoryBookView({
     const slug =
       ctxSlug ?? window.location.pathname.split("/").filter(Boolean).pop();
     if (!slug) return;
+    setError(null);
     setBusy(true);
     try {
       const res = await fetch(
@@ -43,14 +46,25 @@ export function MemoryBookView({
         {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ authorName: name, message }),
+          body: JSON.stringify({ authorName: name, message, hp }),
         }
       );
-      if (!res.ok) throw new Error();
+      if (res.status === 429) {
+        setError("Çok fazla mesaj. Birkaç dakika sonra tekrar dene.");
+        return;
+      }
+      if (res.status === 422) {
+        setError("Mesajın kabul edilmedi. Lütfen kibar bir dil kullan.");
+        return;
+      }
+      if (!res.ok) {
+        setError("Mesaj kaydedilemedi.");
+        return;
+      }
       setSubmitted(true);
       setOpen(false);
     } catch {
-      // silent
+      setError("Bağlantı hatası.");
     } finally {
       setBusy(false);
     }
@@ -108,11 +122,31 @@ export function MemoryBookView({
             <textarea
               required
               rows={4}
+              maxLength={2000}
               placeholder="Mesajın"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full rounded-md border border-gray-200 px-3 py-2 mb-4 text-sm resize-none"
+              className="w-full rounded-md border border-gray-200 px-3 py-2 mb-2 text-sm resize-none"
             />
+            <input
+              type="text"
+              value={hp}
+              onChange={(e) => setHp(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="hidden"
+              name="company"
+            />
+            {error ? (
+              <div className="text-xs text-red-600 mb-2 text-center">
+                {error}
+              </div>
+            ) : null}
+            <p className="text-[10px] text-center opacity-60 mb-3">
+              Mesajın gelin/damat onayından sonra hatıra defterinde
+              gözükecek.
+            </p>
             <button
               type="submit"
               disabled={busy}

@@ -81,7 +81,7 @@ export interface MediaRef {
 /**
  * Top-of-card layout variants. Hero renders completely differently per
  * variant (arched frame, full-bleed photo, oversized typography, etc.)
- * while still using the same editable fields. Optional — when absent the
+ * while still using the same editable fields. Optional, when absent the
  * renderer falls back to the "classic" variant.
  */
 export type HeroVariant =
@@ -135,11 +135,85 @@ export interface EventProgramItem {
   label: string;
   icon?: string;
 }
+
+/**
+ * Outfit / dress code for a specific day. Free-text `note` for nuanced
+ * cases ("krem ve beyaz dışında her renk"), pinned `preset` for quick
+ * picks. Either or both can be present.
+ */
+export interface DressCode {
+  preset?:
+    | "smart-casual"
+    | "formal"
+    | "black-tie"
+    | "white-tie"
+    | "beach"
+    | "boho"
+    | "henna-traditional"
+    | "white-banned";
+  note?: string;
+}
+
+/**
+ * One day in a multi-event invitation (engagement, henna, ceremony,
+ * after-party). When present this list takes precedence over the flat
+ * `items` array, the renderer chains the days vertically.
+ */
+export interface EventDay {
+  id: string;
+  /** Human label ("Nişan", "Kına", "Düğün", "After Party"). */
+  label: string;
+  /** ISO date YYYY-MM-DD. */
+  date: string;
+  /** HH:MM (24h). */
+  time?: string;
+  items: EventProgramItem[];
+  venueName?: string;
+  venueAddress?: string;
+  mapUrl?: string;
+  dressCode?: DressCode;
+  /** Booking-affiliate hotel suggestions for guests coming from out of town. */
+  hotels?: HotelRec[];
+  /** Transport guidance (servis, otopark, metro). */
+  transport?: TransportInfo;
+  /** When false, the day is hidden in the public render. */
+  visible?: boolean;
+}
+
+export interface HotelRec {
+  name: string;
+  /** Distance to venue in km, integer. */
+  distanceKm?: number;
+  /** Affiliate URL ({source}/{partnerId} embedded). */
+  bookingUrl?: string;
+  /** Star rating 1..5. */
+  stars?: number;
+  /** Approx price per night in TRY. */
+  priceTryPerNight?: number;
+  note?: string;
+}
+
+export interface TransportInfo {
+  /** "Mekana servis var" toggle. */
+  shuttleEnabled?: boolean;
+  shuttleNote?: string;
+  shuttleTimes?: string[];
+  /** Free-text parking guidance. */
+  parkingNote?: string;
+  /** Closest metro / public-transit stop. */
+  publicTransitNote?: string;
+}
+
 export interface EventProgramData {
   items: EventProgramItem[];
   venueName?: string;
   venueAddress?: string;
   mapUrl?: string;
+  /** Multi-event chain. When non-empty the renderer prefers this over
+   *  the legacy flat `items`. */
+  eventDays?: EventDay[];
+  /** Optional global dress code that applies when no per-day code set. */
+  dressCode?: DressCode;
 }
 
 export interface StoryMilestone {

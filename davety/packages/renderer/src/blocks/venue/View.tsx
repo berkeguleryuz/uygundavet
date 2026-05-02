@@ -1,31 +1,77 @@
 "use client";
 
 import type { VenueData } from "@davety/schema";
+import { useRendererContext } from "../../context";
 import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
+
+function pad(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
+}
+
+function toCalendarStamp(d: Date): string {
+  return (
+    d.getUTCFullYear().toString() +
+    pad(d.getUTCMonth() + 1) +
+    pad(d.getUTCDate()) +
+    "T" +
+    pad(d.getUTCHours()) +
+    pad(d.getUTCMinutes()) +
+    pad(d.getUTCSeconds()) +
+    "Z"
+  );
+}
 
 function buildIcs(args: {
   title: string;
   address: string;
   startIso: string;
   durationMinutes?: number;
+  url?: string;
 }): string {
   const start = new Date(args.startIso);
-  const end = new Date(start.getTime() + (args.durationMinutes ?? 240) * 60_000);
-  const fmt = (d: Date) =>
-    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  return [
+  const end = new Date(
+    start.getTime() + (args.durationMinutes ?? 240) * 60_000
+  );
+  const escape = (s: string) =>
+    s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
+    "PRODID:-//DavetYolla//Invitation//TR",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
     "BEGIN:VEVENT",
-    `UID:${Date.now()}@davety`,
-    `DTSTAMP:${fmt(new Date())}`,
-    `DTSTART:${fmt(start)}`,
-    `DTEND:${fmt(end)}`,
-    `SUMMARY:${args.title}`,
-    `LOCATION:${args.address}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+    `UID:${start.getTime().toString(36)}@davetyolla.com`,
+    `DTSTAMP:${toCalendarStamp(new Date())}`,
+    `DTSTART:${toCalendarStamp(start)}`,
+    `DTEND:${toCalendarStamp(end)}`,
+    `SUMMARY:${escape(args.title)}`,
+    `LOCATION:${escape(args.address)}`,
+  ];
+  if (args.url) lines.push(`URL:${escape(args.url)}`);
+  lines.push("END:VEVENT", "END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function googleCalendarHref(args: {
+  title: string;
+  address: string;
+  startIso: string;
+  durationMinutes?: number;
+  url?: string;
+}): string {
+  const start = new Date(args.startIso);
+  const end = new Date(
+    start.getTime() + (args.durationMinutes ?? 240) * 60_000
+  );
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: args.title,
+    dates: `${toCalendarStamp(start)}/${toCalendarStamp(end)}`,
+    location: args.address,
+    details: args.url ?? "",
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 export function VenueView({
@@ -34,6 +80,7 @@ export function VenueView({
   onFieldSelect,
 }: BlockViewProps<VenueData>) {
   const rootStyle = styleToCss(block.style);
+  const ctx = useRendererContext();
   const { venueName, venueAddress, mapUrl, directionsUrl, reminderEnabled } =
     block.data;
 
@@ -49,11 +96,15 @@ export function VenueView({
         }
       : {};
 
-  const handleReminder = () => {
+  const startIso = ctx?.startIso ?? new Date().toISOString();
+  const shareUrl = ctx?.publicUrl;
+
+  const handleIcsDownload = () => {
     const ics = buildIcs({
       title: venueName || "Düğün",
       address: venueAddress || "",
-      startIso: new Date().toISOString(),
+      startIso,
+      url: shareUrl,
     });
     const blob = new Blob([ics], { type: "text/calendar" });
     const url = URL.createObjectURL(blob);
@@ -102,6 +153,7 @@ export function VenueView({
         <div className="mt-5 max-w-md mx-auto aspect-video rounded-md overflow-hidden border border-current/10">
           <iframe
             src={mapUrl}
+            title={venueName || "Mekan haritası"}
             className="w-full h-full"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -109,14 +161,29 @@ export function VenueView({
         </div>
       ) : null}
 
-      <div className="mt-5 flex items-center justify-center gap-3 flex-wrap">
+      <div className="mt-5 flex items-center justify-center gap-2 flex-wrap">
         {reminderEnabled ? (
-          <button
-            onClick={handleReminder}
-            className="text-xs px-4 py-2 rounded-md border border-current/30 hover:bg-current/5"
-          >
-            Hatırlatıcı Aç
-          </button>
+          <>
+            <a
+              href={googleCalendarHref({
+                title: venueName || "Düğün",
+                address: venueAddress || "",
+                startIso,
+                url: shareUrl,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs px-4 py-2 rounded-md border border-current/30 hover:bg-current/5"
+            >
+              Google Takvime Ekle
+            </a>
+            <button
+              onClick={handleIcsDownload}
+              className="text-xs px-4 py-2 rounded-md border border-current/30 hover:bg-current/5"
+            >
+              Apple / Outlook (.ics)
+            </button>
+          </>
         ) : null}
         {mapsHref ? (
           <a

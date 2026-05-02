@@ -81,7 +81,7 @@ export function useAssetUpload(designId: string | null) {
   /**
    * Multi-select variant. Opens the OS file picker with multiple-mode
    * enabled and uploads each selected file in parallel. Returns only the
-   * successful uploads — failed ones are skipped (per-file toast already
+   * successful uploads, failed ones are skipped (per-file toast already
    * fired). Useful for gallery where users want to add 5–10 photos at
    * once instead of clicking the upload button every time.
    */

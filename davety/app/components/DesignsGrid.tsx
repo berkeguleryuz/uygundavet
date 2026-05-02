@@ -109,7 +109,7 @@ export function DesignsGrid({
   );
 }
 
-/* ─── Date/time picker dialog — creates invitation with the chosen theme ── */
+/* ─── Date/time picker dialog, creates invitation with the chosen theme ── */
 function DesignDateDialog({
   design,
   onClose,
@@ -136,14 +136,14 @@ function DesignDateDialog({
       body: JSON.stringify({
         weddingDate: date,
         weddingTime: time,
-        // Send the full design id — the server looks it up in DESIGN_SAMPLES
+        // Send the full design id, the server looks it up in DESIGN_SAMPLES
         // and builds a doc with the matching hero variant + theme + photo.
         designId: design.id,
       }),
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      // Cap aşımı için kullanıcıya net mesaj göster — yoksa raw error
+      // Cap aşımı için kullanıcıya net mesaj göster, yoksa raw error
       // kodu ("InvitationCapReached") çıkıyordu.
       toast.error(body.message ?? body.error ?? "Oluşturulamadı");
       setBusy(false);
@@ -263,7 +263,7 @@ const TR_DAYS_FULL = [
 ];
 
 function formatTrDate(iso: string): string {
-  if (!iso) return "—";
+  if (!iso) return ",";
   const [y, m, d] = iso.split("-").map((p) => parseInt(p, 10));
   if (!y || !m || !d) return iso;
   const date = new Date(y, m - 1, d);

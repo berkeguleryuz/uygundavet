@@ -11,16 +11,20 @@ export function RsvpFormView({
   editable,
   onFieldSelect,
 }: BlockViewProps<RsvpFormData>) {
-  const { slug: ctxSlug, publicBase } = useRendererContext();
+  const { slug: ctxSlug, publicBase, guestToken } = useRendererContext();
   const rootStyle = styleToCss(block.style);
   const [open, setOpen] = useState(false);
-  const [attending, setAttending] = useState<"yes" | "no" | null>(null);
+  const [attending, setAttending] = useState<"yes" | "no" | "maybe" | null>(
+    null
+  );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [guestCount, setGuestCount] = useState(1);
   const [note, setNote] = useState("");
+  const [hp, setHp] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Lock body scroll while the modal is open (guest view only; editors
   // shouldn't have it open anyway).
@@ -51,23 +55,40 @@ export function RsvpFormView({
     const slug =
       ctxSlug ?? window.location.pathname.split("/").filter(Boolean).pop();
     if (!slug) return;
+    setError(null);
     setBusy(true);
     try {
-      const res = await fetch(apiUrl(`/api/public/design/${slug}/rsvp`, publicBase), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          name,
-          phone,
-          attending,
-          guestCount,
-          note,
-        }),
-      });
-      if (!res.ok) throw new Error();
+      const res = await fetch(
+        apiUrl(`/api/public/design/${slug}/rsvp`, publicBase),
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name,
+            phone,
+            attending,
+            guestCount: attending === "yes" ? guestCount : 1,
+            note,
+            hp,
+            guestToken,
+          }),
+        }
+      );
+      if (res.status === 429) {
+        setError("Çok fazla deneme. Birkaç dakika sonra tekrar dene.");
+        return;
+      }
+      if (res.status === 410) {
+        setError("Cevap tarihi geçti.");
+        return;
+      }
+      if (!res.ok) {
+        setError("Cevap kaydedilemedi. Daha sonra tekrar dene.");
+        return;
+      }
       setSubmitted(true);
     } catch {
-      // silent
+      setError("Bağlantı hatası. İnternetini kontrol et.");
     } finally {
       setBusy(false);
     }
@@ -120,7 +141,7 @@ export function RsvpFormView({
         {buttonLabel}
       </button>
 
-      {/* Popup — guest view */}
+      {/* Popup, guest view */}
       {open && !editable ? (
         <div
           className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
@@ -160,30 +181,51 @@ export function RsvpFormView({
                   </button>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setAttending("yes")}
-                    className={`flex-1 py-2 rounded-full text-sm border ${
+                    className={`py-2 rounded-full text-sm border ${
                       attending === "yes"
                         ? "bg-[#252224] text-white border-[#252224]"
                         : "border-black/20 hover:bg-black/5"
                     }`}
                   >
-                    Katılacağım
+                    Geleceğim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAttending("maybe")}
+                    className={`py-2 rounded-full text-sm border ${
+                      attending === "maybe"
+                        ? "bg-[#252224] text-white border-[#252224]"
+                        : "border-black/20 hover:bg-black/5"
+                    }`}
+                  >
+                    Belki
                   </button>
                   <button
                     type="button"
                     onClick={() => setAttending("no")}
-                    className={`flex-1 py-2 rounded-full text-sm border ${
+                    className={`py-2 rounded-full text-sm border ${
                       attending === "no"
                         ? "bg-[#252224] text-white border-[#252224]"
                         : "border-black/20 hover:bg-black/5"
                     }`}
                   >
-                    Katılamayacağım
+                    Gelemiyorum
                   </button>
                 </div>
+                <input
+                  type="text"
+                  value={hp}
+                  onChange={(e) => setHp(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                  name="company"
+                />
 
                 <input
                   required
@@ -224,6 +266,12 @@ export function RsvpFormView({
                   onChange={(e) => setNote(e.target.value)}
                   className="w-full rounded-md border border-black/20 bg-white px-3 py-2 text-sm resize-none"
                 />
+
+                {error ? (
+                  <div className="text-xs text-red-600 text-center">
+                    {error}
+                  </div>
+                ) : null}
 
                 <button
                   type="submit"

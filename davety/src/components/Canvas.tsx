@@ -98,6 +98,24 @@ export function Canvas() {
         setInsertingAt(null);
       }}
     >
+      {/* Head insert slot, sits OUTSIDE the card (just above it) so the
+           button has its own breathing room and never gets clipped by
+           the card's overflow-hidden or the editor toolbar. Mirror of
+           the TailInsertSlot at the bottom, gives users a discoverable
+           way to add a block ABOVE the first one. */}
+      <div
+        className="mx-auto w-full max-w-md mb-4 flex justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <TailInsertSlot
+          active={insertingAt === 0}
+          tier={tier}
+          onOpen={() => setInsertingAt(0)}
+          onClose={() => setInsertingAt(null)}
+          onPick={(type) => handlePick(0, type)}
+        />
+      </div>
+
       <div
         className="mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
         style={{
@@ -113,10 +131,10 @@ export function Canvas() {
         {doc.blocks.map((block, i) => {
           const View = getBlockView(block.type);
           const selected = selectedBlockId === block.id;
-          // When the card has an arch silhouette, hide the very first
-          // insert slot — it would sit on top of the rounded dome and
-          // be visually clipped/unreachable.
-          const hideSlot = i === 0 && archActive;
+          // İlk bloğun InsertSlot'u kart-dışı head slot olarak yukarıda
+          // render ediliyor. Buradaki absolute slot kart içinde
+          // overflow-hidden tarafından kırpılıyordu.
+          const hideSlot = i === 0;
 
           return (
             <div key={block.id} className="relative group/block">
@@ -228,7 +246,7 @@ export function Canvas() {
 
       </div>
 
-      {/* Tail insert slot — sits OUTSIDE the card so it never appears in
+      {/* Tail insert slot, sits OUTSIDE the card so it never appears in
            the invitation itself (so the user can screenshot/preview the
            card cleanly). Always visible, palette opens downward. */}
       <div
@@ -276,7 +294,6 @@ function IconBtn({
 }
 
 function InsertSlot({
-  index: _i,
   active,
   flipUp,
   forceVisible,
@@ -290,7 +307,7 @@ function InsertSlot({
   /** Open the palette above the button instead of below (used for slots
    *  near the bottom of the card so it doesn't get clipped). */
   flipUp: boolean;
-  /** Show the button regardless of hover state — used on touch devices
+  /** Show the button regardless of hover state, used on touch devices
    *  (no :hover) and when the adjacent block is selected, so mobile
    *  users have a deterministic way to reveal "+ Blok Ekle". */
   forceVisible: boolean;
@@ -377,9 +394,9 @@ function BlockPalette({
   onClose: () => void;
   onPick: (type: BlockType) => void;
 }) {
-  // CTA / "Buton" bloğu palette'ten gizlendi — kullanıcı için
-  // anlamlı değil (link/işlev karmaşası). Renderer hala destekliyor
-  // ki eski davetiyelerde varsa görünmeye devam etsin.
+  // CTA / "Buton" bloğu palette'ten gizlendi, kullanıcı için anlamlı
+  // değil (link/işlev karmaşası). Renderer hâlâ destekliyor ki eski
+  // davetiyelerde varsa görünmeye devam etsin.
   const entries = listBlockEntries().filter((e) => e.type !== "cta");
   return (
     <div
@@ -415,7 +432,7 @@ function BlockPalette({
    The envelope component handles its own click → flap-open animation,
    so theme tweaks (color, flap, lining) can be verified end-to-end
    the same way recipients will see them. The card slot inside the
-   envelope holds the FULL InvitationView (every block — hero,
+   envelope holds the FULL InvitationView (every block, hero,
    countdown, families, program, …) so the editor preview matches what
    the recipient actually sees. The card frame is a fixed size; the
    InvitationView scrolls inside it so the user can read every block
@@ -427,7 +444,7 @@ function EnvelopeCanvas() {
   // available canvas vertically instead of leaving a big empty area
   // below the scene. The subtracted offset accounts for the editor
   // header, "Zarf Önizlemesi" label, sceneTopPad, sceneBottomPad and
-  // canvas padding — picked empirically to land the envelope cleanly
+  // canvas padding, picked empirically to land the envelope cleanly
   // inside the visible area on common desktop heights.
   const [cardHeight, setCardHeight] = useState(780);
   useEffect(() => {

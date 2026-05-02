@@ -31,7 +31,7 @@ export function stripSvgText(raw: string): string {
  *  in a context that can't reach the filesystem). Used to inline the
  *  sample's chosen decoration template as a real `decoration` block in
  *  the seeded doc so editor + galeri görünümü aynı süsü taşır. Metin
- *  içeren dosyalarda harfler temizlenir — süslemeler kullanıcının
+ *  içeren dosyalarda harfler temizlenir, süslemeler kullanıcının
  *  isimleriyle alakasız harfler taşımasın. */
 function loadTemplateSvg(assetKey: string): string | undefined {
   try {
@@ -72,7 +72,7 @@ function familyTitlesFor(category: EventCategory): {
 
 /** Maps the gallery card's `decorative` flavour onto a real icon id from
  *  the renderer's decoration catalog. The gallery preview draws a
- *  daisy-arc / rose-vine / gold-divider above the names — and once the
+ *  daisy-arc / rose-vine / gold-divider above the names, and once the
  *  user opens the invitation we want the same flavour to be present
  *  (inline in the subtitle + as a standalone decoration block) so the
  *  preview's promise is kept. */
@@ -95,7 +95,7 @@ function decorativeIconKey(
 /**
  * Turn a DesignSample (visual template on the homepage grid) into a real
  * editable InvitationDoc that the editor can open. Anything the user will
- * see on the card — theme colours, hero variant, photo, decorative flourish —
+ * see on the card, theme colours, hero variant, photo, decorative flourish,
  * is baked into the doc so editing actually shows their chosen design.
  *
  * The user still sees the full block suite (countdown, families, venue,
@@ -107,7 +107,7 @@ export function buildDesignDoc(
 ): InvitationDoc {
   const locale: Locale = args.locale ?? "tr";
 
-  // Start from the rich default doc — keeps all the functional blocks
+  // Start from the rich default doc, keeps all the functional blocks
   // (venue, rsvp, gallery, memory_book, etc.) in their default state.
   const base = buildDefaultDoc({
     weddingDate: args.weddingDate,
@@ -122,7 +122,7 @@ export function buildDesignDoc(
 
   const iconKey = decorativeIconKey(design.decorative);
   const familyTitles = familyTitlesFor(design.category);
-  // Birthday and business launches only have one celebrant — the gallery
+  // Birthday and business launches only have one celebrant, the gallery
   // sample uses the second slot for descriptive text ("3 Yaş", "Doğum
   // Günü") which then becomes a non-deletable second name in the
   // editor. Strip it on doc-build so the hero collapses to a single name
@@ -132,10 +132,10 @@ export function buildDesignDoc(
       ? ""
       : design.sampleGroom;
 
-  // Hero — swap in the design's layout variant, subtitle, photo, flourish.
+  // Hero, swap in the design's layout variant, subtitle, photo, flourish.
   // When the design carries a decorative flavour, we wrap the subtitle
   // with the matching {{iconKey}} markers so the renderer's inline
-  // decoration parser draws the actual icon flanking the subtitle —
+  // decoration parser draws the actual icon flanking the subtitle,
   // mirroring the dotted/floral arc the homepage card shows.
   const blocks: Block[] = base.blocks.map((b) => {
     if (b.type === "hero") {
@@ -161,14 +161,14 @@ export function buildDesignDoc(
         style: {
           ...b.style,
           color: design.textColor,
-          // Merienda for display names — matches the grid preview.
+          // Merienda for display names, matches the grid preview.
           fontFamily: b.style.fontFamily ?? "Merienda",
         },
       };
     }
     if (b.type === "families") {
       // Rewrite "Gelinin Ailesi" / "Damadın Ailesi" to match the event
-      // category — keeps members[] but swaps the section titles so a
+      // category, keeps members[] but swaps the section titles so a
       // birthday/business invite doesn't ship with bride/groom labels.
       const fam = b.data as FamiliesData;
       return {
@@ -222,7 +222,7 @@ export function buildDesignDoc(
     }
   }
 
-  // Theme — apply sample's palette + envelope settings + card shape.
+  // Theme, apply sample's palette + envelope settings + card shape.
   return {
     ...base,
     meta: {

@@ -50,7 +50,7 @@ export async function GET(
   return new NextResponse(cleaned, {
     headers: {
       "Content-Type": "image/svg+xml; charset=utf-8",
-      // SVG dosyaları statik — bir kez fetch edilip uzun süre cache'lensin.
+      // SVG dosyaları statik, bir kez fetch edilip uzun süre cache'lensin.
       "Cache-Control": "public, max-age=31536000, immutable",
     },
   });

@@ -77,7 +77,7 @@ function Column({
         {members.length > 0 ? (
           members.map((m, i) => <div key={i}>{m}</div>)
         ) : (
-          <div className="opacity-40 italic">—</div>
+          <div className="opacity-40 italic">,</div>
         )}
       </div>
     </div>

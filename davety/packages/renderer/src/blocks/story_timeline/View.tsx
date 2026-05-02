@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- renderer package supports
+ * non-Next.js consumers, plus story photos already use the responsive
+ * variants pipeline. */
 import type { StoryTimelineData } from "@davety/schema";
 import { fieldStyle, styleToCss, type BlockViewProps } from "../types";
 import { buildImgProps } from "../../media";

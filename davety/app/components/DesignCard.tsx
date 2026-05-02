@@ -6,7 +6,7 @@ import type { DesignCardShape, DesignSample } from "./designSamples";
 import { shapeFor } from "./designSamples";
 
 /** CSS for each card silhouette. Keep in lockstep with `shapeCss` in
- *  the renderer package — when one moves, the other must follow so the
+ *  the renderer package, when one moves, the other must follow so the
  *  gallery preview and the editor canvas always agree on the look. */
 function cardShapeCss(shape: DesignCardShape): CSSProperties {
   switch (shape) {
@@ -61,11 +61,11 @@ export function DesignCard({
 
   return (
     <article className="group flex flex-col">
-      {/* Outer frame — padded background, the actual invitation sits in
+      {/* Outer frame, padded background, the actual invitation sits in
           the middle so the gallery card mirrors how the invitation will
           look in the editor / public view (with shape + shadow). */}
       <div className="relative p-6 rounded-2xl border border-border bg-[#f5f1e7] shadow-sm">
-        {/* Theme name pill — top-left, on the frame */}
+        {/* Theme name pill, top-left, on the frame */}
         <div
           className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-full bg-white/95 border border-border text-[10px] font-medium tracking-wide text-foreground shadow-sm"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -73,7 +73,7 @@ export function DesignCard({
           {design.name}
         </div>
 
-        {/* Category pill — top-right, on the frame */}
+        {/* Category pill, top-right, on the frame */}
         <div
           className="absolute top-2 right-2 z-10 px-2.5 py-1 rounded-full bg-foreground text-background text-[10px] font-medium tracking-wide shadow-sm"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -83,10 +83,10 @@ export function DesignCard({
 
         {/* Real invitation card preview (matches editor/public render).
             Arch shape applied to the outer container when layout is
-            arch — same look as the live invitation. */}
+            arch, same look as the live invitation. */}
         <InvitationPreview design={design} />
 
-        {/* Optional zarf / box indicator — bottom-left, on the frame */}
+        {/* Optional zarf / box indicator, bottom-left, on the frame */}
         <div
           className="absolute bottom-2 left-2 z-10 flex items-center gap-1.5"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -96,7 +96,7 @@ export function DesignCard({
         </div>
       </div>
 
-      {/* Actions — favorite + Tasarla */}
+      {/* Actions, favorite + Tasarla */}
       <div
         className="mt-2 flex items-stretch gap-2 text-sm"
         style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -245,7 +245,7 @@ function TemplateOverlay({
   // Doğrudan `/assets/templates/...` yerine sanitize eden API route'u
   // kullanıyoruz. Asset dosyalarının bir kısmında sabit harfler ya da
   // tarihler (S · E, EST. 2026) gömülü ve CSS `mask-image` bunları
-  // mask'e dahil ediyor — endpoint metin node'larını temizleyip
+  // mask'e dahil ediyor, endpoint metin node'larını temizleyip
   // ulaştırıyor.
   const url = `/api/decorations/clean/${assetKey}.svg`;
   const placement =
@@ -285,7 +285,7 @@ function CoupleNames({
       ? "text-xl md:text-2xl lg:text-3xl"
       : "text-lg md:text-xl lg:text-2xl";
   // Single-celebrant categories (birthday, business) ship with an empty
-  // sampleGroom — collapse the "&" + second name so the gallery card
+  // sampleGroom, collapse the "&" + second name so the gallery card
   // doesn't render a ghost ampersand under the name.
   const hasSecond = !!design.sampleGroom?.trim();
   return (
@@ -336,7 +336,7 @@ function DateRow({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Classic — simple centered card. Inner border frame intentionally
+/* ─── Classic, simple centered card. Inner border frame intentionally
    removed: the live invitation render doesn't draw it, so the gallery
    was over-promising. The decorative top/bottom ornament still maps to
    a real {{...}} marker injected in buildDesignDoc. */
@@ -359,7 +359,7 @@ function ClassicLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Arch — silhouette only; no inner frame (the outer card shape
+/* ─── Arch, silhouette only; no inner frame (the outer card shape
    already provides the arch). The inner SVG used to draw a second arched
    line inside the card, but that frame doesn't render in the actual
    invitation editor/public view, so the gallery would over-promise. */
@@ -390,7 +390,7 @@ function ArchLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Photo top — photo occupies the top ~55%, monogram bridges the
+/* ─── Photo top, photo occupies the top ~55%, monogram bridges the
    photo/text boundary, text section lives strictly in the bottom 45%.
    Earlier the text container was pinned to bottom:0 and grew upward,
    which pushed the subtitle behind the photo's bottom edge whenever the
@@ -459,7 +459,7 @@ function PhotoTopLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Photo full — photo fills card with overlay text ─── */
+/* ─── Photo full, photo fills card with overlay text ─── */
 function PhotoFullLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design} templatePosition="none">
@@ -517,7 +517,7 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Floral crown — arc of florals across top ─── */
+/* ─── Floral crown, arc of florals across top ─── */
 function FloralCrownLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design} templatePosition="bottom">
@@ -564,7 +564,7 @@ function FloralCrownLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Monogram circle — big ring with initials, names below ─── */
+/* ─── Monogram circle, big ring with initials, names below ─── */
 function MonogramCircleLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design}>
@@ -605,7 +605,7 @@ function MonogramCircleLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Bold type — oversized names ─── */
+/* ─── Bold type, oversized names ─── */
 function BoldTypeLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design}>
@@ -651,7 +651,7 @@ function BoldTypeLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/* ─── Botanical frame — leaves along vertical edges ─── */
+/* ─── Botanical frame, leaves along vertical edges ─── */
 function BotanicalFrameLayout({ design }: { design: DesignSample }) {
   return (
     <CardShell design={design}>
@@ -701,7 +701,7 @@ function BotanicalFrameLayout({ design }: { design: DesignSample }) {
   );
 }
 
-/** Abstract corner ornaments — driven by design.decorative. */
+/** Abstract corner ornaments, driven by design.decorative. */
 function DecorOrnament({
   position,
   kind,
@@ -737,7 +737,7 @@ function DecorOrnament({
       </svg>
     );
   }
-  // daisy fallback — dotted arc
+  // daisy fallback, dotted arc
   return (
     <svg
       viewBox="0 0 64 18"

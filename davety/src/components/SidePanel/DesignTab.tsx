@@ -246,7 +246,7 @@ const CARD_SHAPES: {
   { key: "tag", label: "Etiket" },
 ];
 
-/** Visual silhouette picker — each thumbnail mirrors the actual shape
+/** Visual silhouette picker, each thumbnail mirrors the actual shape
  *  the renderer applies, so the user picks by sight rather than label. */
 function CardShapePicker({
   value,

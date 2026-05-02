@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useEditorStore } from "@/src/store/editor-store";
 
 /**
- * Explicit save — only triggered when the user clicks the Save button
+ * Explicit save, only triggered when the user clicks the Save button
  * in the editor header. Persists the current `doc` to the database
  * via PATCH /api/design/invitations/:id and updates the local clean
  * state on success.
@@ -37,7 +37,7 @@ export function useManualSave() {
       return true;
     } catch (err) {
       console.warn("save error", err);
-      toast.error("Bağlantı hatası — tekrar dene");
+      toast.error("Bağlantı hatası, tekrar dene");
       return false;
     } finally {
       setSaving(false);

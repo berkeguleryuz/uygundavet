@@ -12,28 +12,28 @@ const STANDALONE_SCENES: ReadonlyArray<{
     route: "3d",
     title: "Düğün Zarfı 3D",
     description:
-      "CSS 3D zarf — kapağı menteşeden açılıyor, davetiye içinden süzülerek çıkıyor.",
+      "CSS 3D zarf, kapağı menteşeden açılıyor, davetiye içinden süzülerek çıkıyor.",
     palette: { bg: "#f5f6f3", ink: "#252224", accent: "#555670", paper: "#ffffff" },
   },
   {
     route: "zarf",
     title: "Zarf Reveal Sahnesi",
     description:
-      "Klasik zarf açılış animasyonu — sade ve temiz bir reveal deneyimi.",
+      "Klasik zarf açılış animasyonu, sade ve temiz bir reveal deneyimi.",
     palette: { bg: "#f1ece1", ink: "#1f1a14", accent: "#8a5a2c", paper: "#fffaf0" },
   },
   {
     route: "envelopes",
     title: "Zarf Tasarımı Seçici",
     description:
-      "10 farklı zarf stili — pill üzerinden seç, beğendiğin zarfı belirle.",
+      "10 farklı zarf stili, pill üzerinden seç, beğendiğin zarfı belirle.",
     palette: { bg: "#ece7da", ink: "#1f1a14", accent: "#a25d2c", paper: "#fff7e8" },
   },
   {
     route: "box",
     title: "Hediye Kutusu",
     description:
-      "Süslü hediye kutusu açılıyor — içinden davetiye yükseliyor.",
+      "Süslü hediye kutusu açılıyor, içinden davetiye yükseliyor.",
     palette: { bg: "#f0e7e7", ink: "#241719", accent: "#a8434c", paper: "#fff5f0" },
   },
 ];

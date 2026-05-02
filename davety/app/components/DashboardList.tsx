@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowUpRight,
   Calendar,
   Check,
   Copy,
@@ -14,6 +15,7 @@ import {
   MessageCircle,
   Pencil,
   Search,
+  Sparkles,
   Trash2,
   Users,
 } from "lucide-react";
@@ -71,7 +73,7 @@ export function DashboardList({ designs: initial, locale, publicBase }: Props) {
         else acc.draft += 1;
         acc.guests += d.guestCount;
         // RSVP yanıt toplamı sadece okuma yetkisi olan tier'lardan
-        // toplanır. Free davetlerin RSVP'leri summary'de gözükmez —
+        // toplanır. Free davetlerin RSVP'leri summary'de gözükmez,
         // kullanıcı yanıtları görmek için upgrade etmedi.
         if (planLimitsFor(d.tier).rsvpReadEnabled) {
           acc.rsvpHeads += d.rsvpYesHeads;
@@ -304,7 +306,7 @@ function DesignCard({
   publicBase: string;
   onDelete: () => void;
 }) {
-  // Router was missing in this component — onClick paywalls in the
+  // Router was missing in this component, onClick paywalls in the
   // QuickAction grid below need it to navigate to the upgrade screen.
   const router = useRouter();
   const handle = d.vanityPath ?? d.slug;
@@ -330,22 +332,29 @@ function DesignCard({
 
   return (
     <article className="group relative flex flex-col rounded-2xl border border-border bg-card overflow-hidden hover:border-foreground/20 transition-colors">
-      {/* Top meta strip — tier badge + status + theme swatches in a single
+      {/* Top meta strip, tier badge + status + theme swatches in a single
           neutral row. Önceden kafa karıştıran tema-renk gradyanı vardı;
           kullanıcılar bunun ne olduğunu anlamadı, kaldırdık. Tema renkleri
           artık küçük noktalar olarak göründüğü için karta hala bakışta
           tematik kimlik veriyor ama "ne bu büyük renkli alan" sorusunu
           tetiklemiyor. */}
-      <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2 border-b border-border/60">
+      {/* Üst strip: tier + yükselt solda, status badge sağda. Tema
+           renkleri çakışmasın diye bir alt satıra alındı. */}
+      <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
         <div className="flex items-center gap-2 min-w-0">
           <TierBadge tier={d.tier} />
-          <div className="flex gap-1 shrink-0" title="Tema renkleri">
-            <ColorChip color={bgSwatch} />
-            <ColorChip color={accentSwatch} />
-            <ColorChip color={pageSwatch} />
-          </div>
+          <UpgradeButton designId={d.id} tier={d.tier} />
         </div>
         <StatusBadge published={isPublished} />
+      </div>
+      {/* Tema renkleri ayrı satırda, status badge'in altında. Daha
+          fazla yer var, üç nokta da çakışmadan sığıyor. */}
+      <div className="flex items-center px-4 pb-2 border-b border-border/60">
+        <div className="flex gap-1 shrink-0" title="Tema renkleri">
+          <ColorChip color={bgSwatch} />
+          <ColorChip color={accentSwatch} />
+          <ColorChip color={pageSwatch} />
+        </div>
       </div>
 
       <div className="flex-1 p-4 flex flex-col gap-3">
@@ -395,7 +404,7 @@ function DesignCard({
           </button>
         </div>
 
-        {/* Sayılar her zaman görünür — paywall sadece detay sayfasında.
+        {/* Sayılar her zaman görünür, paywall sadece detay sayfasında.
              Free tier kullanıcı kaç kişinin geleceğini özet olarak görsün
              ama tek tek listeyi görmek için upgrade etmesi gereksin. */}
         <div className="grid grid-cols-3 gap-2 mt-1">
@@ -445,11 +454,21 @@ function DesignCard({
                 icon={Lock}
                 label="Misafir"
                 onClick={() => {
+                  // Otomatik /save'a yönlendirme yapmıyoruz. Toast'ta
+                  // Yükselt aksiyonu var, kullanıcı tıklarsa gider.
+                  // Önceden tıklayınca hem toast çıkıp hem yönlenince
+                  // kullanıcı kafası karışıyordu.
                   toast.warning(
-                    `Misafir listesi ${nextTierLabel(d.tier)} paketinde açılır.`
-                  );
-                  router.push(
-                    `/design/invitations/${d.id}/save` as never
+                    `Misafir listesi ${nextTierLabel(d.tier)} paketinde açılır.`,
+                    {
+                      action: {
+                        label: "Yükselt",
+                        onClick: () =>
+                          router.push(
+                            `/design/invitations/${d.id}/save` as never
+                          ),
+                      },
+                    }
                   );
                 }}
                 locked
@@ -467,10 +486,16 @@ function DesignCard({
                 label="Hatıra"
                 onClick={() => {
                   toast.warning(
-                    `Hatıra defteri ${nextTierLabel(d.tier)} paketinde açılır.`
-                  );
-                  router.push(
-                    `/design/invitations/${d.id}/save` as never
+                    `Hatıra defteri ${nextTierLabel(d.tier)} paketinde açılır.`,
+                    {
+                      action: {
+                        label: "Yükselt",
+                        onClick: () =>
+                          router.push(
+                            `/design/invitations/${d.id}/save` as never
+                          ),
+                      },
+                    }
                   );
                 }}
                 locked
@@ -548,15 +573,46 @@ function Stat({
  * Stat slot that hides the actual number behind a paywall. Free-tier
  * users see this where the RSVP "Gelecek" count would normally be.
  * Clicking it routes to the publish/save screen where they can pick a
- * higher tier — that's the existing upgrade entry point so we don't
+ * higher tier, that's the existing upgrade entry point so we don't
  * fork the upgrade flow per surface.
  */
 /**
- * Tier rozeti — kullanıcı kart üstünde davetiyenin hangi paketle
+ * Tier rozeti, kullanıcı kart üstünde davetiyenin hangi paketle
  * yayınlandığını/oluşturulduğunu görüyor. Davetiye-bazlı satış
  * yaptığımız için her kart kendi tier'ını gösteriyor (kullanıcının
  * global "üyelik" durumu yok).
  */
+/**
+ * Tier badge'in yanına oturan kompakt "Paketi Yükselt" butonu. Premium
+ * dışındaki her tier'da görünür ve davetiye-bazlı save/publish ekranına
+ * yönlendirir; orada zaten tier picker var, ayrı upgrade flow yaratmıyoruz.
+ *
+ * Görsel: amber-pill + arrow-up-right ikon, dikkat çeker ama TierBadge'in
+ * yanında orantılı kalır.
+ */
+function UpgradeButton({
+  designId,
+  tier,
+}: {
+  designId: string;
+  tier: PlanTier | undefined | null;
+}) {
+  const t = tier ?? "free";
+  if (t === "premium") return null;
+  const next = nextTierLabel(tier);
+  return (
+    <Link
+      href={`/design/invitations/${designId}/save` as never}
+      title={`${next} paketine yükselt`}
+      className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider hover:bg-amber-100 hover:border-amber-400 transition-colors cursor-pointer shrink-0"
+    >
+      <Sparkles className="size-2.5" />
+      <span>Yükselt</span>
+      <ArrowUpRight className="size-2.5" />
+    </Link>
+  );
+}
+
 function TierBadge({
   tier,
 }: {
@@ -607,7 +663,7 @@ function QuickAction({
   external?: boolean;
   onClick?: () => void;
   destructive?: boolean;
-  /** Premium feature — buton görsel olarak kilitli görünür ve onClick
+  /** Premium feature, buton görsel olarak kilitli görünür ve onClick
    *  upgrade sayfasına yönlendirir. */
   locked?: boolean;
 }) {

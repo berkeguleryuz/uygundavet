@@ -4,9 +4,9 @@ import { styleToCss, type BlockViewProps } from "../types";
 
 /**
  * Renders one of two flavours:
- *  1. Inline catalog icon — when `iconKey` resolves to an entry in
+ *  1. Inline catalog icon, when `iconKey` resolves to an entry in
  *     `DECORATION_ICONS`. Single-path line icon, sized in px.
- *  2. Inline SVG template — when `svgRaw` is set, the markup is inlined so
+ *  2. Inline SVG template, when `svgRaw` is set, the markup is inlined so
  *     `currentColor` recolours every path. Width is sized in px (height
  *     auto) for consistent layout.
  */
@@ -21,7 +21,7 @@ export function DecorationView({ block }: BlockViewProps<DecorationData>) {
         ? "flex-end"
         : "center";
 
-  // Raw SVG template branch — strip the outer <svg ...> wrapper if present
+  // Raw SVG template branch, strip the outer <svg ...> wrapper if present
   // so we can re-emit it with our own width/colour, otherwise inline as-is.
   if (svgRaw) {
     const size = sizePx ?? 220;

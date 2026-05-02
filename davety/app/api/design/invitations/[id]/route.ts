@@ -89,17 +89,15 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // 1) R2 temizliği — davetiyeye ait tüm medyalar (orijinal + thumb/md/lg
+  // 1) R2 temizliği. Davetiyeye ait tüm medyalar (orijinal + thumb/md/lg
   //    varyantları + DB'de iz bırakmamış olası orphan dosyalar)
   //    `users/{userId}/designs/{designId}/` prefix'i altında olduğu için
-  //    tek prefix-delete çağrısıyla siliniyor. Şimdiye kadar bu adım
-  //    yoktu; o yüzden DB'den silinen davetiyelerin görselleri R2'de
-  //    askıda kalıyordu.
-  // 2) DB temizliği — Asset rows da silinmeli; schema'da relation
+  //    tek prefix-delete çağrısıyla siliniyor.
+  // 2) DB temizliği. Asset rows da silinmeli, schema'da relation
   //    onDelete: SetNull olduğu için davetiye silindiğinde row kalır
-  //    (sadece designId null'a düşer). Bu rows şişme yaratıyor; davetiye
-  //    bazlı sattığımız için davetiye gidince asset de gitmeli.
-  // 3) Asıl davetiye silme — diğer alt kayıtlar (Guest, MemoryEntry,
+  //    (sadece designId null'a düşer). Davetiye bazlı sattığımız için
+  //    davetiye gidince asset de gitmeli.
+  // 3) Asıl davetiye silme. Diğer alt kayıtlar (Guest, MemoryEntry,
   //    EditEvent) zaten cascade ile temizleniyor.
   const r2Prefix = `users/${session.user.id}/designs/${id}/`;
   try {
@@ -112,7 +110,7 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
       });
     }
   } catch (err) {
-    // R2 erişimi düşse bile davetiye silinmeli — kullanıcı işlemi
+    // R2 erişimi düşse bile davetiye silinmeli, kullanıcı işlemi
     // tamamlanır, R2 orphan'ları sonra cron ile süpürülebilir.
     console.error("[delete invitation] R2 cleanup failed:", err);
   }

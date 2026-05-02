@@ -29,6 +29,10 @@ function useCountdown(targetIso: string | null) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     if (!targetIso) return;
+    // Time is an external system, we sample it on mount and via interval.
+    // The initial sample is deliberate to render the current diff on the
+    // first paint after hydration without waiting for the first tick.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
@@ -155,7 +159,7 @@ export function InvitationCard({
           {groomName}
         </div>
 
-        {/* Ornament — floral SVG centerpiece */}
+        {/* Ornament, floral SVG centerpiece */}
         <div className="my-4">
           <FloralOrnament accent={accent} width={Math.min(width * 0.5, 170)} />
         </div>
@@ -331,7 +335,7 @@ function FloralOrnament({
   );
 }
 
-/* Corner ornaments — tiny floral flourish at each corner */
+/* Corner ornaments, tiny floral flourish at each corner */
 function CornerOrnament({
   pos,
   accent,

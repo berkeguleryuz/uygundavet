@@ -222,7 +222,7 @@ export function buildPremiumTemplateDoc(
     block(template, "gallery", { items: [] }, { align: "center" }, true),
     // Etkinlik notu davetiyenin sonunda ek bilgi (kıyafet kodu, hediye
     // tercihi vs.) için bırakılan açık slot. Tüm hazır temalar bunu
-    // sonda taşıyor — kullanıcı isterse silebilir, isterse ön plana
+    // sonda taşıyor, kullanıcı isterse silebilir, isterse ön plana
     // çıkartabilir.
     block(
       template,

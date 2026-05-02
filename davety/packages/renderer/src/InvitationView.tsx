@@ -26,7 +26,7 @@ export function getCardShapeStyle(doc: InvitationDoc): CSSProperties {
   // wouldn't visibly clear a previously-applied dome from a sample doc.
   if (explicit) return shapeCss(explicit);
 
-  // Backward compat — old docs encoded shape inside hero.variant.
+  // Backward compat, old docs encoded shape inside hero.variant.
   const hero = doc.blocks.find((b) => b.type === "hero") as
     | Block<HeroData>
     | undefined;
@@ -79,7 +79,7 @@ export function shapeCss(shape: NonNullable<InvitationDoc["theme"]["cardShape"]>
         borderTopRightRadius: "44px",
       };
     case "peaked":
-      // Triangular peak — depth scales with card height.
+      // Triangular peak, depth scales with card height.
       return {
         clipPath: "polygon(0% 7%, 50% 0%, 100% 7%, 100% 100%, 0% 100%)",
       };
@@ -89,7 +89,7 @@ export function shapeCss(shape: NonNullable<InvitationDoc["theme"]["cardShape"]>
         clipPath: "polygon(0% 0%, 50% 6%, 100% 0%, 100% 100%, 0% 100%)",
       };
     case "tag":
-      // Luggage tag — top corners cut at 28px.
+      // Luggage tag, top corners cut at 28px.
       return {
         clipPath:
           "polygon(28px 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%, 0 28px)",
@@ -112,8 +112,12 @@ export interface InvitationViewProps {
   className?: string;
   /** Absolute URL to the davety app (for memory/RSVP POST endpoints from consumer apps). */
   publicBase?: string;
-  /** Public slug — required for memory/RSVP submit endpoints. */
+  /** Public slug, required for memory/RSVP submit endpoints. */
   slug?: string;
+  /** Personalised guest token, when present is forwarded with RSVP submissions. */
+  guestToken?: string;
+  /** Public share URL of the invitation, embedded in calendar invites. */
+  publicUrl?: string;
 }
 
 export function InvitationView({
@@ -123,45 +127,50 @@ export function InvitationView({
   className,
   publicBase,
   slug,
+  guestToken,
+  publicUrl,
 }: InvitationViewProps) {
+  const startIso = `${doc.meta.weddingDate}T${doc.meta.weddingTime}:00`;
   return (
-    <RendererProvider value={{ publicBase, slug }}>
-    <div
-      className={`invitation-canvas overflow-hidden ${className ?? ""}`}
-      style={{
-        background: doc.theme.bgColor,
-        color: doc.theme.accentColor,
-        ...getCardShapeStyle(doc),
-        ...getCardShapePadding(doc),
-      }}
+    <RendererProvider
+      value={{ publicBase, slug, startIso, publicUrl, guestToken }}
     >
-      <FontBoot doc={doc} />
+      <div
+        className={`invitation-canvas overflow-hidden ${className ?? ""}`}
+        style={{
+          background: doc.theme.bgColor,
+          color: doc.theme.accentColor,
+          ...getCardShapeStyle(doc),
+          ...getCardShapePadding(doc),
+        }}
+      >
+        <FontBoot doc={doc} />
 
-      {doc.blocks
-        .filter((b) => b.visible || editable)
-        .map((block) => {
-          const View = getBlockView(block.type);
-          return (
-            <div
-              key={block.id}
-              data-block-id={block.id}
-              data-block-type={block.type}
-              style={{ opacity: block.visible ? 1 : 0.35 }}
-            >
-              <View
-                block={block}
-                theme={doc.theme}
-                editable={editable}
-                onFieldSelect={
-                  onFieldSelect
-                    ? (fieldId) => onFieldSelect(block.id, fieldId)
-                    : undefined
-                }
-              />
-            </div>
-          );
-        })}
-    </div>
+        {doc.blocks
+          .filter((b) => b.visible || editable)
+          .map((block) => {
+            const View = getBlockView(block.type);
+            return (
+              <div
+                key={block.id}
+                data-block-id={block.id}
+                data-block-type={block.type}
+                style={{ opacity: block.visible ? 1 : 0.35 }}
+              >
+                <View
+                  block={block}
+                  theme={doc.theme}
+                  editable={editable}
+                  onFieldSelect={
+                    onFieldSelect
+                      ? (fieldId) => onFieldSelect(block.id, fieldId)
+                      : undefined
+                  }
+                />
+              </div>
+            );
+          })}
+      </div>
     </RendererProvider>
   );
 }

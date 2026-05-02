@@ -22,7 +22,7 @@ export interface ParseInlineOptions {
    *  comparable in weight to surrounding glyphs without overpowering the
    *  line. */
   size?: number | string;
-  /** Stroke width in viewBox units. Defaults to 1.8 — heavier than the
+  /** Stroke width in viewBox units. Defaults to 1.8, heavier than the
    *  decoration-block default so the icon stays legible at body-text
    *  sizes. */
   strokeWidth?: number;

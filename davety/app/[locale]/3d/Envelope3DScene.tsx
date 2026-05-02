@@ -92,7 +92,7 @@ export function Envelope3DScene() {
             transition: "transform 0.55s cubic-bezier(0.2, 0.7, 0.25, 1)",
           }}
         >
-          {/* Envelope body — anchored to bottom of scene, 3D box, flips 180° Y */}
+          {/* Envelope body, anchored to bottom of scene, 3D box, flips 180° Y */}
           <div
             style={{
               position: "absolute",
@@ -108,10 +108,10 @@ export function Envelope3DScene() {
             {/* ══════ FRONT FACE (address side, closest to viewer pre-flip) ══════ */}
             <FrontFace guestName={guestName} />
 
-            {/* ══════ INNER LINING — deepest layer, visible through top V opening ══════ */}
+            {/* ══════ INNER LINING, deepest layer, visible through top V opening ══════ */}
             <InnerLining />
 
-            {/* ══════ CARD — middle layer, emerges UP through the V opening.
+            {/* ══════ CARD, middle layer, emerges UP through the V opening.
                 Placed BEHIND PocketWalls in z-order so its lower portion stays
                 hidden by the pocket paper triangles, exactly like a real card
                 being pulled out of an envelope. ══════ */}
@@ -121,7 +121,7 @@ export function Envelope3DScene() {
               guestName={guestName}
             />
 
-            {/* ══════ POCKET WALLS — three paper triangles + V-seam, CLOSEST to
+            {/* ══════ POCKET WALLS, three paper triangles + V-seam, CLOSEST to
                 the viewer post-flip, occluding the card's bottom portion. ══════ */}
             <PocketWalls />
 
@@ -133,11 +133,11 @@ export function Envelope3DScene() {
 
             {/* ══════ FLAP PIECE (parts 4 → 5 of the envelope back).
                 Closed: the 4th pocket triangle (top), paper color, flat on the
-                back — completing the square with the other 3 triangles.
+                back, completing the square with the other 3 triangles.
                 Opening: hinges at its top edge (transform-origin center top)
                 and rotates -180° about X, flipping up and above the envelope.
                 Its paper face hides (backface) while the lining face is
-                revealed — becoming the "5th piece". ═════════════════════════ */}
+                revealed, becoming the "5th piece". ═════════════════════════ */}
             <FlapPiece active={flipped} />
           </div>
 
@@ -163,7 +163,7 @@ export function Envelope3DScene() {
         {/* 2D occluder (flat overlay, not in 3D scene). Paints the strip below
             the envelope with the page background, hiding the card's body
             before it rises above the envelope top. Without this the 38px
-            band beneath the envelope exposes the card's bottom — the user
+            band beneath the envelope exposes the card's bottom, the user
             sees it "start from the empty area below the envelope" instead of
             appearing to emerge from inside the envelope's V opening. */}
         <div
@@ -306,7 +306,7 @@ function FrontFace({ guestName }: { guestName: string }) {
   );
 }
 
-/* ───── Inner lining — deep inside the pocket, visible through the V opening.
+/* ───── Inner lining, deep inside the pocket, visible through the V opening.
    Positioned near the inner surface of the front face (local z=+D/2-2) so
    after the body's 180° Y flip it ends up at global z ≈ -9, i.e. the farthest
    plane from the viewer. The card sits in front of it (at z=0 local → 0 global)
@@ -331,7 +331,7 @@ function InnerLining() {
   );
 }
 
-/* ───── Pocket walls — the three paper triangles forming the pocket (left,
+/* ───── Pocket walls, the three paper triangles forming the pocket (left,
    right, bottom) plus the V-seam. At local z=-D/2 (outer back surface), which
    after the body flip is global z=+11, i.e. the CLOSEST plane to the viewer.
    This is the layer that occludes the card's lower portion, making the card
@@ -470,18 +470,18 @@ function SideWall({ axis }: { axis: "left" | "right" | "top" | "bottom" }) {
   );
 }
 
-/* ───── Flap piece — parts 4 & 5 of the envelope back.
+/* ───── Flap piece, parts 4 & 5 of the envelope back.
    When `active` is false, it's the 4th pocket triangle: apex-down triangle
    lying flat on the top half of the back face, paper colored, completing the
    square with the three static pocket triangles. When `active` is true, the
    element hinges at its top edge and rotates -180° about X, flipping UP and
    BACK above the envelope. Its paper face is then pointing away (hidden by
-   backface) and the inner lining face is revealed toward the viewer — this is
+   backface) and the inner lining face is revealed toward the viewer, this is
    the 5th piece. Because it's a single physical flap rotating about its own
    hinge, the animation reads as "the envelope opening", not as a new piece
    appearing out of nowhere. ───── */
 function FlapPiece({ active }: { active: boolean }) {
-  const FLAP_HEIGHT = Math.round(H / 2); // 118 — top half of back square
+  const FLAP_HEIGHT = Math.round(H / 2); // 118, top half of back square
   return (
     <div
       style={{
@@ -504,7 +504,7 @@ function FlapPiece({ active }: { active: boolean }) {
         pointerEvents: "none",
       }}
     >
-      {/* Paper side — faces outward on the envelope back when closed.
+      {/* Paper side, faces outward on the envelope back when closed.
           Apex points DOWN (toward the center of the back square). */}
       <div
         style={{
@@ -518,7 +518,7 @@ function FlapPiece({ active }: { active: boolean }) {
         }}
       />
 
-      {/* Lining side — rotated 180° about Y so it faces the opposite direction
+      {/* Lining side, rotated 180° about Y so it faces the opposite direction
           of the paper side. Revealed when the flap has rotated open. */}
       <div
         style={{
@@ -540,7 +540,7 @@ function FlapPiece({ active }: { active: boolean }) {
             boxShadow: "0 -6px 14px -4px rgba(0,0,0,0.22)",
           }}
         />
-        {/* Lining inset — paper border effect */}
+        {/* Lining inset, paper border effect */}
         <div
           style={{
             position: "absolute",
@@ -575,7 +575,7 @@ function CardLayer({
   // 2D WeddingEnvelope exactly. After the body's 180° Y flip the back face is
   // between the viewer and the card, so the portion of the card that overlaps
   // the envelope XY bounds is hidden behind the V-pocket panel. The portion
-  // that moves ABOVE the envelope top becomes visible — it reads as the card
+  // that moves ABOVE the envelope top becomes visible, it reads as the card
   // sliding up out of the pocket opening. A tiny strip pokes out below the
   // envelope too, reinforcing the "card passes through envelope" feel.
   const CARD_TOP_REST = 0;
@@ -699,7 +699,7 @@ function InvitationCardFront({ guestName }: { guestName: string }) {
             marginTop: 6,
           }}
         >
-          19:00 — Boğaz Terası
+          19:00, Boğaz Terası
         </div>
       </div>
 

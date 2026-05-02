@@ -128,7 +128,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
       hourglass.add(pillar);
     }
 
-    /* Glass cones — built as LatheGeometry with hourglass profile */
+    /* Glass cones, built as LatheGeometry with hourglass profile */
     const profilePoints: THREE.Vector2[] = [];
     const segs = 40;
     for (let i = 0; i <= segs; i++) {
@@ -249,7 +249,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
       ctx.fillText("Hilal & İbrahim", 210, 290);
       ctx.font = "20px Space Grotesk, sans-serif";
       ctx.fillText("15 Haziran 2026", 210, 360);
-      ctx.fillText("19:00 — Boğaz Terası", 210, 395);
+      ctx.fillText("19:00, Boğaz Terası", 210, 395);
       ctx.font = "italic 18px Merienda, serif";
       ctx.fillText("~ bize katılın ~", 210, 510);
     }
@@ -365,7 +365,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
             p.vel.y < 0.05 &&
             Math.hypot(p.vel.x, p.vel.z) < 0.05
           ) {
-            // not yet — let it slide
+            // not yet, let it slide
             stillFalling++;
           } else {
             stillFalling++;

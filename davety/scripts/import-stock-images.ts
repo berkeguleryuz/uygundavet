@@ -5,7 +5,7 @@
  *
  * Run:  npx tsx scripts/import-stock-images.ts
  *
- * The script is idempotent — existing files are skipped. It does NOT rewrite
+ * The script is idempotent, existing files are skipped. It does NOT rewrite
  * imageLibrary.ts automatically; after the first run you can pipe the
  * manifest back (or update `url`/`thumb` to point at `/stock/<id>.jpg`).
  */

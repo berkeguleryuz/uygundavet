@@ -11,12 +11,8 @@ import {
   ExternalLink,
   Flame,
   Heart,
-  Mail,
-  MessageCircle,
   Minus,
   Pencil,
-  Send,
-  Share2,
   Sparkles,
   Star,
   Users,
@@ -27,13 +23,6 @@ import {
   type ActiveOffer,
 } from "@/app/components/pricingOffers";
 
-function XIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
 import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
@@ -43,6 +32,15 @@ import {
   ZapIcon,
   CrownIcon,
 } from "@/src/components/tier-icons";
+import {
+  ShareIconStyles,
+  WhatsAppIcon,
+  EmailIcon,
+  TelegramIcon,
+  XBrandIcon,
+  SmsIcon,
+  NativeShareIcon,
+} from "@/src/components/share-icons";
 
 type TierId = "free" | "basic" | "pro" | "premium";
 
@@ -255,11 +253,15 @@ export function SaveScreen({
   const [step, setStep] = useState<"intro" | "tier">("intro");
   const [selectedTier, setSelectedTier] = useState<TierId | null>(initialTier);
   const [activeTier, setActiveTier] = useState<TierId | null>(initialTier);
-  // Pending tier the user clicked "Yayınla" with — shows the
+  // Pending tier the user clicked "Yayınla" with, shows the
   // confirmation/payment modal until they confirm or cancel. Free tier
   // sees a warning about gallery trim + DavetYolla.com banner; paid
   // tiers see the payment placeholder (Stripe wiring comes later).
   const [confirmingTier, setConfirmingTier] = useState<TierId | null>(null);
+  // Yayınlanmış davetiyede "Yükselt" butonuna basıldığında TierPicker'ı
+  // tekrar göstermek için flag. publish route mevcut tier'ı yenisiyle
+  // değiştiriyor, ayrı bir endpoint'e gerek yok.
+  const [wantsUpgrade, setWantsUpgrade] = useState(false);
 
   const davetiyeBase =
     process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "https://davetyolla.com";
@@ -292,6 +294,8 @@ export function SaveScreen({
     }
     setStatus("published");
     setActiveTier(tierId);
+    setWantsUpgrade(false);
+    setStep("intro");
     toast.success(t("title"));
   }
 
@@ -366,11 +370,14 @@ export function SaveScreen({
           <ArrowLeft className="size-4" /> Düzenlemeye dön
         </button>
 
-        {!isPublished && step === "tier" ? (
+        {(!isPublished && step === "tier") || wantsUpgrade ? (
           <TierPicker
             selectedTier={selectedTier}
             onSelect={setSelectedTier}
-            onCancel={() => setStep("intro")}
+            onCancel={() => {
+              setStep("intro");
+              setWantsUpgrade(false);
+            }}
             onConfirm={() => selectedTier && setConfirmingTier(selectedTier)}
             publishing={publishing}
           />
@@ -380,6 +387,10 @@ export function SaveScreen({
             publishing={publishing}
             tier={activeTierMeta}
             onPublish={() => setStep("tier")}
+            onUpgrade={() => {
+              setWantsUpgrade(true);
+              setSelectedTier(activeTier);
+            }}
           />
         )}
 
@@ -416,7 +427,7 @@ export function SaveScreen({
         ) : null}
       </div>
 
-      {/* Hidden canvas QR used for PNG download — we render a parallel
+      {/* Hidden canvas QR used for PNG download, we render a parallel
           canvas so the visible QR can stay SVG-crisp for display. */}
       <div id="share-qr" className="hidden">
         <QRCodeCanvas value={shareUrl} size={512} includeMargin />
@@ -486,7 +497,7 @@ function ConfirmTierModal({
           </div>
         ) : (
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
-            {/* Payment placeholder — Stripe wiring will land here.
+            {/* Payment placeholder, Stripe wiring will land here.
                 Until then we let the publish proceed so the rest of the
                 flow can be developed without a payment provider. */}
             <p>
@@ -537,11 +548,13 @@ function Hero({
   publishing,
   tier,
   onPublish,
+  onUpgrade,
 }: {
   isPublished: boolean;
   publishing: boolean;
   tier: TierMeta | null;
   onPublish: () => void;
+  onUpgrade: () => void;
 }) {
   return (
     <section className="rounded-[1.75rem] border border-border/60 bg-white p-8 sm:p-12 mb-6 text-center">
@@ -582,37 +595,58 @@ function Hero({
             Şimdi Yayınla
           </button>
         ) : tier ? (
-          <ActiveTierBadge tier={tier} />
+          <ActiveTierBadge tier={tier} onUpgrade={onUpgrade} />
         ) : null}
       </div>
     </section>
   );
 }
 
-function ActiveTierBadge({ tier }: { tier: TierMeta }) {
+function ActiveTierBadge({
+  tier,
+  onUpgrade,
+}: {
+  tier: TierMeta;
+  onUpgrade: () => void;
+}) {
   const Icon = tier.icon;
+  // Premium dışındaki tier'larda altta "Yükselt" butonu görünür.
+  // onUpgrade parent'taki state'i tetikleyip TierPicker'ı açıyor,
+  // anchor link gibi sessiz başarısızlık yok.
+  const canUpgrade = tier.id !== "premium";
   return (
-    <div className="mt-7 inline-flex flex-col sm:flex-row items-center gap-3 rounded-2xl border border-border/70 bg-white/70 backdrop-blur px-4 py-3 shadow-sm">
-      <div className="flex items-center gap-2.5">
-        <span className="size-9 rounded-full bg-foreground text-background inline-flex items-center justify-center">
-          <Icon className="size-4" />
-        </span>
-        <div className="text-left">
-          <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-mono">
-            Aktif Paket
-          </div>
-          <div className="text-sm font-semibold text-foreground">
-            {tier.name}{" "}
-            <span className="text-muted-foreground font-normal tabular-nums">
-              · {tier.basePrice === 0 ? "Ücretsiz" : formatTry(tier.basePrice)}
-            </span>
+    <div className="mt-7 inline-flex flex-col items-stretch gap-3 rounded-2xl border border-border/70 bg-white/70 backdrop-blur px-4 py-3 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="size-9 rounded-full bg-foreground text-background inline-flex items-center justify-center">
+            <Icon className="size-4" />
+          </span>
+          <div className="text-left">
+            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-mono">
+              Aktif Paket
+            </div>
+            <div className="text-sm font-semibold text-foreground">
+              {tier.name}{" "}
+              <span className="text-muted-foreground font-normal tabular-nums">
+                · {tier.basePrice === 0 ? "Ücretsiz" : formatTry(tier.basePrice)}
+              </span>
+            </div>
           </div>
         </div>
+        <span className="hidden sm:inline-block h-8 w-px bg-border/70" />
+        <p className="text-[11px] text-muted-foreground sm:max-w-[220px] text-left">
+          {tier.tagline}
+        </p>
       </div>
-      <span className="hidden sm:inline-block h-8 w-px bg-border/70" />
-      <p className="text-[11px] text-muted-foreground sm:max-w-[220px] text-left">
-        {tier.tagline}
-      </p>
+      {canUpgrade ? (
+        <button
+          type="button"
+          onClick={onUpgrade}
+          className="inline-flex items-center justify-center gap-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-[11px] uppercase tracking-[0.2em] font-mono px-4 py-2 transition-colors cursor-pointer shadow-sm"
+        >
+          <Sparkles className="size-3.5" /> Paketi Yükselt
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -630,7 +664,7 @@ function TierPicker({
   onConfirm: () => void;
   publishing: boolean;
 }) {
-  // Resolve offer client-side only — same pattern as PricingTable to avoid
+  // Resolve offer client-side only, same pattern as PricingTable to avoid
   // SSR/timezone drift, with a 60s tick so the banner updates on rollover.
   const [offer, setOffer] = useState<ActiveOffer | null>(null);
   useEffect(() => {
@@ -651,7 +685,10 @@ function TierPicker({
       : selectedMeta?.basePrice ?? 0;
 
   return (
-    <section className="rounded-[1.75rem] border border-border/60 bg-white p-4 sm:p-6 lg:p-9 mb-6">
+    <section
+      id="tier-picker"
+      className="rounded-[1.75rem] border border-border/60 bg-white p-4 sm:p-6 lg:p-9 mb-6 scroll-mt-24"
+    >
       <TierIconStyles />
       <div>
         <div className="text-center mb-5">
@@ -669,7 +706,7 @@ function TierPicker({
 
         <OfferNote offer={offer} />
 
-        {/* Sticky publish bar — kullanıcı uzun feature listelerini geçmek
+        {/* Sticky publish bar, kullanıcı uzun feature listelerini geçmek
              zorunda kalmadan üstten direkt yayına basabilsin diye kart
              grid'inin üstünde duruyor. Mobilde de aynı yer, sticky =
              scroll sırasında ekranın tepesinde tutuyor. */}
@@ -789,7 +826,7 @@ function TierCard({
             : "border-border hover:border-foreground/50 hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
-      {/* Selected check rozeti — hover/select durumunu kart üstünde
+      {/* Selected check rozeti, hover/select durumunu kart üstünde
            kesin görünür yapar. Border + ring tek başına bazı renklerde
            silikti. */}
       {selected ? (
@@ -798,8 +835,10 @@ function TierCard({
         </div>
       ) : null}
 
+      {/* Popüler rozeti, kart üst kenarında ortalanmış olarak yüzüyor.
+          Eskiden top-right idi ve countdown ile çakışıyordu. */}
       {tier.highlight ? (
-        <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-foreground text-background px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] font-mono">
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-foreground text-background px-2.5 py-0.5 text-[9px] uppercase tracking-[0.18em] font-mono shadow-sm whitespace-nowrap z-10">
           <Star className="size-2.5 fill-current" /> Popüler
         </div>
       ) : null}
@@ -810,16 +849,15 @@ function TierCard({
         </div>
       ) : null}
 
-      {/* Discount countdown lives inside each tier card so the urgency
-          appears next to the price the discount applies to (free tier
-          never gets a countdown — no discount applies to it). */}
+      {/* Discount countdown, sağ üstte. Popüler rozeti üst-orta'ya
+          taşındığı için artık çakışma yok. */}
       {percent > 0 && !isFree && offer ? (
         <div className="absolute top-3 right-3">
           <Countdown targetIso={offer.endsAtIso} compact />
         </div>
       ) : null}
 
-      {/* Header — fixed-height block so every card's "between" area lines up */}
+      {/* Header, fixed-height block so every card's "between" area lines up */}
       <div className="flex flex-col">
         <span
           className={`inline-flex size-10 items-center justify-center rounded-xl border ${
@@ -841,7 +879,7 @@ function TierCard({
           {tier.name}
         </div>
 
-        {/* Reserved 2-line price slot — keeps tagline / bestFor / features
+        {/* Reserved 2-line price slot, keeps tagline / bestFor / features
             at identical y-coords across cards regardless of discount. */}
         <div className="mt-1 h-[3.25rem] flex flex-col justify-end leading-none">
           {isFree ? (
@@ -884,7 +922,7 @@ function TierCard({
         </div>
       </div>
 
-      {/* Feature matrix — same rows in same order in every card. */}
+      {/* Feature matrix, same rows in same order in every card. */}
       <div className="mt-4 flex-1 flex flex-col gap-3">
         {TIER_FEATURE_GROUPS.map((group) => (
           <div key={group.section}>
@@ -964,7 +1002,7 @@ function OfferNote({ offer }: { offer: ActiveOffer | null }) {
   if (!offer || offer.percent <= 0) {
     return <div className="h-2" aria-hidden />;
   }
-  // Slim banner — countdown moved to the affected tier cards.
+  // Slim banner, countdown moved to the affected tier cards.
   return (
     <div className="mb-4 text-center">
       <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-rose-50 text-rose-700 px-3 py-1 text-[11px] font-medium">
@@ -1087,53 +1125,57 @@ function QuickShareCard({
 }) {
   const encMsg = encodeURIComponent(shareMessage);
   const encUrl = encodeURIComponent(shareUrl);
+  // Brand-doğru animasyonlu SVG'ler share-icons.tsx'te. Önceden hepsi
+  // generic Lucide MessageCircle kullanıyordu (WhatsApp + SMS aynı
+  // ikondu, kullanıcı kafa karıştırıyordu).
   const channels: Array<{
     label: string;
     href?: string;
     onClick?: () => void;
-    icon: typeof Send;
+    Icon: (props: { className?: string }) => React.ReactElement;
     accent: string;
   }> = [
     {
       label: "WhatsApp",
       href: `https://wa.me/?text=${encMsg}`,
-      icon: MessageCircle,
+      Icon: WhatsAppIcon,
       accent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
     },
     {
       label: "E-posta",
       href: `mailto:?subject=${encodeURIComponent("Düğün Davetiyesi")}&body=${encMsg}`,
-      icon: Mail,
+      Icon: EmailIcon,
       accent: "bg-blue-500/10 text-blue-700 border-blue-500/20",
     },
     {
       label: "Telegram",
       href: `https://t.me/share/url?url=${encUrl}&text=${encMsg}`,
-      icon: Send,
+      Icon: TelegramIcon,
       accent: "bg-sky-500/10 text-sky-700 border-sky-500/20",
     },
     {
       label: "X / Twitter",
       href: `https://twitter.com/intent/tweet?text=${encMsg}`,
-      icon: XIcon,
+      Icon: XBrandIcon,
       accent: "bg-foreground/5 text-foreground border-foreground/15",
     },
     {
       label: "SMS",
       href: `sms:?body=${encMsg}`,
-      icon: MessageCircle,
+      Icon: SmsIcon,
       accent: "bg-amber-500/10 text-amber-700 border-amber-500/20",
     },
     {
       label: "Cihazda Paylaş",
       onClick: onNativeShare,
-      icon: Share2,
+      Icon: NativeShareIcon,
       accent: "bg-violet-500/10 text-violet-700 border-violet-500/20",
     },
   ];
 
   return (
     <article className="lg:col-span-3 rounded-2xl border border-border bg-card p-6">
+      <ShareIconStyles />
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-mono">
@@ -1161,7 +1203,7 @@ function QuickShareCard({
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium hover:opacity-90 transition-opacity ${c.accent}`}
             >
-              <c.icon className="size-4" /> {c.label}
+              <c.Icon className="size-5" /> {c.label}
             </a>
           ) : (
             <button
@@ -1169,7 +1211,7 @@ function QuickShareCard({
               onClick={c.onClick}
               className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer ${c.accent}`}
             >
-              <c.icon className="size-4" /> {c.label}
+              <c.Icon className="size-5" /> {c.label}
             </button>
           ),
         )}
@@ -1216,7 +1258,7 @@ function VanityCard({
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        Çiftin adıyla okunabilir bir link oluştur — sosyal medyada ve
+        Çiftin adıyla okunabilir bir link oluştur, sosyal medyada ve
         davetiyelerde profesyonel görünür.
       </p>
 

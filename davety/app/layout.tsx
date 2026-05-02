@@ -23,7 +23,7 @@ const chakra = Chakra_Petch({
 });
 
 export const metadata: Metadata = {
-  title: "davety — Dijital Davetiye Tasarım",
+  title: "davety, Dijital Davetiye Tasarım",
   description:
     "Düğün davetiyeni sürükle-bırak editör ile tasarla, zarfı özelleştir, misafirlerinle paylaş.",
   icons: { icon: "/favicon.ico" },
