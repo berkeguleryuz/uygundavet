@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
+import { planLimitsFor, tierOrFree } from "@/src/lib/plan-limits";
+import type { PlanTier } from "@davety/schema";
 
 const setSchema = z.object({
   customDomain: z
@@ -42,10 +44,26 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
 
   const existing = await prisma.invitationDesign.findUnique({
     where: { id },
-    select: { userId: true },
+    select: { userId: true, doc: true },
   });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Custom domain SADECE Premium tier'da açık. Diğer tier'larda
+  // domain set / clear isteği reddedilir, kullanıcı paketini
+  // yükseltmeden bağlayamasın.
+  const tier = tierOrFree(
+    ((existing.doc as { meta?: { tier?: PlanTier } })?.meta?.tier ?? null)
+  );
+  if (!planLimitsFor(tier).customDomainEnabled) {
+    return NextResponse.json(
+      {
+        error: "CustomDomainLocked",
+        message: "Özel alan adı sadece Premium pakette açılır.",
+      },
+      { status: 402 }
+    );
   }
 
   const body = await req.json().catch(() => null);

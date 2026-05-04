@@ -7,6 +7,7 @@ import { apiUrl, useRendererContext } from "../../context";
 
 export function MemoryBookView({
   block,
+  theme,
   editable,
   onFieldSelect,
 }: BlockViewProps<MemoryBookData>) {
@@ -57,12 +58,20 @@ export function MemoryBookView({
         setError("Mesajın kabul edilmedi. Lütfen kibar bir dil kullan.");
         return;
       }
+      if (res.status === 404) {
+        setError(
+          "Davetiye henüz yayında değil. Yayınlandıktan sonra tekrar dene."
+        );
+        return;
+      }
       if (!res.ok) {
         setError("Mesaj kaydedilemedi.");
         return;
       }
       setSubmitted(true);
-      setOpen(false);
+      // Başarı state'i in-modal "Hatıran kaydedildi" görsel feedback
+      // sağlıyor, ek toast'a gerek yok. Modal kullanıcı kapatana kadar
+      // açık kalır ki onay mesajını okuyabilsin.
     } catch {
       setError("Bağlantı hatası.");
     } finally {
@@ -94,9 +103,15 @@ export function MemoryBookView({
         ) : (
           <button
             onClick={() => !editable && setOpen(true)}
-            className="text-xs px-5 py-2.5 rounded-full border border-current/30 hover:bg-current/5 font-chakra uppercase tracking-[0.2em]"
+            className="inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90 transition-opacity"
+            style={{
+              // RSVP butonu ile aynı temaya uygun renklendirme,
+              // arkaplan accent rengi, metin sayfa rengi (kontrast).
+              background: theme.accentColor,
+              color: theme.bgColor,
+            }}
           >
-            Anı Bırak
+            Hatıra Bırak
           </button>
         )}
       </div>
@@ -106,55 +121,79 @@ export function MemoryBookView({
           className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50"
           onClick={() => !busy && setOpen(false)}
         >
-          <form
+          <div
             onClick={(e) => e.stopPropagation()}
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl p-6 w-full max-w-md"
+            className="relative bg-white text-black rounded-2xl p-6 w-full max-w-md"
           >
-            <h4 className="font-display text-xl mb-3">Anı Bırak</h4>
-            <input
-              required
-              placeholder="Adın"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-gray-200 px-3 py-2 mb-3 text-sm"
-            />
-            <textarea
-              required
-              rows={4}
-              maxLength={2000}
-              placeholder="Mesajın"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="w-full rounded-md border border-gray-200 px-3 py-2 mb-2 text-sm resize-none"
-            />
-            <input
-              type="text"
-              value={hp}
-              onChange={(e) => setHp(e.target.value)}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="hidden"
-              name="company"
-            />
-            {error ? (
-              <div className="text-xs text-red-600 mb-2 text-center">
-                {error}
-              </div>
-            ) : null}
-            <p className="text-[10px] text-center opacity-60 mb-3">
-              Mesajın gelin/damat onayından sonra hatıra defterinde
-              gözükecek.
-            </p>
             <button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded-full bg-black text-white py-2.5 text-xs font-chakra uppercase tracking-[0.2em] disabled:opacity-50 cursor-pointer"
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Kapat"
+              className="absolute top-3 right-3 size-8 rounded-full inline-flex items-center justify-center hover:bg-black/5 cursor-pointer text-lg leading-none text-black"
             >
-              {busy ? "..." : "Gönder"}
+              ×
             </button>
-          </form>
+            {submitted ? (
+              <div className="flex flex-col items-center text-center gap-3 py-4">
+                <div className="size-12 rounded-full bg-emerald-100 text-emerald-600 inline-flex items-center justify-center text-2xl">
+                  ✓
+                </div>
+                <h4 className="font-display text-xl">Hatıran kaydedildi</h4>
+                <p className="text-sm opacity-75 max-w-xs">
+                  Gelin/damat onayından sonra hatıra defterinde gözükecek.
+                  Teşekkürler!
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <h4 className="font-display text-xl mb-3 pr-8">
+                  Hatıra Bırak
+                </h4>
+                <input
+                  required
+                  placeholder="Adın"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-md border border-gray-200 px-3 py-2 mb-3 text-sm"
+                />
+                <textarea
+                  required
+                  rows={4}
+                  maxLength={2000}
+                  placeholder="Mesajın"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full rounded-md border border-gray-200 px-3 py-2 mb-2 text-sm resize-none"
+                />
+                <input
+                  type="text"
+                  value={hp}
+                  onChange={(e) => setHp(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                  name="company"
+                />
+                {error ? (
+                  <div className="text-xs text-red-600 mb-2 text-center">
+                    {error}
+                  </div>
+                ) : null}
+                <p className="text-[10px] text-center opacity-60 mb-3">
+                  Mesajın gelin/damat onayından sonra hatıra defterinde
+                  gözükecek.
+                </p>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded-full bg-black text-white py-2.5 text-xs font-chakra uppercase tracking-[0.2em] disabled:opacity-50 cursor-pointer"
+                >
+                  {busy ? "..." : "Gönder"}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       ) : null}
     </section>

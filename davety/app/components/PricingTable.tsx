@@ -76,12 +76,12 @@ const FEATURES: FeatureRow[] = [
   {
     section: "Tasarım",
     label: "Davetiye şablonları",
-    description: "Hazır tasarım sayısı",
+    description: "Tüm hazır tasarımlar her pakette açık",
     values: {
-      free: "Seçili 5 şablon",
-      basic: "Tüm şablonlar",
-      pro: "Tüm şablonlar",
-      premium: "Tüm şablonlar + VIP",
+      free: true,
+      basic: true,
+      pro: true,
+      premium: true,
     },
   },
   {
@@ -169,6 +169,33 @@ const FEATURES: FeatureRow[] = [
     section: "Yayın & Marka",
     label: "Kendi alan adınla yayınla",
     description: "ornek.com gibi özel domain",
+    values: { free: false, basic: false, pro: false, premium: true },
+  },
+
+  // Premium Avantajları, VIP şablon yerine ayırt edici Premium-özel
+  // value-add'lar. Tablonun fiyat farkını haklı çıkaran somut feature'lar.
+  {
+    section: "Premium Avantajları",
+    label: "AI metin asistanı",
+    description: "Davet metnini AI ile yaz, üç dile çevir",
+    values: { free: false, basic: false, pro: false, premium: true },
+  },
+  {
+    section: "Premium Avantajları",
+    label: "Yüksek çözünürlüklü PDF",
+    description: "Baskı kalitesinde davetiye çıktısı",
+    values: { free: false, basic: false, pro: false, premium: true },
+  },
+  {
+    section: "Premium Avantajları",
+    label: "Misafir okundu raporu",
+    description: "Davetiyeyi kim ne zaman açtı görsele dök",
+    values: { free: false, basic: false, pro: false, premium: true },
+  },
+  {
+    section: "Premium Avantajları",
+    label: "Süresiz davetiye arşivi",
+    description: "Diğer paketlerde 30-365 gün sonra arşivlenir",
     values: { free: false, basic: false, pro: false, premium: true },
   },
 

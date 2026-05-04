@@ -39,6 +39,22 @@ export default async function SavePage({ params }: { params: Params }) {
   };
   const tier = readTier(design.publishedDoc) ?? readTier(design.doc);
 
+  // Hero ve doc.meta'dan paylaşım mesajı için isim+tarih çek, böylece
+  // "Düğünümüze davetlisin..." yerine "Elif & Yusuf'un düğününe..."
+  // gibi kişiselleştirilmiş mesaj gönderebiliriz.
+  const docSource =
+    (design.publishedDoc as object | null) ?? design.doc;
+  const heroBlock = (docSource as { blocks?: Array<{ type: string; data?: { brideName?: string; groomName?: string } }> })?.blocks?.find(
+    (b) => b.type === "hero"
+  );
+  const couple =
+    heroBlock?.data?.brideName && heroBlock?.data?.groomName
+      ? `${heroBlock.data.brideName} & ${heroBlock.data.groomName}`
+      : null;
+  const meta = (docSource as { meta?: { weddingDate?: string; eventCategory?: string } })?.meta;
+  const weddingDate = meta?.weddingDate ?? null;
+  const eventCategory = meta?.eventCategory ?? null;
+
   return (
     <SaveScreen
       designId={design.id}
@@ -46,6 +62,9 @@ export default async function SavePage({ params }: { params: Params }) {
       vanityPath={design.vanityPath}
       status={design.status as "draft" | "published"}
       tier={(tier as "free" | "basic" | "pro" | "premium" | null) ?? null}
+      coupleName={couple}
+      weddingDate={weddingDate}
+      eventCategory={eventCategory}
     />
   );
 }

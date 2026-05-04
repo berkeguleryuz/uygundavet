@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { validateVanityPath } from "@/src/lib/slug";
+import { planLimitsFor, tierOrFree } from "@/src/lib/plan-limits";
+import type { PlanTier } from "@davety/schema";
 
 const slugSchema = z.object({ vanityPath: z.string() });
 type Params = Promise<{ id: string }>;
@@ -29,10 +31,25 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
 
   const existing = await prisma.invitationDesign.findUnique({
     where: { id },
-    select: { userId: true },
+    select: { userId: true, doc: true },
   });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Vanity path Klasik+ tier gerekli. Free kullanıcı buton görmemeli
+  // (UI gate), defensive olarak server-side de blokla.
+  const tier = tierOrFree(
+    ((existing.doc as { meta?: { tier?: PlanTier } })?.meta?.tier ?? null)
+  );
+  if (!planLimitsFor(tier).vanityPathEnabled) {
+    return NextResponse.json(
+      {
+        error: "VanityPathLocked",
+        message: "Özel kısa link Klasik+ paketinde açılır.",
+      },
+      { status: 402 }
+    );
   }
 
   const conflict = await prisma.invitationDesign.findFirst({

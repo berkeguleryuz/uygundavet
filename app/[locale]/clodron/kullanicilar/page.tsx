@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Mail, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Users, Mail, Calendar, ChevronRight, Ban } from "lucide-react";
 
 interface UserEntry {
   _id: string;
   name?: string;
   email: string;
   createdAt: string;
+  disabled?: boolean;
 }
 
 export default function KullanicilarPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<UserEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,18 +45,27 @@ export default function KullanicilarPage() {
       ) : (
         <div className="space-y-2">
           {users.map((user) => (
-            <div
+            <button
               key={user._id}
-              className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/10 rounded-xl"
+              onClick={() => router.push(`/clodron/kullanicilar/${user._id}`)}
+              className="w-full flex items-center justify-between p-4 bg-white/[0.03] border border-white/10 rounded-xl hover:bg-white/[0.05] hover:border-white/20 transition-colors text-left cursor-pointer"
             >
               <div className="flex items-center gap-4">
                 <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
                   <Users className="w-4 h-4 text-white/50" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white font-sans">
-                    {user.name || "İsimsiz"}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-white font-sans">
+                      {user.name || "İsimsiz"}
+                    </p>
+                    {user.disabled && (
+                      <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-red-300 bg-red-500/15 border border-red-500/30 rounded-full px-1.5 py-0.5 font-sans">
+                        <Ban className="w-2.5 h-2.5" />
+                        Deaktif
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Mail className="w-3 h-3 text-white/30" />
                     <span className="text-xs text-white/40 font-sans">{user.email}</span>
@@ -61,13 +73,16 @@ export default function KullanicilarPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3 h-3 text-white/30" />
-                <span className="text-xs text-white/40 font-sans">
-                  {new Date(user.createdAt).toLocaleDateString("tr-TR")}
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3 text-white/30" />
+                  <span className="text-xs text-white/40 font-sans">
+                    {new Date(user.createdAt).toLocaleDateString("tr-TR")}
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/30" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}

@@ -1,6 +1,9 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
+import { APIError } from "better-auth/api";
+import { ObjectId } from "mongodb";
 import { db } from "./db";
 import { resend, FROM_EMAIL } from "./resend";
 import {
@@ -61,5 +64,35 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
-  plugins: [nextCookies()],
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          try {
+            const userId = String(session.userId);
+            const filter = ObjectId.isValid(userId)
+              ? { $or: [{ _id: new ObjectId(userId) }, { id: userId }] }
+              : { id: userId };
+            const target = await db.collection("user").findOne(filter);
+            if (target?.disabled) {
+              throw new APIError("FORBIDDEN", {
+                message: "Hesabınız yönetici tarafından deaktif edildi.",
+                code: "ACCOUNT_DISABLED",
+              });
+            }
+          } catch (err) {
+            if (err instanceof APIError) throw err;
+          }
+        },
+      },
+    },
+  },
+  plugins: [
+    admin({
+      adminRoles: ["admin"],
+      defaultRole: "user",
+      impersonationSessionDuration: 60 * 60,
+    }),
+    nextCookies(),
+  ],
 });

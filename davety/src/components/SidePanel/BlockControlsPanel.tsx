@@ -21,6 +21,7 @@ import { DECORATION_TEMPLATE_CATEGORIES } from "@/src/components/decorations/tem
 
 export function BlockControlsPanel() {
   const t = useTranslations("Editor.block");
+  const tBlocks = useTranslations("Blocks");
 
   const doc = useEditorStore((s) => s.doc);
   const docId = useEditorStore((s) => s.docId);
@@ -35,6 +36,8 @@ export function BlockControlsPanel() {
   if (!doc || !blockId) return null;
   const block = doc.blocks.find((b) => b.id === blockId);
   if (!block) return null;
+
+  const blockLabel = blockTypeLabel(block.type, tBlocks);
 
   const supportsMedia = ["hero", "gallery", "story_timeline"].includes(block.type);
 
@@ -53,7 +56,7 @@ export function BlockControlsPanel() {
     <div className="p-5 flex flex-col gap-4">
       <header className="flex items-center gap-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-          {block.type}
+          {blockLabel}
         </span>
       </header>
 
@@ -518,4 +521,40 @@ function Chip({
       <span>{label}</span>
     </button>
   );
+}
+
+/**
+ * Block type → localized panel başlığı. Side panel header'ında
+ * "story_timeline" yerine kullanıcının dilinde "Hikayemiz" göstermek
+ * için. Eksik anahtar varsa raw type'a düşer (silent fallback).
+ */
+function blockTypeLabel(
+  type: string,
+  t: (key: string) => string
+): string {
+  const KEY: Record<string, string> = {
+    hero: "hero.title",
+    countdown: "countdown.title",
+    families: "families.title",
+    event_program: "eventProgram.title",
+    venue: "venue.title",
+    story_timeline: "storyTimeline.title",
+    gallery: "gallery.title",
+    memory_book: "memoryBook.title",
+    rsvp_form: "rsvpForm.title",
+    donation: "donation.title",
+    custom_note: "customNote.title",
+    custom_section: "customSection.title",
+    contact: "contact.title",
+    footer: "footer.title",
+    decoration: "decoration.title",
+    cta: "cta.title",
+  };
+  const k = KEY[type];
+  if (!k) return type;
+  try {
+    return t(k);
+  } catch {
+    return type;
+  }
 }

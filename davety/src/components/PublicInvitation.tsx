@@ -6,6 +6,7 @@ import { InvitationView, getCardShapeStyle } from "@davety/renderer";
 import type { InvitationDoc } from "@davety/schema";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
+import { AutoRsvpPrompt } from "@/src/components/AutoRsvpPrompt";
 
 export interface GuestContext {
   name: string;
@@ -150,6 +151,16 @@ export function PublicInvitation({
           )}
         />
       </div>
+
+      {/* Otomatik RSVP popup'ı, davetiye yüklendiğinde 1.5sn sonra
+          açılır. Cevap verince 90 gün cookie ile bir daha açılmaz.
+          Davetiye sahibinde hiç çıkmaz (kendi davetinden RSVP doldurmaz). */}
+      <AutoRsvpPrompt
+        doc={doc}
+        slug={slug}
+        guest={guest}
+        isOwner={isOwner}
+      />
 
       {isOwner ? (
         <Link

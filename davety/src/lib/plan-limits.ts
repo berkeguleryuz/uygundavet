@@ -1,57 +1,112 @@
 /**
- * Per-tier limits for editor-time gating and publish-time decisions.
+ * Tier-bazlı feature kuralları. Editor tarafında hiçbir kısıtlama
+ * yapılmıyor (free kullanıcı her şeyi deneyip görsün), kurallar
+ * SADECE publish anında `publishedDoc`'a uygulanır. Aktif kullanıcı
+ * editor'de gallery'ye 30 foto eklerse Free pakette yayınladığında
+ * yayın versiyonu 1 fotoğrafa trim edilir, ama editor'deki çalışma
+ * dokümanı (`doc`) korunur (kullanıcı upgrade edince geri açılır).
  *
- * The tier itself lives in `doc.meta.tier`. When the field is missing
- * (older invitations created before the field existed) we default to
- * "free", that's the safer fallback because it under-shows features
- * rather than letting paid features leak to free users.
+ * Tier'ı bir davetiye için satın alındıktan sonra DOWNGRADE edilemez.
+ * Buradaki kurallar fiyatlandırma tablosundaki sözle birebir aynı
+ * olmalı, kullanıcı ödediğinin eksiğini almasın.
  *
- * Treat this file as the single source of truth: editor UI, publish
- * trim logic, and watermark rendering all read from here so tier
- * decisions stay consistent across the codebase.
+ * Kaynak: davetyolla.com fiyatlandırma sayfasındaki feature matrisi.
  */
 import type { PlanTier } from "@davety/schema";
 
 export interface PlanLimits {
-  /** Max photos/videos in the gallery block. */
+  /** Galeri block'unda kalacak max medya sayısı. */
   galleryMaxItems: number;
-  /** Whether memory_book block is allowed. */
+  /** Misafirler galeri'ye fotoğraf ekleyebilir mi (Pro+ feature). */
+  guestPhotoUploadEnabled: boolean;
+  /** Hatıra defteri (memory_book) bloğu yayında kalır mı. */
   memoryBookEnabled: boolean;
-  /** Whether the host can VIEW guest RSVP responses on the dashboard.
-   *  Submitting RSVP from the public page is always allowed (so the host
-   *  collects data even on free), this only gates the dashboard view. */
+  /** RSVP formu (rsvp_form) bloğu yayında kalır mı. */
+  rsvpFormEnabled: boolean;
+  /** Host RSVP cevap listesini dashboard'da görebilir mi. */
   rsvpReadEnabled: boolean;
-  /** Whether the published invitation shows a davetyolla.com watermark
-   *  / promo footer. Free tier shows the ad; paid tiers don't. */
+  /** Özel bloklar (event_program, families, story_timeline,
+   *  custom_section) yayında kalır mı. Free'de bu bloklar yayın
+   *  versiyonundan çıkarılır, hero/countdown/venue gibi temel bloklar
+   *  her tier'da kalır. */
+  customBlocksEnabled: boolean;
+  /** Davetiyede DavetYolla tanıtım bölümü gösterilir mi. */
   showsBranding: boolean;
+  /** Vanity path (özel kısa link) kullanılabilir mi. */
+  vanityPathEnabled: boolean;
+  /** Arkaplan müziği yayında çalar mı.
+   *  off = Free, bgMusicUrl temizlenir.
+   *  preset-only = Klasik, sadece kütüphaneden seçilmiş 1 parça.
+   *  full = Pro+, tüm kütüphane + custom URL serbest. */
+  backgroundMusicMode: "off" | "preset-only" | "full";
+  /** Custom domain kullanılabilir mi (Premium only). */
+  customDomainEnabled: boolean;
+  /** Çok sayfalı web sitesi (Premium only, ileri seviye scaffold). */
+  multiPageEnabled: boolean;
 }
 
 const LIMITS: Record<PlanTier, PlanLimits> = {
   free: {
     galleryMaxItems: 1,
+    guestPhotoUploadEnabled: false,
     memoryBookEnabled: false,
+    rsvpFormEnabled: false,
     rsvpReadEnabled: false,
+    customBlocksEnabled: false,
     showsBranding: true,
+    vanityPathEnabled: false,
+    backgroundMusicMode: "off",
+    customDomainEnabled: false,
+    multiPageEnabled: false,
   },
   basic: {
     galleryMaxItems: 20,
-    memoryBookEnabled: true,
-    rsvpReadEnabled: true,
+    guestPhotoUploadEnabled: false,
+    memoryBookEnabled: false,
+    rsvpFormEnabled: false,
+    rsvpReadEnabled: false,
+    customBlocksEnabled: true,
     showsBranding: false,
+    vanityPathEnabled: true,
+    backgroundMusicMode: "preset-only",
+    customDomainEnabled: false,
+    multiPageEnabled: false,
   },
   pro: {
     galleryMaxItems: 100,
+    guestPhotoUploadEnabled: true,
     memoryBookEnabled: true,
+    rsvpFormEnabled: true,
     rsvpReadEnabled: true,
+    customBlocksEnabled: true,
     showsBranding: false,
+    vanityPathEnabled: true,
+    backgroundMusicMode: "full",
+    customDomainEnabled: false,
+    multiPageEnabled: false,
   },
   premium: {
     galleryMaxItems: 500,
+    guestPhotoUploadEnabled: true,
     memoryBookEnabled: true,
+    rsvpFormEnabled: true,
     rsvpReadEnabled: true,
+    customBlocksEnabled: true,
     showsBranding: false,
+    vanityPathEnabled: true,
+    backgroundMusicMode: "full",
+    customDomainEnabled: true,
+    multiPageEnabled: true,
   },
 };
+
+/** "Özel" sayılan blok tipleri. Free pakette yayında çıkarılır. */
+export const CUSTOM_BLOCK_TYPES: ReadonlySet<string> = new Set([
+  "event_program",
+  "families",
+  "story_timeline",
+  "custom_section",
+]);
 
 export function tierOrFree(tier: PlanTier | undefined | null): PlanTier {
   return tier ?? "free";

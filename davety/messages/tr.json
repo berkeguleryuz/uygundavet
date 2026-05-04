@@ -143,6 +143,33 @@
     "donation": {
       "title": "Bizlere Destek Olun"
     },
+    "gallery": {
+      "title": "Galeri"
+    },
+    "storyTimeline": {
+      "title": "Hikayemiz"
+    },
+    "rsvpForm": {
+      "title": "Katılım Formu"
+    },
+    "customNote": {
+      "title": "Özel Not"
+    },
+    "customSection": {
+      "title": "Özel Bölüm"
+    },
+    "contact": {
+      "title": "İletişim"
+    },
+    "footer": {
+      "title": "Altyazı"
+    },
+    "decoration": {
+      "title": "Süsleme"
+    },
+    "cta": {
+      "title": "Buton"
+    },
     "venue": {
       "title": "Mekan",
       "address": "Adres",
@@ -252,6 +279,30 @@
     "remove": "Bağlantıyı Kaldır",
     "alreadyTaken": "Bu domain zaten başka bir davetiyeye bağlı.",
     "reserved": "Bu domain rezerve edilmiş."
+  },
+  "Support": {
+    "greetingTitle": "Merhaba 👋",
+    "greetingSubtitle": "Sana nasıl yardımcı olabiliriz?",
+    "searchPlaceholder": "Yardım ara...",
+    "whatsappTitle": "WhatsApp'tan yaz",
+    "whatsappDesc": "Sorularını direkt bize ilet, en kısa sürede dönelim.",
+    "homeTab": "Anasayfa",
+    "whatsappTab": "WhatsApp",
+    "helpTab": "Yardım",
+    "newsTab": "Yenilikler",
+    "helpTitle": "Sıkça Sorulan Sorular",
+    "helpItem1": "Davetiyemi nasıl kişiselleştiririm?",
+    "helpItem2": "RSVP yanıtlarını nasıl takip ederim?",
+    "helpItem3": "Fiyatlandırma planları nasıl çalışır?",
+    "helpItem4": "Misafirlerime nasıl davetiye gönderirim?",
+    "newsTitle": "Yenilikler",
+    "newsItem1Title": "Yeni şablon koleksiyonu yayında",
+    "newsItem1Desc": "Bahar esintili 6 yeni davetiye tasarımı eklendi.",
+    "newsItem2Title": "Üç dil desteği aktif",
+    "newsItem2Desc": "Davetiyelerini TR, EN ve DE dillerinde paylaşabilirsin.",
+    "close": "Kapat",
+    "openSupport": "Destek panelini aç",
+    "emptyResult": "Eşleşen yardım konusu bulunamadı."
   },
   "Story": {
     "title": "Hikayemiz",

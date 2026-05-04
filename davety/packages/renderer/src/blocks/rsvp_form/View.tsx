@@ -82,6 +82,12 @@ export function RsvpFormView({
         setError("Cevap tarihi geçti.");
         return;
       }
+      if (res.status === 404) {
+        setError(
+          "Davetiye henüz yayında değil. Yayınlandıktan sonra tekrar dene."
+        );
+        return;
+      }
       if (!res.ok) {
         setError("Cevap kaydedilemedi. Daha sonra tekrar dene.");
         return;

@@ -25,6 +25,7 @@ import {
 
 import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
+import { planLimitsFor } from "@/src/lib/plan-limits";
 import {
   TierIconStyles,
   SparkleIcon,
@@ -115,10 +116,10 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
       {
         label: "Hazır şablonlar",
         values: {
-          free: "5 şablon",
+          free: "Tümü",
           basic: "Tümü",
           pro: "Tümü",
-          premium: "Tümü + VIP",
+          premium: "Tümü",
         },
       },
       {
@@ -205,6 +206,27 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
     ],
   },
   {
+    section: "Premium Avantajları",
+    items: [
+      {
+        label: "AI metin asistanı",
+        values: { free: false, basic: false, pro: false, premium: true },
+      },
+      {
+        label: "Yüksek çözünürlüklü PDF çıktı",
+        values: { free: false, basic: false, pro: false, premium: true },
+      },
+      {
+        label: "Misafir okundu raporu",
+        values: { free: false, basic: false, pro: false, premium: true },
+      },
+      {
+        label: "Süresiz davetiye arşivi",
+        values: { free: false, basic: false, pro: false, premium: true },
+      },
+    ],
+  },
+  {
     section: "Destek",
     items: [
       {
@@ -233,6 +255,10 @@ interface SaveScreenProps {
   vanityPath: string | null;
   status: "draft" | "published";
   tier: TierId | null;
+  /** Çift adı, paylaşım mesajını kişiselleştirmek için. */
+  coupleName?: string | null;
+  weddingDate?: string | null;
+  eventCategory?: string | null;
 }
 
 export function SaveScreen({
@@ -241,6 +267,9 @@ export function SaveScreen({
   vanityPath: initialVanity,
   status: initialStatus,
   tier: initialTier,
+  coupleName,
+  weddingDate,
+  eventCategory,
 }: SaveScreenProps) {
   const t = useTranslations("Publish");
   const router = useRouter();
@@ -270,11 +299,33 @@ export function SaveScreen({
 
   const isPublished = status === "published";
 
-  const shareMessage = useMemo(
-    () =>
-      `Düğünümüze davetlisin! Davetiyemizi buradan inceleyebilirsin: ${shareUrl}`,
-    [shareUrl],
-  );
+  // Paylaşım mesajı çift adı + tarih + etkinlik tipinden oluşturulur.
+  // Boş alanlar varsa sade fallback'e düşer. Mesaj hem hızlı paylaşım
+  // butonlarına (WhatsApp, mail, vb.) hem native share API'ye girer.
+  const shareMessage = useMemo(() => {
+    const eventLabel =
+      eventCategory === "engagement"
+        ? "nişan etkinliğimize"
+        : eventCategory === "circumcision"
+          ? "sünnet törenimize"
+          : eventCategory === "birthday"
+            ? "doğum günü kutlamamıza"
+            : eventCategory === "business"
+              ? "etkinliğimize"
+              : "düğünümüze";
+    const dateLabel = weddingDate
+      ? new Date(weddingDate).toLocaleDateString("tr-TR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : null;
+    const intro = coupleName
+      ? `${coupleName} olarak ${eventLabel} davetlisin!`
+      : `${eventLabel.charAt(0).toUpperCase()}${eventLabel.slice(1)} davetlisin!`;
+    const dateLine = dateLabel ? ` ${dateLabel} tarihinde gerçekleşecek.` : "";
+    return `${intro}${dateLine} Davetiyeyi inceleyip katılım durumunu paylaşmak için: ${shareUrl}`;
+  }, [shareUrl, coupleName, weddingDate, eventCategory]);
 
   async function handlePublish(tierId: TierId) {
     setPublishing(true);
@@ -418,6 +469,11 @@ export function SaveScreen({
                 savedVanity={savedVanity}
                 onSave={saveVanity}
                 saving={savingVanity}
+                tier={activeTier}
+                onUpgrade={() => {
+                  setWantsUpgrade(true);
+                  setSelectedTier(activeTier);
+                }}
               />
               <NextStepsCard designId={designId} shareUrl={shareUrl} />
             </div>
@@ -1233,6 +1289,8 @@ function VanityCard({
   savedVanity,
   onSave,
   saving,
+  tier,
+  onUpgrade,
 }: {
   davetiyeBase: string;
   slug: string;
@@ -1241,28 +1299,49 @@ function VanityCard({
   savedVanity: string;
   onSave: () => void;
   saving: boolean;
+  tier: TierId | null;
+  onUpgrade: () => void;
 }) {
   const cleanBase = davetiyeBase.replace(/^https?:\/\//, "");
   const dirty = vanity !== savedVanity;
   const valid = /^[a-z0-9-]{0,40}$/.test(vanity);
   const previewSlug = vanity || slug;
+  // Vanity path Klasik+ paketinde açılır. Free tier'da kart kilitli
+  // overlay ile gösterilir, input disabled olur, save butonu yerine
+  // "Paketi Yükselt" CTA'sı çıkar.
+  const locked = !planLimitsFor(tier).vanityPathEnabled;
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-6">
+    <article
+      className={`relative rounded-2xl border border-border bg-card p-6 ${
+        locked ? "overflow-hidden" : ""
+      }`}
+    >
       <div className="flex items-start justify-between gap-3 mb-1">
-        <div>
+        <div className="flex items-center gap-2">
           <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-mono">
             Özel Link
           </div>
-          <h3 className="font-display text-lg mt-1">Daha Akılda Kalıcı Bir Adres</h3>
+          {locked ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
+              Klasik+
+            </span>
+          ) : null}
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <h3 className="font-display text-lg mt-1">
+        Daha Akılda Kalıcı Bir Adres
+      </h3>
+      <p className="text-xs text-muted-foreground mt-1">
         Çiftin adıyla okunabilir bir link oluştur, sosyal medyada ve
         davetiyelerde profesyonel görünür.
       </p>
 
-      <div className="mt-4 rounded-lg border border-border overflow-hidden flex items-stretch">
+      <div
+        className={`mt-4 rounded-lg border border-border overflow-hidden flex items-stretch ${
+          locked ? "opacity-60" : ""
+        }`}
+      >
         <span className="bg-muted px-3 inline-flex items-center text-xs text-muted-foreground border-r border-border whitespace-nowrap font-mono">
           {cleanBase}/i/
         </span>
@@ -1271,9 +1350,10 @@ function VanityCard({
           onChange={(e) =>
             onChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
           }
+          disabled={locked}
           placeholder="mehmet-ve-zeynep"
           maxLength={40}
-          className="flex-1 px-3 py-2.5 text-sm bg-background focus:outline-none"
+          className="flex-1 px-3 py-2.5 text-sm bg-background focus:outline-none disabled:cursor-not-allowed"
         />
       </div>
       <div className="mt-2 text-[11px] text-muted-foreground flex items-center justify-between gap-3 flex-wrap">
@@ -1283,20 +1363,30 @@ function VanityCard({
             {cleanBase}/i/{previewSlug}
           </span>
         </span>
-        {!valid ? (
+        {!locked && !valid ? (
           <span className="text-amber-600">
             Yalnızca küçük harf, rakam ve tire (-) kullanabilirsin.
           </span>
         ) : null}
       </div>
 
-      <button
-        onClick={onSave}
-        disabled={!dirty || !valid || saving}
-        className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground text-xs px-5 py-2.5 font-mono uppercase tracking-[0.15em] disabled:opacity-50 hover:opacity-90 cursor-pointer transition-opacity"
-      >
-        {saving ? "Kaydediliyor..." : dirty ? "Özel Linki Kaydet" : "Kaydedildi"}
-      </button>
+      {locked ? (
+        <button
+          onClick={onUpgrade}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-xs px-5 py-2.5 font-mono uppercase tracking-[0.15em] cursor-pointer transition-colors shadow-sm"
+        >
+          <Sparkles className="size-3.5" />
+          Paketi Yükselt
+        </button>
+      ) : (
+        <button
+          onClick={onSave}
+          disabled={!dirty || !valid || saving}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground text-xs px-5 py-2.5 font-mono uppercase tracking-[0.15em] disabled:opacity-50 hover:opacity-90 cursor-pointer transition-opacity"
+        >
+          {saving ? "Kaydediliyor..." : dirty ? "Özel Linki Kaydet" : "Kaydedildi"}
+        </button>
+      )}
     </article>
   );
 }

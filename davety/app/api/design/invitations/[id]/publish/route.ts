@@ -4,7 +4,11 @@ import { nanoid } from "nanoid";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { validateVanityPath } from "@/src/lib/slug";
-import { planLimitsFor, tierOrFree } from "@/src/lib/plan-limits";
+import {
+  planLimitsFor,
+  tierOrFree,
+  CUSTOM_BLOCK_TYPES,
+} from "@/src/lib/plan-limits";
 import { computeExpiresAt } from "@/src/lib/archive";
 import type { Block, PlanTier } from "@davety/schema";
 
@@ -14,29 +18,37 @@ const publishSchema = z.object({
 });
 
 /**
- * Apply tier-based mutations to the doc snapshot before persisting it as
- * the published version. Server-side gate: even if the editor UI is
- * bypassed (developer tools, malicious client), the publishedDoc never
- * leaks paid-tier features to free users.
+ * Yayın anında doc'a tier kurallarını uygular ve `publishedDoc` olarak
+ * persist eder. Önemli: editor'deki çalışma dokümanı (`doc`) bu trim'den
+ * etkilenmez, böylece kullanıcı upgrade ederse fazla içerikleri geri
+ * gelir. Sadece `publishedDoc` (misafirin gördüğü versiyon) trim'lenir.
  *
- * Mutations applied:
- *   1. Trim gallery items to the tier's max (1 for free, larger for paid).
- *   2. Drop disallowed blocks (memory_book on free).
- *   3. Inject a branded promo block at the 4th position (index 3) for
- *      free tier so every published free invitation carries our advert.
- *      Idempotent, running twice doesn't duplicate the block.
+ * Server-side gate: bu fonksiyon UI bypass edilse bile (devtools,
+ * direkt API call) paid feature'ların free yayında sızmasını engeller.
  *
- * The branding block uses a lightweight custom_note with a recognisable
- * id prefix so we can detect and replace it on subsequent publishes.
+ * Uygulanan mutations:
+ *   1. Galeri item'ları tier max'ına kırpılır.
+ *   2. İzin verilmeyen bloklar düşürülür: memory_book, rsvp_form,
+ *      custom blocks (event_program/families/story_timeline/custom_section).
+ *   3. Tema'da bgMusicUrl free tier'da temizlenir.
+ *   4. Free tier'da DavetYolla tanıtım bloğu 4. pozisyona enjekte edilir
+ *      (idempotent, eski branding block'u önce temizlenir).
+ *
+ * Tanıtım bloğu recognisable id prefix'iyle locked custom_note olarak
+ * eklenir, sonraki publish'lerde tekrar bulunup yeniden ekleniyor.
  */
 const BRANDING_BLOCK_ID_PREFIX = "davetyolla-brand-";
 
-function applyTierToDoc(doc: object, tier: PlanTier): object {
+function applyTierToPublishedDoc(doc: object, tier: PlanTier): object {
   const limits = planLimitsFor(tier);
-  const docTyped = doc as { blocks?: Block[]; meta?: Record<string, unknown> };
+  const docTyped = doc as {
+    blocks?: Block[];
+    meta?: Record<string, unknown>;
+    theme?: Record<string, unknown>;
+  };
   let blocks = (docTyped.blocks ?? []).slice();
 
-  // 1. Trim gallery items
+  // 1. Galeri trim (tier max kadar item)
   blocks = blocks.map((b) => {
     if (b.type !== "gallery") return b;
     const items = ((b.data as { items?: unknown[] }).items ?? []).slice(
@@ -46,13 +58,22 @@ function applyTierToDoc(doc: object, tier: PlanTier): object {
     return { ...b, data: { ...b.data, items } };
   });
 
-  // 2. Drop disallowed blocks
+  // 2a. Memory book bloğu
   if (!limits.memoryBookEnabled) {
     blocks = blocks.filter((b) => b.type !== "memory_book");
   }
 
-  // 3. Branding block: free shows it permanently at index 3, paid tiers
-  //    have it removed if it leaked in.
+  // 2b. RSVP form bloğu
+  if (!limits.rsvpFormEnabled) {
+    blocks = blocks.filter((b) => b.type !== "rsvp_form");
+  }
+
+  // 2c. Özel bloklar (program, aileler, hikaye, özel bölüm)
+  if (!limits.customBlocksEnabled) {
+    blocks = blocks.filter((b) => !CUSTOM_BLOCK_TYPES.has(b.type));
+  }
+
+  // 3. Eski branding bloğunu temizle, sonra free için yeniden ekle
   blocks = blocks.filter(
     (b) => !b.id.startsWith(BRANDING_BLOCK_ID_PREFIX)
   );
@@ -76,9 +97,20 @@ function applyTierToDoc(doc: object, tier: PlanTier): object {
     ];
   }
 
+  // 4. Theme'deki bgMusicUrl, müzik mode'a göre temizle.
+  //    Free = off → URL silinir, hiç müzik çalmaz.
+  //    Basic = preset-only → şimdilik full ile aynı, library check
+  //    catalog endpoint'i hazırlandığında eklenecek (TODO).
+  //    Pro+ = full → dokunulmaz.
+  let theme = docTyped.theme;
+  if (limits.backgroundMusicMode === "off" && theme && "bgMusicUrl" in theme) {
+    theme = { ...theme, bgMusicUrl: undefined };
+  }
+
   return {
     ...docTyped,
     blocks,
+    ...(theme ? { theme } : {}),
   };
 }
 
@@ -102,7 +134,27 @@ export async function POST(req: Request, ctx: { params: Params }) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const tier = parsed.data.tier;
+  const existingMeta =
+    (existing.doc as { meta?: { tier?: string } }).meta ?? {};
+  const effectiveTier = tierOrFree(
+    (tier ?? (existingMeta.tier as PlanTier | undefined)) ?? null
+  );
+  const limits = planLimitsFor(effectiveTier);
+
+  // Vanity path: tier izin vermiyorsa istek olsa bile yazma. Yine
+  // mevcut vanity'yi de temizle (Free'ye düşmüş olabilir, mantıken
+  // olmaz çünkü downgrade yok ama defensive).
   const vanity = parsed.data.vanityPath;
+  if (vanity && !limits.vanityPathEnabled) {
+    return NextResponse.json(
+      {
+        error: "VanityPathLocked",
+        message: "Özel kısa link Klasik+ paketinde açılır.",
+      },
+      { status: 402 }
+    );
+  }
   if (vanity) {
     const check = validateVanityPath(vanity);
     if (!check.ok) {
@@ -123,31 +175,27 @@ export async function POST(req: Request, ctx: { params: Params }) {
     }
   }
 
-  const tier = parsed.data.tier;
-  const existingMeta =
-    (existing.doc as { meta?: { tier?: string } }).meta ?? {};
-  const effectiveTier = tierOrFree(
-    (tier ?? (existingMeta.tier as PlanTier | undefined)) ?? null
+  // Tier kuralları SADECE publishedDoc'a uygulanır. Editor'deki çalışma
+  // dokümanı (`doc`) full kalır, kullanıcı upgrade ederse fazla
+  // içerikler (memory_book, ekstra galeriler, vb.) yine yerinde olur.
+  const publishedDocRaw = applyTierToPublishedDoc(
+    existing.doc as object,
+    effectiveTier
   );
-
-  // Tier mutations (gallery trim + branding block) before stamping
-  // status=published. publishedDoc is what guests see; doc is what the
-  // owner keeps editing, we apply the same trim to both so the editor
-  // shows the actual published state.
-  const tierApplied = applyTierToDoc(existing.doc as object, effectiveTier);
   const publishedDoc = {
-    ...tierApplied,
+    ...publishedDocRaw,
     meta: {
       ...existingMeta,
-      ...(tierApplied as { meta?: object }).meta,
+      ...(publishedDocRaw as { meta?: object }).meta,
       status: "published",
       updatedAt: new Date().toISOString(),
       tier: effectiveTier,
     },
   };
 
+  // doc'a sadece tier'ı stamp et, içerik değişmesin.
   const docWithTier = {
-    ...tierApplied,
+    ...(existing.doc as object),
     meta: { ...existingMeta, tier: effectiveTier },
   };
 
