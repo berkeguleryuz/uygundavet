@@ -15,11 +15,19 @@ import { TemaGalerisiReelComposition } from "./compositions/TemaGalerisiReel";
 import { HikayemizReelComposition } from "./compositions/HikayemizReel";
 import { GeriSayimReelComposition } from "./compositions/GeriSayimReel";
 import { AniDefteriReelComposition } from "./compositions/AniDefteriReel";
-import { HediyeListesiReelComposition } from "./compositions/HediyeListesiReel";
 import { CokDilliReelComposition } from "./compositions/CokDilliReel";
 import { KendiAlanAdiniReelComposition } from "./compositions/KendiAlanAdiniReel";
 import { KutuReelComposition } from "./compositions/KutuReel";
 import { OmurlukReelComposition } from "./compositions/OmurlukReel";
+import { WebsiteReelComposition } from "./compositions/WebsiteReel";
+import { PaylasReelComposition } from "./compositions/PaylasReel";
+import { CokCihazReelComposition } from "./compositions/CokCihazReel";
+import { YolReelComposition } from "./compositions/YolReel";
+import { OzellestirReelComposition } from "./compositions/OzellestirReel";
+import { HizliReelComposition } from "./compositions/HizliReel";
+import { GaleriReelComposition } from "./compositions/GaleriReel";
+import { PaketlerReelComposition } from "./compositions/PaketlerReel";
+import { SonsuzReelComposition } from "./compositions/SonsuzReel";
 
 const FPS = 30;
 
@@ -174,15 +182,6 @@ export const Root: React.FC = () => {
       />
 
       <Composition
-        id="HediyeListesiReel"
-        component={HediyeListesiReelComposition}
-        width={1080}
-        height={1920}
-        fps={FPS}
-        durationInFrames={FPS * 15}
-      />
-
-      <Composition
         id="CokDilliReel"
         component={CokDilliReelComposition}
         width={1080}
@@ -217,6 +216,16 @@ export const Root: React.FC = () => {
         fps={FPS}
         durationInFrames={FPS * 15}
       />
+
+      <Composition id="WebsiteReel" component={WebsiteReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 16} />
+      <Composition id="PaylasReel" component={PaylasReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 12} />
+      <Composition id="CokCihazReel" component={CokCihazReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 14} />
+      <Composition id="YolReel" component={YolReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 12} />
+      <Composition id="OzellestirReel" component={OzellestirReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 15} />
+      <Composition id="HizliReel" component={HizliReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 13} />
+      <Composition id="GaleriReel" component={GaleriReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 13} />
+      <Composition id="PaketlerReel" component={PaketlerReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 18} />
+      <Composition id="SonsuzReel" component={SonsuzReelComposition} width={1080} height={1920} fps={FPS} durationInFrames={FPS * 15} />
     </>
   );
 };

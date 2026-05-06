@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useSession, signOut } from "@/src/lib/auth-client";
 
@@ -50,14 +51,31 @@ export function Nav() {
       style={{ fontFamily: "Space Grotesk, sans-serif" }}
     >
       <div className="pointer-events-auto mx-auto flex items-center gap-2 h-14 pl-3 pr-2 rounded-full bg-white/90 backdrop-blur-md border border-border shadow-[0_4px_20px_-6px_rgba(0,0,0,0.08)]">
-        {/* Logo */}
+        {/* Logo + brand text. Image webp dönüştürüldü (1.7MB → 247KB).
+            Yazı uygundavet'in markasıyla aynı font ailesi (Chakra Petch),
+            tutarlı kardeş ürün hissi için. */}
         <Link
           href="/"
-          className="shrink-0 flex items-center gap-1.5 pr-2 text-lg md:text-xl font-semibold tracking-tight text-foreground"
-          style={{ fontFamily: "Merienda, serif" }}
+          className="shrink-0 flex items-center gap-2 pr-2 text-foreground"
+          aria-label="DavetYolla"
         >
-          davety
-          <span className="text-muted-foreground text-[11px]">.com</span>
+          <Image
+            src="/davetyolla.webp"
+            alt=""
+            width={48}
+            height={48}
+            priority
+            className="rounded-md object-contain w-11 h-11 md:w-12 md:h-12"
+          />
+          <span
+            className="text-lg md:text-xl font-black tracking-tight leading-none"
+            style={{
+              fontFamily: "var(--font-chakra), Chakra Petch, sans-serif",
+            }}
+          >
+            <span className="text-foreground">Davet</span>
+            <span className="text-foreground">Yolla</span>
+          </span>
         </Link>
 
         <span className="hidden md:block w-px h-6 bg-border" aria-hidden />

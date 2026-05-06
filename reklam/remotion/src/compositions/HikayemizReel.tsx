@@ -2,6 +2,7 @@ import React from "react";
 import {
   AbsoluteFill,
   Audio,
+  OffthreadVideo,
   Sequence,
   staticFile,
   useVideoConfig,
@@ -201,10 +202,9 @@ const PolaroidStack: React.FC = () => {
                   }}
                 />
               ) : (
-                <video
+                <OffthreadVideo
                   src={staticFile(p.src)}
                   muted
-                  autoPlay
                   loop
                   style={{
                     width: "100%",

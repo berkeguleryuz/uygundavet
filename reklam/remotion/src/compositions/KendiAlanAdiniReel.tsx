@@ -16,11 +16,11 @@ import { Typewriter } from "../components/Typewriter";
 import { BrandLockup } from "../components/BrandLockup";
 import { Frame } from "../components/Frame";
 
-// 14s 9:16 — "İki İsim, Bir Adres"
+// 14s 9:16 — "Tema Seçin, Adresiniz Hazır"
 // Tarayıcı çubuğunda davetiye URL'si harf-harf yazılır.
-//   0.0 – 3.5   AÇILIŞ        "İki isim, bir adres."
-//   3.5 – 9.5   URL           tarayıcı çubuğu + tuana-ates.uygundavet.com
-//   9.5 – 12.0  ÖZET          "Kendi davetiniz, kendi alan adınız."
+//   0.0 – 3.5   AÇILIŞ        "Tema seçin, adres hazır."
+//   3.5 – 9.5   URL           tarayıcı çubuğu + uygundavet.com/sunset
+//   9.5 – 12.0  ÖZET          "Davetiyeniz, tema adresinde yaşar."
 //  12.0 – 14.0  KAPANIŞ
 export const KendiAlanAdiniReelComposition: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -80,17 +80,17 @@ const Hook: React.FC = () => {
           align="left"
           lines={[
             {
-              text: "İki isim,",
+              text: "Tema seçin,",
               font: "serif",
-              size: 152,
+              size: 144,
               color: C.cream,
               weight: 300,
             },
             {
-              text: "bir adres.",
+              text: "adres hazır.",
               font: "serifSoft",
               italic: true,
-              size: 152,
+              size: 144,
               color: C.goldHi,
               weight: 400,
             },
@@ -191,23 +191,23 @@ const UrlScene: React.FC = () => {
           >
             <span style={{ color: "rgba(245,240,230,0.55)" }}>https://</span>
             <Typewriter
-              text="tuana-ates"
+              text="uygundavet.com/"
               start={0.4}
-              speed={0.09}
+              speed={0.07}
               caret={false}
               style={{
-                color: C.goldHi,
-                fontWeight: 500,
+                color: C.cream,
               }}
             />
             <Typewriter
-              text=".uygundavet.com"
+              text="sunset"
               start={1.6}
-              speed={0.07}
+              speed={0.12}
               caret
               caretChar="│"
               style={{
-                color: C.cream,
+                color: C.goldHi,
+                fontWeight: 500,
               }}
             />
           </div>
@@ -225,7 +225,7 @@ const UrlScene: React.FC = () => {
             lineHeight: 1.3,
           }}
         >
-          Davetiyeniz, kendi adresinde yaşar.
+          Davetiyeniz, tema adresinde yaşar.
         </div>
       </AbsoluteFill>
       <Frame tone="dark" stage="REELS · 02" role="ADRES" showTimecode={false} />
@@ -262,14 +262,14 @@ const FrameLine: React.FC = () => {
           align="center"
           lines={[
             {
-              text: "Kendi davetiniz,",
+              text: "Tema sizin,",
               font: "serif",
               size: 88,
               color: C.cream,
               weight: 300,
             },
             {
-              text: "kendi alan adınız.",
+              text: "adres hazır.",
               font: "serifSoft",
               italic: true,
               size: 88,

@@ -4,6 +4,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { Toaster } from "sonner";
 import { routing } from "@/i18n/routing";
 import { Nav } from "@/app/components/Nav";
+import { Footer } from "@/app/components/Footer";
 import { SupportLauncher } from "@/src/components/SupportLauncher";
 
 export function generateStaticParams() {
@@ -30,6 +31,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <Nav />
       {children}
+      <Footer />
       <SupportLauncher />
       <Toaster richColors position="top-center" />
     </NextIntlClientProvider>

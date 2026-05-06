@@ -321,10 +321,10 @@ const RsvpFeed: React.FC = () => {
 const FeatureList: React.FC = () => {
   const t = useSeconds();
   const items: [string, string][] = [
-    ["Otomatik katılım takibi", "Yanıt geldikçe size bildirir"],
-    ["Takvime tek dokunuş", "Misafir gününü iCal'e ekler"],
-    ["Hediye listesi", "Çift ve aile için tek liste"],
-    ["Anı defteri", "Dileklerinizi ömürlük arşive alın"],
+    ["Online LCV Formu", "Misafiriniz tek dokunuşla yanıtlasın"],
+    ["Hatırlatma bildirimleri", "Tarih yaklaşırken otomatik hatırlatır"],
+    ["Anı Defteri", "Misafir mesajları ömürlük arşivde"],
+    ["WhatsApp ile paylaşım", "Bağlantıyı tek dokunuşta gönderin"],
   ];
   return (
     <AbsoluteFill style={{ background: C.bgDark }}>
