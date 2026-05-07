@@ -33,27 +33,27 @@ export function SpacingControl({
         <span className="w-10 text-muted-foreground">Üst</span>
         <input
           type="range"
-          min={0}
+          min={-40}
           max={80}
           step={2}
           value={top}
           onChange={(e) => onChange({ paddingTop: Number(e.target.value) })}
           className="flex-1 cursor-pointer"
         />
-        <span className="w-10 text-right tabular-nums">{top}px</span>
+        <span className="w-12 text-right tabular-nums">{top}px</span>
       </label>
       <label className="flex items-center gap-2 text-[11px]">
         <span className="w-10 text-muted-foreground">Alt</span>
         <input
           type="range"
-          min={0}
+          min={-40}
           max={80}
           step={2}
           value={bottom}
           onChange={(e) => onChange({ paddingBottom: Number(e.target.value) })}
           className="flex-1 cursor-pointer"
         />
-        <span className="w-10 text-right tabular-nums">{bottom}px</span>
+        <span className="w-12 text-right tabular-nums">{bottom}px</span>
       </label>
     </div>
   );

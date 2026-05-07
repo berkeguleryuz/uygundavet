@@ -317,23 +317,207 @@ function SubtitleLine({ design }: { design: DesignSample }) {
   );
 }
 
-function DateRow({ design }: { design: DesignSample }) {
+/** Hero description line, mirrors the renderer's HeroView default copy. Short
+ *  single-line truncation so the thumbnail still feels like an invitation
+ *  with words on it but doesn't overwhelm the limited card height. */
+function HeroDescription({ design }: { design: DesignSample }) {
+  return (
+    <p
+      className="text-[8px] md:text-[9px] italic leading-snug max-w-[22ch] truncate"
+      style={{
+        fontFamily: "Merienda, serif",
+        color: `${design.textColor}99`,
+      }}
+    >
+      Sizi aramızda görmekten mutluluk duyarız.
+    </p>
+  );
+}
+
+/** Inline decoration block, mirrors the editor's `decoration` block that
+ *  sits between the hero and the countdown. If the design carries a
+ *  `decorationTemplate`, we render the asset SVG via CSS `mask-image`
+ *  recoloured with the accent (same way the gallery's TemplateOverlay
+ *  works), so the gallery card and the live invitation share the exact
+ *  same flourish. Otherwise we fall back to the abstract rings glyph. */
+function InlineDecoration({ design, size = 28 }: { design: DesignSample; size?: number }) {
+  if (design.decorationTemplate) {
+    const url = `/api/decorations/clean/${design.decorationTemplate}.svg`;
+    return (
+      <div
+        aria-hidden
+        style={{
+          width: size * 1.6,
+          height: size,
+          backgroundColor: design.accent,
+          WebkitMaskImage: `url(${url})`,
+          maskImage: `url(${url})`,
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          opacity: 0.85,
+        }}
+      />
+    );
+  }
+  return <RingsDecoration color={design.accent} size={size} />;
+}
+
+/** Two interlocking rings, the hero decoration the editor renders right
+ *  below the subtitle. Coloured with the design's accent so each card's
+ *  ornament inherits its palette. */
+function RingsDecoration({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size * 0.55}
+      viewBox="0 0 60 33"
+      aria-hidden
+      style={{ display: "block" }}
+    >
+      <g fill="none" stroke={color} strokeWidth="1.4">
+        <circle cx="22" cy="16.5" r="11" />
+        <circle cx="38" cy="16.5" r="11" />
+      </g>
+      <g fill="none" stroke={color} strokeWidth="0.8" opacity="0.7">
+        <path d="M 30 6 Q 32 4 30 2" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+/** Countdown row, four cells with placeholder values that match the
+ *  editor's default countdown look (big serif numbers + tiny labels). */
+function CountdownRow({
+  design,
+  size = "md",
+}: {
+  design: DesignSample;
+  size?: "sm" | "md";
+}) {
+  const isDark = isDarkColor(design.bg);
+  const numCls = size === "sm" ? "text-[14px]" : "text-[16px] md:text-[18px]";
+  const labelCls =
+    size === "sm" ? "text-[6px]" : "text-[6px] md:text-[7px]";
+  const cells: [string, string][] = [
+    ["91", "GÜN"],
+    ["17", "SAAT"],
+    ["57", "DAK"],
+    ["39", "SAN"],
+  ];
+  return (
+    <div className="flex items-end gap-2 md:gap-3">
+      {cells.map(([n, l], i) => (
+        <div key={i} className="flex flex-col items-center leading-none">
+          <span
+            className={`${numCls} font-medium`}
+            style={{ fontFamily: "Merienda, serif", color: design.accent }}
+          >
+            {n}
+          </span>
+          <span
+            className={`${labelCls} mt-0.5 uppercase tracking-[0.18em]`}
+            style={{
+              fontFamily: "Space Grotesk, sans-serif",
+              color: isDark ? `${design.textColor}99` : `${design.textColor}88`,
+            }}
+          >
+            {l}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Date + time line used under the countdown, mirrors what the editor
+ *  shows just above the families block. */
+function DateTimeLine({ design }: { design: DesignSample }) {
   const isDark = isDarkColor(design.bg);
   return (
     <div
-      className="flex items-center gap-2 text-[9px] md:text-[10px] uppercase tracking-[0.25em]"
+      className="text-[8px] md:text-[9px] tracking-[0.18em]"
       style={{
         fontFamily: "Space Grotesk, sans-serif",
         color: isDark ? `${design.textColor}cc` : `${design.textColor}aa`,
       }}
     >
-      <span>15</span>
-      <span className="opacity-40">·</span>
-      <span>AĞUSTOS</span>
-      <span className="opacity-40">·</span>
-      <span>2026</span>
+      15.08.2026 <span className="opacity-50">·</span> 19:00
     </div>
   );
+}
+
+/** Families row, two columns with section titles + placeholder lines.
+ *  Matches the FamiliesView the editor renders below the countdown. The
+ *  category-aware titles come from buildDesignDoc; we replicate the same
+ *  mapping here so the thumbnail labels never lie. */
+function FamiliesRow({ design }: { design: DesignSample }) {
+  const titles = familyTitlesForCategory(design.category);
+  // Always render both columns. The category-aware titles already cover
+  // single-celebrant events (sünnet → "Çocuğun Ailesi"/"Akrabalar",
+  // birthday → "Aile"/"Yakınlar", iş → "Ev Sahibi"/"Sponsorlar"); a
+  // missing groom name is just a missing celebrant, not a missing
+  // family. Hiding the right column made circumcision/birthday/business
+  // cards lopsided, so we keep both visible.
+  return (
+    <div
+      className="grid grid-cols-2 gap-3 md:gap-4 w-full max-w-[180px] mt-1"
+      style={{ fontFamily: "Space Grotesk, sans-serif" }}
+    >
+      <FamilyColumn title={titles.bride} accent={design.accent} text={design.textColor} />
+      <FamilyColumn title={titles.groom} accent={design.accent} text={design.textColor} />
+    </div>
+  );
+}
+
+function FamilyColumn({
+  title,
+  accent,
+  text,
+}: {
+  title: string;
+  accent: string;
+  text: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center leading-tight">
+      <div
+        className="text-[8px] md:text-[9px] italic underline decoration-1 underline-offset-2"
+        style={{ fontFamily: "Merienda, serif", color: accent }}
+      >
+        {title}
+      </div>
+      <div
+        className="text-[7px] md:text-[8px] mt-1 opacity-55"
+        style={{ color: text }}
+      >
+        Anne · Baba
+      </div>
+    </div>
+  );
+}
+
+/** Local copy of the category → family-title map used by buildDesignDoc.
+ *  Kept here (instead of imported) so the gallery card stays a leaf
+ *  client component without dragging in the server-only doc builder. */
+function familyTitlesForCategory(
+  category: DesignSample["category"],
+): { bride: string; groom: string } {
+  switch (category) {
+    case "circumcision":
+      return { bride: "Çocuğun Ailesi", groom: "Akrabalar" };
+    case "birthday":
+      return { bride: "Aile", groom: "Yakınlar" };
+    case "business":
+      return { bride: "Ev Sahibi", groom: "Sponsorlar" };
+    case "engagement":
+    case "wedding":
+    default:
+      return { bride: "Gelinin Ailesi", groom: "Damadın Ailesi" };
+  }
 }
 
 /* ─── Classic, simple centered card. Inner border frame intentionally
@@ -342,18 +526,15 @@ function DateRow({ design }: { design: DesignSample }) {
    a real {{...}} marker injected in buildDesignDoc. */
 function ClassicLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
-      <DecorOrnament position="top" kind={design.decorative} color={design.accent} />
-      <DecorOrnament position="bottom" kind={design.decorative} color={design.accent} />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 md:px-7 py-10 md:py-12">
+    <CardShell design={design} templatePosition="none">
+      <div className="absolute inset-0 flex flex-col items-center justify-start text-center gap-1.5 md:gap-2 px-4 md:px-5 pt-6 md:pt-7 pb-3">
+        <CoupleNames design={design} size="sm" />
         <SubtitleLine design={design} />
-        <div className="mt-3 md:mt-4">
-          <CoupleNames design={design} />
-        </div>
-        <div className="mt-3 md:mt-4 h-px w-10" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2 md:mt-3">
-          <DateRow design={design} />
-        </div>
+        <HeroDescription design={design} />
+        <InlineDecoration design={design} size={22} />
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
     </CardShell>
   );
@@ -365,11 +546,10 @@ function ClassicLayout({ design }: { design: DesignSample }) {
    invitation editor/public view, so the gallery would over-promise. */
 function ArchLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
-      <DecorOrnament position="bottom" kind={design.decorative} color={design.accent} />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8 md:px-10 pt-8 md:pt-12 pb-10">
+    <CardShell design={design} templatePosition="none">
+      <div className="absolute inset-0 flex flex-col items-center justify-start text-center gap-1.5 px-5 md:px-7 pt-6 md:pt-9 pb-3">
         <div
-          className="text-[20px] md:text-2xl font-semibold italic mb-2 opacity-60"
+          className="text-[14px] md:text-base font-semibold italic opacity-55"
           style={{ fontFamily: "Merienda, serif", color: design.accent }}
         >
           {design.sampleBride[0]}
@@ -377,14 +557,12 @@ function ArchLayout({ design }: { design: DesignSample }) {
             <>&nbsp;|&nbsp; {design.sampleGroom[0]}</>
           ) : null}
         </div>
+        <CoupleNames design={design} size="sm" />
         <SubtitleLine design={design} />
-        <div className="mt-3">
-          <CoupleNames design={design} size="sm" />
-        </div>
-        <div className="mt-3 h-px w-8" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2">
-          <DateRow design={design} />
-        </div>
+        <InlineDecoration design={design} size={20} />
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
     </CardShell>
   );
@@ -443,17 +621,14 @@ function PhotoTopLayout({ design }: { design: DesignSample }) {
         </span>
       </div>
       <div
-        className="absolute inset-x-0 bottom-0 pt-8 pb-5 px-5 flex flex-col items-center text-center"
+        className="absolute inset-x-0 bottom-0 pt-7 pb-4 px-4 flex flex-col items-center text-center gap-1.5"
         style={{ top: "55%" }}
       >
+        <CoupleNames design={design} size="sm" />
         <SubtitleLine design={design} />
-        <div className="mt-2">
-          <CoupleNames design={design} size="sm" />
-        </div>
-        <div className="mt-2 h-px w-8" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2">
-          <DateRow design={design} />
-        </div>
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
     </CardShell>
   );
@@ -481,36 +656,56 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
           }}
         />
       </div>
-      <div className="absolute inset-0 flex flex-col justify-end text-center px-5 pb-8 text-white">
+      <div className="absolute inset-0 flex flex-col justify-end items-center text-center gap-1.5 px-4 pb-5 text-white">
+        <div className="leading-tight" style={{ fontFamily: "Merienda, serif" }}>
+          <div className="text-lg md:text-xl font-medium">
+            {design.sampleBride}
+          </div>
+          {design.sampleGroom?.trim() ? (
+            <>
+              <div className="text-xs italic my-0.5 opacity-80">&amp;</div>
+              <div className="text-lg md:text-xl font-medium">
+                {design.sampleGroom}
+              </div>
+            </>
+          ) : null}
+        </div>
         <div
           className="text-[8px] md:text-[9px] uppercase tracking-[0.35em] opacity-80"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
           {design.subtitle}
         </div>
-        <div className="mt-2 leading-tight" style={{ fontFamily: "Merienda, serif" }}>
-          <div className="text-xl md:text-2xl font-medium">
-            {design.sampleBride}
-          </div>
-          {design.sampleGroom?.trim() ? (
-            <>
-              <div className="text-xs italic my-0.5 opacity-80">&amp;</div>
-              <div className="text-xl md:text-2xl font-medium">
-                {design.sampleGroom}
-              </div>
-            </>
-          ) : null}
+        <RingsDecoration color="#ffffff" size={20} />
+        {/* Countdown over photo, white-tinted to read against the gradient. */}
+        <div className="flex items-end gap-2 md:gap-3">
+          {[
+            ["91", "GÜN"],
+            ["17", "SAAT"],
+            ["57", "DAK"],
+            ["39", "SAN"],
+          ].map(([n, l], i) => (
+            <div key={i} className="flex flex-col items-center leading-none">
+              <span
+                className="text-[14px] md:text-[15px] font-medium"
+                style={{ fontFamily: "Merienda, serif" }}
+              >
+                {n}
+              </span>
+              <span
+                className="text-[6px] mt-0.5 uppercase tracking-[0.18em] opacity-80"
+                style={{ fontFamily: "Space Grotesk, sans-serif" }}
+              >
+                {l}
+              </span>
+            </div>
+          ))}
         </div>
-        <div className="mt-3 mx-auto h-px w-10 bg-white/60" />
         <div
-          className="mt-2 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.25em]"
+          className="text-[8px] md:text-[9px] tracking-[0.18em] opacity-85"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
-          <span>15</span>
-          <span className="opacity-60">·</span>
-          <span>AĞUSTOS</span>
-          <span className="opacity-60">·</span>
-          <span>2026</span>
+          15.08.2026 <span className="opacity-60">·</span> 19:00
         </div>
       </div>
     </CardShell>
@@ -520,10 +715,10 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
 /* ─── Floral crown, arc of florals across top ─── */
 function FloralCrownLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design} templatePosition="bottom">
+    <CardShell design={design} templatePosition="none">
       {/* Crown */}
       <svg
-        className="absolute top-4 md:top-5 left-1/2 -translate-x-1/2 w-[75%]"
+        className="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 w-[70%]"
         viewBox="0 0 120 30"
         aria-hidden
       >
@@ -545,21 +740,16 @@ function FloralCrownLayout({ design }: { design: DesignSample }) {
             <circle key={i} cx={d[0]} cy={d[1]} r={d[2]} />
           ))}
         </g>
-        <g fill="none" stroke={design.accent} strokeWidth="0.4" opacity="0.55">
-          <path d="M 36 8 L 34 2 M 50 10 L 49 2 M 72 14 L 73 4 M 100 14 L 101 3" />
-        </g>
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-7 pt-14 pb-10">
+      <div className="absolute inset-0 flex flex-col items-center justify-start text-center gap-1.5 px-4 md:px-5 pt-10 md:pt-12 pb-3">
+        <CoupleNames design={design} size="sm" />
         <SubtitleLine design={design} />
-        <div className="mt-3">
-          <CoupleNames design={design} />
-        </div>
-        <div className="mt-3 h-px w-10" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2">
-          <DateRow design={design} />
-        </div>
+        <HeroDescription design={design} />
+        <InlineDecoration design={design} size={20} />
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
-      <DecorOrnament position="bottom" kind={design.decorative} color={design.accent} />
     </CardShell>
   );
 }
@@ -567,18 +757,18 @@ function FloralCrownLayout({ design }: { design: DesignSample }) {
 /* ─── Monogram circle, big ring with initials, names below ─── */
 function MonogramCircleLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <CardShell design={design} templatePosition="none">
+      <div className="absolute inset-0 flex flex-col items-center justify-start text-center gap-1.5 px-4 pt-5 pb-3">
         <div
-          className="relative w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center"
+          className="relative w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center"
           style={{ border: `1px solid ${design.accent}` }}
         >
           <div
-            className="absolute inset-2 rounded-full"
+            className="absolute inset-1 rounded-full"
             style={{ border: `1px solid ${design.accent}55` }}
           />
           <div
-            className="text-xl md:text-2xl italic"
+            className="text-sm md:text-base italic"
             style={{ fontFamily: "Merienda, serif", color: design.accent }}
           >
             {design.sampleBride[0]}
@@ -590,16 +780,11 @@ function MonogramCircleLayout({ design }: { design: DesignSample }) {
             ) : null}
           </div>
         </div>
-        <div className="mt-4">
-          <SubtitleLine design={design} />
-        </div>
-        <div className="mt-2">
-          <CoupleNames design={design} size="sm" />
-        </div>
-        <div className="mt-3 h-px w-10" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2">
-          <DateRow design={design} />
-        </div>
+        <CoupleNames design={design} size="sm" />
+        <SubtitleLine design={design} />
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
     </CardShell>
   );
@@ -608,8 +793,8 @@ function MonogramCircleLayout({ design }: { design: DesignSample }) {
 /* ─── Bold type, oversized names ─── */
 function BoldTypeLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
-      <div className="absolute inset-0 flex flex-col justify-between p-5 md:p-6">
+    <CardShell design={design} templatePosition="none">
+      <div className="absolute inset-0 flex flex-col justify-between p-4 md:p-5 gap-2">
         <div
           className="text-[9px] uppercase tracking-[0.35em] opacity-70"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -620,27 +805,34 @@ function BoldTypeLayout({ design }: { design: DesignSample }) {
           className="text-left leading-[0.85]"
           style={{ fontFamily: "Merienda, serif" }}
         >
-          <div className="text-2xl md:text-4xl font-semibold tracking-tight">
+          <div className="text-xl md:text-3xl font-semibold tracking-tight">
             {design.sampleBride}
           </div>
           {design.sampleGroom?.trim() ? (
             <>
               <div
-                className="text-sm md:text-lg italic my-1 opacity-70"
+                className="text-xs md:text-base italic my-1 opacity-70"
                 style={{ color: design.accent }}
               >
                 &amp;
               </div>
-              <div className="text-2xl md:text-4xl font-semibold tracking-tight">
+              <div className="text-xl md:text-3xl font-semibold tracking-tight">
                 {design.sampleGroom}
               </div>
             </>
           ) : null}
         </div>
-        <div className="flex items-center justify-between">
-          <DateRow design={design} />
+        <div className="flex items-center justify-center -my-1">
+          <InlineDecoration design={design} size={20} />
+        </div>
+        <div className="flex flex-col items-start gap-1.5">
+          <CountdownRow design={design} size="sm" />
+          <DateTimeLine design={design} />
+        </div>
+        <div className="flex items-start justify-between gap-2">
+          <FamiliesRow design={design} />
           <span
-            className="text-[9px] uppercase tracking-[0.35em]"
+            className="text-[9px] uppercase tracking-[0.35em] mt-1"
             style={{ fontFamily: "Space Grotesk, sans-serif", color: design.accent }}
           >
             ◆
@@ -654,7 +846,7 @@ function BoldTypeLayout({ design }: { design: DesignSample }) {
 /* ─── Botanical frame, leaves along vertical edges ─── */
 function BotanicalFrameLayout({ design }: { design: DesignSample }) {
   return (
-    <CardShell design={design}>
+    <CardShell design={design} templatePosition="none">
       <svg
         className="absolute left-2 top-4 bottom-4 w-6"
         viewBox="0 0 20 120"
@@ -687,73 +879,16 @@ function BotanicalFrameLayout({ design }: { design: DesignSample }) {
           ))}
         </g>
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-10 md:px-12 py-10">
+      <div className="absolute inset-0 flex flex-col items-center justify-start text-center gap-1.5 px-9 md:px-10 pt-7 md:pt-9 pb-3">
+        <CoupleNames design={design} size="sm" />
         <SubtitleLine design={design} />
-        <div className="mt-3">
-          <CoupleNames design={design} />
-        </div>
-        <div className="mt-3 h-px w-10" style={{ background: `${design.accent}aa` }} />
-        <div className="mt-2">
-          <DateRow design={design} />
-        </div>
+        <HeroDescription design={design} />
+        <InlineDecoration design={design} size={20} />
+        <CountdownRow design={design} size="sm" />
+        <DateTimeLine design={design} />
+        <FamiliesRow design={design} />
       </div>
     </CardShell>
-  );
-}
-
-/** Abstract corner ornaments, driven by design.decorative. */
-function DecorOrnament({
-  position,
-  kind,
-  color,
-}: {
-  position: "top" | "bottom";
-  kind: DesignSample["decorative"];
-  color: string;
-}) {
-  if (kind === "none") return null;
-
-  const wrap = `absolute ${
-    position === "top" ? "top-5 md:top-7" : "bottom-5 md:bottom-7"
-  } left-1/2 -translate-x-1/2 w-14 md:w-16 opacity-80 pointer-events-none`;
-
-  if (kind === "rose" || kind === "gold") {
-    return (
-      <svg
-        viewBox="0 0 64 20"
-        className={wrap}
-        style={{
-          transform: `translateX(-50%) ${
-            position === "bottom" ? "rotate(180deg)" : ""
-          }`,
-        }}
-      >
-        <g stroke={color} strokeWidth="0.9" fill="none">
-          <path d="M 4 14 Q 20 4 32 10 Q 44 14 60 4" />
-          <circle cx="32" cy="10" r="1.6" fill={color} />
-          <circle cx="18" cy="8" r="0.9" fill={color} opacity="0.6" />
-          <circle cx="46" cy="12" r="0.9" fill={color} opacity="0.6" />
-        </g>
-      </svg>
-    );
-  }
-  // daisy fallback, dotted arc
-  return (
-    <svg
-      viewBox="0 0 64 18"
-      className={wrap}
-      style={{
-        transform: `translateX(-50%) ${
-          position === "bottom" ? "rotate(180deg)" : ""
-        }`,
-      }}
-    >
-      <g fill={color}>
-        {[8, 16, 24, 32, 40, 48, 56].map((x, i) => (
-          <circle key={i} cx={x} cy={10} r={i === 3 ? 2 : 1.2} opacity={0.8} />
-        ))}
-      </g>
-    </svg>
   );
 }
 

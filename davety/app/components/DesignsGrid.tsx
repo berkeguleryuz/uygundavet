@@ -157,34 +157,30 @@ function DesignDateDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 overflow-y-auto"
       onClick={busy ? undefined : onClose}
     >
       <form
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
-        className="bg-white rounded-2xl w-full max-w-md shadow-xl my-8"
+        className="bg-white rounded-2xl w-full max-w-sm shadow-xl my-4 max-h-[92vh] flex flex-col"
         style={{ fontFamily: "Space Grotesk, sans-serif" }}
       >
-        <div className="px-6 pt-6 pb-4 border-b border-border">
-          <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+        <div className="px-4 pt-4 pb-2.5 border-b border-border shrink-0">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
             {design.name} · #{design.code}
           </div>
           <h2
-            className="text-2xl font-medium mb-1"
+            className="text-lg font-medium leading-tight"
             style={{ fontFamily: "Merienda, serif" }}
           >
             Etkinlik Tarihini Seç
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Davetiyeni seçtiğin tema ile oluşturacağız. Sonra editörde
-            istediğin gibi değiştirebilirsin.
-          </p>
         </div>
 
-        <div className="px-6 py-5 flex flex-col gap-5">
+        <div className="px-4 py-3 flex flex-col gap-3 overflow-y-auto">
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
                 Tarih
               </span>
@@ -198,7 +194,7 @@ function DesignDateDialog({
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
                 Saat
               </span>
@@ -209,25 +205,25 @@ function DesignDateDialog({
             <TimePicker value={time} onChange={setTime} />
           </div>
 
-          <div className="rounded-lg bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground">
+          <div className="rounded-lg bg-muted/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
             <span className="font-medium text-foreground">Etkinlik:</span>{" "}
             {summary}
           </div>
         </div>
 
-        <div className="px-6 pb-6 pt-2 flex items-center gap-2">
+        <div className="px-4 pb-3 pt-2 flex items-center gap-2 border-t border-border shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="flex-1 px-4 py-2.5 rounded-full border border-border bg-white text-sm hover:border-foreground/40 cursor-pointer disabled:opacity-50"
+            className="flex-1 px-3 py-2 rounded-full border border-border bg-white text-sm hover:border-foreground/40 cursor-pointer disabled:opacity-50"
           >
             Vazgeç
           </button>
           <button
             type="submit"
             disabled={busy || !date}
-            className="flex-1 px-4 py-2.5 rounded-full bg-foreground text-background text-sm hover:bg-foreground/90 cursor-pointer disabled:opacity-70"
+            className="flex-1 px-3 py-2 rounded-full bg-foreground text-background text-sm hover:bg-foreground/90 cursor-pointer disabled:opacity-70"
           >
             {busy ? "Oluşturuluyor..." : "Editöre Git"}
           </button>

@@ -150,12 +150,29 @@ export function InvitationView({
           .filter((b) => b.visible || editable)
           .map((block) => {
             const View = getBlockView(block.type);
+            // Spacing on the outer wrapper, not the inner <section>.
+            // - Positive values become extra padding around the block so
+            //   the inner content gets more breathing room.
+            // - Negative values become margins so the block can ride into
+            //   its neighbours. We apply margin out here (instead of on
+            //   the inner <section>) so the negative reaches the
+            //   sibling block instead of getting swallowed by margin
+            //   collapse inside this wrapper div.
+            const pt = block.style.paddingTop;
+            const pb = block.style.paddingBottom;
+            const wrapperStyle: React.CSSProperties = {
+              opacity: block.visible ? 1 : 0.35,
+              paddingTop: pt != null && pt > 0 ? pt : undefined,
+              paddingBottom: pb != null && pb > 0 ? pb : undefined,
+              marginTop: pt != null && pt < 0 ? pt : undefined,
+              marginBottom: pb != null && pb < 0 ? pb : undefined,
+            };
             return (
               <div
                 key={block.id}
                 data-block-id={block.id}
                 data-block-type={block.type}
-                style={{ opacity: block.visible ? 1 : 0.35 }}
+                style={wrapperStyle}
               >
                 <View
                   block={block}

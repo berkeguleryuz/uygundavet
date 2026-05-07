@@ -154,6 +154,16 @@ export function buildDesignDoc(
         decorative: design.decorative,
         accent: design.accent,
       };
+      // Bold-type layout reads as a left-flush editorial poster (oversized
+      // names, sub on top), so we lock its block alignment to "left" up
+      // front. The default hero seed uses align:"center" which made the
+      // gallery card (left-flush) and the editor (center) diverge for
+      // bold-type designs; aligning the doc to the layout's intent keeps
+      // them in lockstep. Other layouts keep their existing align.
+      const heroAlign =
+        design.layout === "bold-type"
+          ? "left"
+          : (b.style.align ?? "center");
       return {
         ...b,
         id: b.id || nanoid(8),
@@ -163,6 +173,7 @@ export function buildDesignDoc(
           color: design.textColor,
           // Merienda for display names, matches the grid preview.
           fontFamily: b.style.fontFamily ?? "Merienda",
+          align: heroAlign,
         },
       };
     }

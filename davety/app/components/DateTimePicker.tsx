@@ -69,39 +69,39 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
   return (
     <div className="rounded-xl border border-border bg-background overflow-hidden">
       {/* Month header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/40">
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-border bg-muted/40">
         <button
           type="button"
           onClick={() => shiftMonth(-1)}
-          className="size-7 rounded-full hover:bg-background inline-flex items-center justify-center cursor-pointer transition-colors"
+          className="size-6 rounded-full hover:bg-background inline-flex items-center justify-center cursor-pointer transition-colors"
           aria-label="Önceki ay"
         >
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="size-3.5" />
         </button>
-        <div className="text-sm font-medium">
+        <div className="text-[13px] font-medium">
           {MONTH_NAMES[viewMonth]} {viewYear}
         </div>
         <button
           type="button"
           onClick={() => shiftMonth(1)}
-          className="size-7 rounded-full hover:bg-background inline-flex items-center justify-center cursor-pointer transition-colors"
+          className="size-6 rounded-full hover:bg-background inline-flex items-center justify-center cursor-pointer transition-colors"
           aria-label="Sonraki ay"
         >
-          <ChevronRight className="size-4" />
+          <ChevronRight className="size-3.5" />
         </button>
       </div>
 
       {/* Day-of-week labels */}
-      <div className="grid grid-cols-7 px-2 pt-2 text-[10px] uppercase tracking-wider text-muted-foreground text-center">
+      <div className="grid grid-cols-7 px-1.5 pt-1.5 text-[9px] uppercase tracking-wider text-muted-foreground text-center">
         {DAY_NAMES.map((d) => (
-          <div key={d} className="py-1">
+          <div key={d} className="py-0.5">
             {d}
           </div>
         ))}
       </div>
 
       {/* Day grid */}
-      <div className="grid grid-cols-7 gap-0.5 px-2 pb-2">
+      <div className="grid grid-cols-7 gap-px px-1.5 pb-1.5">
         {cells.map((cell) => {
           const iso = toIso(cell.date);
           const isSelected = value === iso;
@@ -114,7 +114,7 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
               type="button"
               disabled={isPast}
               onClick={() => onChange(iso)}
-              className={`relative aspect-square text-xs rounded-md inline-flex items-center justify-center transition-colors ${
+              className={`relative h-7 text-[11px] rounded-md inline-flex items-center justify-center transition-colors ${
                 isSelected
                   ? "bg-foreground text-background font-medium"
                   : isPast
@@ -126,7 +126,7 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
             >
               {cell.date.getDate()}
               {isToday && !isSelected ? (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full bg-foreground" />
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 size-1 rounded-full bg-foreground" />
               ) : null}
             </button>
           );
@@ -134,11 +134,11 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
       </div>
 
       {/* Quick shortcuts */}
-      <div className="flex items-center gap-1 px-2 pb-2 pt-1 border-t border-border bg-muted/20">
+      <div className="flex flex-wrap items-center gap-1 px-1.5 pb-1.5 pt-1 border-t border-border bg-muted/20">
         <QuickBtn label="Yarın" onClick={() => jumpTo(addDays(today, 1))} />
-        <QuickBtn label="Bu Hafta Sonu" onClick={() => jumpTo(nextSaturday(today))} />
-        <QuickBtn label="1 Ay Sonra" onClick={() => jumpTo(addMonths(today, 1))} />
-        <QuickBtn label="3 Ay Sonra" onClick={() => jumpTo(addMonths(today, 3))} />
+        <QuickBtn label="Hafta Sonu" onClick={() => jumpTo(nextSaturday(today))} />
+        <QuickBtn label="1 Ay" onClick={() => jumpTo(addMonths(today, 1))} />
+        <QuickBtn label="3 Ay" onClick={() => jumpTo(addMonths(today, 3))} />
       </div>
     </div>
   );
@@ -149,7 +149,7 @@ function QuickBtn({ label, onClick }: { label: string; onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full bg-background border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
+      className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-background border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 cursor-pointer transition-colors"
     >
       {label}
     </button>
@@ -180,46 +180,49 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
 
   return (
     <div className="rounded-xl border border-border bg-background overflow-hidden">
-      <div className="flex items-stretch divide-x divide-border">
-        <Spinner
-          value={hh}
-          onChange={setHour}
-          step={1}
-          max={23}
-          format={(n) => n.toString().padStart(2, "0")}
-          label="Saat"
-        />
-        <div className="flex items-center px-1 text-2xl font-medium text-muted-foreground">
-          :
+      {/* Spinners + presets share one row so the dialog stays short. The
+       *  preset chips wrap below if there isn't room. */}
+      <div className="flex items-center gap-2 px-2 py-2">
+        <div className="inline-flex items-stretch divide-x divide-border rounded-lg border border-border">
+          <Spinner
+            value={hh}
+            onChange={setHour}
+            step={1}
+            max={23}
+            format={(n) => n.toString().padStart(2, "0")}
+            label="Saat"
+          />
+          <div className="flex items-center px-0.5 text-base font-medium text-muted-foreground">
+            :
+          </div>
+          <Spinner
+            value={mm}
+            onChange={setMinute}
+            step={5}
+            max={59}
+            format={(n) => n.toString().padStart(2, "0")}
+            label="Dakika"
+          />
         </div>
-        <Spinner
-          value={mm}
-          onChange={setMinute}
-          step={5}
-          max={59}
-          format={(n) => n.toString().padStart(2, "0")}
-          label="Dakika"
-        />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-1 px-2 py-2 border-t border-border bg-muted/20">
-        {TIME_PRESETS.map((t) => {
-          const active = value === t;
-          return (
-            <button
-              key={t}
-              type="button"
-              onClick={() => onChange(t)}
-              className={`text-[11px] tabular-nums px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
-                active
-                  ? "bg-foreground text-background border-foreground"
-                  : "bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-              }`}
-            >
-              {t}
-            </button>
-          );
-        })}
+        <div className="flex flex-wrap items-center gap-1 flex-1 min-w-0">
+          {TIME_PRESETS.map((t) => {
+            const active = value === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => onChange(t)}
+                className={`text-[10px] tabular-nums px-2 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                  active
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                }`}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -241,14 +244,14 @@ function Spinner({
   label: string;
 }) {
   return (
-    <div className="flex-1 flex flex-col items-center py-3 gap-1">
+    <div className="flex flex-col items-center py-1 gap-0.5 px-1">
       <button
         type="button"
         onClick={() => onChange(value + step)}
-        className="size-6 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+        className="size-4 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
         aria-label={`${label} arttır`}
       >
-        <ChevronUp className="size-3.5" />
+        <ChevronUp className="size-3" />
       </button>
       <input
         type="text"
@@ -262,16 +265,16 @@ function Spinner({
           onChange(Math.min(max, Math.max(0, n)));
         }}
         onFocus={(e) => e.target.select()}
-        className="w-14 text-center text-2xl font-medium tabular-nums leading-none py-1 bg-transparent border-0 focus:outline-none focus:bg-muted/40 rounded cursor-text"
+        className="w-9 text-center text-lg font-medium tabular-nums leading-none py-0.5 bg-transparent border-0 focus:outline-none focus:bg-muted/40 rounded cursor-text"
         aria-label={label}
       />
       <button
         type="button"
         onClick={() => onChange(value - step)}
-        className="size-6 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+        className="size-4 rounded-full inline-flex items-center justify-center hover:bg-muted cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
         aria-label={`${label} azalt`}
       >
-        <ChevronDown className="size-3.5" />
+        <ChevronDown className="size-3" />
       </button>
     </div>
   );

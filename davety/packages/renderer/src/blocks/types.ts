@@ -27,13 +27,18 @@ export function styleToCss(style: BlockStyle): CSSProperties {
   if (style.underline) decorations.push("underline");
   if (style.strike) decorations.push("line-through");
   if (decorations.length) fontStyle.textDecoration = decorations.join(" ");
+
+  // Note: paddingTop/paddingBottom (and their negative-→-margin
+  // counterparts) are applied on the outer block wrapper in
+  // `InvitationView`, not here. Putting them on the inner <section>
+  // means a negative bottom value gets trapped by margin-collapse
+  // inside the wrapper div and never reaches the next block; the
+  // wrapper is the right place for adjacent-block spacing.
   return {
     fontFamily: style.fontFamily ? `"${style.fontFamily}"` : undefined,
     fontSize: style.fontSize ? `${style.fontSize}px` : undefined,
     color: style.color,
     textAlign: style.align,
-    paddingTop: style.paddingTop,
-    paddingBottom: style.paddingBottom,
     ...fontStyle,
   };
 }
