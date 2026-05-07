@@ -129,7 +129,7 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
       {
         label: "Renk, font & tema",
         values: {
-          free: "Kısıtlı",
+          free: true,
           basic: true,
           pro: true,
           premium: true,
@@ -159,11 +159,11 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
       },
       {
         label: "RSVP formu (katılım yanıtı)",
-        values: { free: false, basic: false, pro: true, premium: true },
+        values: { free: false, basic: true, pro: true, premium: true },
       },
       {
         label: "Anı defteri",
-        values: { free: false, basic: false, pro: true, premium: true },
+        values: { free: false, basic: true, pro: true, premium: true },
       },
       {
         label: "Foto galeri",
@@ -176,7 +176,12 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
       },
       {
         label: "Misafir takip paneli",
-        values: { free: false, basic: false, pro: true, premium: true },
+        values: {
+          free: false,
+          basic: "Sadece sayı",
+          pro: true,
+          premium: true,
+        },
       },
     ],
   },
@@ -188,8 +193,8 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         values: { free: true, basic: true, pro: true, premium: true },
       },
       {
-        label: "Özel kısa link (davetyolla.com/isim)",
-        values: { free: false, basic: true, pro: true, premium: true },
+        label: "Özel kısa link (davetyolla.com/davetiyem/isim)",
+        values: { free: false, basic: false, pro: true, premium: true },
       },
       {
         label: "Reklam & watermark yok",
@@ -203,26 +208,9 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         label: "Kendi alan adı (özel domain)",
         values: { free: false, basic: false, pro: false, premium: true },
       },
-    ],
-  },
-  {
-    section: "Premium Avantajları",
-    items: [
       {
-        label: "AI metin asistanı",
-        values: { free: false, basic: false, pro: false, premium: true },
-      },
-      {
-        label: "Yüksek çözünürlüklü PDF çıktı",
-        values: { free: false, basic: false, pro: false, premium: true },
-      },
-      {
-        label: "Misafir okundu raporu",
-        values: { free: false, basic: false, pro: false, premium: true },
-      },
-      {
-        label: "Süresiz davetiye arşivi",
-        values: { free: false, basic: false, pro: false, premium: true },
+        label: "PDF olarak indir",
+        values: { free: false, basic: true, pro: true, premium: true },
       },
     ],
   },
@@ -295,7 +283,7 @@ export function SaveScreen({
   const davetiyeBase =
     process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "https://davetyolla.com";
   const publicPath = savedVanity || slug;
-  const shareUrl = `${davetiyeBase}/i/${publicPath}`;
+  const shareUrl = `${davetiyeBase}/davetiyem/${publicPath}`;
 
   const isPublished = status === "published";
 
@@ -450,8 +438,14 @@ export function SaveScreen({
             <div className="grid lg:grid-cols-5 gap-4 mb-6">
               <ShareCard
                 shareUrl={shareUrl}
+                slug={savedVanity || slug}
                 onCopy={() => copy(shareUrl, "Bağlantı kopyalandı")}
                 onDownloadQR={downloadQR}
+                pdfEnabled={planLimitsFor(activeTier).pdfDownloadEnabled}
+                onUpgrade={() => {
+                  setWantsUpgrade(true);
+                  setSelectedTier(activeTier);
+                }}
               />
               <QuickShareCard
                 shareUrl={shareUrl}
@@ -1127,12 +1121,18 @@ function DraftHint() {
 
 function ShareCard({
   shareUrl,
+  slug,
   onCopy,
   onDownloadQR,
+  pdfEnabled,
+  onUpgrade,
 }: {
   shareUrl: string;
+  slug: string;
   onCopy: () => void;
   onDownloadQR: () => void;
+  pdfEnabled: boolean;
+  onUpgrade: () => void;
 }) {
   return (
     <article className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 flex flex-col items-center text-center">
@@ -1166,6 +1166,24 @@ function ShareCard({
       >
         <Download className="size-3.5" /> QR&apos;ı PNG indir
       </button>
+      {pdfEnabled ? (
+        <a
+          href={`/api/public/design/${slug}/print`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs hover:opacity-90 cursor-pointer transition-opacity"
+        >
+          <Download className="size-3.5" /> Davetiyeyi PDF indir
+        </a>
+      ) : (
+        <button
+          onClick={onUpgrade}
+          className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-4 py-2 text-xs hover:bg-amber-100 cursor-pointer transition-colors"
+          title="PDF indirme Klasik+ paketinde açılır"
+        >
+          <Sparkles className="size-3.5" /> PDF için Yükselt
+        </button>
+      )}
     </article>
   );
 }
@@ -1343,7 +1361,7 @@ function VanityCard({
         }`}
       >
         <span className="bg-muted px-3 inline-flex items-center text-xs text-muted-foreground border-r border-border whitespace-nowrap font-mono">
-          {cleanBase}/i/
+          {cleanBase}/davetiyem/
         </span>
         <input
           value={vanity}
@@ -1360,7 +1378,7 @@ function VanityCard({
         <span>
           Önizleme:{" "}
           <span className="font-mono text-foreground">
-            {cleanBase}/i/{previewSlug}
+            {cleanBase}/davetiyem/{previewSlug}
           </span>
         </span>
         {!locked && !valid ? (

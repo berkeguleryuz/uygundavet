@@ -56,7 +56,7 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      url: `https://davetyolla.com/i/${design.slug}`,
+      url: `https://davetyolla.com/davetiyem/${design.slug}`,
       siteName: "DavetYolla",
     },
     twitter: { card: "summary_large_image", title, description },
@@ -236,7 +236,7 @@ function buildEventJsonLd(doc: InvitationDoc, slug: string) {
         }
       : undefined,
     organizer: { "@type": "Person", name: couple },
-    url: `https://davetyolla.com/i/${slug}`,
+    url: `https://davetyolla.com/davetiyem/${slug}`,
     inLanguage: doc.meta.locale,
   };
 }

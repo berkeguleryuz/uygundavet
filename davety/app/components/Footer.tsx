@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/navigation";
-import { ArrowUpRight, Heart, Mail, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Mail, MessageCircle } from "lucide-react";
 
 /**
  * lucide-react v1.7'de Instagram icon yok, custom inline SVG ile
@@ -38,7 +38,7 @@ const HIDDEN_ON = [
   "/signup",
   "/design/invitations/",
   "/admin",
-  "/i/",
+  "/davetiyem/",
 ];
 
 const PRODUCT_LINKS: { label: string; href: string }[] = [
@@ -114,7 +114,7 @@ export function Footer() {
               alt="DavetYolla"
               width={120}
               height={120}
-              className="rounded-2xl object-contain w-24 h-24 md:w-28 md:h-28 shadow-[0_18px_50px_-12px_rgba(213,209,173,0.35)]"
+              className="rounded-2xl object-contain w-24 h-24 md:w-28 md:h-28"
             />
             <div className="flex flex-col gap-2">
               <span
@@ -204,9 +204,9 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar, copyright + made with */}
+      {/* Bottom bar, sadece copyright */}
       <div className="border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 md:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-center sm:justify-start">
           <span
             className="text-xs opacity-60"
             style={{
@@ -215,17 +215,6 @@ export function Footer() {
             }}
           >
             © {year} DavetYolla. Tüm hakları saklıdır.
-          </span>
-          <span
-            className="inline-flex items-center gap-1.5 text-xs opacity-60"
-            style={{
-              fontFamily:
-                "var(--font-space-grotesk), Space Grotesk, sans-serif",
-            }}
-          >
-            Türkiye&apos;de
-            <Heart className="size-3 fill-[#d5d1ad] text-[#d5d1ad]" />
-            ile yapıldı
           </span>
         </div>
       </div>

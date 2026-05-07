@@ -23,8 +23,12 @@ export interface PlanLimits {
   memoryBookEnabled: boolean;
   /** RSVP formu (rsvp_form) bloğu yayında kalır mı. */
   rsvpFormEnabled: boolean;
-  /** Host RSVP cevap listesini dashboard'da görebilir mi. */
+  /** Host RSVP cevap listesinin DETAYINI dashboard'da görebilir mi
+   *  (her misafirin adı, telefonu, mesajı). Pro+ feature. */
   rsvpReadEnabled: boolean;
+  /** Host RSVP toplamını/sayısını görebilir mi (kaç kişi geleceğini
+   *  özet olarak). Basic+ feature, listeyi göremezken sayıyı görür. */
+  rsvpCountEnabled: boolean;
   /** Özel bloklar (event_program, families, story_timeline,
    *  custom_section) yayında kalır mı. Free'de bu bloklar yayın
    *  versiyonundan çıkarılır, hero/countdown/venue gibi temel bloklar
@@ -43,6 +47,8 @@ export interface PlanLimits {
   customDomainEnabled: boolean;
   /** Çok sayfalı web sitesi (Premium only, ileri seviye scaffold). */
   multiPageEnabled: boolean;
+  /** Davetiyeyi PDF olarak indirebilir mi (Free hariç tüm tier'larda). */
+  pdfDownloadEnabled: boolean;
 }
 
 const LIMITS: Record<PlanTier, PlanLimits> = {
@@ -52,25 +58,35 @@ const LIMITS: Record<PlanTier, PlanLimits> = {
     memoryBookEnabled: false,
     rsvpFormEnabled: false,
     rsvpReadEnabled: false,
+    rsvpCountEnabled: false,
     customBlocksEnabled: false,
     showsBranding: true,
     vanityPathEnabled: false,
     backgroundMusicMode: "off",
     customDomainEnabled: false,
     multiPageEnabled: false,
+    pdfDownloadEnabled: false,
   },
   basic: {
     galleryMaxItems: 20,
     guestPhotoUploadEnabled: false,
-    memoryBookEnabled: false,
-    rsvpFormEnabled: false,
+    memoryBookEnabled: true,
+    // Misafir formu açık (form publish'te kalır). Host RSVP DETAYINI
+    // göremez (rsvpReadEnabled false), sadece toplam sayıyı görür
+    // (rsvpCountEnabled true). Detaylar Pro+ funnel'i.
+    rsvpFormEnabled: true,
     rsvpReadEnabled: false,
+    rsvpCountEnabled: true,
     customBlocksEnabled: true,
     showsBranding: false,
-    vanityPathEnabled: true,
+    // Klasik tier'da vanity path kapalı, sadece otomatik üretilen
+    // /davetiyem/{slug} kullanılır. Pro+ kullanıcı kendi adıyla
+    // özel link belirleyebilir.
+    vanityPathEnabled: false,
     backgroundMusicMode: "preset-only",
     customDomainEnabled: false,
     multiPageEnabled: false,
+    pdfDownloadEnabled: true,
   },
   pro: {
     galleryMaxItems: 100,
@@ -78,12 +94,14 @@ const LIMITS: Record<PlanTier, PlanLimits> = {
     memoryBookEnabled: true,
     rsvpFormEnabled: true,
     rsvpReadEnabled: true,
+    rsvpCountEnabled: true,
     customBlocksEnabled: true,
     showsBranding: false,
     vanityPathEnabled: true,
     backgroundMusicMode: "full",
     customDomainEnabled: false,
     multiPageEnabled: false,
+    pdfDownloadEnabled: true,
   },
   premium: {
     galleryMaxItems: 500,
@@ -91,12 +109,14 @@ const LIMITS: Record<PlanTier, PlanLimits> = {
     memoryBookEnabled: true,
     rsvpFormEnabled: true,
     rsvpReadEnabled: true,
+    rsvpCountEnabled: true,
     customBlocksEnabled: true,
     showsBranding: false,
     vanityPathEnabled: true,
     backgroundMusicMode: "full",
     customDomainEnabled: true,
     multiPageEnabled: true,
+    pdfDownloadEnabled: true,
   },
 };
 

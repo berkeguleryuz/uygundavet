@@ -72,10 +72,11 @@ export function DashboardList({ designs: initial, locale, publicBase }: Props) {
         if (d.status === "published") acc.published += 1;
         else acc.draft += 1;
         acc.guests += d.guestCount;
-        // RSVP yanıt toplamı sadece okuma yetkisi olan tier'lardan
-        // toplanır. Free davetlerin RSVP'leri summary'de gözükmez,
-        // kullanıcı yanıtları görmek için upgrade etmedi.
-        if (planLimitsFor(d.tier).rsvpReadEnabled) {
+        // RSVP yanıt toplamı: sayıyı görmeye yetkili tier'lardan
+        // toplanır. Klasik tier sayıyı görür (rsvpCountEnabled),
+        // detay listesi için Pro+ gerek (rsvpReadEnabled). Free
+        // hiçbir RSVP datası göremez.
+        if (planLimitsFor(d.tier).rsvpCountEnabled) {
           acc.rsvpHeads += d.rsvpYesHeads;
         }
         acc.memories += d.memoryCount;
@@ -310,7 +311,7 @@ function DesignCard({
   // QuickAction grid below need it to navigate to the upgrade screen.
   const router = useRouter();
   const handle = d.vanityPath ?? d.slug;
-  const publicUrl = `${publicBase}/i/${handle}`;
+  const publicUrl = `${publicBase}/davetiyem/${handle}`;
   const isPublished = d.status === "published";
 
   const wedding = d.weddingIso ? new Date(d.weddingIso) : null;
@@ -400,7 +401,7 @@ function DesignCard({
             title="Bağlantıyı kopyala"
           >
             <Copy className="size-3.5 shrink-0" />
-            <span className="truncate font-mono">/i/{handle}</span>
+            <span className="truncate font-mono">/davetiyem/{handle}</span>
           </button>
         </div>
 

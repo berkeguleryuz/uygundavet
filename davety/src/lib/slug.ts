@@ -13,13 +13,17 @@ const RESERVED = new Set([
   "api",
   "design",
   "dashboard",
+  "davetiyem",
   "login",
   "signup",
   "logout",
   "auth",
-  "i",
   "public",
   "static",
+  "pricing",
+  "fiyatlandirma",
+  "davetiye-galerisi",
+  "zarf",
 ]);
 
 export function validateVanityPath(vanity: string): {

@@ -30,7 +30,7 @@ export default async function proxy(request: NextRequest) {
 
   // Custom domain resolver. When the request host is not one of our
   // canonical app hosts, we look it up in the InvitationDesign table
-  // and rewrite the URL to /i/[slug] so the existing public render
+  // and rewrite the URL to /davetiyem/[slug] so the existing public render
   // page handles the request. We rewrite (not redirect) so the user
   // keeps seeing their own domain in the address bar.
   if (host && !isCanonicalHost(host) && request.nextUrl.pathname === "/") {
@@ -43,7 +43,7 @@ export default async function proxy(request: NextRequest) {
       if (design && design.status !== "archived") {
         const target = design.vanityPath ?? design.slug;
         const url = request.nextUrl.clone();
-        url.pathname = `/${routing.defaultLocale}/i/${target}`;
+        url.pathname = `/${routing.defaultLocale}/davetiyem/${target}`;
         return NextResponse.rewrite(url);
       }
     } catch (err) {

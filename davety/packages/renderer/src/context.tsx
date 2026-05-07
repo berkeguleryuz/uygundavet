@@ -11,7 +11,7 @@ export interface RendererContextValue {
   startIso?: string;
   /** Public share URL of the invitation, embedded in calendar invites. */
   publicUrl?: string;
-  /** Personalised guest token, when the visitor came in via /i/[slug]/[token]. */
+  /** Personalised guest token, when the visitor came in via /davetiyem/[slug]/[token]. */
   guestToken?: string;
 }
 

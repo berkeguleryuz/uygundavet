@@ -18,13 +18,13 @@ export const dynamic = "force-dynamic";
 /**
  * Personalised public invitation route.
  *
- *   /[locale]/i/[slug]/[token]
+ *   /[locale]/davetiyem/[slug]/[token]
  *
  * Looks up the guest by `(designId, token)`. When the token is invalid
  * or doesn't belong to the design we drop the token and fall back to
  * the base invitation (or to home if even the slug doesn't exist).
  * Leaked tokens can still be revoked by deleting the Guest row, the
- * fallback to /i/[slug] just gives a friendlier UX than 404.
+ * fallback to /davetiyem/[slug] just gives a friendlier UX than 404.
  */
 export default async function PersonalisedInvitationPage({
   params,
@@ -34,7 +34,7 @@ export default async function PersonalisedInvitationPage({
   const { locale, slug, token } = await params;
   setRequestLocale(locale);
 
-  if (!isValidGuestToken(token)) redirect(`/i/${slug}`);
+  if (!isValidGuestToken(token)) redirect(`/davetiyem/${slug}`);
 
   const design = await prisma.invitationDesign.findFirst({
     where: { OR: [{ slug }, { vanityPath: slug }] },
@@ -62,7 +62,7 @@ export default async function PersonalisedInvitationPage({
       eventDays: true,
     },
   });
-  if (!guest) redirect(`/i/${design.slug}`);
+  if (!guest) redirect(`/davetiyem/${design.slug}`);
 
   if (design.archivedAt) {
     return (

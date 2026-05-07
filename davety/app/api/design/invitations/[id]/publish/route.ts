@@ -258,8 +258,8 @@ export async function POST(req: Request, ctx: { params: Params }) {
   }
 
   const shareUrl = updated.vanityPath
-    ? `/i/${updated.vanityPath}`
-    : `/i/${updated.slug}`;
+    ? `/davetiyem/${updated.vanityPath}`
+    : `/davetiyem/${updated.slug}`;
 
   return NextResponse.json({
     ok: true,

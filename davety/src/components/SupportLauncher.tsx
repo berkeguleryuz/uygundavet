@@ -16,7 +16,7 @@ import { SupportWidget } from "./SupportWidget";
  * noktası. Hover'da hafif scale up.
  *
  * Görünmez kalması gereken yerler:
- *   - Public davetiye sayfaları (/i/[slug] ve token'lı versiyonu),
+ *   - Public davetiye sayfaları (/davetiyem/[slug] ve token'lı versiyonu),
  *     misafirler envelope animasyonunu görüyor, üstüne chat
  *     butonu binmesin.
  *   - Editor canvas'ı (/design/invitations/[id]/editor), zaten kendi

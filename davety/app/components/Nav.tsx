@@ -28,7 +28,7 @@ const HIDDEN_ON = [
   "/signup",
   "/design/invitations/", // editor + save screens own the viewport
   "/admin",
-  "/i/", // public invitation view
+  "/davetiyem/", // public invitation view
 ];
 
 export function Nav() {

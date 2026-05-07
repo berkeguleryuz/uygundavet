@@ -94,7 +94,7 @@ const FEATURES: FeatureRow[] = [
     section: "Tasarım",
     label: "Renk & yazı özelleştirme",
     description: "Tema, font ve renk düzenleme",
-    values: { free: "Kısıtlı", basic: true, pro: true, premium: true },
+    values: { free: true, basic: true, pro: true, premium: true },
   },
   {
     section: "Tasarım",
@@ -119,7 +119,7 @@ const FEATURES: FeatureRow[] = [
     section: "Misafir Etkileşimi",
     label: "Katılım formu (RSVP)",
     description: "Misafirler katılım gönderebilir",
-    values: { free: true, basic: true, pro: true, premium: true },
+    values: { free: false, basic: true, pro: true, premium: true },
   },
   {
     section: "Misafir Etkileşimi",
@@ -137,21 +137,26 @@ const FEATURES: FeatureRow[] = [
     section: "Misafir Etkileşimi",
     label: "Misafir listesi & takip",
     description: "RSVP yanıtlarını dashboardda gör",
-    values: { free: false, basic: true, pro: true, premium: true },
+    values: {
+      free: false,
+      basic: "Sadece sayı",
+      pro: true,
+      premium: true,
+    },
   },
 
   // Yayın
   {
     section: "Yayın & Marka",
     label: "davetyolla.com altında link",
-    description: "davetyolla.com/i/your-wedding",
+    description: "davetyolla.com/davetiyem/your-wedding",
     values: { free: true, basic: true, pro: true, premium: true },
   },
   {
     section: "Yayın & Marka",
     label: "Özel kısa link",
-    description: "davetyolla.com/your-name",
-    values: { free: false, basic: true, pro: true, premium: true },
+    description: "davetyolla.com/davetiyem/cift-adi",
+    values: { free: false, basic: false, pro: true, premium: true },
   },
   {
     section: "Yayın & Marka",
@@ -171,32 +176,11 @@ const FEATURES: FeatureRow[] = [
     description: "ornek.com gibi özel domain",
     values: { free: false, basic: false, pro: false, premium: true },
   },
-
-  // Premium Avantajları, VIP şablon yerine ayırt edici Premium-özel
-  // value-add'lar. Tablonun fiyat farkını haklı çıkaran somut feature'lar.
   {
-    section: "Premium Avantajları",
-    label: "AI metin asistanı",
-    description: "Davet metnini AI ile yaz, üç dile çevir",
-    values: { free: false, basic: false, pro: false, premium: true },
-  },
-  {
-    section: "Premium Avantajları",
-    label: "Yüksek çözünürlüklü PDF",
+    section: "Yayın & Marka",
+    label: "PDF olarak indir",
     description: "Baskı kalitesinde davetiye çıktısı",
-    values: { free: false, basic: false, pro: false, premium: true },
-  },
-  {
-    section: "Premium Avantajları",
-    label: "Misafir okundu raporu",
-    description: "Davetiyeyi kim ne zaman açtı görsele dök",
-    values: { free: false, basic: false, pro: false, premium: true },
-  },
-  {
-    section: "Premium Avantajları",
-    label: "Süresiz davetiye arşivi",
-    description: "Diğer paketlerde 30-365 gün sonra arşivlenir",
-    values: { free: false, basic: false, pro: false, premium: true },
+    values: { free: false, basic: true, pro: true, premium: true },
   },
 
   // Destek

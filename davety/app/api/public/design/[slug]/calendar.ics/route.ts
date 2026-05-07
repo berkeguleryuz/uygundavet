@@ -75,7 +75,7 @@ export async function GET(req: Request, ctx: { params: Params }) {
     title,
     startLocalIso,
     location,
-    url: `https://davetyolla.com/i/${design.slug}`,
+    url: `https://davetyolla.com/davetiyem/${design.slug}`,
   });
 
   return new NextResponse(ics, {
