@@ -98,7 +98,16 @@ export type HeroVariant =
   | "floral-crown"
   | "monogram-circle"
   | "bold-type"
-  | "botanical-frame";
+  | "botanical-frame"
+  /** Görsel kart-genelinde tam arka plan, hero sadece text. Variant
+   *  seçilince theme.bgImageUrl otomatik atanır (UI tarafı). */
+  | "card-bg"
+  /** İki kolon: solda görsel, sağda metin (mobil tek sütun). */
+  | "side-photo"
+  /** Vintage polaroid kart, görsel üstte, alt kenarda metin caption. */
+  | "polaroid"
+  /** Görsel zarif çerçeve içinde, isimler aşağıda. */
+  | "frame-photo";
 
 export interface HeroData {
   brideName: string;
@@ -289,6 +298,7 @@ export interface ContactData {
   venueName?: string;
   venueAddress?: string;
   phone?: string;
+  email?: string;
 }
 
 export interface FooterData {

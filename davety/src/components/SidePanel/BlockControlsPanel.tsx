@@ -13,6 +13,7 @@ import {
   ArrowUp,
   ArrowDown,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DECORATION_ICONS, DECORATION_CATEGORIES } from "@davety/renderer";
@@ -20,6 +21,7 @@ import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { useConfirm } from "@/src/components/ConfirmDialog";
+import { PresetMediaPicker } from "@/src/components/PresetMediaPicker";
 import { SpacingControl } from "./controls/SpacingControl";
 import { FocalPointPicker } from "./controls/FocalPointPicker";
 import { DECORATION_TEMPLATE_CATEGORIES } from "@/src/components/decorations/templateManifest";
@@ -33,6 +35,7 @@ export function BlockControlsPanel() {
   const toggleVisibility = useEditorStore((s) => s.toggleVisibility);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
   const updateBlockStyle = useEditorStore((s) => s.updateBlockStyle);
+  const updateTheme = useEditorStore((s) => s.updateTheme);
   const moveBlock = useEditorStore((s) => s.moveBlock);
   const deleteBlock = useEditorStore((s) => s.deleteBlock);
   const blockId = useUIStore((s) => s.selectedBlockId);
@@ -41,6 +44,7 @@ export function BlockControlsPanel() {
   const confirm = useConfirm();
 
   const { pick, busy: uploading } = useAssetUpload(docId);
+  const [presetPickerOpen, setPresetPickerOpen] = useState(false);
 
   if (!doc || !blockId) return null;
   const block = doc.blocks.find((b) => b.id === blockId);
@@ -129,7 +133,35 @@ export function BlockControlsPanel() {
       {block.type === "hero" ? (
         <HeroVariantPicker
           value={(block.data as { variant?: string }).variant ?? "classic"}
-          onChange={(variant) => updateBlockData(blockId, { variant })}
+          onChange={(variant) => {
+            const prevVariant =
+              (block.data as { variant?: string }).variant ?? "classic";
+            updateBlockData(blockId, { variant });
+            const data = block.data as {
+              media?: { url?: string };
+              photoUrl?: string;
+            };
+            const url = data.media?.url ?? data.photoUrl;
+            // "Tam Arka Plan" seçildiğinde hero'nun mevcut görselini
+            // otomatik kart-genelinde bgImage olarak set et — bu
+            // variant zaten "görsel kartı kaplasın, hero text'i
+            // overlay" anlamına geliyor, manuel ek tıklama gerekmesin.
+            if (variant === "card-bg" && url) {
+              updateTheme({ bgImageUrl: url });
+            }
+            // card-bg'den farklı bir variant'a geçilirken, theme.bgImageUrl
+            // hâlâ hero'nun görseliyle aynıysa temizle. Yani auto-set
+            // olduğunu varsay (kullanıcı kasıtlı başka bir bgImage
+            // seçtiyse o farklı URL'de olur, dokunmuyoruz).
+            if (
+              prevVariant === "card-bg" &&
+              variant !== "card-bg" &&
+              doc.theme.bgImageUrl &&
+              doc.theme.bgImageUrl === url
+            ) {
+              updateTheme({ bgImageUrl: undefined });
+            }
+          }}
         />
       ) : null}
 
@@ -146,13 +178,45 @@ export function BlockControlsPanel() {
           photoHeight?: number;
           variant?: string;
         };
-        const hasMedia = !!(data.media?.url || data.photoUrl);
+        const heroImageUrl = data.media?.url ?? data.photoUrl;
+        const hasMedia = !!heroImageUrl;
         if (!hasMedia) return null;
         // Yükseklik slider'ı sadece photo-top varyantında anlamlı,
         // photo-full zaten tam ekran, arch'ın görsel alanı yok.
         const showHeightSlider = data.variant === "photo-top";
+        // Bu görsel zaten kart arka planı mı? Eğer öyleyse buton
+        // "Arka Planı Kaldır"'a dönüşür ve kullanıcı tek tıkla geri
+        // alabilir. Farklı bir görsel arka plansa (eski set), normal
+        // "Arka Plan Yap" davranışı.
+        const isCurrentBg = doc.theme.bgImageUrl === heroImageUrl;
         return (
           <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (isCurrentBg) {
+                  updateTheme({ bgImageUrl: undefined });
+                  toast.success("Kart arka planı kaldırıldı");
+                } else {
+                  updateTheme({ bgImageUrl: heroImageUrl });
+                  toast.success("Görsel kart arka planı oldu", {
+                    description:
+                      "Tasarım sekmesinden overlay yoğunluğunu ayarlayabilirsin",
+                  });
+                }
+              }}
+              className={`inline-flex items-center justify-center gap-1.5 rounded-md text-xs font-chakra uppercase tracking-[0.12em] px-3 py-2.5 cursor-pointer transition ${
+                isCurrentBg
+                  ? "bg-muted text-foreground border border-border hover:bg-muted/70"
+                  : "bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100"
+              }`}
+            >
+              <Sparkles className="size-3.5" />
+              {isCurrentBg
+                ? "Kart Arka Planından Kaldır"
+                : "Bu Görseli Kart Arka Planı Yap"}
+            </button>
+
             <div className="flex flex-col gap-1.5">
               <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
                 Görsel Odak Noktası
@@ -282,12 +346,22 @@ export function BlockControlsPanel() {
           onClick={() => selectField(blockId, "*")}
         />
         {supportsMedia ? (
-          <Chip
-            icon={<ImageIcon className="size-4" />}
-            label={uploading ? "..." : t("uploadMedia")}
-            onClick={handleUpload}
-            disabled={uploading}
-          />
+          <>
+            <Chip
+              icon={<ImageIcon className="size-4" />}
+              label={uploading ? "..." : t("uploadMedia")}
+              onClick={handleUpload}
+              disabled={uploading}
+            />
+            {/* Hazır görsel havuzu (/public/template-images/). Kendi
+                yüklemek istemeyen kullanıcı için curated seçim, tek
+                tıkla MediaRef olarak block'a uygulanır. */}
+            <Chip
+              icon={<Sparkles className="size-4" />}
+              label="Hazır Görsel"
+              onClick={() => setPresetPickerOpen(true)}
+            />
+          </>
         ) : (
           <Chip
             icon={<ImageIcon className="size-4" />}
@@ -309,6 +383,89 @@ export function BlockControlsPanel() {
         paddingBottom={block.style.paddingBottom}
         onChange={(patch) => updateBlockStyle(blockId, patch)}
       />
+
+      {/* Bağış bloğu için IBAN giriş alanı. Renderer iban set olduğunda
+          kopyala butonlu kart, set değilken gizli/placeholder gösteriyor.
+          Burada düz input + kopyala butonu (test için), live'da
+          render zaten kopyala-edebilir kutucuk. */}
+      {block.type === "donation" ? (
+        <div className="flex flex-col gap-2 pt-3 mt-1 border-t border-border">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+            IBAN
+          </div>
+          <p className="text-[10px] text-muted-foreground leading-snug -mt-1">
+            Misafirlerin tek tıkla kopyalayabileceği IBAN. Boş bırakırsan
+            bağış kutusu gizlenir.
+          </p>
+          <input
+            type="text"
+            value={(block.data as { iban?: string }).iban ?? ""}
+            onChange={(e) =>
+              updateBlockData(blockId, { iban: e.target.value })
+            }
+            placeholder="TR00 0000 0000 0000 0000 0000 00"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+        </div>
+      ) : null}
+
+      {/* Aksiyon butonları (Katılım Bilgisi, Hatıra Bırak) için
+          inline renk kontrolleri. Theme-level actionButtonBg/Text
+          yazar; tüm aksiyon butonları aynı tasarım dilinde kalsın
+          diye tek noktadan ayarlanır. Tasarım sekmesinde de aynı
+          alan var, ama kullanıcı RSVP/Memory bloğu seçiliyken oraya
+          gitmek zorunda kalmasın diye burada da gösteriyoruz. */}
+      {block.type === "rsvp_form" || block.type === "memory_book" ? (
+        <div className="flex flex-col gap-2 pt-3 mt-1 border-t border-border">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+            Buton Rengi
+          </div>
+          <p className="text-[10px] text-muted-foreground leading-snug -mt-1">
+            Tüm aksiyon butonlarına uygulanır (Katılım, Hatıra).
+          </p>
+          <div className="space-y-2">
+            <ColorRowInline
+              label="Arka Plan"
+              value={doc.theme.actionButtonBg ?? doc.theme.accentColor}
+              onChange={(v) => updateTheme({ actionButtonBg: v })}
+            />
+            <ColorRowInline
+              label="Metin"
+              value={doc.theme.actionButtonText ?? doc.theme.bgColor}
+              onChange={(v) => updateTheme({ actionButtonText: v })}
+            />
+          </div>
+          {doc.theme.actionButtonBg || doc.theme.actionButtonText ? (
+            <button
+              type="button"
+              onClick={() =>
+                updateTheme({
+                  actionButtonBg: undefined,
+                  actionButtonText: undefined,
+                })
+              }
+              className="self-start text-[10px] underline text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              Tema renklerine sıfırla
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {presetPickerOpen ? (
+        <PresetMediaPicker
+          onClose={() => setPresetPickerOpen(false)}
+          onPick={(media) => {
+            // Hero için media field, gallery için items array'ine push.
+            if (block.type === "hero") {
+              updateBlockData(blockId, { media });
+            } else if (block.type === "gallery") {
+              const existing = (block.data as { items?: unknown[] }).items ?? [];
+              updateBlockData(blockId, { items: [...existing, media] });
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -360,7 +517,11 @@ const HERO_VARIANTS: { key: string; label: string }[] = [
   { key: "classic", label: "Klasik" },
   { key: "arch", label: "Arch" },
   { key: "photo-top", label: "Foto-Üst" },
-  { key: "photo-full", label: "Tam Foto" },
+  { key: "photo-full", label: "Büyük Foto" },
+  { key: "card-bg", label: "Tam Arka Plan" },
+  { key: "side-photo", label: "Yan Foto" },
+  { key: "polaroid", label: "Polaroid" },
+  { key: "frame-photo", label: "Çerçeve" },
   { key: "floral-crown", label: "Çiçek Taç" },
   { key: "monogram-circle", label: "Monogram" },
   { key: "bold-type", label: "Büyük Yazı" },
@@ -751,5 +912,40 @@ function PanelIconBtn({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Side panel'in dar genişliğine uyumlu kompakt color row. DesignTab'taki
+ * ColorRow'un mini versiyonu (label solda, swatch + hex sağda). Aynı
+ * fonksiyonel davranış, daha az padding.
+ */
+function ColorRowInline({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="flex items-center justify-between gap-2 text-xs">
+      <span className="text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="size-7 rounded border border-border cursor-pointer overflow-hidden"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-20 rounded border border-border bg-background px-1.5 py-1 text-[11px] font-mono"
+        />
+      </div>
+    </label>
   );
 }

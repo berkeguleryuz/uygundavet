@@ -15,6 +15,7 @@ import {
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useConfirm } from "@/src/components/ConfirmDialog";
+import { getEventLabels } from "@/src/lib/event-labels";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
 import { cn } from "@/src/lib/utils";
@@ -79,12 +80,29 @@ export function Canvas() {
     // yayında görünmez). Bu UX kullanıcıyı denemeden alıkoymuyor.
     const entry = listBlockEntries().find((e) => e.type === type);
     if (!entry) return;
+    // Hero block için event kategorisine göre default isimleri uyarla.
+    // Düğün/nişan dışındaki etkinliklerde "Gelin & Damat" anlamsız
+    // (doğum günü, sünnet, business launch). secondName=null kategorilerde
+    // groomName boş başlar (kullanıcı dolduracak ya da boş kalacak,
+    // boşsa zaten render edilmez), brideName kategoriye uygun
+    // placeholder ile başlar.
+    let data = entry.defaultData as Record<string, unknown>;
+    if (entry.type === "hero") {
+      const cat = doc.meta.eventCategory;
+      const labels = getEventLabels(cat);
+      const isCouple = labels.secondName !== null;
+      data = {
+        ...data,
+        brideName: isCouple ? "Gelin" : labels.firstName,
+        groomName: isCouple ? "Damat" : "",
+      };
+    }
     insertBlock(
       {
         id: nanoid(8),
         type: entry.type,
         visible: true,
-        data: entry.defaultData as Record<string, unknown>,
+        data,
         style: entry.defaultStyle,
       },
       index
@@ -121,7 +139,7 @@ export function Canvas() {
       </div>
 
       <div
-        className="mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
+        className="relative mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
         style={{
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
@@ -145,8 +163,34 @@ export function Canvas() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Card-wide bgImage + overlay. InvitationView ile aynı mantık,
+            editor canvas'ta da tutarlı render için burada da yer alır. */}
+        {doc.theme.bgImageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={doc.theme.bgImageUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              style={{ zIndex: 0 }}
+              aria-hidden
+            />
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                zIndex: 1,
+                background: "#000",
+                opacity: (doc.theme.bgImageOverlay ?? 40) / 100,
+              }}
+              aria-hidden
+            />
+          </>
+        ) : null}
         <FontBoot doc={doc} />
 
+        {/* Block stack bgImage + overlay'in üstünde durur. Sarmalayıcı
+            relative + z-index ile content'i ön plana çıkarır. */}
+        <div className="relative" style={{ zIndex: 2 }}>
         {doc.blocks.map((block, i) => {
           const View = getBlockView(block.type);
           const selected = selectedBlockId === block.id;
@@ -283,6 +327,7 @@ export function Canvas() {
             </div>
           );
         })}
+        </div>
 
       </div>
 
@@ -324,7 +369,10 @@ function IconBtn({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "bg-card border border-border rounded-md p-1.5 shadow cursor-pointer hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed",
+        // text-foreground açıkça set edilmeli, aksi halde block içeriği
+        // text-white ise (hero photo-full vb.) ikonlar beyaz bg üstünde
+        // beyaz olarak inherit edip görünmez kalıyordu.
+        "bg-card text-foreground border border-border rounded-md p-1.5 shadow cursor-pointer hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed",
         !disabled && danger && "hover:bg-destructive hover:text-destructive-foreground"
       )}
     >

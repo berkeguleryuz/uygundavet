@@ -1,7 +1,10 @@
 "use client";
 
-import { Wand2, Check } from "lucide-react";
+import { useState } from "react";
+import { Wand2, Check, ImageIcon, Sparkles, Trash2 } from "lucide-react";
 import { useEditorStore } from "@/src/store/editor-store";
+import { useAssetUpload } from "@/src/hooks/useAssetUpload";
+import { PresetMediaPicker } from "@/src/components/PresetMediaPicker";
 
 interface Preset {
   name: string;
@@ -109,8 +112,11 @@ function hslToHex(h: number, s: number, l: number): string {
 
 export function DesignTab() {
   const theme = useEditorStore((s) => s.doc?.theme);
+  const docId = useEditorStore((s) => s.docId);
   const applyPatch = useEditorStore((s) => s.applyPatch);
   const updateTheme = useEditorStore((s) => s.updateTheme);
+  const { pick: uploadAsset, busy: uploading } = useAssetUpload(docId);
+  const [presetPickerOpen, setPresetPickerOpen] = useState(false);
 
   if (!theme) return null;
 
@@ -228,6 +234,143 @@ export function DesignTab() {
           Zarf ve kapak renkleri için &quot;Zarf Tasarımı&quot; sekmesini kullan.
         </p>
       </div>
+
+      {/* Aksiyon butonları (Katılım Bilgisi, Hatıra Bırak gibi solid
+          dolgulu butonlar) için ayrı renk kontrolleri. Default'ta theme
+          accent + bg kullanılır, ama bgImage'lı kartlarda kontrast
+          kaybolabildiği için override imkanı veriyoruz. Set edilince
+          tüm RSVP/MemoryBook butonları beraber bu renkleri kullanır. */}
+      <div>
+        <h3 className="text-sm font-medium mb-2">Buton Renkleri</h3>
+        <p className="text-[11px] text-muted-foreground mb-2 leading-snug">
+          Katılım ve Hatıra butonları için. Boş bırakırsan tema renklerini
+          kullanır.
+        </p>
+        <div className="space-y-2">
+          <ColorRow
+            label="Buton Arka Plan"
+            value={theme.actionButtonBg ?? theme.accentColor}
+            onChange={(v) => updateTheme({ actionButtonBg: v })}
+          />
+          <ColorRow
+            label="Buton Metni"
+            value={theme.actionButtonText ?? theme.bgColor}
+            onChange={(v) => updateTheme({ actionButtonText: v })}
+          />
+        </div>
+        {theme.actionButtonBg || theme.actionButtonText ? (
+          <button
+            type="button"
+            onClick={() =>
+              updateTheme({
+                actionButtonBg: undefined,
+                actionButtonText: undefined,
+              })
+            }
+            className="mt-2 text-[11px] underline text-muted-foreground hover:text-foreground cursor-pointer"
+          >
+            Tema renklerine sıfırla
+          </button>
+        ) : null}
+      </div>
+
+      {/* Card-wide arka plan görseli. Kullanıcı kendi görselini
+          yükleyebilir veya curated havuzdan seçebilir. Set edildiğinde
+          tüm bloklar bu görselin üstünde render edilir, overlay slider
+          ile metin okunabilirliği ayarlanır. */}
+      <div>
+        <h3 className="text-sm font-medium mb-2">Kart Arka Plan Görseli</h3>
+        <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+          Tüm kartı kaplayan bir arka plan görseli ekle. Hero bloğunun
+          değil, davetiyenin tamamının arkasına gelir.
+        </p>
+
+        {theme.bgImageUrl ? (
+          <div className="space-y-3">
+            <div className="relative aspect-[3/4] rounded-md overflow-hidden border border-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={theme.bgImageUrl}
+                alt="Arka plan önizleme"
+                className="w-full h-full object-cover"
+              />
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: "#000",
+                  opacity: (theme.bgImageOverlay ?? 40) / 100,
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                updateTheme({ bgImageUrl: undefined, bgImageOverlay: 40 })
+              }
+              className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-border text-foreground text-xs px-3 py-2 hover:bg-muted cursor-pointer"
+            >
+              <Trash2 className="size-3.5" /> Görseli Kaldır
+            </button>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] text-muted-foreground">
+                  Karanlık Overlay
+                </span>
+                <span className="text-[11px] font-mono">
+                  {theme.bgImageOverlay ?? 40}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={90}
+                step={5}
+                value={theme.bgImageOverlay ?? 40}
+                onChange={(e) =>
+                  updateTheme({ bgImageOverlay: Number(e.target.value) })
+                }
+                className="w-full"
+              />
+              <p className="mt-1 text-[10px] text-muted-foreground leading-snug">
+                Metnin okunabilirliği için. Daha karanlık = daha iyi okunur.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={async () => {
+                const media = await uploadAsset("image/*");
+                if (media?.url) {
+                  updateTheme({ bgImageUrl: media.url });
+                }
+              }}
+              className="inline-flex flex-col items-center gap-1 rounded-md border border-border px-3 py-3 text-xs hover:bg-muted disabled:opacity-50 cursor-pointer"
+            >
+              <ImageIcon className="size-4" />
+              <span>{uploading ? "..." : "Görsel Yükle"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPresetPickerOpen(true)}
+              className="inline-flex flex-col items-center gap-1 rounded-md border border-border px-3 py-3 text-xs hover:bg-muted cursor-pointer"
+            >
+              <Sparkles className="size-4" />
+              <span>Hazır Görsel</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {presetPickerOpen ? (
+        <PresetMediaPicker
+          onClose={() => setPresetPickerOpen(false)}
+          onPick={(media) => updateTheme({ bgImageUrl: media.url })}
+        />
+      ) : null}
 
     </div>
   );

@@ -105,10 +105,13 @@ export function MemoryBookView({
             onClick={() => !editable && setOpen(true)}
             className="inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90 transition-opacity"
             style={{
-              // RSVP butonu ile aynı temaya uygun renklendirme,
-              // arkaplan accent rengi, metin sayfa rengi (kontrast).
-              background: theme.accentColor,
-              color: theme.bgColor,
+              // RSVP butonu ile aynı temaya uygun renklendirme.
+              // Theme'deki actionButtonBg/Text override'ı varsa onu
+              // kullan, yoksa accent/bg fallback. bgImage'lı kartlarda
+              // varsayılanlar okunmaz olabilir, kullanıcı override'larsa
+              // bütün aksiyon butonları beraber değişir.
+              background: theme.actionButtonBg ?? theme.accentColor,
+              color: theme.actionButtonText ?? theme.bgColor,
             }}
           >
             Hatıra Bırak

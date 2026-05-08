@@ -48,6 +48,22 @@ export const themeSchema = z.object({
   pageBgColor: z.string().default("#252224"),
   /** Outer card top silhouette. Defaults to flat (square corners). */
   cardShape: cardShapeSchema.default("flat"),
+  /** Tüm kartı kaplayan arka plan görseli (URL). Set edildiğinde
+   *  InvitationView image'i absolute fill olarak render eder, tüm
+   *  blokların arkasında görünür. bgColor altta kalır (image
+   *  overlay'lendiyse). */
+  bgImageUrl: z.string().optional(),
+  /** Arka plan görselinin üzerine eklenen koyu overlay yoğunluğu
+   *  (0-100). 0 = overlay yok, 100 = tamamen koyu. Default 40, metin
+   *  okunabilirliği için. */
+  bgImageOverlay: z.number().min(0).max(100).default(40),
+  /** Aksiyon butonları (RSVP, Anı Defteri, vb. solid bg butonlar) için
+   *  arka plan rengi override'ı. Set edilmediğinde accentColor kullanılır.
+   *  bgImage ile zenginleştirilmiş kartlarda accent/bg renklerinin
+   *  buton üzerinde okunmaz olduğu durumlar için. */
+  actionButtonBg: z.string().optional(),
+  /** Aksiyon butonlarının metin rengi. Set edilmediğinde bgColor kullanılır. */
+  actionButtonText: z.string().optional(),
   pattern: z.string().optional(),
   bgMusicUrl: z.string().optional(),
   envelope: envelopeThemeSchema.default({

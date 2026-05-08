@@ -55,15 +55,36 @@ export function DonationView({
       ) : null}
 
       {iban ? (
-        <div className="max-w-md mx-auto border border-current/20 rounded-md p-4 flex items-center justify-between gap-3">
-          <code className="text-sm font-chakra break-all">{iban}</code>
-          <button
-            onClick={handleCopy}
-            className="shrink-0 text-xs px-3 py-1.5 rounded-full bg-current/10 hover:bg-current/20"
-          >
+        /* Tüm IBAN kartı bir button — kullanıcı kartın herhangi bir yerine
+           tıklayınca clipboard'a kopyalanır. Köşedeki "Kopyala" rozeti
+           hala görsel ipucu için duruyor, gerçek tetikleyici button'un
+           kendisi. Editor'de (editable=true) kopya devre dışı, yoksa
+           canvas'ta düzenleme tıklamalarına çakışırdı. */
+        <button
+          type="button"
+          onClick={editable ? undefined : handleCopy}
+          aria-label={copied ? "IBAN kopyalandı" : "IBAN'ı kopyala"}
+          className={`max-w-md mx-auto w-full border border-current/20 rounded-md p-4 flex items-center justify-between gap-3 text-left transition ${
+            editable
+              ? "cursor-default"
+              : "cursor-pointer hover:bg-current/5 active:scale-[0.99]"
+          }`}
+        >
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
+              IBAN
+            </span>
+            <code className="text-sm font-chakra break-all">{iban}</code>
+            {!editable ? (
+              <span className="text-[10px] opacity-50 mt-1">
+                Tıkla, panoya kopyalansın
+              </span>
+            ) : null}
+          </div>
+          <span className="shrink-0 text-xs px-3 py-1.5 rounded-full bg-current/10">
             {copied ? "Kopyalandı" : "Kopyala"}
-          </button>
-        </div>
+          </span>
+        </button>
       ) : (
         <div className="text-sm opacity-50 italic">IBAN eklenmedi</div>
       )}

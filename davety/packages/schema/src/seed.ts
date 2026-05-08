@@ -229,6 +229,28 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
           : "Use this space for any extra information or special requests.",
       },
     },
+
+    // 12. CONTACT, davet sahibi ile iletişim. Davetiyenin altında
+    // sabit slot, kullanıcı kendi maili / telefonuyla değiştirebilir
+    // ama default olarak DavetYolla destek bilgileri gelir; kullanıcı
+    // editi unuttuğunda misafirler en azından bizimle iletişime
+    // geçebilir.
+    {
+      id: nanoid(8),
+      type: "contact",
+      visible: true,
+      style: { align: "center" },
+      data: {
+        venueName: tr ? "İletişim" : de ? "Kontakt" : "Contact",
+        venueAddress: tr
+          ? "Sorularınız için bize ulaşabilirsiniz."
+          : de
+          ? "Bei Fragen erreichen Sie uns."
+          : "Get in touch for any questions.",
+        phone: "+90 554 678 97 80",
+        email: "davet@davetyolla.com",
+      },
+    },
     // (Önceden burada hardcoded "davety.app" footer'ı vardı; tanıtım
     // bloğu artık sadece free tier için yayınlama anında 4. sıraya
     // injekt ediliyor, burada bir daha çıkmıyor.)

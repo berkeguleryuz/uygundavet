@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { X, Eye, Save, Star, Undo2, Redo2 } from "lucide-react";
+import { X, Eye, Save, Star, Undo2, Redo2, Sparkles } from "lucide-react";
 import type { Block, CountdownData, InvitationDoc } from "@davety/schema";
 import { useRouter } from "@/i18n/navigation";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useDebouncedAutosave } from "@/src/hooks/useDebouncedAutosave";
 import { useManualSave } from "@/src/hooks/useManualSave";
+import { useIsAdmin } from "@/src/hooks/useIsAdmin";
 import { ConfirmProvider, useConfirm } from "./ConfirmDialog";
 import { HeaderCountdown } from "./HeaderCountdown";
 import { Canvas } from "./Canvas";
@@ -17,6 +18,7 @@ import { MobileSidePanel } from "./MobileSidePanel";
 import { MobileHintBar } from "./MobileHintBar";
 import { OnboardingFlow } from "./OnboardingFlow";
 import { PreviewOverlay } from "./PreviewOverlay";
+import { SaveTemplateModal } from "./SaveTemplateModal";
 
 interface DesignerShellProps {
   docId: string;
@@ -50,6 +52,8 @@ function DesignerShellInner({
   const futureLen = useEditorStore((s) => s.future.length);
   const togglePreview = useUIStore((s) => s.togglePreview);
   const { save, saving } = useManualSave();
+  const isAdmin = useIsAdmin();
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   useEffect(() => {
     hydrate({ docId, doc: initialDoc, updatedAt: initialUpdatedAt });
@@ -129,6 +133,21 @@ function DesignerShellInner({
           >
             <X className="size-4" />
           </button>
+          {/* Admin için "Şablon Olarak Kaydet" kısayolu. Kullanıcının
+              tasarladığı mevcut doc'u DesignTemplate'e push eder, daha
+              sonra /admin/templates'den preview ekleyip yayınlanır.
+              Sadece isAdminSession() true olan kullanıcılarda render
+              edilir, normal kullanıcılar bu butonu görmez. */}
+          {isAdmin ? (
+            <button
+              onClick={() => setTemplateModalOpen(true)}
+              title="Şablon Olarak Kaydet"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 text-amber-700 px-2.5 py-1 text-[11px] font-chakra uppercase tracking-[0.12em] hover:bg-amber-100 cursor-pointer"
+            >
+              <Sparkles className="size-3.5" />
+              <span className="hidden sm:inline">Şablon Kaydet</span>
+            </button>
+          ) : null}
           <span className="text-sm font-medium truncate">
             {t("stepTitle")}
           </span>
@@ -218,6 +237,15 @@ function DesignerShellInner({
       />
       <OnboardingFlow docId={docId} />
       <PreviewOverlay />
+      {/* SaveTemplateModal sadece admin için + sadece açıkken mount.
+          Modal her açılışta fresh state'le başlasın diye conditional
+          render. AnimatePresence onExitComplete unmount'u tetikler. */}
+      {isAdmin && templateModalOpen ? (
+        <SaveTemplateModal
+          onClose={() => setTemplateModalOpen(false)}
+          doc={doc}
+        />
+      ) : null}
     </div>
   );
 }

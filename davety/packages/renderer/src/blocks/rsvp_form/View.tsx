@@ -135,12 +135,14 @@ export function RsvpFormView({
         }}
         className="inline-flex items-center justify-center rounded-full px-8 py-3 text-xs font-chakra uppercase tracking-[0.2em] cursor-pointer hover:opacity-90 transition-opacity"
         style={{
-          // Read from theme directly so the button always contrasts with
-          // the section. Earlier we used `bg-current text-white` which
-          // collapsed to a near-invisible button on light themes (current
-          // resolved to the cream accent and white text disappeared).
-          background: theme.accentColor,
-          color: theme.bgColor,
+          // Buton rengi öncelik sırası:
+          // 1) field-level override (kullanıcı butona tıklayıp seçti)
+          // 2) theme.actionButtonBg / actionButtonText (genel buton stili)
+          // 3) accentColor / bgColor (varsayılan)
+          // bgImage'lı kartlarda 3. seçenek beyaz-üstü-beyaz gibi okunmaz
+          // sonuçlar verebildiği için 2. katman eklendi.
+          background: theme.actionButtonBg ?? theme.accentColor,
+          color: theme.actionButtonText ?? theme.bgColor,
           ...fieldStyle(block, "buttonLabel"),
         }}
       >

@@ -312,33 +312,53 @@ export function TextStylePanel() {
           (() => {
             const labels = getEventLabels(doc?.meta.eventCategory);
             const showSecond = labels.secondName !== null;
+            const groomValue = (block.data["groomName"] as string) ?? "";
             return (
-              <div className={showSecond ? "grid grid-cols-2 gap-2" : ""}>
-                <div>
-                  <label className="text-[11px] text-muted-foreground block mb-1">
-                    {labels.firstName}
-                  </label>
-                  <input
-                    value={(block.data["brideName"] as string) ?? ""}
-                    onChange={(e) =>
-                      updateBlockData(blockId, { brideName: e.target.value })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-                {showSecond ? (
+              <div className="flex flex-col gap-2">
+                <div className={showSecond ? "grid grid-cols-2 gap-2" : ""}>
                   <div>
                     <label className="text-[11px] text-muted-foreground block mb-1">
-                      {labels.secondName}
+                      {labels.firstName}
                     </label>
                     <input
-                      value={(block.data["groomName"] as string) ?? ""}
+                      value={(block.data["brideName"] as string) ?? ""}
                       onChange={(e) =>
-                        updateBlockData(blockId, { groomName: e.target.value })
+                        updateBlockData(blockId, { brideName: e.target.value })
                       }
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     />
                   </div>
+                  {showSecond ? (
+                    <div>
+                      <label className="text-[11px] text-muted-foreground block mb-1">
+                        {labels.secondName}
+                      </label>
+                      <input
+                        value={groomValue}
+                        onChange={(e) =>
+                          updateBlockData(blockId, { groomName: e.target.value })
+                        }
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                  ) : null}
+                </div>
+                {/* İkinci isim alanını temizle. Couple event'lerde
+                    bile (düğün/nişan) tek isimle çalışmak isteyenler
+                    için, non-couple event'lerde (doğum günü vs.) eski
+                    seed'den kalan "Damat" değerini silmek için.
+                    Boşsa link görünmez. Renderer groomName boşsa
+                    AndSpacer + ikinci satırı zaten gizliyor. */}
+                {groomValue.trim() ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateBlockData(blockId, { groomName: "" })
+                    }
+                    className="self-start text-[10px] underline text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    İkinci ismi kaldır
+                  </button>
                 ) : null}
               </div>
             );
@@ -550,6 +570,7 @@ const FIELD_LABELS: Record<string, string> = {
   venueAddress: "Mekan Adresi",
   mapUrl: "Harita Bağlantısı",
   phone: "Telefon",
+  email: "E-posta",
   iban: "IBAN",
   items: "Satırlar",
   prompt: "Soru / Yönlendirme",

@@ -7,7 +7,7 @@ export function ContactView({
   onFieldSelect,
 }: BlockViewProps<ContactData>) {
   const rootStyle = styleToCss(block.style);
-  const { venueName, venueAddress, phone } = block.data;
+  const { venueName, venueAddress, phone, email } = block.data;
 
   const click = (id: string) =>
     editable && onFieldSelect
@@ -60,6 +60,25 @@ export function ContactView({
             style={fieldStyle(block, "phone")}
           >
             {phone}
+          </a>
+        )
+      ) : null}
+      {email ? (
+        editable ? (
+          <span
+            {...click("email")}
+            className="inline-block mt-1.5 text-sm underline cursor-pointer hover:bg-yellow-100/30 rounded px-1"
+            style={fieldStyle(block, "email")}
+          >
+            {email}
+          </span>
+        ) : (
+          <a
+            href={`mailto:${email}`}
+            className="inline-block mt-1.5 text-sm underline"
+            style={fieldStyle(block, "email")}
+          >
+            {email}
           </a>
         )
       ) : null}

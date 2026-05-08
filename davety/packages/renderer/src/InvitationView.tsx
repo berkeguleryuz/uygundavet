@@ -180,7 +180,7 @@ export function InvitationView({
       value={{ publicBase, slug, startIso, publicUrl, guestToken }}
     >
       <div
-        className={`invitation-canvas overflow-hidden ${className ?? ""}`}
+        className={`invitation-canvas overflow-hidden relative ${className ?? ""}`}
         style={{
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
@@ -190,6 +190,39 @@ export function InvitationView({
       >
         <FontBoot doc={doc} />
 
+        {/* Card-wide arka plan görseli. Tüm kartı kaplar, blokların
+            arkasında durur. Overlay metni okunur tutmak için yarı
+            saydam siyah katman (yoğunluk theme.bgImageOverlay'dan,
+            0-100). Kart silüeti (clip-path / border-radius) outer
+            div'de overflow-hidden olduğu için image silüetin dışına
+            taşmaz. Padding outer'a uygulanmış olsa da inset-0
+            absolute outer'ın 100%'üne uzanır, content padding kadar
+            içeride başlar. */}
+        {doc.theme.bgImageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={doc.theme.bgImageUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              style={{ zIndex: 0 }}
+              aria-hidden
+            />
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                zIndex: 1,
+                background: "#000",
+                opacity: (doc.theme.bgImageOverlay ?? 40) / 100,
+              }}
+              aria-hidden
+            />
+          </>
+        ) : null}
+
+        {/* Content stack image + overlay'in üstünde, z-index ile
+            ayrılır. position:relative olmadan z-index çalışmaz. */}
+        <div className="relative" style={{ zIndex: 2 }}>
         {doc.blocks
           .filter((b) => b.visible || editable)
           .map((block) => {
@@ -231,6 +264,7 @@ export function InvitationView({
               </div>
             );
           })}
+        </div>
       </div>
     </RendererProvider>
   );

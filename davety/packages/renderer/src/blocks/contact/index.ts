@@ -8,7 +8,8 @@ export const contactRegistryEntry: BlockRegistryEntry<ContactData> = {
   defaultData: {
     venueName: "İletişim",
     venueAddress: "Sorularınız için bize ulaşabilirsiniz.",
-    phone: "+90 555 000 00 00",
+    phone: "+90 554 678 97 80",
+    email: "davet@davetyolla.com",
   },
   defaultStyle: { align: "center" },
   labelKey: "Blocks.hero.title",

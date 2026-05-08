@@ -27,6 +27,14 @@ export function HeroView(props: BlockViewProps<HeroData>) {
       return <BoldTypeVariant {...props} />;
     case "botanical-frame":
       return <BotanicalFrameVariant {...props} />;
+    case "card-bg":
+      return <CardBgVariant {...props} />;
+    case "side-photo":
+      return <SidePhotoVariant {...props} />;
+    case "polaroid":
+      return <PolaroidVariant {...props} />;
+    case "frame-photo":
+      return <FramePhotoVariant {...props} />;
     case "classic":
     default:
       return <ClassicVariant {...props} />;
@@ -52,16 +60,17 @@ function selectableProps(
     : { className: "" };
 }
 
-function AndSpacer({ accent, second }: { accent?: string; second?: string }) {
+function AndSpacer({ second }: { accent?: string; second?: string }) {
   // Single-celebrant events (birthday, business launch) carry an empty
   // groomName. Hiding the spacer in that case avoids the awkward "Mira
   // & " ghost row a few users hit on doğum günü templates.
   if (second !== undefined && !second.trim()) return null;
-  return (
-    <div className="opacity-70 text-[0.8em] italic" style={{ color: accent }}>
-      &amp;
-    </div>
-  );
+  // & sembolü artık parent'ın color'ını miras alır (coupleNames field
+  // style'ı). Eski versiyon accent rengini zorla uyguluyordu, ama
+  // kullanıcı isim rengini değiştirdiğinde & değişmiyordu. Inherit
+  // davranışı doğal sonuç verir, italik + opacity-70 görsel farkı
+  // sağlamaya yeter.
+  return <div className="opacity-70 text-[0.8em] italic">&amp;</div>;
 }
 
 /** Renders the second name only when it carries content; mirror of the
@@ -227,6 +236,7 @@ function ArchVariant({
 function PhotoTopVariant({
   block,
   editable,
+  theme,
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description, accent, photoHeight } =
@@ -238,28 +248,41 @@ function PhotoTopVariant({
     typeof photoHeight === "number" && photoHeight > 0
       ? { height: photoHeight }
       : undefined;
+  // Hero görseli kart-genelinde bgImage'a aynı şekilde set edildiyse
+  // üstteki tekrar render'ı atla. Aksi halde iki farklı kırpma "ek
+  // yeri" yaratıyor.
+  const heroUrl = block.data.media?.url ?? block.data.photoUrl;
+  const dropBackdrop = !!(heroUrl && theme.bgImageUrl === heroUrl);
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div
-        className={`relative ${photoStyle ? "" : "h-48 md:h-56"} bg-black/5 overflow-hidden`}
-        style={photoStyle}
-      >
-        <MediaBackdrop data={block.data} />
-        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-[color:var(--bg,#fff)]" />
-      </div>
-      <div className={`relative px-8 py-10 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
+      {dropBackdrop ? null : (
         <div
-          className="size-12 rounded-full -mt-16 flex items-center justify-center border shadow-sm"
-          style={{
-            background: "var(--bg, white)",
-            borderColor: `${accent}55`,
-            color: accent,
-            fontFamily: "Merienda, serif",
-          }}
+          className={`relative ${photoStyle ? "" : "h-48 md:h-56"} bg-black/5 overflow-hidden`}
+          style={photoStyle}
         >
-          {brideName[0]}
-          {groomName?.trim() ? <>&amp;{groomName[0]}</> : null}
+          <MediaBackdrop data={block.data} />
+          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-[color:var(--bg,#fff)]" />
         </div>
+      )}
+      <div className={`relative px-8 py-10 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
+        {/* Monogram daire fotoğraf ile metin arasındaki köprü. Foto
+            container atlandığında (kart bgImage = bu görsel) daire
+            havada asılı kalır ve negative-margin yarım render olur, bu
+            yüzden o senaryoda daireyi de atlıyoruz. */}
+        {dropBackdrop ? null : (
+          <div
+            className="size-12 rounded-full -mt-16 flex items-center justify-center border shadow-sm"
+            style={{
+              background: "var(--bg, white)",
+              borderColor: `${accent}55`,
+              color: accent,
+              fontFamily: "Merienda, serif",
+            }}
+          >
+            {brideName[0]}
+            {groomName?.trim() ? <>&amp;{groomName[0]}</> : null}
+          </div>
+        )}
         {subtitle ? (
           <div
             {...selectableProps(editable, onFieldSelect, "subtitle")}
@@ -299,6 +322,7 @@ const DEFAULT_PHOTO_FULL =
 function PhotoFullVariant({
   block,
   editable,
+  theme,
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
   const { brideName, groomName, subtitle, description } = block.data;
@@ -314,15 +338,31 @@ function PhotoFullVariant({
   const data = hasMedia
     ? block.data
     : { ...block.data, photoUrl: DEFAULT_PHOTO_FULL };
+  // Bu hero'nun görseli zaten kart-genelinde bgImage olarak ayarlandıysa
+  // tekrar render etme — iki farklı container farklı kırpma yaptığı için
+  // "ek yeri" görüntüsü oluşturuyor. Sadece text + dark gradient kalır,
+  // alttaki kart bgImage zaten görseli gösterir.
+  const heroUrl = data.media?.url ?? data.photoUrl;
+  const dropBackdrop = !!(heroUrl && theme.bgImageUrl === heroUrl);
   return (
     <section
-      className="relative overflow-hidden min-h-[420px] text-white"
+      className={`relative overflow-hidden text-white ${dropBackdrop ? "" : "min-h-[420px]"}`}
       style={rootStyle}
     >
-      <div className="absolute inset-0">
-        <MediaBackdrop data={data} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80" />
-      </div>
+      {/* MediaBackdrop ve onun üstüne gelen dark gradient (vignette)
+          ikilisi sadece hero kendi içinde foto render ederken anlamlı.
+          dropBackdrop=true ise (görsel zaten kart-genelinde bgImage),
+          ikisini de atlıyoruz; aksi halde gradient bgImage'ı koyu
+          kırparak hero alanını çevreden ayırıyor ve kart ortasında
+          "ek yeri" oluşuyor. Card-level overlay metni okunabilir
+          tutar, kullanıcı yetmiyorsa Tasarım > overlay slider'dan
+          karartabilir. */}
+      {dropBackdrop ? null : (
+        <div className="absolute inset-0">
+          <MediaBackdrop data={data} />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/45 to-black/80" />
+        </div>
+      )}
       <div className={`relative px-8 pb-12 pt-40 flex flex-col gap-2 ${alignClasses(block.style.align)}`}>
         {subtitle ? (
           <div
@@ -605,6 +645,242 @@ function BotanicalFrameVariant({
           </p>
         ) : null}
       </div>
+    </section>
+  );
+}
+
+/* ─── Card BG (Tam Arka Plan) ───
+ * Hero block sadece text gösterir; görsel kart-genelinde theme.bgImageUrl
+ * olarak ayarlanmış kabul edilir (BlockControlsPanel variant değişiminde
+ * otomatik atar). Kart bgImage yoksa text accent rengiyle sade durur.
+ */
+function CardBgVariant({
+  block,
+  editable,
+  onFieldSelect,
+}: BlockViewProps<HeroData>) {
+  const { brideName, groomName, subtitle, description } = block.data;
+  return (
+    <section
+      className="relative px-8 py-20 text-center text-white"
+      style={styleToCss(block.style)}
+    >
+      {subtitle ? (
+        <div
+          {...selectableProps(editable, onFieldSelect, "subtitle")}
+          className="text-[11px] uppercase tracking-[0.3em] opacity-90 mb-4"
+          style={fieldStyle(block, "subtitle")}
+        >
+          {parseInlineDecorations(subtitle)}
+        </div>
+      ) : null}
+      <div
+        {...selectableProps(editable, onFieldSelect, "coupleNames")}
+        className="text-3xl md:text-4xl font-medium drop-shadow-md"
+        style={fieldStyle(block, "coupleNames")}
+      >
+        <div>{brideName}</div>
+        <AndSpacer second={groomName} />
+        <SecondName name={groomName} />
+      </div>
+      {description ? (
+        <p
+          {...selectableProps(editable, onFieldSelect, "description")}
+          className="max-w-md mx-auto text-sm mt-4 opacity-95 drop-shadow"
+          style={fieldStyle(block, "description")}
+        >
+          {parseInlineDecorations(description)}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+/* ─── Side Photo ───
+ * İki kolon: solda görsel, sağda metin. Mobilde tek kolon (foto üstte).
+ */
+function SidePhotoVariant({
+  block,
+  editable,
+  onFieldSelect,
+}: BlockViewProps<HeroData>) {
+  const { brideName, groomName, subtitle, description, accent } = block.data;
+  const heroUrl = block.data.media?.url ?? block.data.photoUrl;
+  return (
+    <section
+      className="relative grid grid-cols-1 md:grid-cols-2 min-h-[280px]"
+      style={styleToCss(block.style)}
+    >
+      <div className="relative h-48 md:h-auto bg-black/5 overflow-hidden">
+        {heroUrl ? <MediaBackdrop data={block.data} /> : null}
+      </div>
+      <div className="relative px-6 py-8 md:py-12 flex flex-col justify-center gap-2">
+        {subtitle ? (
+          <div
+            {...selectableProps(editable, onFieldSelect, "subtitle")}
+            className="text-[10px] uppercase tracking-[0.3em] opacity-70"
+            style={fieldStyle(block, "subtitle")}
+          >
+            {parseInlineDecorations(subtitle)}
+          </div>
+        ) : null}
+        <div
+          {...selectableProps(editable, onFieldSelect, "coupleNames")}
+          className="text-2xl md:text-3xl font-medium leading-tight"
+          style={{ color: accent, ...fieldStyle(block, "coupleNames") }}
+        >
+          <div>{brideName}</div>
+          <AndSpacer second={groomName} />
+          <SecondName name={groomName} />
+        </div>
+        {description ? (
+          <p
+            {...selectableProps(editable, onFieldSelect, "description")}
+            className="text-sm mt-2 opacity-90"
+            style={fieldStyle(block, "description")}
+          >
+            {parseInlineDecorations(description)}
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Polaroid ───
+ * Vintage polaroid kartı: beyaz çerçeveli görsel, hafif sağa yatık,
+ * alt kenarda el yazısı caption. Görsel yoksa boş çerçeve placeholder.
+ */
+function PolaroidVariant({
+  block,
+  editable,
+  onFieldSelect,
+}: BlockViewProps<HeroData>) {
+  const { brideName, groomName, subtitle, description, accent } = block.data;
+  const heroUrl = block.data.media?.url ?? block.data.photoUrl;
+  return (
+    <section
+      className="relative px-8 py-12 flex flex-col items-center gap-6"
+      style={styleToCss(block.style)}
+    >
+      <div
+        className="relative bg-white p-3 pb-12 shadow-xl"
+        style={{ transform: "rotate(-2deg)", maxWidth: 280 }}
+      >
+        <div className="relative aspect-square bg-black/5 overflow-hidden">
+          {heroUrl ? (
+            <MediaBackdrop data={block.data} />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
+              Görsel ekle
+            </div>
+          )}
+        </div>
+        <div
+          className="absolute bottom-2 left-0 right-0 text-center text-sm"
+          style={{ fontFamily: "Merienda, serif", color: accent }}
+        >
+          {brideName}
+          {groomName?.trim() ? ` & ${groomName}` : ""}
+        </div>
+      </div>
+      <div className="text-center flex flex-col gap-1.5 max-w-md">
+        {subtitle ? (
+          <div
+            {...selectableProps(editable, onFieldSelect, "subtitle")}
+            className="text-[11px] uppercase tracking-[0.3em] opacity-70"
+            style={fieldStyle(block, "subtitle")}
+          >
+            {parseInlineDecorations(subtitle)}
+          </div>
+        ) : null}
+        <div
+          {...selectableProps(editable, onFieldSelect, "coupleNames")}
+          className="text-2xl font-medium"
+          style={fieldStyle(block, "coupleNames")}
+        >
+          <div>{brideName}</div>
+          <AndSpacer second={groomName} />
+          <SecondName name={groomName} />
+        </div>
+        {description ? (
+          <p
+            {...selectableProps(editable, onFieldSelect, "description")}
+            className="text-sm mt-2 opacity-90"
+            style={fieldStyle(block, "description")}
+          >
+            {parseInlineDecorations(description)}
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Frame Photo ───
+ * Görsel zarif çift-çizgi çerçevenin içinde, alttında isimler. Klasik
+ * davetiye estetiği.
+ */
+function FramePhotoVariant({
+  block,
+  editable,
+  onFieldSelect,
+}: BlockViewProps<HeroData>) {
+  const { brideName, groomName, subtitle, description, accent } = block.data;
+  const heroUrl = block.data.media?.url ?? block.data.photoUrl;
+  return (
+    <section
+      className="relative px-8 py-10 flex flex-col items-center gap-4 text-center"
+      style={styleToCss(block.style)}
+    >
+      <div
+        className="relative w-full max-w-xs"
+        style={{
+          padding: 6,
+          border: `1px solid ${accent}66`,
+        }}
+      >
+        <div
+          className="relative aspect-[3/4] overflow-hidden"
+          style={{ border: `1px solid ${accent}33` }}
+        >
+          {heroUrl ? (
+            <MediaBackdrop data={block.data} />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground bg-black/5">
+              Görsel ekle
+            </div>
+          )}
+        </div>
+      </div>
+
+      {subtitle ? (
+        <div
+          {...selectableProps(editable, onFieldSelect, "subtitle")}
+          className="text-[11px] uppercase tracking-[0.3em] opacity-70 mt-2"
+          style={fieldStyle(block, "subtitle")}
+        >
+          {parseInlineDecorations(subtitle)}
+        </div>
+      ) : null}
+      <div
+        {...selectableProps(editable, onFieldSelect, "coupleNames")}
+        className="text-2xl md:text-3xl font-medium"
+        style={fieldStyle(block, "coupleNames")}
+      >
+        <div>{brideName}</div>
+        <AndSpacer second={groomName} />
+        <SecondName name={groomName} />
+      </div>
+      {description ? (
+        <p
+          {...selectableProps(editable, onFieldSelect, "description")}
+          className="max-w-md text-sm mt-1 opacity-90"
+          style={fieldStyle(block, "description")}
+        >
+          {parseInlineDecorations(description)}
+        </p>
+      ) : null}
     </section>
   );
 }
