@@ -85,6 +85,9 @@ export function GalleryView({
                     <video
                       src={m.url}
                       className="w-full h-full object-cover"
+                      style={{
+                        objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%`,
+                      }}
                       muted
                       preload="metadata"
                       aria-label={altText}
@@ -95,6 +98,9 @@ export function GalleryView({
                       alt={altText}
                       loading="lazy"
                       decoding="async"
+                      style={{
+                        objectPosition: `${m.focalX ?? 50}% ${m.focalY ?? 50}%`,
+                      }}
                       className="w-full h-full object-cover hover:scale-105 transition-transform"
                     />
                   )}

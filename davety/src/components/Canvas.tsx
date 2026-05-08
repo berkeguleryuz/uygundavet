@@ -9,7 +9,7 @@ import {
   listBlockEntries,
   getCardShapeStyle,
   getCardShapePadding,
-  isArchShape,
+  getCardShapeTopClipPx,
   InvitationView,
 } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
@@ -57,7 +57,11 @@ export function Canvas() {
 
   if (!doc) return null;
 
-  const archActive = isArchShape(doc);
+  // İlk blokta floating toolbar'ın clip-path tarafından kırpılmaması
+  // için sağ köşedeki clip derinliği kadar (artı 8px nefes payı)
+  // aşağı itilir. peaked/tag/arch/tall-arch için bu sayı kayda değer,
+  // chevron sağ köşede tepede olduğu için neredeyse 0.
+  const firstBlockClipPx = getCardShapeTopClipPx(doc);
 
   // When the user is on the Zarf Tasarımı tab in the side panel, the
   // canvas swaps to a live envelope preview instead of the invitation
@@ -122,7 +126,22 @@ export function Canvas() {
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
           ...getCardShapeStyle(doc),
-          ...getCardShapePadding(doc),
+          // Photo-driven hero ilk blok ise paddingTop sıfır, görsel
+          // kart tepesine kadar uzansın. InvitationView ile birebir
+          // aynı mantık.
+          ...(() => {
+            const firstBlock = doc.blocks[0];
+            const fbd = firstBlock?.data as
+              | { variant?: string; media?: { url?: string }; photoUrl?: string }
+              | undefined;
+            const firstHasPhoto = !!(
+              firstBlock?.type === "hero" &&
+              (fbd?.variant === "photo-top" || fbd?.variant === "photo-full") &&
+              (fbd?.media?.url || fbd?.photoUrl)
+            );
+            const p = getCardShapePadding(doc);
+            return firstHasPhoto ? { ...p, paddingTop: "0px" } : p;
+          })(),
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -195,14 +214,17 @@ export function Canvas() {
 
                 {selected ? (
                   <div
-                    // First block + arch shape: push toolbar below the
-                    // dome so move/hide/delete buttons aren't clipped
-                    // by the rounded top corners (overflow-hidden on
-                    // the card cuts off anything sitting in the curve).
-                    className={cn(
-                      "absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1",
-                      i === 0 && archActive ? "top-20" : "top-2"
-                    )}
+                    // İlk blokta toolbar'ın clip-path tarafından
+                    // kırpılmaması için shape'e göre dinamik offset
+                    // (arch/tag/peaked/tall-arch hepsi farklı miktarda
+                    // sağ köşeyi yer). Diğer bloklar normal top-2.
+                    className="absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1"
+                    style={{
+                      top:
+                        i === 0 && firstBlockClipPx > 0
+                          ? `${firstBlockClipPx + 8}px`
+                          : "8px",
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <IconBtn
@@ -339,14 +361,16 @@ function InsertSlot({
   // there is no hover trigger to reveal it. It also stays visible when
   // the adjacent block is selected, so a tap-then-add flow works on
   // mobile.
+  // Buton sağ uçta dursun ki üstteki blok'un toolbar (yukarı/aşağı/
+  // gizle/sil) butonlarıyla çakışmasın. Palette de sağa-yaslı açılır.
   const paletteCls = flipUp
-    ? "absolute bottom-full mb-2 left-1/2 -translate-x-1/2"
-    : "absolute top-full mt-2 left-1/2 -translate-x-1/2";
+    ? "absolute bottom-full mb-2 right-0"
+    : "absolute top-full mt-2 right-0";
 
   return (
     <div
       className={cn(
-        "absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-0 z-20",
+        "absolute right-2 -translate-y-1/2 top-0 z-20",
         "opacity-0 group-hover/block:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity",
         (active || forceVisible) && "opacity-100"
       )}

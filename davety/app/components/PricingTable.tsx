@@ -230,11 +230,12 @@ export function PricingTable() {
       <OfferNote offer={offer} />
 
       {/* Pricing cards row, sticky at top for long feature tables.
-          items-stretch + h-full on cards equalises heights, so the
-          CTA buttons land on the same baseline regardless of whether
-          a tier shows a countdown / strikethrough / promo badge. */}
-      <div className="sticky top-20 z-20 bg-background/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-3 border-b border-border">
-        <div className="grid grid-cols-[minmax(140px,1.2fr)_repeat(4,1fr)] gap-3 items-stretch">
+          Mobilde 4 kart yan yana sığsın diye grid mobilde
+          repeat(4,1fr), desktop'ta label-kolonu + 4 tier. Kartların
+          kendileri (TierHeader) responsive olarak iç boşluk/font
+          küçültür, böylece dar ekranda da overflow olmaz. */}
+      <div className="sticky top-20 z-20 bg-background/95 backdrop-blur-md -mx-4 md:-mx-8 px-2 md:px-8 py-2 md:py-3 border-b border-border">
+        <div className="grid grid-cols-4 md:grid-cols-[minmax(140px,1.2fr)_repeat(4,1fr)] gap-1.5 md:gap-3 items-stretch">
           <div className="hidden md:block" />
           {TIERS.map((tier) => (
             <TierHeader key={tier.id} tier={tier} offer={offer} />
@@ -312,50 +313,59 @@ function TierHeader({
   const percent = offer?.percent ?? 0;
   const discounted = percent > 0 ? applyOffer(tier.basePrice, percent) : tier.basePrice;
 
+  // Mobilde kompakt ikon + isim + fiyat + buton; desktop'ta zengin
+  // (badge slot, countdown, tagline, reklam uyarı kutusu, full CTA).
+  const mobileCta =
+    tier.id === "free" ? "Başla" : tier.id === "premium" ? "Al" : "Seç";
+
   return (
     <div
-      className={`relative rounded-2xl border p-3 md:p-4 flex flex-col items-center text-center transition-all h-full ${
+      className={`relative rounded-xl md:rounded-2xl border p-1.5 md:p-4 flex flex-col items-center text-center transition-all h-full ${
         tier.highlight
           ? "bg-foreground text-background border-foreground shadow-lg"
           : "bg-white border-border"
       }`}
     >
-      {/* Top badge slot — sabit yükseklik, "En Popüler" / boş için aynı
-          dikey alan ayrılır ki tüm kartlar hizalı kalsın. */}
-      <div className="h-5 mb-1 flex items-center justify-center">
-        {tier.highlight ? (
-          <div className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest">
-            <Star className="size-3 fill-current" /> En Popüler
+      {/* Top badge: mobilde absolute mini, desktop'ta sabit slot */}
+      {tier.highlight ? (
+        <>
+          <div className="md:hidden absolute -top-1.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-0.5 px-1.5 py-0 rounded-full text-[7px] font-bold uppercase tracking-wider bg-foreground text-background border border-background/30 whitespace-nowrap">
+            <Star className="size-2 fill-current" /> Popüler
           </div>
-        ) : null}
-      </div>
+          <div className="hidden md:flex h-5 mb-1 items-center justify-center">
+            <div className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest">
+              <Star className="size-3 fill-current" /> En Popüler
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="hidden md:block h-5 mb-1" aria-hidden />
+      )}
 
-      {/* Tier ikonu + sağ alt köşede mini "Seç" pill butonu, ikinci
-           CTA: bilmeyen kullanıcının kart başında bir tıklanabilir
-           öğe görmesi için. Asıl uzun CTA butonu hâlâ kartın altında.
-           Animasyon sürekli tier-icons.tsx'teki keyframes ile loop'lar. */}
-      <div className="relative mb-2">
+      {/* Tier ikonu, mobilde minik */}
+      <div className={`relative ${tier.highlight ? "mt-1.5 md:mt-0" : ""} mb-1 md:mb-2`}>
         <div
-          className={`size-12 inline-flex items-center justify-center rounded-xl border ${
+          className={`size-7 md:size-12 inline-flex items-center justify-center rounded-md md:rounded-xl border ${
             tier.highlight
               ? "border-background/30 text-background"
               : "border-border text-foreground"
           }`}
         >
           {tier.id === "free" ? (
-            <SparkleIcon className="size-7" />
+            <SparkleIcon className="size-4 md:size-7" />
           ) : tier.id === "basic" ? (
-            <DrawStarIcon className="size-7" />
+            <DrawStarIcon className="size-4 md:size-7" />
           ) : tier.id === "pro" ? (
-            <ZapIcon className="size-7" />
+            <ZapIcon className="size-4 md:size-7" />
           ) : (
-            <CrownIcon className="size-7" />
+            <CrownIcon className="size-4 md:size-7" />
           )}
         </div>
+        {/* "Seç" pill yalnızca desktop'ta, mobilde alt CTA buton zaten var */}
         <a
           href={tier.ctaHref}
           aria-label={`${tier.name} paketini seç`}
-          className={`absolute -bottom-2 -right-3 inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] shadow-sm transition-colors cursor-pointer ${
+          className={`hidden md:inline-flex absolute -bottom-2 -right-3 items-center justify-center rounded-full px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] shadow-sm transition-colors cursor-pointer ${
             tier.highlight
               ? "bg-background text-foreground hover:bg-background/90"
               : "bg-foreground text-background hover:bg-foreground/90"
@@ -366,14 +376,14 @@ function TierHeader({
       </div>
 
       {percent > 0 && !isFree ? (
-        <div className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500 text-white shadow">
-          <Flame className="size-3" /> %{percent}
+        <div className="absolute -top-1 -right-1 md:-top-2 md:right-3 md:left-auto inline-flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-0 md:py-0.5 rounded-full text-[8px] md:text-[10px] font-semibold bg-rose-500 text-white shadow">
+          <Flame className="size-2 md:size-3" /> %{percent}
         </div>
       ) : null}
 
-      {/* Countdown slot — sabit yükseklik. İndirim olan kartlarda timer,
-          olmayanlarda boş ama aynı alan ayrılır. */}
-      <div className="h-6 mb-1 flex items-center justify-center">
+      {/* Countdown: mobilde gizli (yer kaplamasın, OfferNote zaten üst
+          kampanya etiketini gösteriyor), desktop'ta sabit slot */}
+      <div className="hidden md:flex h-6 mb-1 items-center justify-center">
         {percent > 0 && !isFree && offer ? (
           <Countdown
             targetIso={offer.endsAtIso}
@@ -384,35 +394,34 @@ function TierHeader({
       </div>
 
       <div
-        className={`text-sm md:text-base font-semibold ${
+        className={`text-[10px] md:text-base font-semibold leading-tight ${
           tier.highlight ? "" : "text-foreground"
         }`}
       >
         {tier.name}
       </div>
 
-      {/* Fiyat slot — sabit yükseklik. Hem strikethrough+yeni-fiyat
-          (iki satır) hem tek-fiyat hem "Ücretsiz" aynı alana sığsın. */}
-      <div className="mt-1 leading-none min-h-[3rem] flex items-center justify-center">
+      {/* Fiyat: mobilde tek satır mini, desktop'ta full + min-h */}
+      <div className="mt-0.5 md:mt-1 leading-none md:min-h-[3rem] flex items-center justify-center">
         {isFree ? (
-          <span className="text-xl md:text-2xl font-bold tabular-nums">
+          <span className="text-xs md:text-2xl font-bold tabular-nums">
             Ücretsiz
           </span>
         ) : percent > 0 ? (
-          <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col items-center gap-0">
             <span
-              className={`text-[11px] md:text-xs tabular-nums line-through ${
+              className={`hidden md:inline text-[11px] md:text-xs tabular-nums line-through ${
                 tier.highlight ? "opacity-60" : "text-muted-foreground"
               }`}
             >
               {tier.basePrice.toLocaleString("tr-TR")}₺
             </span>
-            <span className="text-xl md:text-2xl font-bold tabular-nums">
+            <span className="text-xs md:text-2xl font-bold tabular-nums">
               {discounted.toLocaleString("tr-TR")}₺
             </span>
           </div>
         ) : (
-          <span className="text-xl md:text-2xl font-bold tabular-nums">
+          <span className="text-xs md:text-2xl font-bold tabular-nums">
             {tier.basePrice.toLocaleString("tr-TR")}₺
           </span>
         )}
@@ -426,29 +435,35 @@ function TierHeader({
         {tier.tagline}
       </div>
 
-      {/* Free kartında reklam uyarısı, butonun hemen üstünde dikkat
-          çeken sarı/amber etiketle. Diğer kartlarda boş slot, hizalama
-          için aynı yer ayrılır. */}
-      <div className="mt-auto pt-3 w-full flex flex-col items-stretch gap-2">
+      {/* Reklam uyarısı + CTA. Mobilde tek satır mini etiket, desktop'ta
+          tam metin amber kutu. CTA mobilde "Seç/Başla/Al" gibi 1 kelime,
+          desktop'ta tam başlıklı. */}
+      <div className="mt-auto pt-1 md:pt-3 w-full flex flex-col items-stretch gap-1 md:gap-2">
         {isFree ? (
-          <div
-            className="flex items-center gap-1.5 rounded-md bg-amber-100 border border-amber-300 text-amber-900 px-2 py-1.5 text-[10px] md:text-[11px] leading-snug font-medium text-left"
-            role="note"
-          >
-            <span className="text-base leading-none">⚠️</span>
-            <span>Davetiyende DavetYolla reklamı görünür.</span>
-          </div>
+          <>
+            <div className="md:hidden text-[7.5px] text-amber-700 font-medium leading-tight">
+              ⚠️ Reklamlı
+            </div>
+            <div
+              className="hidden md:flex items-center gap-1.5 rounded-md bg-amber-100 border border-amber-300 text-amber-900 px-2 py-1.5 text-[10px] md:text-[11px] leading-snug font-medium text-left"
+              role="note"
+            >
+              <span className="text-base leading-none">⚠️</span>
+              <span>Davetiyende DavetYolla reklamı görünür.</span>
+            </div>
+          </>
         ) : null}
 
         <a
           href={tier.ctaHref}
-          className={`w-full px-3 py-1.5 md:py-2 rounded-full text-[11px] md:text-xs font-medium transition-colors ${
+          className={`w-full px-1.5 md:px-3 py-1 md:py-1.5 rounded-full text-[9px] md:text-xs font-medium leading-tight transition-colors ${
             tier.highlight
               ? "bg-background text-foreground hover:bg-background/90"
               : "bg-foreground text-background hover:bg-foreground/90"
           }`}
         >
-          {tier.cta}
+          <span className="md:hidden">{mobileCta}</span>
+          <span className="hidden md:inline">{tier.cta}</span>
         </a>
       </div>
     </div>

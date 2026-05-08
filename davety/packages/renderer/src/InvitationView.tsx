@@ -104,6 +104,30 @@ export function isArchShape(doc: InvitationDoc): boolean {
   return doc.theme.cardShape === "arch" || doc.theme.cardShape === "tall-arch";
 }
 
+/**
+ * Top-right'taki floating toolbar'ın clip-path tarafından kırpılmaması
+ * için gereken minimum y offset (px). Editor canvas'ında ilk bloğun
+ * üstüne yerleştirilen kontrol bar'ını bu kadar aşağı iter, böylece
+ * peaked/chevron/tag/arch/tall-arch silüetlerinin köşe kırpması
+ * butonları yutmaz. clip-path'siz şekiller (flat/rounded) için 0.
+ */
+export function getCardShapeTopClipPx(doc: InvitationDoc): number {
+  switch (doc.theme.cardShape) {
+    case "peaked":
+      return 56; // sağ köşe %7 yukarıda + nefes payı
+    case "chevron":
+      return 8; // sağ köşe tepede, sadece minik default
+    case "tag":
+      return 44; // sağ köşe 28px diagonal cut + pay
+    case "arch":
+      return 72; // dome'un alt kenarına kadar
+    case "tall-arch":
+      return 96;
+    default:
+      return 0;
+  }
+}
+
 export interface InvitationViewProps {
   doc: InvitationDoc;
   /** When true each text slot becomes clickable via onFieldSelect. */
@@ -131,6 +155,26 @@ export function InvitationView({
   publicUrl,
 }: InvitationViewProps) {
   const startIso = `${doc.meta.weddingDate}T${doc.meta.weddingTime}:00`;
+  // Photo-driven hero (photo-top / photo-full) ilk blok ise card-shape
+  // paddingTop'unu sıfırla, böylece görsel kart tepesine kadar uzanır.
+  // Diğer şekillerin (peaked/chevron/tag) clip-path'i fotoğrafı zaten
+  // kırpıyor, yani şekil silüeti korunur ama görselin üstünde boş bg
+  // kalmaz. Hero olmayan ilk blok için padding aynı (text bloklar
+  // clip'in içine girmesin).
+  const firstBlock = doc.blocks[0];
+  const firstBlockData = firstBlock?.data as
+    | { variant?: string; media?: { url?: string }; photoUrl?: string }
+    | undefined;
+  const firstHasPhoto = !!(
+    firstBlock?.type === "hero" &&
+    (firstBlockData?.variant === "photo-top" ||
+      firstBlockData?.variant === "photo-full") &&
+    (firstBlockData?.media?.url || firstBlockData?.photoUrl)
+  );
+  const cardPadding = getCardShapePadding(doc);
+  const effectivePadding = firstHasPhoto
+    ? { ...cardPadding, paddingTop: "0px" }
+    : cardPadding;
   return (
     <RendererProvider
       value={{ publicBase, slug, startIso, publicUrl, guestToken }}
@@ -141,7 +185,7 @@ export function InvitationView({
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
           ...getCardShapeStyle(doc),
-          ...getCardShapePadding(doc),
+          ...effectivePadding,
         }}
       >
         <FontBoot doc={doc} />

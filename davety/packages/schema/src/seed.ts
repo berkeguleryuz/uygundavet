@@ -110,7 +110,7 @@ export function buildDefaultDoc(args: SeedArgs): InvitationDoc {
       style: { align: "center" },
       data: {
         venueName: tr
-          ? "Davet Salonu"
+          ? "DavetYolla Salonu"
           : de
           ? "Veranstaltungsort"
           : "Venue Name",

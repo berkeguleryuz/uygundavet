@@ -506,7 +506,7 @@ function drawInvitationCanvas(ctx: CanvasRenderingContext2D, invitation: Invitat
   ctx.globalAlpha = 0.72;
   ctx.fillText(invitation.meta.weddingTime, 512, 1135);
   ctx.font = fontSpec(500, 34, fonts.sans);
-  ctx.fillText(venueData?.venueName ?? "Davet Salonu", 512, 1215);
+  ctx.fillText(venueData?.venueName ?? "DavetYolla Salonu", 512, 1215);
   ctx.globalAlpha = 1;
 }
 

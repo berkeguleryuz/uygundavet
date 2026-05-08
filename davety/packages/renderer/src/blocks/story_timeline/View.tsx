@@ -47,6 +47,9 @@ export function StoryTimelineView({
               <img
                 {...buildImgProps(m.media)}
                 alt=""
+                style={{
+                  objectPosition: `${m.media.focalX ?? 50}% ${m.media.focalY ?? 50}%`,
+                }}
                 className="w-full aspect-[4/3] object-cover rounded-md"
               />
             ) : (

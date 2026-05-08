@@ -10,13 +10,18 @@ import {
   MapPin,
   Sliders,
   Info,
+  ArrowUp,
+  ArrowDown,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DECORATION_ICONS, DECORATION_CATEGORIES } from "@davety/renderer";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
+import { useConfirm } from "@/src/components/ConfirmDialog";
 import { SpacingControl } from "./controls/SpacingControl";
+import { FocalPointPicker } from "./controls/FocalPointPicker";
 import { DECORATION_TEMPLATE_CATEGORIES } from "@/src/components/decorations/templateManifest";
 
 export function BlockControlsPanel() {
@@ -28,8 +33,12 @@ export function BlockControlsPanel() {
   const toggleVisibility = useEditorStore((s) => s.toggleVisibility);
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
   const updateBlockStyle = useEditorStore((s) => s.updateBlockStyle);
+  const moveBlock = useEditorStore((s) => s.moveBlock);
+  const deleteBlock = useEditorStore((s) => s.deleteBlock);
   const blockId = useUIStore((s) => s.selectedBlockId);
   const selectField = useUIStore((s) => s.selectField);
+  const selectBlock = useUIStore((s) => s.selectBlock);
+  const confirm = useConfirm();
 
   const { pick, busy: uploading } = useAssetUpload(docId);
 
@@ -37,6 +46,7 @@ export function BlockControlsPanel() {
   const block = doc.blocks.find((b) => b.id === blockId);
   if (!block) return null;
 
+  const blockIndex = doc.blocks.findIndex((b) => b.id === blockId);
   const blockLabel = blockTypeLabel(block.type, tBlocks);
 
   const supportsMedia = ["hero", "gallery", "story_timeline"].includes(block.type);
@@ -54,10 +64,66 @@ export function BlockControlsPanel() {
 
   return (
     <div className="p-5 flex flex-col gap-4">
-      <header className="flex items-center gap-2">
+      <header className="flex items-center justify-between gap-2">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
           {blockLabel}
         </span>
+        {/* Blok aksiyonları: clip-path'lı kart şekillerinde canvas
+            üstündeki floating bar bazen erişilemez kalabilir, bu
+            yüzden aynı kontroller (yukarı/aşağı taşı, gizle/göster,
+            sil) burada da bulunur. Sağ panel her durumda görünür. */}
+        <div className="flex items-center gap-1">
+          <PanelIconBtn
+            title="Yukarı taşı"
+            disabled={blockIndex <= 0}
+            onClick={() => moveBlock(blockId, blockIndex - 1)}
+          >
+            <ArrowUp className="size-3.5" />
+          </PanelIconBtn>
+          <PanelIconBtn
+            title="Aşağı taşı"
+            disabled={blockIndex >= doc.blocks.length - 1}
+            onClick={() => moveBlock(blockId, blockIndex + 1)}
+          >
+            <ArrowDown className="size-3.5" />
+          </PanelIconBtn>
+          <PanelIconBtn
+            title={block.visible ? "Gizle" : "Göster"}
+            onClick={() => toggleVisibility(blockId)}
+          >
+            {block.visible ? (
+              <EyeOff className="size-3.5" />
+            ) : (
+              <Eye className="size-3.5" />
+            )}
+          </PanelIconBtn>
+          <PanelIconBtn
+            title={
+              block.locked
+                ? "Bu blok silinemez (işlevsel). Gizleyebilirsin."
+                : "Sil"
+            }
+            danger
+            disabled={!!block.locked}
+            onClick={async () => {
+              if (block.locked) return;
+              const ok = await confirm({
+                title: "Bloğu sil",
+                description:
+                  "Bu bloğu silmek istediğine emin misin? Bu işlem geri alınabilir (Ctrl+Z).",
+                confirmLabel: "Sil",
+                cancelLabel: "Vazgeç",
+                variant: "danger",
+              });
+              if (ok) {
+                deleteBlock(blockId);
+                selectBlock(null);
+              }
+            }}
+          >
+            <Trash2 className="size-3.5" />
+          </PanelIconBtn>
+        </div>
       </header>
 
       {block.type === "hero" ? (
@@ -66,6 +132,96 @@ export function BlockControlsPanel() {
           onChange={(variant) => updateBlockData(blockId, { variant })}
         />
       ) : null}
+
+      {/* Hero foto odak noktası: kullanıcı yüklediği fotoğrafın
+          neresini frame içinde tutacağını seçer. media (yeni upload'lar)
+          ve photoUrl (sample template'lerden gelen) iki kaynak da
+          destekleniyor. Sadece hero bloğunda + bir görsel varsa görünür. */}
+      {block.type === "hero" ? (() => {
+        const data = block.data as {
+          media?: { url?: string; focalX?: number; focalY?: number };
+          photoUrl?: string;
+          photoFocalX?: number;
+          photoFocalY?: number;
+          photoHeight?: number;
+          variant?: string;
+        };
+        const hasMedia = !!(data.media?.url || data.photoUrl);
+        if (!hasMedia) return null;
+        // Yükseklik slider'ı sadece photo-top varyantında anlamlı,
+        // photo-full zaten tam ekran, arch'ın görsel alanı yok.
+        const showHeightSlider = data.variant === "photo-top";
+        return (
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+                Görsel Odak Noktası
+              </div>
+              {data.media?.url ? (
+                <FocalPointPicker
+                  imageUrl={data.media.url}
+                  focalX={data.media.focalX ?? 50}
+                  focalY={data.media.focalY ?? 50}
+                  onChange={(x, y) =>
+                    updateBlockData(blockId, {
+                      media: { ...data.media, focalX: x, focalY: y },
+                    })
+                  }
+                />
+              ) : (
+                <FocalPointPicker
+                  imageUrl={data.photoUrl!}
+                  focalX={data.photoFocalX ?? 50}
+                  focalY={data.photoFocalY ?? 50}
+                  onChange={(x, y) =>
+                    updateBlockData(blockId, {
+                      photoFocalX: x,
+                      photoFocalY: y,
+                    })
+                  }
+                />
+              )}
+            </div>
+
+            {showHeightSlider ? (
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+                    Görsel Yüksekliği
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateBlockData(blockId, { photoHeight: undefined })
+                    }
+                    className="text-[10px] text-muted-foreground hover:underline cursor-pointer"
+                  >
+                    sıfırla
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min={120}
+                    max={420}
+                    step={4}
+                    value={data.photoHeight ?? 224}
+                    onChange={(e) =>
+                      updateBlockData(blockId, {
+                        photoHeight: Number(e.target.value),
+                      })
+                    }
+                    className="flex-1 cursor-pointer"
+                  />
+                  <span className="text-[11px] tabular-nums text-muted-foreground w-12 text-right">
+                    {data.photoHeight ?? 224}px
+                  </span>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        );
+      })() : null}
 
       {block.type === "decoration" ? (
         <DecorationBlockEditor
@@ -560,4 +716,40 @@ function blockTypeLabel(
   } catch {
     return type;
   }
+}
+
+/**
+ * Header'daki aksiyon butonları için kompakt icon button. Canvas
+ * IconBtn'iyle aynı görünüm + davranış, sadece panel tone'una uygun.
+ * Yan paneller dar olduğu için size-7'lik kare butonlar tercih edildi.
+ */
+function PanelIconBtn({
+  title,
+  onClick,
+  disabled,
+  danger,
+  children,
+}: {
+  title: string;
+  onClick: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      disabled={disabled}
+      onClick={onClick}
+      className={`size-7 rounded-md inline-flex items-center justify-center border border-border transition disabled:opacity-40 disabled:cursor-not-allowed ${
+        danger && !disabled
+          ? "text-destructive hover:bg-destructive/10"
+          : "hover:bg-muted"
+      }`}
+    >
+      {children}
+    </button>
+  );
 }

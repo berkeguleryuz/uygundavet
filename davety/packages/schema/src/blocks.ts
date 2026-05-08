@@ -76,6 +76,12 @@ export interface MediaRef {
   mediaType: "image" | "video" | "audio";
   /** Responsive URL variants (thumb/md/lg/original) for images only. */
   variants?: Partial<Record<"thumb" | "md" | "lg" | "original", string>>;
+  /** Focal point as percentage (0-100). 50/50 = merkez. CSS
+   *  object-position'a forward edilir, photo crop edildiğinde
+   *  görünen kısım buna göre kayar. Yüz/önemli kısım hep frame
+   *  içinde kalsın diye. */
+  focalX?: number;
+  focalY?: number;
 }
 
 /**
@@ -104,6 +110,15 @@ export interface HeroData {
   variant?: HeroVariant;
   /** Explicit photo URL for photo-driven variants (photo-top / photo-full). */
   photoUrl?: string;
+  /** Focal point for photoUrl crop (0-100). photoUrl bir MediaRef
+   *  değil sadece string olduğu için focal point ayrı tutuluyor. */
+  photoFocalX?: number;
+  photoFocalY?: number;
+  /** Photo-top / arch-foto varyantlarında üstteki görsel alanının
+   *  yüksekliği (px). Boş bırakılırsa varyantın default yüksekliği
+   *  kullanılır (~224px desktop). Kullanıcı 120-360 arası slider ile
+   *  ayarlayabilir. */
+  photoHeight?: number;
   /** Decorative style for floral-crown / classic ornaments. */
   decorative?: "daisy" | "rose" | "gold" | "none";
   /** Accent colour override for SVG flourishes. Falls back to theme.accent. */

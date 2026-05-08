@@ -87,6 +87,11 @@ function SecondName({
 
 function MediaBackdrop({ data }: { data: HeroData }) {
   if (data.media?.url) {
+    // Focal point: 0-100 yüzde, default merkez (50/50). Kullanıcı
+    // editor'de yüzünün ortada kalması için crop noktası seçebiliyor.
+    const fx = data.media.focalX ?? 50;
+    const fy = data.media.focalY ?? 50;
+    const objectPosition = `${fx}% ${fy}%`;
     return data.media.mediaType === "video" ? (
       <video
         src={data.media.url}
@@ -95,6 +100,7 @@ function MediaBackdrop({ data }: { data: HeroData }) {
         loop
         playsInline
         className="w-full h-full object-cover"
+        style={{ objectPosition }}
       />
     ) : (
       // eslint-disable-next-line @next/next/no-img-element
@@ -102,16 +108,20 @@ function MediaBackdrop({ data }: { data: HeroData }) {
         {...buildImgProps(data.media)}
         alt=""
         className="w-full h-full object-cover"
+        style={{ objectPosition }}
       />
     );
   }
   if (data.photoUrl) {
+    const fx = data.photoFocalX ?? 50;
+    const fy = data.photoFocalY ?? 50;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={data.photoUrl}
         alt=""
         className="w-full h-full object-cover"
+        style={{ objectPosition: `${fx}% ${fy}%` }}
         draggable={false}
       />
     );
@@ -219,10 +229,21 @@ function PhotoTopVariant({
   editable,
   onFieldSelect,
 }: BlockViewProps<HeroData>) {
-  const { brideName, groomName, subtitle, description, accent } = block.data;
+  const { brideName, groomName, subtitle, description, accent, photoHeight } =
+    block.data;
+  // photoHeight kullanıcı tarafından slider ile ayarlanır, değer
+  // yoksa default 224px (desktop) / 192px (mobile responsive ile
+  // h-48 md:h-56). Inline style ile override.
+  const photoStyle: React.CSSProperties | undefined =
+    typeof photoHeight === "number" && photoHeight > 0
+      ? { height: photoHeight }
+      : undefined;
   return (
     <section className="relative overflow-hidden" style={styleToCss(block.style)}>
-      <div className="relative h-48 md:h-56 bg-black/5 overflow-hidden">
+      <div
+        className={`relative ${photoStyle ? "" : "h-48 md:h-56"} bg-black/5 overflow-hidden`}
+        style={photoStyle}
+      >
         <MediaBackdrop data={block.data} />
         <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-[color:var(--bg,#fff)]" />
       </div>
