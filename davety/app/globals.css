@@ -88,6 +88,29 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* İnce temalı scrollbar. Default sistem scrollbar'ları ana sayfada ve
+   uzun listelerde geniş + tema-dışı renklerde görünüyordu; thumb'i
+   border-token'a hizalayıp track'i transparan yapıyoruz. WebKit
+   (Chrome/Safari) ve Firefox için ayrı kurallar. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
 /* editor-only: scope user-chosen fonts to the invitation canvas */
 .invitation-canvas {
   font-family: var(--invitation-font, var(--font-sans));

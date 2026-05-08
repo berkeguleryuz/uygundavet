@@ -178,7 +178,10 @@ export function Nav() {
       </div>
 
       {/* Mobile tabs row, also pills, below the nav pill */}
-      <div className="pointer-events-auto md:hidden mt-2 flex items-center gap-1.5 overflow-x-auto px-1">
+      {/* overflow-x-auto sadece x'i auto yaptığında bile çoğu browser
+          overflow-y'yi de auto'ya yükseltip dikey scrollbar açıyor.
+          overflow-y-hidden açıkça eklendi ki bu yan etki olmasın. */}
+      <div className="pointer-events-auto md:hidden mt-2 flex items-center gap-1.5 overflow-x-auto overflow-y-hidden px-1">
         {TABS.map((tab) => {
           const active = tab.key === activeKey;
           return (

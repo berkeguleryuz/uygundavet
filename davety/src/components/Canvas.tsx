@@ -138,198 +138,218 @@ export function Canvas() {
         />
       </div>
 
-      <div
-        className="relative mx-auto w-full max-w-md rounded-xl overflow-hidden shadow-xl border border-border bg-card"
-        style={{
-          background: doc.theme.bgColor,
-          color: doc.theme.accentColor,
-          ...getCardShapeStyle(doc),
-          // Photo-driven hero ilk blok ise paddingTop sıfır, görsel
-          // kart tepesine kadar uzansın. InvitationView ile birebir
-          // aynı mantık.
-          ...(() => {
-            const firstBlock = doc.blocks[0];
-            const fbd = firstBlock?.data as
-              | { variant?: string; media?: { url?: string }; photoUrl?: string }
-              | undefined;
-            const firstHasPhoto = !!(
-              firstBlock?.type === "hero" &&
-              (fbd?.variant === "photo-top" || fbd?.variant === "photo-full") &&
-              (fbd?.media?.url || fbd?.photoUrl)
-            );
-            const p = getCardShapePadding(doc);
-            return firstHasPhoto ? { ...p, paddingTop: "0px" } : p;
-          })(),
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Card-wide bgImage + overlay. InvitationView ile aynı mantık,
-            editor canvas'ta da tutarlı render için burada da yer alır. */}
-        {doc.theme.bgImageUrl ? (
+      {(() => {
+        const cardShape = doc.theme.cardShape ?? "flat";
+        const isClipPath = ["peaked", "chevron", "tag"].includes(cardShape);
+        const shapeStyle = getCardShapeStyle(doc);
+        const firstBlock = doc.blocks[0];
+        const fbd = firstBlock?.data as
+          | { variant?: string; media?: { url?: string }; photoUrl?: string }
+          | undefined;
+        const firstHasPhoto = !!(
+          firstBlock?.type === "hero" &&
+          (fbd?.variant === "photo-top" || fbd?.variant === "photo-full") &&
+          (fbd?.media?.url || fbd?.photoUrl)
+        );
+        const p = getCardShapePadding(doc);
+        const effectivePadding = firstHasPhoto
+          ? { ...p, paddingTop: "0px" }
+          : p;
+
+        const cardContent = (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={doc.theme.bgImageUrl}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-              style={{ zIndex: 0 }}
-              aria-hidden
-            />
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                zIndex: 1,
-                background: "#000",
-                opacity: (doc.theme.bgImageOverlay ?? 40) / 100,
-              }}
-              aria-hidden
-            />
-          </>
-        ) : null}
-        <FontBoot doc={doc} />
-
-        {/* Block stack bgImage + overlay'in üstünde durur. Sarmalayıcı
-            relative + z-index ile content'i ön plana çıkarır. */}
-        <div className="relative" style={{ zIndex: 2 }}>
-        {doc.blocks.map((block, i) => {
-          const View = getBlockView(block.type);
-          const selected = selectedBlockId === block.id;
-          // İlk bloğun InsertSlot'u kart-dışı head slot olarak yukarıda
-          // render ediliyor. Buradaki absolute slot kart içinde
-          // overflow-hidden tarafından kırpılıyordu.
-          const hideSlot = i === 0;
-
-          // Block boşluk slider'ı block.style.paddingTop/Bottom'a yazar.
-          // InvitationView ile aynı mantık: pozitif değer padding,
-          // negatif değer margin (komşuya doğru sokulsun). Editor
-          // canvas'ı da aynı kuralı uygulamalı ki kullanıcı slider'ı
-          // çekince anında değişimi görsün.
-          const pt = block.style.paddingTop;
-          const pb = block.style.paddingBottom;
-          const wrapperStyle: React.CSSProperties = {
-            paddingTop: pt != null && pt > 0 ? pt : undefined,
-            paddingBottom: pb != null && pb > 0 ? pb : undefined,
-            marginTop: pt != null && pt < 0 ? pt : undefined,
-            marginBottom: pb != null && pb < 0 ? pb : undefined,
-          };
-
-          return (
-            <div
-              key={block.id}
-              className="relative group/block"
-              style={wrapperStyle}
-            >
-              {hideSlot ? null : (
-                <InsertSlot
-                  index={i}
-                  active={insertingAt === i}
-                  // Flip palette upward for the last 3 slots so it doesn't
-                  // run off the bottom of the card / canvas.
-                  flipUp={i >= doc.blocks.length - 2}
-                  // Force-show the slot when the adjacent block is the
-                  // selected one so mobile users (no hover) can still
-                  // reach it after tapping a block.
-                  forceVisible={selected || selectedBlockId === doc.blocks[i - 1]?.id}
-                  tier={tier}
-                  onOpen={() => setInsertingAt(i)}
-                  onClose={() => setInsertingAt(null)}
-                  onPick={(type) => handlePick(i, type)}
+            {/* Card-wide bgImage + overlay. InvitationView ile aynı mantık,
+                editor canvas'ta da tutarlı render için burada da yer alır. */}
+            {doc.theme.bgImageUrl ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={doc.theme.bgImageUrl}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                  style={{ zIndex: 0 }}
+                  aria-hidden
                 />
-              )}
-
-              <div
-                className={cn(
-                  "relative transition-all",
-                  !block.visible && "opacity-35",
-                  selected &&
-                    "outline-2 outline-accent outline-offset-2 outline-dashed"
-                )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  selectBlock(block.id);
-                }}
-              >
-                <View
-                  block={block}
-                  theme={doc.theme}
-                  editable
-                  onFieldSelect={(fieldId) => selectField(block.id, fieldId)}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    zIndex: 1,
+                    background: "#000",
+                    opacity: (doc.theme.bgImageOverlay ?? 40) / 100,
+                  }}
+                  aria-hidden
                 />
-
-                {selected ? (
+              </>
+            ) : null}
+            <FontBoot doc={doc} />
+            <div className="relative" style={{ zIndex: 2 }}>
+              {doc.blocks.map((block, i) => {
+                const View = getBlockView(block.type);
+                const selected = selectedBlockId === block.id;
+                const hideSlot = i === 0;
+                const pt = block.style.paddingTop;
+                const pb = block.style.paddingBottom;
+                const wrapperStyle: React.CSSProperties = {
+                  paddingTop: pt != null && pt > 0 ? pt : undefined,
+                  paddingBottom: pb != null && pb > 0 ? pb : undefined,
+                  marginTop: pt != null && pt < 0 ? pt : undefined,
+                  marginBottom: pb != null && pb < 0 ? pb : undefined,
+                };
+                return (
                   <div
-                    // İlk blokta toolbar'ın clip-path tarafından
-                    // kırpılmaması için shape'e göre dinamik offset
-                    // (arch/tag/peaked/tall-arch hepsi farklı miktarda
-                    // sağ köşeyi yer). Diğer bloklar normal top-2.
-                    className="absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1"
-                    style={{
-                      top:
-                        i === 0 && firstBlockClipPx > 0
-                          ? `${firstBlockClipPx + 8}px`
-                          : "8px",
-                    }}
-                    onClick={(e) => e.stopPropagation()}
+                    key={block.id}
+                    className="relative group/block"
+                    style={wrapperStyle}
                   >
-                    <IconBtn
-                      title="Yukarı taşı"
-                      disabled={i === 0}
-                      onClick={() => moveBlock(block.id, i - 1)}
-                    >
-                      <ArrowUp className="size-3.5" />
-                    </IconBtn>
-                    <IconBtn
-                      title="Aşağı taşı"
-                      disabled={i === doc.blocks.length - 1}
-                      onClick={() => moveBlock(block.id, i + 1)}
-                    >
-                      <ArrowDown className="size-3.5" />
-                    </IconBtn>
-                    <IconBtn
-                      title={block.visible ? "Gizle" : "Göster"}
-                      onClick={() => toggleVisibility(block.id)}
-                    >
-                      {block.visible ? (
-                        <EyeOff className="size-3.5" />
-                      ) : (
-                        <Eye className="size-3.5" />
-                      )}
-                    </IconBtn>
-                    <IconBtn
-                      title={
-                        block.locked
-                          ? "Bu blok silinemez (işlevsel). Gizleyebilirsin."
-                          : "Sil"
-                      }
-                      danger
-                      disabled={block.locked}
-                      onClick={async () => {
-                        if (block.locked) return;
-                        const ok = await confirm({
-                          title: "Bloğu sil",
-                          description:
-                            "Bu bloğu silmek istediğine emin misin? Bu işlem geri alınabilir (Ctrl+Z).",
-                          confirmLabel: "Sil",
-                          cancelLabel: "Vazgeç",
-                          variant: "danger",
-                        });
-                        if (ok) {
-                          deleteBlock(block.id);
-                          selectBlock(null);
+                    {hideSlot ? null : (
+                      <InsertSlot
+                        index={i}
+                        active={insertingAt === i}
+                        flipUp={i >= doc.blocks.length - 2}
+                        forceVisible={
+                          selected ||
+                          selectedBlockId === doc.blocks[i - 1]?.id
                         }
+                        tier={tier}
+                        onOpen={() => setInsertingAt(i)}
+                        onClose={() => setInsertingAt(null)}
+                        onPick={(type) => handlePick(i, type)}
+                      />
+                    )}
+                    <div
+                      className={cn(
+                        "relative transition-all",
+                        !block.visible && "opacity-35",
+                        selected &&
+                          "outline-2 outline-accent outline-offset-2 outline-dashed"
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectBlock(block.id);
                       }}
                     >
-                      <Trash2 className="size-3.5" />
-                    </IconBtn>
+                      <View
+                        block={block}
+                        theme={doc.theme}
+                        editable
+                        onFieldSelect={(fieldId) =>
+                          selectField(block.id, fieldId)
+                        }
+                      />
+                      {selected ? (
+                        <div
+                          className="absolute right-2 flex items-center gap-1 z-30 bg-card/95 backdrop-blur-sm border border-border rounded-md shadow-lg p-1"
+                          style={{
+                            top:
+                              i === 0 && firstBlockClipPx > 0
+                                ? `${firstBlockClipPx + 8}px`
+                                : "8px",
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <IconBtn
+                            title="Yukarı taşı"
+                            disabled={i === 0}
+                            onClick={() => moveBlock(block.id, i - 1)}
+                          >
+                            <ArrowUp className="size-3.5" />
+                          </IconBtn>
+                          <IconBtn
+                            title="Aşağı taşı"
+                            disabled={i === doc.blocks.length - 1}
+                            onClick={() => moveBlock(block.id, i + 1)}
+                          >
+                            <ArrowDown className="size-3.5" />
+                          </IconBtn>
+                          <IconBtn
+                            title={block.visible ? "Gizle" : "Göster"}
+                            onClick={() => toggleVisibility(block.id)}
+                          >
+                            {block.visible ? (
+                              <EyeOff className="size-3.5" />
+                            ) : (
+                              <Eye className="size-3.5" />
+                            )}
+                          </IconBtn>
+                          <IconBtn
+                            title={
+                              block.locked
+                                ? "Bu blok silinemez (işlevsel). Gizleyebilirsin."
+                                : "Sil"
+                            }
+                            danger
+                            disabled={block.locked}
+                            onClick={async () => {
+                              if (block.locked) return;
+                              const ok = await confirm({
+                                title: "Bloğu sil",
+                                description:
+                                  "Bu bloğu silmek istediğine emin misin? Bu işlem geri alınabilir (Ctrl+Z).",
+                                confirmLabel: "Sil",
+                                cancelLabel: "Vazgeç",
+                                variant: "danger",
+                              });
+                              if (ok) {
+                                deleteBlock(block.id);
+                                selectBlock(null);
+                              }
+                            }}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </IconBtn>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                ) : null}
+                );
+              })}
+            </div>
+          </>
+        );
+
+        const innerStyle: React.CSSProperties = {
+          background: doc.theme.bgColor,
+          color: doc.theme.accentColor,
+          ...shapeStyle,
+          ...effectivePadding,
+        };
+
+        // Clip-path şekilleri için outer wrapper border layer:
+        // outer aynı clip-path + 1px padding + var(--border) bg →
+        // inner kart aynı clip-path'le 1px daha küçük silüet çiziyor,
+        // arada kalan 1px kuşak silüeti takip eden uniform border.
+        if (isClipPath) {
+          return (
+            <div
+              className="relative mx-auto w-full max-w-md shadow-xl"
+              style={{
+                background: "var(--border)",
+                padding: "1px",
+                ...shapeStyle,
+              }}
+            >
+              <div
+                className="relative w-full overflow-hidden bg-card"
+                style={innerStyle}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {cardContent}
               </div>
             </div>
           );
-        })}
-        </div>
+        }
 
-      </div>
+        // Diğer şekiller: tek div, normal CSS border.
+        return (
+          <div
+            className="relative mx-auto w-full max-w-md overflow-hidden shadow-xl bg-card border border-border"
+            style={innerStyle}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {cardContent}
+          </div>
+        );
+      })()}
 
       {/* Tail insert slot, sits OUTSIDE the card so it never appears in
            the invitation itself (so the user can screenshot/preview the
