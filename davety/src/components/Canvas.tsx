@@ -136,8 +136,26 @@ export function Canvas() {
           // overflow-hidden tarafından kırpılıyordu.
           const hideSlot = i === 0;
 
+          // Block boşluk slider'ı block.style.paddingTop/Bottom'a yazar.
+          // InvitationView ile aynı mantık: pozitif değer padding,
+          // negatif değer margin (komşuya doğru sokulsun). Editor
+          // canvas'ı da aynı kuralı uygulamalı ki kullanıcı slider'ı
+          // çekince anında değişimi görsün.
+          const pt = block.style.paddingTop;
+          const pb = block.style.paddingBottom;
+          const wrapperStyle: React.CSSProperties = {
+            paddingTop: pt != null && pt > 0 ? pt : undefined,
+            paddingBottom: pb != null && pb > 0 ? pb : undefined,
+            marginTop: pt != null && pt < 0 ? pt : undefined,
+            marginBottom: pb != null && pb < 0 ? pb : undefined,
+          };
+
           return (
-            <div key={block.id} className="relative group/block">
+            <div
+              key={block.id}
+              className="relative group/block"
+              style={wrapperStyle}
+            >
               {hideSlot ? null : (
                 <InsertSlot
                   index={i}

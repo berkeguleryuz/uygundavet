@@ -118,9 +118,12 @@ export function BlockControlsPanel() {
         <Chip
           icon={<Sliders className="size-4" />}
           label={t("changeSettings")}
-          // Open the text/style panel for the block's primary field so the
-          // user can adjust fonts, sizes, colors, alignment from there.
-          onClick={() => selectField(blockId, primaryFieldFor(block.type))}
+          // "*" sentinel field id, TextStylePanel'i blok-seviye stil
+          // moduna alır. Font/size/color/align değişikliği tüm fields'a
+          // uygulanır (her field'ı ayrı ayrı tıklamaya gerek yok).
+          // Özellikle families bloğunda "Gelinin Ailesi" + "Damadın
+          // Ailesi"ni tek tıkla beraber düzenlemek için.
+          onClick={() => selectField(blockId, "*")}
         />
         {supportsMedia ? (
           <Chip

@@ -88,7 +88,7 @@ const FEATURES: FeatureRow[] = [
     section: "Tasarım",
     label: "Kendi görsellerini yükle",
     description: "Fotoğraf & video ekleme",
-    values: { free: false, basic: true, pro: true, premium: true },
+    values: { free: "1 görsel", basic: true, pro: true, premium: true },
   },
   {
     section: "Tasarım",

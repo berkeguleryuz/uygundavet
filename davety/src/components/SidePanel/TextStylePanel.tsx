@@ -64,7 +64,13 @@ export function TextStylePanel() {
   const FANOUT_READ: Record<string, string> = {
     targetIso: "days",
   };
-  const readFieldId = FANOUT_READ[fieldId ?? ""] ?? fieldId ?? "";
+  // "*" sentinel = block-level styling mode. Panel hiçbir spesifik
+  // field'ı target almaz, doğrudan block.style root'una yazar. Tüm
+  // alt-field'lar (override'sız olanlar) bu değeri inherit eder.
+  const isBlockMode = fieldId === "*";
+  const readFieldId = isBlockMode
+    ? ""
+    : FANOUT_READ[fieldId ?? ""] ?? fieldId ?? "";
   // Re-measure whenever the user picks a different field/block. Skip the
   // measurement when the user has an explicit override, the override is
   // the source of truth in that case.
@@ -103,6 +109,8 @@ export function TextStylePanel() {
   }, [blockId, readFieldId, doc]);
 
   if (!doc || !blockId || !fieldId) return null;
+  // "*" block-mode'unda fieldId="*" geldiği için aşağıdaki guard'lar
+  // doğrudan field-level data'ya bakan kısımları skip eder.
   const block = doc.blocks.find((b) => b.id === blockId);
   if (!block) return null;
 
@@ -125,6 +133,12 @@ export function TextStylePanel() {
     targetIso: ["days", "hours", "minutes", "seconds"],
   };
   const update = (patch: Record<string, unknown>) => {
+    if (isBlockMode) {
+      // Block-level mode, doğrudan block.style'a yaz, tüm field'lar
+      // inherit eder.
+      updateBlockStyle(blockId, patch);
+      return;
+    }
     const targets = FANOUT[fieldId] ?? [fieldId];
     for (const id of targets) {
       updateFieldStyle(blockId, id, patch);
@@ -176,15 +190,18 @@ export function TextStylePanel() {
   const isStoryItemsField =
     block.type === "story_timeline" && fieldId === "items";
   const showContentEditor =
-    isCoupleNames ||
-    isDateField ||
-    isFamiliesField ||
-    isEventItemsField ||
-    isGalleryItemsField ||
-    isStoryItemsField ||
-    isOptionalLocationField ||
-    fieldValue !== undefined;
-  const fieldLabel = fieldLabelFor(fieldId, doc?.meta.eventCategory);
+    !isBlockMode &&
+    (isCoupleNames ||
+      isDateField ||
+      isFamiliesField ||
+      isEventItemsField ||
+      isGalleryItemsField ||
+      isStoryItemsField ||
+      isOptionalLocationField ||
+      fieldValue !== undefined);
+  const fieldLabel = isBlockMode
+    ? "Tüm Bloğun Metin Ayarları"
+    : fieldLabelFor(fieldId, doc?.meta.eventCategory);
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
 

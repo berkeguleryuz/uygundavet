@@ -124,7 +124,7 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
       },
       {
         label: "Kendi fotoğraf & video",
-        values: { free: false, basic: true, pro: true, premium: true },
+        values: { free: "1 görsel", basic: true, pro: true, premium: true },
       },
       {
         label: "Renk, font & tema",

@@ -130,7 +130,7 @@ export default function OrderDetailPage() {
   const remaining = order.totalAmount - order.depositAmount;
 
   return (
-    <div className="space-y-8 max-w-6xl">
+    <div className="space-y-8 w-full">
       <button
         onClick={() => router.push("/clodron/siparisler")}
         className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors font-sans cursor-pointer"
