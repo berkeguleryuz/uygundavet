@@ -98,14 +98,17 @@ export default async function PersonalisedInvitationPage({
     }
   }
 
+  const isDraft = design.status !== "published" || !design.publishedDoc;
+
+  // Yayında olan davetiyede owner da publishedDoc'u görür (free tier
+  // tanıtım bloğu, tier trim'leri publish anında uygulanmış halde).
+  // Sadece taslakta owner çalışma dokümanına düşer.
   const doc = (
-    isOwner
+    isDraft && isOwner
       ? design.doc ?? design.publishedDoc
       : design.publishedDoc ?? design.doc
   ) as InvitationDoc | null;
   if (!doc) redirect("/");
-
-  const isDraft = design.status !== "published" || !design.publishedDoc;
 
   if (isDraft && !isOwner) {
     return (

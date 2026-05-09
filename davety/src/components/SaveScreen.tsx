@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Flame,
   Heart,
+  Lock,
   Minus,
   Pencil,
   Sparkles,
@@ -38,7 +39,7 @@ import {
 
 import { toast } from "sonner";
 import { Link, useRouter } from "@/i18n/navigation";
-import { planLimitsFor } from "@/src/lib/plan-limits";
+import { planLimitsFor, nextTierLabel } from "@/src/lib/plan-limits";
 import {
   TierIconStyles,
   SparkleIcon,
@@ -527,7 +528,12 @@ export function SaveScreen({
                 tier={activeTier}
                 onUpgrade={triggerUpgrade}
               />
-              <NextStepsCard designId={designId} shareUrl={shareUrl} />
+              <NextStepsCard
+                designId={designId}
+                shareUrl={shareUrl}
+                tier={activeTier}
+                onUpgrade={triggerUpgrade}
+              />
             </div>
           </>
         ) : step === "intro" ? (
@@ -1532,44 +1538,61 @@ function VanityCard({
 function NextStepsCard({
   designId,
   shareUrl,
+  tier,
+  onUpgrade,
 }: {
   designId: string;
   shareUrl: string;
+  tier: TierId | null;
+  onUpgrade: () => void;
 }) {
-  // designId/shareUrl değişmedikçe items array'i stabil kalsın.
-  const items = useMemo(() => [
-    {
-      icon: Users,
-      title: "Misafirleri takip et",
-      desc: "RSVP yanıtlarını ve katılımcı listeni gör.",
-      href: `/dashboard/${designId}/guests`,
-    },
-    {
-      icon: Heart,
-      title: "Hatıralara göz at",
-      desc: "Misafirlerin bıraktığı mesajları onayla.",
-      href: `/dashboard/${designId}/memories`,
-    },
-    {
-      icon: Pencil,
-      title: "Düzenlemeye devam et",
-      desc: "Yayındaki davetiye üzerinde değişiklik yap.",
-      href: `/design/invitations/${designId}/editor`,
-    },
-    {
-      icon: ExternalLink,
-      title: "Davetiyeyi misafir gibi gör",
-      desc: "Yayındaki halini yeni sekmede aç.",
-      href: shareUrl,
-      external: true,
-    },
-  ] as Array<{
-    icon: typeof Users;
-    title: string;
-    desc: string;
-    href: string;
-    external?: boolean;
-  }>, [designId, shareUrl]);
+  // Tier limitleri her adıma göre kontrol ediliyor: Misafirler =
+  // rsvpReadEnabled (Pro+), Hatıralar = memoryBookEnabled (Klasik+),
+  // Düzenleme ve "misafir gibi gör" her tier'da açık. Kilitli adımlar
+  // tıklanmaz, gri görünür ve Yükselt rozeti gösterir.
+  const items = useMemo(() => {
+    const limits = planLimitsFor(tier);
+    return [
+      {
+        icon: Users,
+        title: "Misafirleri takip et",
+        desc: "RSVP yanıtlarını ve katılımcı listeni gör.",
+        href: `/dashboard/${designId}/guests`,
+        locked: !limits.rsvpReadEnabled,
+      },
+      {
+        icon: Heart,
+        title: "Hatıralara göz at",
+        desc: "Misafirlerin bıraktığı mesajları onayla.",
+        href: `/dashboard/${designId}/memories`,
+        locked: !limits.memoryBookEnabled,
+      },
+      {
+        icon: Pencil,
+        title: "Düzenlemeye devam et",
+        desc: "Yayındaki davetiye üzerinde değişiklik yap.",
+        href: `/design/invitations/${designId}/editor`,
+        locked: false,
+      },
+      {
+        icon: ExternalLink,
+        title: "Davetiyeyi misafir gibi gör",
+        desc: "Yayındaki halini yeni sekmede aç.",
+        href: shareUrl,
+        external: true,
+        locked: false,
+      },
+    ] as Array<{
+      icon: typeof Users;
+      title: string;
+      desc: string;
+      href: string;
+      external?: boolean;
+      locked: boolean;
+    }>;
+  }, [designId, shareUrl, tier]);
+
+  const upgradeLabel = nextTierLabel(tier);
 
   return (
     <article className="rounded-2xl border border-border bg-card p-6">
@@ -1581,11 +1604,34 @@ function NextStepsCard({
         {items.map((it) => {
           const inner = (
             <>
-              <span className="size-9 shrink-0 rounded-full bg-primary/10 text-primary inline-flex items-center justify-center">
-                <it.icon className="size-4" />
+              <span
+                className={`size-9 shrink-0 rounded-full inline-flex items-center justify-center ${
+                  it.locked
+                    ? "bg-muted text-muted-foreground"
+                    : "bg-primary/10 text-primary"
+                }`}
+              >
+                {it.locked ? (
+                  <Lock className="size-4" />
+                ) : (
+                  <it.icon className="size-4" />
+                )}
               </span>
               <span className="flex-1">
-                <span className="block text-sm font-medium">{it.title}</span>
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className={`block text-sm font-medium ${
+                      it.locked ? "text-muted-foreground" : ""
+                    }`}
+                  >
+                    {it.title}
+                  </span>
+                  {it.locked ? (
+                    <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
+                      {upgradeLabel}
+                    </span>
+                  ) : null}
+                </span>
                 <span className="block text-[11px] text-muted-foreground">
                   {it.desc}
                 </span>
@@ -1593,6 +1639,17 @@ function NextStepsCard({
               <Check className="size-3.5 text-muted-foreground/40" />
             </>
           );
+          if (it.locked) {
+            return (
+              <button
+                key={it.title}
+                onClick={onUpgrade}
+                className="flex items-center gap-3 rounded-xl border border-amber-300/40 bg-amber-50/40 px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50 transition-colors cursor-pointer text-left"
+              >
+                {inner}
+              </button>
+            );
+          }
           return it.external ? (
             <a
               key={it.title}

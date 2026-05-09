@@ -255,7 +255,9 @@ export function buildPremiumTemplateDoc(
       bgImageOverlay: 40,
       envelope: {
         color: template.palette.envelope,
-        flapColor: template.palette.flap,
+        // Tüm hazır temalarda zarf rengi = kapak rengi (birleşik silüet,
+        // daha zarif). Kullanıcı isterse EnvelopeTab'dan ayırabilir.
+        flapColor: template.palette.envelope,
         liningBg: template.palette.lining,
         liningPattern: template.palette.pattern,
         stampEnabled: true,

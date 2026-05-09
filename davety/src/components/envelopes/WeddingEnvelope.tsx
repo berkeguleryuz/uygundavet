@@ -49,6 +49,10 @@ export interface StampConfig {
   image?: string;
   borderStyle?: "dashed" | "solid" | "perforated";
   size?: number;
+  /** Marka pulu modu: tepede "DavetYolla" yazısı + altında küçük
+   *  ikon, transparan dolgu. Kullanıcı kendi yazı/görsel seçince
+   *  resolver bu flag'i kapatır. */
+  brand?: boolean;
 }
 
 export interface WeddingEnvelopeProps {
@@ -58,7 +62,16 @@ export interface WeddingEnvelopeProps {
   cardHeight?: number;
   envelopeColor?: string;
   flapColor?: string;
-  liningPattern?: "daisy" | "rose" | "gold" | "none" | "chevron";
+  liningPattern?:
+    | "daisy"
+    | "rose"
+    | "gold"
+    | "none"
+    | "chevron"
+    | "floral"
+    | "leaves"
+    | "waves"
+    | "damask";
   liningBg?: string;
   cardProps?: InvitationCardProps;
   cardRender?: (props: { width: number; height: number }) => ReactNode;
@@ -589,9 +602,9 @@ export function WeddingEnvelope({
         </div>
       </div>
 
-      {/* Brand logo (replaces the previous reset button, kept the
-          same top-of-scene slot so the logo sits above the envelope
-          once the card has settled). */}
+      {/* Marka logosu — kart açıldıktan sonra zarfın üstünde görünür.
+          Resmi DavetYolla wordmark'ı (webp), eski altın yüzük ikonu
+          yerine. */}
       {stage === "done" ? (
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2"
@@ -599,13 +612,13 @@ export function WeddingEnvelope({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo-gold-transparent.png"
-            alt="davetyolla"
+            src="/davetyolla.png"
+            alt="DavetYolla"
             width={56}
             height={56}
             loading="lazy"
             decoding="async"
-            className="block transition-opacity duration-500 ease-in-out"
+            className="block transition-opacity duration-500 ease-in-out object-contain"
           />
         </div>
       ) : null}
@@ -615,12 +628,132 @@ export function WeddingEnvelope({
 }
 
 /* ───── Lining patterns ───── */
-function LiningPattern({
+export function LiningPattern({
   kind,
 }: {
-  kind: "daisy" | "rose" | "gold" | "none" | "chevron";
+  kind:
+    | "daisy"
+    | "rose"
+    | "gold"
+    | "none"
+    | "chevron"
+    | "floral"
+    | "leaves"
+    | "waves"
+    | "damask";
 }) {
   if (kind === "none") return null;
+  if (kind === "floral") {
+    return (
+      <svg
+        viewBox="0 0 200 100"
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        {Array.from({ length: 18 }).map((_, i) => {
+          const x = 14 + (i % 6) * 32;
+          const y = 18 + Math.floor(i / 6) * 30;
+          return (
+            <g key={i} transform={`translate(${x},${y})`}>
+              {[0, 60, 120, 180, 240, 300].map((a) => (
+                <ellipse
+                  key={a}
+                  cx="0"
+                  cy="-7"
+                  rx="3.6"
+                  ry="7"
+                  fill="#f4e0c4"
+                  opacity="0.95"
+                  transform={`rotate(${a})`}
+                />
+              ))}
+              <circle r="2.6" fill="#c98a3c" />
+            </g>
+          );
+        })}
+      </svg>
+    );
+  }
+  if (kind === "leaves") {
+    return (
+      <svg
+        viewBox="0 0 200 100"
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        {Array.from({ length: 22 }).map((_, i) => {
+          const x = 12 + (i % 6) * 32 + (Math.floor(i / 6) % 2) * 16;
+          const y = 16 + Math.floor(i / 6) * 24;
+          const rot = (i * 47) % 360;
+          return (
+            <g key={i} transform={`translate(${x},${y}) rotate(${rot})`}>
+              <path
+                d="M 0 -10 Q 7 -2 0 10 Q -7 -2 0 -10 Z"
+                fill="#9bbf7e"
+                opacity="0.85"
+              />
+              <path
+                d="M 0 -8 L 0 8"
+                stroke="#5d8048"
+                strokeWidth="0.6"
+                opacity="0.8"
+              />
+            </g>
+          );
+        })}
+      </svg>
+    );
+  }
+  if (kind === "waves") {
+    return (
+      <svg
+        viewBox="0 0 200 100"
+        className="w-full h-full"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <pattern id="waves" width="40" height="14" patternUnits="userSpaceOnUse">
+            <path
+              d="M 0 7 Q 10 0 20 7 T 40 7"
+              fill="none"
+              stroke="#ffffff"
+              strokeOpacity="0.32"
+              strokeWidth="1.4"
+            />
+          </pattern>
+        </defs>
+        <rect width="200" height="100" fill="url(#waves)" />
+      </svg>
+    );
+  }
+  if (kind === "damask") {
+    return (
+      <svg
+        viewBox="0 0 200 100"
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          <pattern id="damask" width="40" height="40" patternUnits="userSpaceOnUse">
+            <g
+              fill="none"
+              stroke="#d4b886"
+              strokeWidth="0.9"
+              opacity="0.7"
+              transform="translate(20 20)"
+            >
+              <path d="M 0 -14 Q 8 -8 0 0 Q -8 -8 0 -14 Z" />
+              <path d="M 0 14 Q 8 8 0 0 Q -8 8 0 14 Z" />
+              <path d="M -14 0 Q -8 -8 0 0 Q -8 8 -14 0 Z" />
+              <path d="M 14 0 Q 8 -8 0 0 Q 8 8 14 0 Z" />
+              <circle r="2" fill="#d4b886" stroke="none" />
+            </g>
+          </pattern>
+        </defs>
+        <rect width="200" height="100" fill="url(#damask)" />
+      </svg>
+    );
+  }
   if (kind === "gold") {
     return (
       <svg viewBox="0 0 200 100" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
@@ -712,7 +845,8 @@ function Stamp({
   envelopeWidth: number;
   envelopeBg: string;
 }) {
-  const sizeRatio = config.size ?? 0.18;
+  // Marka modunda boyut biraz daha büyük (yazı + ikon yan yana sığsın)
+  const sizeRatio = config.size ?? (config.brand ? 0.22 : 0.18);
   const w = Math.round(envelopeWidth * sizeRatio);
   const h = Math.round(w * 1.2);
   const borderStyle = config.borderStyle ?? "dashed";
@@ -720,11 +854,18 @@ function Stamp({
   const defaultOutline = isBgLight
     ? "rgba(40, 40, 50, 0.45)"
     : "rgba(220, 220, 230, 0.55)";
-  const outline = config.color ?? defaultOutline;
-  const fill = config.color ?? "transparent";
+  // Marka pulunda renkli arka plan istemiyoruz — şeffaf ve dashed
+  // çerçeve. Kullanıcı renk seçtiyse normal mod.
+  const outline =
+    config.brand && !config.color ? defaultOutline : config.color ?? defaultOutline;
+  const fill = config.brand ? "transparent" : config.color ?? "transparent";
   const textColor =
     config.textColor ??
-    (config.color
+    (config.brand
+      ? isBgLight
+        ? "#2a2420"
+        : "#f3ecdc"
+      : config.color
       ? isLight(config.color)
         ? "#2a2420"
         : "#f8f3e6"
@@ -757,6 +898,46 @@ function Stamp({
             </text>
           ) : null}
         </svg>
+      ) : config.brand ? (
+        // Marka pulu: tepede "DavetYolla" yazısı + altında küçük ikon.
+        // Renkli dolgu yok, dashed çerçeve. Kullanıcı yazı veya görsel
+        // seçince resolveEnvelope `brand: false` döner ve normal akış.
+        <div
+          className="flex flex-col items-center justify-center overflow-hidden w-full h-full"
+          style={{
+            background: fill,
+            border: `2px ${borderStyle} ${outline}`,
+            borderRadius: 3,
+            padding: 4,
+            gap: 2,
+          }}
+        >
+          <span
+            className="font-medium text-center leading-tight whitespace-nowrap"
+            style={{
+              color: textColor,
+              fontFamily: "Merienda, serif",
+              fontSize: Math.round(w * 0.18),
+            }}
+          >
+            DavetYolla
+          </span>
+          {config.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={config.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="object-contain"
+              draggable={false}
+              style={{
+                width: Math.round(w * 0.55),
+                height: Math.round(w * 0.55),
+              }}
+            />
+          ) : null}
+        </div>
       ) : (
         <div
           className="flex items-center justify-center overflow-hidden w-full h-full"

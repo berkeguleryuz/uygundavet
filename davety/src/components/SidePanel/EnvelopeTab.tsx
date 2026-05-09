@@ -189,13 +189,14 @@ export function EnvelopeTab() {
                 Pul Yazısı
               </label>
               <p className="text-[10px] text-muted-foreground/80 mt-0.5">
-                Kısa harfler/baş harfler önerilir (ör. H&amp;İ).
+                Kısa harfler/baş harfler önerilir (ör. D&amp;Y). Boş
+                bırakırsan DavetYolla logosu kullanılır.
               </p>
               <input
                 type="text"
                 value={stampLabel}
                 onChange={(e) => merge({ stampLabel: e.target.value })}
-                placeholder="H&İ"
+                placeholder="D&Y"
                 disabled={!!stampImage}
                 className="mt-1 w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm disabled:opacity-50"
               />

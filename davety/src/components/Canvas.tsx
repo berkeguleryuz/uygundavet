@@ -19,6 +19,7 @@ import { useConfirm } from "@/src/components/ConfirmDialog";
 import { getEventLabels } from "@/src/lib/event-labels";
 import { WeddingEnvelope } from "@/src/components/envelopes/WeddingEnvelope";
 import { resolveEnvelopeProps } from "@/src/components/envelopes/resolveEnvelope";
+import { EnvelopeBackPreview } from "@/src/components/envelopes/EnvelopeBackPreview";
 import { cn } from "@/src/lib/utils";
 import type { BlockType, PlanTier } from "@davety/schema";
 
@@ -618,6 +619,16 @@ function EnvelopeCanvas() {
             <InvitationView doc={doc} />
           </div>
         )}
+      />
+      {/* Statik açık-zarf önizlemesi: kullanıcı kapak / iç astar
+          rengini değiştirirken animasyonu beklemek zorunda kalmasın.
+          Yalnızca editor canvas'ında, public sayfada yok. */}
+      <EnvelopeBackPreview
+        envelopeColor={resolved.envelopeColor}
+        flapColor={resolved.flapColor}
+        liningBg={resolved.liningBg}
+        liningPattern={resolved.liningPattern}
+        width={360}
       />
     </div>
   );

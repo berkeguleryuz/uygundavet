@@ -38,22 +38,29 @@ export function resolveEnvelopeProps(
   void _stripCardProps;
 
   const stampEnabled = envTheme?.stampEnabled ?? true;
-  const stampLabel = envTheme?.stampLabel?.trim() ?? "";
+  const rawStampLabel = envTheme?.stampLabel?.trim() ?? "";
   const stampImage = envTheme?.stampImage;
-  const userStamp =
-    stampEnabled && (stampLabel || stampImage)
+  // Eski varsayılan stampLabel "H&İ" idi. Kullanıcı bunu kendisi
+  // yazmadıysa (legacy default), marka pulunu göstermek için boş
+  // muamelesi yapıyoruz. Kullanıcı kendi başharflerini girdiyse
+  // string aynı olur ama bu tradeoff'a değer — yenilenmiş default
+  // marka pulu daha öncelikli.
+  const stampLabel = rawStampLabel === "H&İ" ? "" : rawStampLabel;
+  // Hiç özelleştirme yoksa marka pulu (DavetYolla yazı + ikon).
+  const userStamp = !stampEnabled
+    ? null
+    : stampLabel || stampImage
       ? {
           color: envTheme?.stampColor ?? "#b85450",
           label: stampLabel || undefined,
           image: stampImage,
           borderStyle: "dashed" as const,
         }
-      : stampEnabled
-        ? presetProps.stamp ?? {
-            color: envTheme?.stampColor ?? "#b85450",
-            borderStyle: "dashed" as const,
-          }
-        : null;
+      : presetProps.stamp ?? {
+          brand: true,
+          image: "/davetyolla.png",
+          borderStyle: "dashed" as const,
+        };
 
   const finalEnvelopeColor =
     envTheme?.color ?? presetProps.envelopeColor;

@@ -171,14 +171,20 @@ export default async function PublicInvitationPage({
     }
   }
 
+  const isDraft = design.status !== "published" || !design.publishedDoc;
+
+  // Yayındaki davetiyede owner da publishedDoc'u görür (publish anında
+  // tier kuralları uygulanır — Free için 4. blok DavetYolla tanıtımı
+  // enjekte ediliyor, RSVP/memory_book trim'leniyor vb.). Eskiden owner
+  // `doc`'u önce alıyordu ve kendi linkinde reklam bloğunu görmediği
+  // için bug sandı. Sadece taslak davetiyelerde owner çalışma
+  // dokümanına düşer (publishedDoc henüz yok).
   const doc = (
-    isOwner
+    isDraft && isOwner
       ? design.doc ?? design.publishedDoc
       : design.publishedDoc ?? design.doc
   ) as InvitationDoc | null;
   if (!doc) redirect("/");
-
-  const isDraft = design.status !== "published" || !design.publishedDoc;
 
   if (isDraft && !isOwner) {
     return (

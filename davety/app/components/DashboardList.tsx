@@ -161,7 +161,7 @@ export function DashboardList({ designs: initial, locale, publicBase }: Props) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Çift, mekân, slug ara…"
+            placeholder="Mekân, etkinlik ara…"
             className="w-64 max-w-full rounded-full border border-border pl-8 pr-3 py-2 text-xs bg-background focus:outline-none focus:border-foreground/40 transition-colors"
           />
         </div>
@@ -435,17 +435,11 @@ function DesignCard({
         </div>
 
         <div className="mt-auto pt-3 flex flex-col gap-2">
-          <Link
-            href={`/design/invitations/${d.id}/editor` as never}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground text-xs px-3 py-2.5 font-chakra uppercase tracking-[0.15em] hover:opacity-90 transition-opacity"
-          >
-            <Pencil className="size-3.5" /> Düzenle
-          </Link>
-          {/* Yayınlanmış davetiyelerde "Paylaş" butonu, /save ekranına
-              yönlendiriyor — QR, link kopyala, WhatsApp/Telegram/SMS
-              paylaşım, paket yükselt akışı hep orada. Eskiden bu
-              ekrana sadece ilk yayında erişilebiliyordu, kullanıcı
-              geri dönmek isteyince yolunu bulamıyordu. */}
+          {/* Yayınlanmış davetiyelerde "Paylaş & QR" butonu Düzenle'nin
+              ÜZERİNDE görünüyor; Düzenle slot'u bütün kartlarda aynı
+              dikeyde kalsın diye. Yayınlanmamış kartta sadece Düzenle
+              olduğu için layout zaten bu hizada. /save → QR + link +
+              WhatsApp/Telegram/SMS paylaşım + paket yükselt akışı. */}
           {isPublished ? (
             <Link
               href={`/design/invitations/${d.id}/save` as never}
@@ -454,6 +448,12 @@ function DesignCard({
               <Share2 className="size-3.5" /> Paylaş & QR
             </Link>
           ) : null}
+          <Link
+            href={`/design/invitations/${d.id}/editor` as never}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary text-primary-foreground text-xs px-3 py-2.5 font-chakra uppercase tracking-[0.15em] hover:opacity-90 transition-opacity"
+          >
+            <Pencil className="size-3.5" /> Düzenle
+          </Link>
           <div className="grid grid-cols-4 gap-1.5">
             {isPublished ? (
               <QuickAction

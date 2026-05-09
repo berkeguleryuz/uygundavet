@@ -14,7 +14,7 @@ export function EnvelopePlayground() {
   // Stamp customisation state
   const [stampOn, setStampOn] = useState(false);
   const [stampColor, setStampColor] = useState("#b85450");
-  const [stampLabel, setStampLabel] = useState("H&İ");
+  const [stampLabel, setStampLabel] = useState("D&Y");
   const [stampBorderStyle, setStampBorderStyle] = useState<
     "dashed" | "solid" | "perforated"
   >("dashed");
@@ -115,7 +115,7 @@ export function EnvelopePlayground() {
                   type="text"
                   value={stampLabel}
                   onChange={(e) => setStampLabel(e.target.value)}
-                  placeholder="H&İ"
+                  placeholder="D&Y"
                   className="flex-1 px-2 py-1 text-sm border border-border rounded"
                 />
               </label>

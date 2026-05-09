@@ -3,7 +3,9 @@ import { z } from "zod";
 export const envelopeThemeSchema = z.object({
   color: z.string().default("#f5eedb"),
   liningPattern: z.string().default("daisy"),
-  flapColor: z.string().default("#eee0be"),
+  // Flap, varsayılanda zarf rengiyle aynı — birleşik ve şık görünüm.
+  // Kullanıcı isterse ayrı bir kapak rengi seçebilir, EnvelopeTab'dan.
+  flapColor: z.string().default("#f5eedb"),
   /** Inner lining background (visible when the flap opens). */
   liningBg: z.string().default("#1f1c17"),
   /** Stamp visibility & color in the upper-right of the envelope front. */
@@ -69,10 +71,11 @@ export const themeSchema = z.object({
   envelope: envelopeThemeSchema.default({
     color: "#f5eedb",
     liningPattern: "daisy",
-    flapColor: "#eee0be",
+    flapColor: "#f5eedb",
     liningBg: "#1f1c17",
     stampEnabled: true,
     stampColor: "#b85450",
+    stampImage: "/davetyolla.png",
   }),
 });
 export type Theme = z.infer<typeof themeSchema>;
@@ -86,10 +89,12 @@ export const defaultTheme: Theme = {
   envelope: {
     color: "#f5eedb",
     liningPattern: "daisy",
-    flapColor: "#eee0be",
+    flapColor: "#f5eedb",
     liningBg: "#1f1c17",
     stampEnabled: true,
     stampColor: "#b85450",
-    stampLabel: "H&İ",
+    // Yeni davetiyeler için varsayılan pul: marka logosu. Kullanıcı
+    // dilerse EnvelopeTab'dan kendi yazısını / görselini seçebilir.
+    stampImage: "/davetyolla.png",
   },
 };
