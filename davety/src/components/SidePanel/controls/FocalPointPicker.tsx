@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { RotateCcw } from "lucide-react";
 
 interface Props {
@@ -26,7 +26,10 @@ export function FocalPointPicker({
   onChange,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const [dragging, setDragging] = useState(false);
+  // dragging sadece pointer event handler'larında okunuyor, JSX'e
+  // girmiyor; useState her toggle'da tüm component subtree'sini yeniden
+  // render ettiriyordu, useRef ile aynı işlev render maliyeti olmadan.
+  const draggingRef = useRef(false);
 
   const updateFromPointer = (clientX: number, clientY: number) => {
     const el = ref.current;
@@ -50,16 +53,16 @@ export function FocalPointPicker({
         style={{ aspectRatio: "4 / 3" }}
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
-          setDragging(true);
+          draggingRef.current = true;
           updateFromPointer(e.clientX, e.clientY);
         }}
         onPointerMove={(e) => {
-          if (!dragging) return;
+          if (!draggingRef.current) return;
           updateFromPointer(e.clientX, e.clientY);
         }}
         onPointerUp={(e) => {
           e.currentTarget.releasePointerCapture(e.pointerId);
-          setDragging(false);
+          draggingRef.current = false;
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

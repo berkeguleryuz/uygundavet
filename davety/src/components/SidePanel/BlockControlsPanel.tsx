@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Eye,
@@ -21,10 +21,24 @@ import { useEditorStore } from "@/src/store/editor-store";
 import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import { useConfirm } from "@/src/components/ConfirmDialog";
-import { PresetMediaPicker } from "@/src/components/PresetMediaPicker";
+import dynamic from "next/dynamic";
+// Picker sadece kullanıcı "Hazır Görsel" tıklayınca açılıyor —
+// framer-motion + radix-dialog'u eager yüklemeyelim, dinamik chunk.
+const PresetMediaPicker = dynamic(
+  () =>
+    import("@/src/components/PresetMediaPicker").then((m) => ({
+      default: m.PresetMediaPicker,
+    })),
+  { ssr: false },
+);
 import { SpacingControl } from "./controls/SpacingControl";
 import { FocalPointPicker } from "./controls/FocalPointPicker";
 import { DECORATION_TEMPLATE_CATEGORIES } from "@/src/components/decorations/templateManifest";
+
+// DECORATION_CATEGORIES key→label O(1) lookup için module-level Map.
+const ICON_CAT_LABELS = new Map<string, string>(
+  DECORATION_CATEGORIES.map((c) => [c.key, c.label]),
+);
 
 export function BlockControlsPanel() {
   const t = useTranslations("Editor.block");
@@ -46,11 +60,17 @@ export function BlockControlsPanel() {
   const { pick, busy: uploading } = useAssetUpload(docId);
   const [presetPickerOpen, setPresetPickerOpen] = useState(false);
 
-  if (!doc || !blockId) return null;
-  const block = doc.blocks.find((b) => b.id === blockId);
-  if (!block) return null;
+  // .find + .findIndex tek geçişte birleştir; doc.blocks değişmedikçe
+  // tekrar hesaplanmasın diye useMemo. (rerender-defer-reads)
+  const blockMeta = useMemo(() => {
+    if (!doc || !blockId) return null;
+    const idx = doc.blocks.findIndex((b) => b.id === blockId);
+    if (idx === -1) return null;
+    return { block: doc.blocks[idx], index: idx };
+  }, [doc, blockId]);
 
-  const blockIndex = doc.blocks.findIndex((b) => b.id === blockId);
+  if (!doc || !blockId || !blockMeta) return null;
+  const { block, index: blockIndex } = blockMeta;
   const blockLabel = blockTypeLabel(block.type, tBlocks);
 
   const supportsMedia = ["hero", "gallery", "story_timeline"].includes(block.type);
@@ -680,18 +700,23 @@ function UnifiedDecorationPicker({
   onPickTemplate: (svgRaw: string) => void;
 }) {
   const [activeKey, setActiveKey] = useState<string>("all");
+  // Hızlı template clikleri için abort: önceki fetch'i iptal eder,
+  // out-of-order resolve ile yanlış SVG inject edilmez. Unmount'ta
+  // pending request abort. (client-fetch-abort)
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   // Tek liste, her chip kategori üzerinden filtre, "all" hepsini gösterir.
   const items = useMemo<UnifiedItem[]>(() => {
-    const iconCatLabel = (key: string) =>
-      DECORATION_CATEGORIES.find((c) => c.key === key)?.label ?? key;
+    // O(1) lookup için DECORATION_CATEGORIES key→label Map'i. Eskiden
+    // her icon için lineer find çalışıyordu (n²). (js-index-maps)
     const iconItems: UnifiedItem[] = DECORATION_ICONS.map((i) => ({
       kind: "icon",
       id: i.id,
       label: i.label,
       categoryKey: `icon:${i.category}`,
-      categoryLabel: iconCatLabel(i.category),
+      categoryLabel: ICON_CAT_LABELS.get(i.category) ?? i.category,
       svg: i.svg,
     }));
     const templateItems: UnifiedItem[] = DECORATION_TEMPLATE_CATEGORIES.flatMap(
@@ -733,14 +758,20 @@ function UnifiedDecorationPicker({
       return;
     }
     setBusyId(it.id);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const res = await fetch(it.url);
+      const res = await fetch(it.url, { signal: controller.signal });
       if (!res.ok) throw new Error("fetch failed");
       const svgRaw = await res.text();
+      if (controller.signal.aborted) return;
       onPickTemplate(svgRaw);
-    } catch {
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return;
       toast.error("Şablon yüklenemedi");
     } finally {
+      if (abortRef.current === controller) abortRef.current = null;
       setBusyId(null);
     }
   }

@@ -14,5 +14,17 @@ export async function GET() {
       previewUrl: true,
     },
   });
-  return NextResponse.json({ templates });
+  // Public template katalogu yavaş değişir; CDN/edge'da 5dk cache,
+  // stale-while-revalidate ile arka planda yenilenir. Her yeni davetiye
+  // create flow'unda çağrıldığı için DB'yi gereksiz yormamak için.
+  // (server-cache-lru benzeri pattern)
+  return NextResponse.json(
+    { templates },
+    {
+      headers: {
+        "Cache-Control":
+          "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    },
+  );
 }

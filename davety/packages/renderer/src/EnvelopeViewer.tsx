@@ -5,7 +5,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 export type EnvelopeState = "closed" | "open";
 
@@ -65,39 +65,49 @@ export function EnvelopeViewer({
   const liningBg = liningImage
     ? `url(${liningImage})`
     : liningPattern === "daisy"
-    ? `url("data:image/svg+xml;utf8,${encodeURIComponent(DAISY_SVG)}")`
+    ? DAISY_BG
     : liningPattern === "rose"
-    ? `url("data:image/svg+xml;utf8,${encodeURIComponent(ROSE_SVG)}")`
+    ? ROSE_BG
     : "none";
 
-  const flapVariants: Variants = reduced
-    ? { closed: { rotateX: 0 }, open: { rotateX: 180 } }
-    : {
-        closed: {
-          rotateX: 0,
-          transition: { duration: 1, ease: [0.76, 0, 0.24, 1] },
-        },
-        open: {
-          rotateX: 180,
-          transition: { duration: 1, ease: [0.76, 0, 0.24, 1] },
-        },
-      };
-
-  const cardVariants: Variants = reduced
-    ? { closed: { y: 0 }, open: { y: -height * 0.55, scale: 1 } }
-    : {
-        closed: { y: 0, scale: 1, transition: { duration: 0.4 } },
-        open: {
-          y: -height * 0.55,
-          scale: 1.02,
-          transition: {
-            type: "spring",
-            stiffness: 120,
-            damping: 18,
-            delay: 0.9,
+  // Variants reduced/height değişmedikçe stable referans, framer-motion
+  // diff cycle'ında gereksiz re-evaluation kalkar. (rerender-memo-with-default-value)
+  const flapVariants: Variants = useMemo(
+    () =>
+      reduced
+        ? { closed: { rotateX: 0 }, open: { rotateX: 180 } }
+        : {
+            closed: {
+              rotateX: 0,
+              transition: { duration: 1, ease: [0.76, 0, 0.24, 1] },
+            },
+            open: {
+              rotateX: 180,
+              transition: { duration: 1, ease: [0.76, 0, 0.24, 1] },
+            },
           },
-        },
-      };
+    [reduced],
+  );
+
+  const cardVariants: Variants = useMemo(
+    () =>
+      reduced
+        ? { closed: { y: 0 }, open: { y: -height * 0.55, scale: 1 } }
+        : {
+            closed: { y: 0, scale: 1, transition: { duration: 0.4 } },
+            open: {
+              y: -height * 0.55,
+              scale: 1.02,
+              transition: {
+                type: "spring",
+                stiffness: 120,
+                damping: 18,
+                delay: 0.9,
+              },
+            },
+          },
+    [reduced, height],
+  );
 
   return (
     <div
@@ -271,3 +281,8 @@ const ROSE_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 280'>
     })
     .join("")}
 </svg>`;
+
+// SVG'leri encode etme her render'da aynı sonucu veriyor — module-level
+// const ile bir kez hesaplanır. (js-cache-function-results)
+const DAISY_BG = `url("data:image/svg+xml;utf8,${encodeURIComponent(DAISY_SVG)}")`;
+const ROSE_BG = `url("data:image/svg+xml;utf8,${encodeURIComponent(ROSE_SVG)}")`;

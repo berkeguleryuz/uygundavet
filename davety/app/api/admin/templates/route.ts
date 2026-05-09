@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
-import { buildDefaultDoc } from "@davety/schema";
+import { buildDefaultDoc, sanitizeInvitationDoc } from "@davety/schema";
 import { isAdminSession } from "@/src/lib/admin";
 import { prisma } from "@/src/lib/prisma";
 
@@ -20,8 +20,21 @@ export async function GET() {
   const session = await isAdminSession();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+  // doc JSON listede gösterilmiyor; AdminTemplateList sadece metadata
+  // ihtiyaç duyuyor. (server-serialization)
   const templates = await prisma.designTemplate.findMany({
     orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      category: true,
+      previewUrl: true,
+      published: true,
+      updatedAt: true,
+      createdAt: true,
+    },
   });
   return NextResponse.json({ templates });
 }
@@ -59,22 +72,26 @@ export async function POST(req: Request) {
       title: parsed.data.title,
       description: parsed.data.description ?? null,
       category: parsed.data.category ?? null,
-      doc: doc as object,
+      doc: sanitizeInvitationDoc(doc) as object,
       createdBy: session.user.id,
     },
     select: { id: true, slug: true },
   });
 
-  await prisma.adminAuditLog
-    .create({
-      data: {
-        actorId: session.user.id,
-        action: "template.create",
-        targetType: "template",
-        targetId: template.id,
-      },
-    })
-    .catch(() => {});
+  // Audit log response yolunda durmasın — after() ile post-response
+  // olarak yazılır, kullanıcı 201 anında alır. (server-after-nonblocking)
+  after(() =>
+    prisma.adminAuditLog
+      .create({
+        data: {
+          actorId: session.user.id,
+          action: "template.create",
+          targetType: "template",
+          targetId: template.id,
+        },
+      })
+      .catch(() => {}),
+  );
 
   return NextResponse.json(template, { status: 201 });
 }

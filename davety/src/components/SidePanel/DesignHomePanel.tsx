@@ -149,12 +149,17 @@ const HERO_VARIANTS: { key: HeroVariant; label: string; description: string }[] 
  *  the home side panel so the user can pick a hero variant and see the
  *  canvas update behind the panel without anything obscuring the card. */
 function AdvancedInlinePanel() {
-  const doc = useEditorStore((s) => s.doc);
+  // Hero block referansı + id store'da narrow selector ile alınır,
+  // her keystroke'ta bu panel re-render olmasın diye.
+  // (rerender-defer-reads)
+  const heroBlock = useEditorStore(
+    (s) =>
+      s.doc?.blocks.find((b) => b.type === "hero") as
+        | Block<HeroData>
+        | undefined,
+  );
   const updateBlockData = useEditorStore((s) => s.updateBlockData);
 
-  const heroBlock = doc?.blocks.find((b) => b.type === "hero") as
-    | Block<HeroData>
-    | undefined;
   const currentVariant = heroBlock?.data.variant ?? "classic";
 
   function pickVariant(v: HeroVariant) {

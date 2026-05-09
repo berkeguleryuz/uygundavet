@@ -41,6 +41,21 @@ export function HeroView(props: BlockViewProps<HeroData>) {
   }
 }
 
+// Module-level static dekoratif data; her render'da yeniden allocate
+// edilmesin diye yukarı çekildi. (rendering-hoist-jsx)
+const FLORAL_CROWN_CIRCLES: ReadonlyArray<readonly [number, number, number]> = [
+  [12, 20, 2],
+  [24, 12, 2.6],
+  [36, 8, 2],
+  [50, 10, 3.2],
+  [60, 12, 2.2],
+  [72, 14, 3],
+  [86, 18, 2.4],
+  [100, 14, 3.2],
+  [112, 9, 2],
+];
+const BOTANICAL_FRAME_Y: ReadonlyArray<number> = [10, 28, 46, 64, 82, 100];
+
 /* ─── Helpers ─── */
 
 function selectableProps(
@@ -418,17 +433,7 @@ function FloralCrownVariant({
           <path d="M 5 22 Q 30 2 60 12 Q 90 22 115 8" />
         </g>
         <g fill={accent ?? "currentColor"} opacity="0.9">
-          {[
-            [12, 20, 2],
-            [24, 12, 2.6],
-            [36, 8, 2],
-            [50, 10, 3.2],
-            [60, 12, 2.2],
-            [72, 14, 3],
-            [86, 18, 2.4],
-            [100, 14, 3.2],
-            [112, 9, 2],
-          ].map((d, i) => (
+          {FLORAL_CROWN_CIRCLES.map((d, i) => (
             <circle key={i} cx={d[0]} cy={d[1]} r={d[2]} />
           ))}
         </g>
@@ -607,7 +612,7 @@ function BotanicalFrameVariant({
         >
           <g stroke={accent ?? "currentColor"} strokeWidth="0.6" fill="none" opacity="0.7">
             <path d="M 10 0 L 10 120" />
-            {[10, 28, 46, 64, 82, 100].map((y, i) => (
+            {BOTANICAL_FRAME_Y.map((y, i) => (
               <g key={i}>
                 <path d={`M 10 ${y} Q 4 ${y - 3} 2 ${y - 7}`} />
                 <path d={`M 10 ${y} Q 16 ${y + 3} 18 ${y + 7}`} />

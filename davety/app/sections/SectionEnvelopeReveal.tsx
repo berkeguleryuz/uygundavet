@@ -1,5 +1,5 @@
 import { buildDefaultDoc, type Locale } from "@davety/schema";
-import { EnvelopeRevealScene } from "@/app/components/envelope-reveal/EnvelopeRevealScene";
+import { EnvelopeRevealSceneLazy } from "@/app/components/envelope-reveal/EnvelopeRevealSceneLazy";
 
 interface SectionEnvelopeRevealProps {
   locale: Locale;
@@ -32,7 +32,7 @@ export function SectionEnvelopeReveal({ locale }: SectionEnvelopeRevealProps) {
           </p>
         </header>
 
-        <EnvelopeRevealScene invitation={invitation} />
+        <EnvelopeRevealSceneLazy invitation={invitation} />
       </section>
     </main>
   );

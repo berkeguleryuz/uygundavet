@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { Envelope3DScene } from "./Envelope3DScene";
+import { Envelope3DSceneLazy } from "./Envelope3DSceneLazy";
 
 export default async function Envelope3DPage({
   params,
@@ -34,7 +34,7 @@ export default async function Envelope3DPage({
         </p>
       </header>
 
-      <Envelope3DScene />
+      <Envelope3DSceneLazy />
     </main>
   );
 }

@@ -168,21 +168,31 @@ export async function POST(req: Request) {
     variants.original = originalKey;
     totalUploadedBytes += originalBytes.length;
 
-    for (const v of IMAGE_VARIANTS) {
-      if (width && width <= v.width) continue;
-      const vkey = `${baseKey}-${v.suffix}.webp`;
-      const vbuf = await source
-        .clone()
-        .resize({ width: v.width, withoutEnlargement: true })
-        .webp({ quality: 80 })
-        .toBuffer();
-      await uploadToR2({
-        key: vkey,
-        body: vbuf,
-        contentType: "image/webp",
-      });
-      variants[v.suffix] = vkey;
-      totalUploadedBytes += vbuf.length;
+    // Üç boyut (thumb/md/lg) bağımsız — her biri kendi sharp clone'u
+    // üzerinde çalışıyor + R2 upload ediyor. Sequential yerine paralel
+    // çalıştırılırsa upload süresi en yavaş tek varyant kadar olur,
+    // toplam üçte bir civarına düşer. (async-parallel)
+    const variantResults = await Promise.all(
+      IMAGE_VARIANTS.filter((v) => !width || width > v.width).map(
+        async (v) => {
+          const vkey = `${baseKey}-${v.suffix}.webp`;
+          const vbuf = await source
+            .clone()
+            .resize({ width: v.width, withoutEnlargement: true })
+            .webp({ quality: 80 })
+            .toBuffer();
+          await uploadToR2({
+            key: vkey,
+            body: vbuf,
+            contentType: "image/webp",
+          });
+          return { suffix: v.suffix, key: vkey, bytes: vbuf.length };
+        },
+      ),
+    );
+    for (const r of variantResults) {
+      variants[r.suffix] = r.key;
+      totalUploadedBytes += r.bytes;
     }
   } else {
     const ext =
@@ -200,6 +210,7 @@ export async function POST(req: Request) {
   );
   const primaryUrl = variantUrls.original;
 
+  // Response sadece id kullanıyor; full row pull etmeye gerek yok.
   const asset = await prisma.asset.create({
     data: {
       userId: session.user.id,
@@ -211,6 +222,7 @@ export async function POST(req: Request) {
       width: width ?? null,
       height: height ?? null,
     },
+    select: { id: true },
   });
 
   const mediaType = file.type.startsWith("video/")

@@ -29,20 +29,23 @@ type Params = Promise<{ id: string }>;
  */
 export async function POST(req: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Body parse, session, ve design fetch — hepsi bağımsız.
+  const bodyPromise = req.json().catch(() => null);
+  const [session, design] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const design = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true },
-  });
   if (!design || design.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const body = await req.json().catch(() => null);
+  const body = await bodyPromise;
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

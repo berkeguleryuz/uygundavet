@@ -77,6 +77,12 @@ export function TemplatePicker({
           key={t.id}
           onClick={() => pick(t.id)}
           disabled={busy !== null}
+          // Şablon kartlarına content-visibility — büyük katalogda
+          // viewport dışı kartlar layout/paint atlanır, scroll smooth.
+          style={{
+            contentVisibility: "auto",
+            containIntrinsicSize: "260px 460px",
+          }}
           className="group flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-primary cursor-pointer disabled:opacity-50 transition-colors text-left"
         >
           <div className="aspect-[5/7] bg-muted/30 relative overflow-hidden">
@@ -84,6 +90,8 @@ export function TemplatePicker({
               <img
                 src={t.previewUrl}
                 alt={t.title}
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (

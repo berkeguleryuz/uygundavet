@@ -10,23 +10,26 @@ export default async function SavePage({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const session = await getSession();
+  const [session, design] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        slug: true,
+        vanityPath: true,
+        status: true,
+        userId: true,
+        doc: true,
+        publishedDoc: true,
+      },
+    }),
+  ]);
   if (!session?.user) {
-    redirect(`/login?returnTo=${encodeURIComponent(`/design/invitations/${id}/save`)}`);
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/design/invitations/${id}/save`)}`,
+    );
   }
-
-  const design = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      slug: true,
-      vanityPath: true,
-      status: true,
-      userId: true,
-      doc: true,
-      publishedDoc: true,
-    },
-  });
   if (!design || design.userId !== session.user.id) {
     notFound();
   }

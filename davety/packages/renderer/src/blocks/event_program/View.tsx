@@ -55,7 +55,7 @@ function HotelList({ hotels }: { hotels?: HotelRec[] }) {
       <ul className="grid grid-cols-1 gap-1.5">
         {hotels.map((h, i) => (
           <li
-            key={i}
+            key={`${h.name}-${i}`}
             className="flex items-center justify-between gap-3 text-xs border-b border-current/10 pb-1.5"
           >
             <span className="flex flex-col">
@@ -131,7 +131,9 @@ function DayCard({ day }: { day: EventDay }) {
     <article className="rounded-lg border border-current/15 px-4 py-4 flex flex-col gap-2">
       <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h4 className="font-display text-xl">{day.label}</h4>
-        <span className="text-xs opacity-70">
+        {/* toLocaleDateString Node/browser farklı output verebilir,
+            hydration warning'i bastır. */}
+        <span className="text-xs opacity-70" suppressHydrationWarning>
           {formatDate(day.date)}
           {day.time ? ` · ${day.time}` : ""}
         </span>
@@ -160,7 +162,7 @@ function DayCard({ day }: { day: EventDay }) {
         <ul className="space-y-2 mt-1">
           {day.items.map((item, i) => (
             <li
-              key={i}
+              key={`${item.time}-${item.label}-${i}`}
               className="flex items-center gap-3 border-b border-current/10 pb-1.5"
             >
               <span className="text-sm tabular-nums opacity-80 w-14">
@@ -222,7 +224,7 @@ export function EventProgramView({
         <ul className="max-w-md mx-auto space-y-3">
           {items.map((item, i) => (
             <li
-              key={i}
+              key={`${item.time}-${item.label}-${i}`}
               className="flex items-center gap-4 border-b border-current/10 pb-2"
             >
               <div className="font-chakra text-sm tabular-nums opacity-80 w-14">

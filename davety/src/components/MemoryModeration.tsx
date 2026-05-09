@@ -84,7 +84,11 @@ export function MemoryModeration({
                 </span>
               </div>
               <p className="text-sm mt-2 whitespace-pre-wrap">{m.message}</p>
-              <div className="text-xs text-muted-foreground mt-2">
+              {/* toLocaleString Node/browser ICU farkı; hydration warn bastır. */}
+              <div
+                className="text-xs text-muted-foreground mt-2"
+                suppressHydrationWarning
+              >
                 {new Date(m.createdAt).toLocaleString()}
               </div>
             </div>

@@ -1,8 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { QRCodeCanvas } from "qrcode.react";
+
+// qrcode.react ~40KB; route SaveScreen olduğu için zaten izole, ama
+// burada da dinamik import ile QR canvas yüklemesi geciktirilir —
+// kullanıcı yayınlamadan önce QR'ı görmüyor zaten.
+const QRCodeCanvas = dynamic(
+  () => import("qrcode.react").then((m) => ({ default: m.QRCodeCanvas })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-muted animate-pulse rounded-md w-full aspect-square" />
+    ),
+  },
+);
 import {
   ArrowLeft,
   Check,
@@ -44,6 +57,17 @@ import {
 } from "@/src/components/share-icons";
 
 type TierId = "free" | "basic" | "pro" | "premium";
+
+// Paket sıralama hiyerarşisi: yayın sonrası "Paketi Yükselt"
+// flow'unda mevcut paketin altındaki seçenekler kilitli olmalı —
+// downgrade business kuralı yok, paket bir kez alındıktan sonra
+// alt seviyeye düşülemez.
+const TIER_RANK: Record<TierId, number> = {
+  free: 0,
+  basic: 1,
+  pro: 2,
+  premium: 3,
+};
 
 type FeatureValue = true | false | string;
 
@@ -101,6 +125,11 @@ const TIERS: TierMeta[] = [
 
 interface TierFeatureRow {
   label: string;
+  /** Opsiyonel alt-satır açıklama (parantez içi vs.). Label kısa
+   *  kalsın diye uzun açıklamalar küçük + mute renkte alt satıra
+   *  düşer. value bir string ise (ör: "1 hazır şarkı") onu da bu
+   *  alt satıra basıyoruz; ikisi birlikte gösterilebilir. */
+  note?: string;
   values: Record<TierId, FeatureValue>;
 }
 
@@ -136,7 +165,8 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         },
       },
       {
-        label: "Özel bloklar (program, aile ağacı)",
+        label: "Özel bloklar",
+        note: "program, aile ağacı",
         values: { free: false, basic: true, pro: true, premium: true },
       },
       {
@@ -158,7 +188,8 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         values: { free: true, basic: true, pro: true, premium: true },
       },
       {
-        label: "RSVP formu (katılım yanıtı)",
+        label: "RSVP formu",
+        note: "katılım yanıtı",
         values: { free: false, basic: true, pro: true, premium: true },
       },
       {
@@ -193,7 +224,8 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         values: { free: true, basic: true, pro: true, premium: true },
       },
       {
-        label: "Özel kısa link (davetyolla.com/davetiyem/isim)",
+        label: "Özel kısa link",
+        note: "davetyolla.com/davetiyem/isim",
         values: { free: false, basic: false, pro: true, premium: true },
       },
       {
@@ -205,7 +237,8 @@ const TIER_FEATURE_GROUPS: TierFeatureGroup[] = [
         values: { free: false, basic: false, pro: false, premium: true },
       },
       {
-        label: "Kendi alan adı (özel domain)",
+        label: "Kendi alan adı",
+        note: "özel domain",
         values: { free: false, basic: false, pro: false, premium: true },
       },
       {
@@ -279,6 +312,27 @@ export function SaveScreen({
   // tekrar göstermek için flag. publish route mevcut tier'ı yenisiyle
   // değiştiriyor, ayrı bir endpoint'e gerek yok.
   const [wantsUpgrade, setWantsUpgrade] = useState(false);
+
+  // Tek noktadan "yükseltme akışını başlat" — kart üstündeki Paketi
+  // Yükselt butonları (ShareCard, VanityCard, Hero, SaveScreen header)
+  // bu callback'i çağırır. wantsUpgrade=true → TierPicker görünür,
+  // selectedTier mevcut paketle başlar, ve sayfa picker'a kayar
+  // (kullanıcı zaten aşağıdaysa görsün).
+  // Birden fazla kart (ShareCard, VanityCard, Hero, header) prop olarak
+  // alıyor; useCallback ile stable ref. (rerender-unstable-callbacks)
+  const triggerUpgrade = useCallback(() => {
+    setWantsUpgrade(true);
+    setSelectedTier(activeTier);
+    // 2x rAF: React DOM flush + style/layout commit. setTimeout magic
+    // sayısı yerine deterministik. (js-nested-timers)
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        document
+          .getElementById("tier-picker")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }),
+    );
+  }, [activeTier]);
 
   const davetiyeBase =
     process.env.NEXT_PUBLIC_DAVETIYE_URL ?? "https://davetyolla.com";
@@ -364,7 +418,7 @@ export function SaveScreen({
     toast.success("Özel link güncellendi");
   }
 
-  function downloadQR() {
+  const downloadQR = useCallback(() => {
     const canvas = document.querySelector<HTMLCanvasElement>(
       "#share-qr canvas",
     );
@@ -377,9 +431,13 @@ export function SaveScreen({
     a.href = url;
     a.download = `davetiye-${publicPath}-qr.png`;
     a.click();
-  }
+  }, [publicPath]);
 
-  async function nativeShare() {
+  // useCallback şart: bu fonksiyon QuickShareCard'a `onNativeShare` ile
+  // geçiyor ve orada `channels` useMemo dep'i. Stable ref olmazsa channels
+  // her parent render'da yeniden allocate olur — useMemo amaçsızlaşır.
+  // (rerender-unstable-callbacks)
+  const nativeShare = useCallback(async () => {
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
         await navigator.share({
@@ -391,9 +449,14 @@ export function SaveScreen({
         // user cancelled
       }
     } else {
-      copy(shareUrl, "Bağlantı kopyalandı");
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Bağlantı kopyalandı");
+      } catch {
+        toast.error("Kopyalanamadı");
+      }
     }
-  }
+  }, [shareMessage, shareUrl]);
 
   const activeTierMeta = activeTier
     ? TIERS.find((tier) => tier.id === activeTier) ?? null
@@ -419,6 +482,10 @@ export function SaveScreen({
             }}
             onConfirm={() => selectedTier && setConfirmingTier(selectedTier)}
             publishing={publishing}
+            // Yayınlanmış davetiyede "Paketi Yükselt" akışında mevcut
+            // paketin altındakileri kilitle (downgrade yok). İlk
+            // yayında current null, hepsi seçilebilir.
+            currentTier={wantsUpgrade ? activeTier : null}
           />
         ) : (
           <Hero
@@ -426,10 +493,7 @@ export function SaveScreen({
             publishing={publishing}
             tier={activeTierMeta}
             onPublish={() => setStep("tier")}
-            onUpgrade={() => {
-              setWantsUpgrade(true);
-              setSelectedTier(activeTier);
-            }}
+            onUpgrade={triggerUpgrade}
           />
         )}
 
@@ -442,10 +506,7 @@ export function SaveScreen({
                 onCopy={() => copy(shareUrl, "Bağlantı kopyalandı")}
                 onDownloadQR={downloadQR}
                 pdfEnabled={planLimitsFor(activeTier).pdfDownloadEnabled}
-                onUpgrade={() => {
-                  setWantsUpgrade(true);
-                  setSelectedTier(activeTier);
-                }}
+                onUpgrade={triggerUpgrade}
               />
               <QuickShareCard
                 shareUrl={shareUrl}
@@ -464,10 +525,7 @@ export function SaveScreen({
                 onSave={saveVanity}
                 saving={savingVanity}
                 tier={activeTier}
-                onUpgrade={() => {
-                  setWantsUpgrade(true);
-                  setSelectedTier(activeTier);
-                }}
+                onUpgrade={triggerUpgrade}
               />
               <NextStepsCard designId={designId} shareUrl={shareUrl} />
             </div>
@@ -707,12 +765,16 @@ function TierPicker({
   onCancel,
   onConfirm,
   publishing,
+  currentTier,
 }: {
   selectedTier: TierId | null;
   onSelect: (id: TierId) => void;
   onCancel: () => void;
   onConfirm: () => void;
   publishing: boolean;
+  /** Yayınlanmış davetiyenin mevcut paketi (yükseltme akışında).
+   *  Null olduğunda tüm paketler seçilebilir (ilk yayın). */
+  currentTier?: TierId | null;
 }) {
   // Resolve offer client-side only, same pattern as PricingTable to avoid
   // SSR/timezone drift, with a 60s tick so the banner updates on rollover.
@@ -825,15 +887,24 @@ function TierPicker({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-          {TIERS.map((tier) => (
-            <TierCard
-              key={tier.id}
-              tier={tier}
-              offer={offer}
-              selected={selectedTier === tier.id}
-              onSelect={() => onSelect(tier.id)}
-            />
-          ))}
+          {TIERS.map((tier) => {
+            // Mevcut paket veya altı kilitli (downgrade yok). currentTier
+            // null ise (ilk yayın) hiçbiri kilitli değil.
+            const locked = currentTier
+              ? TIER_RANK[tier.id] <= TIER_RANK[currentTier]
+              : false;
+            return (
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                offer={offer}
+                selected={selectedTier === tier.id}
+                onSelect={() => onSelect(tier.id)}
+                locked={locked}
+                isCurrent={currentTier === tier.id}
+              />
+            );
+          })}
         </div>
 
         <p className="mt-4 text-[11px] text-muted-foreground text-center">
@@ -850,11 +921,18 @@ function TierCard({
   offer,
   selected,
   onSelect,
+  locked = false,
+  isCurrent = false,
 }: {
   tier: TierMeta;
   offer: ActiveOffer | null;
   selected: boolean;
   onSelect: () => void;
+  /** Yükseltme akışında mevcut paket veya altındakiler için true.
+   *  Buton disabled, görsel olarak soluk + kilitli durur. */
+  locked?: boolean;
+  /** Bu kart kullanıcının halihazırda satın aldığı paket mi? */
+  isCurrent?: boolean;
 }) {
   const Icon = tier.icon;
   const isFree = tier.basePrice === 0;
@@ -866,16 +944,35 @@ function TierCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`relative h-full text-left rounded-2xl border-2 p-3 sm:p-4 flex flex-col transition-all cursor-pointer ${
+      disabled={locked}
+      aria-disabled={locked}
+      title={
+        locked
+          ? isCurrent
+            ? "Şu an aktif paketin"
+            : "Bu paket mevcut paketinin altında — düşürme yapılamaz"
+          : undefined
+      }
+      className={`relative h-full text-left rounded-2xl border-2 p-3 sm:p-4 flex flex-col transition-all ${
+        locked ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+      } ${
         tier.muted ? "bg-muted/30" : "bg-white"
       } ${
         selected
           ? "border-foreground ring-4 ring-foreground/15 -translate-y-0.5 shadow-lg"
-          : tier.muted
-            ? "border-border/60 hover:border-foreground/40 hover:shadow-md hover:-translate-y-0.5"
-            : "border-border hover:border-foreground/50 hover:shadow-md hover:-translate-y-0.5"
+          : locked
+            ? "border-border/40"
+            : tier.muted
+              ? "border-border/60 hover:border-foreground/40 hover:shadow-md hover:-translate-y-0.5"
+              : "border-border hover:border-foreground/50 hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
+      {/* Mevcut paket ozalı: kullanıcı hangi paketi aldığını net görsün. */}
+      {isCurrent ? (
+        <div className="absolute -top-2 right-3 inline-flex items-center gap-1 rounded-full bg-emerald-500 text-white px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] font-mono shadow-sm whitespace-nowrap z-10">
+          <Check className="size-2.5" /> Aktif
+        </div>
+      ) : null}
       {/* Selected check rozeti, hover/select durumunu kart üstünde
            kesin görünür yapar. Border + ring tek başına bazı renklerde
            silikti. */}
@@ -988,6 +1085,7 @@ function TierCard({
                 <FeatureRow
                   key={row.label}
                   label={row.label}
+                  note={row.note}
                   value={row.values[tier.id]}
                 />
               ))}
@@ -1019,12 +1117,23 @@ function TierCard({
 
 function FeatureRow({
   label,
+  note,
   value,
 }: {
   label: string;
+  note?: string;
   value: FeatureValue;
 }) {
   const isOff = value === false;
+  // Hem `note` (sabit alt-açıklama, ör. "program, aile ağacı") hem de
+  // value=string (tier-spesifik kısıtlama, ör. "1 hazır şarkı") aynı
+  // küçük alt satırda gösterilir; ikisi varsa note önce, value sonra.
+  const subline =
+    typeof value === "string"
+      ? note
+        ? `${note} · ${value}`
+        : value
+      : note ?? null;
   return (
     <li
       className={`text-[12px] min-h-[1.75rem] flex items-start gap-1.5 ${
@@ -1038,9 +1147,9 @@ function FeatureRow({
       )}
       <span className={isOff ? "line-through" : ""}>
         {label}
-        {typeof value === "string" ? (
+        {subline ? (
           <span className="block text-[10px] text-muted-foreground/80 leading-tight">
-            {value}
+            {subline}
           </span>
         ) : null}
       </span>
@@ -1168,7 +1277,7 @@ function ShareCard({
       </button>
       {pdfEnabled ? (
         <a
-          href={`/api/public/design/${slug}/print`}
+          href={`/davetiyem/${slug}/print`}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-4 py-2 text-xs hover:opacity-90 cursor-pointer transition-opacity"
@@ -1197,55 +1306,58 @@ function QuickShareCard({
   shareMessage: string;
   onNativeShare: () => void;
 }) {
-  const encMsg = encodeURIComponent(shareMessage);
-  const encUrl = encodeURIComponent(shareUrl);
-  // Brand-doğru animasyonlu SVG'ler share-icons.tsx'te. Önceden hepsi
-  // generic Lucide MessageCircle kullanıyordu (WhatsApp + SMS aynı
-  // ikondu, kullanıcı kafa karıştırıyordu).
-  const channels: Array<{
-    label: string;
-    href?: string;
-    onClick?: () => void;
-    Icon: (props: { className?: string }) => React.ReactElement;
-    accent: string;
-  }> = [
-    {
-      label: "WhatsApp",
-      href: `https://wa.me/?text=${encMsg}`,
-      Icon: WhatsAppIcon,
-      accent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
-    },
-    {
-      label: "E-posta",
-      href: `mailto:?subject=${encodeURIComponent("Düğün Davetiyesi")}&body=${encMsg}`,
-      Icon: EmailIcon,
-      accent: "bg-blue-500/10 text-blue-700 border-blue-500/20",
-    },
-    {
-      label: "Telegram",
-      href: `https://t.me/share/url?url=${encUrl}&text=${encMsg}`,
-      Icon: TelegramIcon,
-      accent: "bg-sky-500/10 text-sky-700 border-sky-500/20",
-    },
-    {
-      label: "X / Twitter",
-      href: `https://twitter.com/intent/tweet?text=${encMsg}`,
-      Icon: XBrandIcon,
-      accent: "bg-foreground/5 text-foreground border-foreground/15",
-    },
-    {
-      label: "SMS",
-      href: `sms:?body=${encMsg}`,
-      Icon: SmsIcon,
-      accent: "bg-amber-500/10 text-amber-700 border-amber-500/20",
-    },
-    {
-      label: "Cihazda Paylaş",
-      onClick: onNativeShare,
-      Icon: NativeShareIcon,
-      accent: "bg-violet-500/10 text-violet-700 border-violet-500/20",
-    },
-  ];
+  // channels array literal her render'da yeniden allocate ediyordu;
+  // shareMessage/shareUrl/onNativeShare değişmedikçe stable referans.
+  // Brand-doğru animasyonlu SVG'ler share-icons.tsx'te.
+  // (rerender-memo-with-default-value)
+  const channels = useMemo(() => {
+    const encMsg = encodeURIComponent(shareMessage);
+    const encUrl = encodeURIComponent(shareUrl);
+    return [
+      {
+        label: "WhatsApp",
+        href: `https://wa.me/?text=${encMsg}`,
+        Icon: WhatsAppIcon,
+        accent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
+      },
+      {
+        label: "E-posta",
+        href: `mailto:?subject=${encodeURIComponent("Düğün Davetiyesi")}&body=${encMsg}`,
+        Icon: EmailIcon,
+        accent: "bg-blue-500/10 text-blue-700 border-blue-500/20",
+      },
+      {
+        label: "Telegram",
+        href: `https://t.me/share/url?url=${encUrl}&text=${encMsg}`,
+        Icon: TelegramIcon,
+        accent: "bg-sky-500/10 text-sky-700 border-sky-500/20",
+      },
+      {
+        label: "X / Twitter",
+        href: `https://twitter.com/intent/tweet?text=${encMsg}`,
+        Icon: XBrandIcon,
+        accent: "bg-foreground/5 text-foreground border-foreground/15",
+      },
+      {
+        label: "SMS",
+        href: `sms:?body=${encMsg}`,
+        Icon: SmsIcon,
+        accent: "bg-amber-500/10 text-amber-700 border-amber-500/20",
+      },
+      {
+        label: "Cihazda Paylaş",
+        onClick: onNativeShare,
+        Icon: NativeShareIcon,
+        accent: "bg-violet-500/10 text-violet-700 border-violet-500/20",
+      },
+    ] as Array<{
+      label: string;
+      href?: string;
+      onClick?: () => void;
+      Icon: (props: { className?: string }) => React.ReactElement;
+      accent: string;
+    }>;
+  }, [shareMessage, shareUrl, onNativeShare]);
 
   return (
     <article className="lg:col-span-3 rounded-2xl border border-border bg-card p-6">
@@ -1342,7 +1454,7 @@ function VanityCard({
           </div>
           {locked ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 text-amber-800 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
-              Klasik+
+              Pro+
             </span>
           ) : null}
         </div>
@@ -1353,6 +1465,14 @@ function VanityCard({
       <p className="text-xs text-muted-foreground mt-1">
         Çiftin adıyla okunabilir bir link oluştur, sosyal medyada ve
         davetiyelerde profesyonel görünür.
+        {locked ? (
+          <>
+            {" "}
+            <span className="text-amber-700 font-medium">
+              Sadece Profesyonel ve Premium pakette açıktır.
+            </span>
+          </>
+        ) : null}
       </p>
 
       <div
@@ -1416,13 +1536,8 @@ function NextStepsCard({
   designId: string;
   shareUrl: string;
 }) {
-  const items: Array<{
-    icon: typeof Users;
-    title: string;
-    desc: string;
-    href: string;
-    external?: boolean;
-  }> = [
+  // designId/shareUrl değişmedikçe items array'i stabil kalsın.
+  const items = useMemo(() => [
     {
       icon: Users,
       title: "Misafirleri takip et",
@@ -1448,7 +1563,13 @@ function NextStepsCard({
       href: shareUrl,
       external: true,
     },
-  ];
+  ] as Array<{
+    icon: typeof Users;
+    title: string;
+    desc: string;
+    href: string;
+    external?: boolean;
+  }>, [designId, shareUrl]);
 
   return (
     <article className="rounded-2xl border border-border bg-card p-6">

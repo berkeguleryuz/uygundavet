@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
+import { sanitizeInvitationDoc } from "@davety/schema";
 import { isAdminSession } from "@/src/lib/admin";
 import { prisma } from "@/src/lib/prisma";
 
@@ -53,21 +54,29 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
       ...(parsed.data.previewUrl !== undefined
         ? { previewUrl: parsed.data.previewUrl }
         : {}),
-      ...(parsed.data.doc !== undefined ? { doc: parsed.data.doc as object } : {}),
+      ...(parsed.data.doc !== undefined
+        ? { doc: sanitizeInvitationDoc(parsed.data.doc) as object }
+        : {}),
     },
+    // Sadece güncelleme onayı için id+slug gerekli; full row (doc dahil)
+    // wire'a düşmesin. (server-serialization)
+    select: { id: true, slug: true, updatedAt: true },
   });
 
-  await prisma.adminAuditLog
-    .create({
-      data: {
-        actorId: session.user.id,
-        action: "template.update",
-        targetType: "template",
-        targetId: id,
-        meta: parsed.data as object,
-      },
-    })
-    .catch(() => {});
+  // Audit log post-response. (server-after-nonblocking)
+  after(() =>
+    prisma.adminAuditLog
+      .create({
+        data: {
+          actorId: session.user.id,
+          action: "template.update",
+          targetType: "template",
+          targetId: id,
+          meta: parsed.data as object,
+        },
+      })
+      .catch(() => {}),
+  );
 
   return NextResponse.json(updated);
 }
@@ -78,16 +87,18 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   await prisma.designTemplate.delete({ where: { id } });
-  await prisma.adminAuditLog
-    .create({
-      data: {
-        actorId: session.user.id,
-        action: "template.delete",
-        targetType: "template",
-        targetId: id,
-      },
-    })
-    .catch(() => {});
+  after(() =>
+    prisma.adminAuditLog
+      .create({
+        data: {
+          actorId: session.user.id,
+          action: "template.delete",
+          targetType: "template",
+          targetId: id,
+        },
+      })
+      .catch(() => {}),
+  );
 
   return NextResponse.json({ ok: true });
 }

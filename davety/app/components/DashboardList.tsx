@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Pencil,
   Search,
+  Share2,
   Sparkles,
   Trash2,
   Users,
@@ -314,9 +315,23 @@ function DesignCard({
   const publicUrl = `${publicBase}/davetiyem/${handle}`;
   const isPublished = d.status === "published";
 
-  const wedding = d.weddingIso ? new Date(d.weddingIso) : null;
-  const validWedding = wedding && !Number.isNaN(wedding.getTime()) ? wedding : null;
-  const countdown = validWedding ? countdownLabel(validWedding) : null;
+  // weddingIso parent'tan stable string; her render'da new Date()
+  // çağırmak gerekmez, useMemo ile cache. (rerender-derived-state)
+  const validWedding = useMemo(() => {
+    if (!d.weddingIso) return null;
+    const w = new Date(d.weddingIso);
+    return Number.isNaN(w.getTime()) ? null : w;
+  }, [d.weddingIso]);
+  const countdown = useMemo(
+    () => (validWedding ? countdownLabel(validWedding) : null),
+    [validWedding],
+  );
+  // updatedAt formatlanmış string memoize; locale değişmedikçe
+  // tekrar Date alloc + format yok.
+  const updatedRelative = useMemo(
+    () => relativeTime(new Date(d.updatedAt), locale),
+    [d.updatedAt, locale],
+  );
 
   const bgSwatch = d.bgColor ?? "#f5f6f3";
   const accentSwatch = d.accentColor ?? "#252224";
@@ -426,6 +441,19 @@ function DesignCard({
           >
             <Pencil className="size-3.5" /> Düzenle
           </Link>
+          {/* Yayınlanmış davetiyelerde "Paylaş" butonu, /save ekranına
+              yönlendiriyor — QR, link kopyala, WhatsApp/Telegram/SMS
+              paylaşım, paket yükselt akışı hep orada. Eskiden bu
+              ekrana sadece ilk yayında erişilebiliyordu, kullanıcı
+              geri dönmek isteyince yolunu bulamıyordu. */}
+          {isPublished ? (
+            <Link
+              href={`/design/invitations/${d.id}/save` as never}
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border bg-card text-foreground text-xs px-3 py-2.5 font-chakra uppercase tracking-[0.15em] hover:bg-muted transition-colors"
+            >
+              <Share2 className="size-3.5" /> Paylaş & QR
+            </Link>
+          ) : null}
           <div className="grid grid-cols-4 gap-1.5">
             {isPublished ? (
               <QuickAction
@@ -512,7 +540,7 @@ function DesignCard({
         </div>
 
         <div className="text-[10px] text-muted-foreground/70">
-          Son güncelleme: {relativeTime(new Date(d.updatedAt), locale)}
+          Son güncelleme: {updatedRelative}
         </div>
       </div>
     </article>
@@ -614,31 +642,20 @@ function UpgradeButton({
   );
 }
 
-function TierBadge({
-  tier,
-}: {
-  tier: PlanTier | undefined | null;
-}) {
-  const t = tier ?? "free";
-  const meta: Record<PlanTier, { label: string; cls: string }> = {
-    free: {
-      label: "Free",
-      cls: "bg-muted text-foreground/70 border-border",
-    },
-    basic: {
-      label: "Klasik",
-      cls: "bg-sky-50 text-sky-700 border-sky-200",
-    },
-    pro: {
-      label: "Pro",
-      cls: "bg-violet-50 text-violet-700 border-violet-200",
-    },
-    premium: {
-      label: "Premium",
-      cls: "bg-amber-50 text-amber-800 border-amber-300",
-    },
-  };
-  const m = meta[t];
+// Module-level constant; eskiden her TierBadge render'ında 4 entry'lik
+// Record yeniden allocate ediliyordu. (rendering-hoist-jsx)
+const TIER_BADGE_META: Record<PlanTier, { label: string; cls: string }> = {
+  free: { label: "Free", cls: "bg-muted text-foreground/70 border-border" },
+  basic: { label: "Klasik", cls: "bg-sky-50 text-sky-700 border-sky-200" },
+  pro: { label: "Pro", cls: "bg-violet-50 text-violet-700 border-violet-200" },
+  premium: {
+    label: "Premium",
+    cls: "bg-amber-50 text-amber-800 border-amber-300",
+  },
+};
+
+function TierBadge({ tier }: { tier: PlanTier | undefined | null }) {
+  const m = TIER_BADGE_META[tier ?? "free"];
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${m.cls}`}

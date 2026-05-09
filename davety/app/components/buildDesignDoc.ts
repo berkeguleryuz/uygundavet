@@ -26,6 +26,12 @@ export function stripSvgText(raw: string): string {
     .replace(/<tspan[\s\S]*?<\/tspan>/gi, "");
 }
 
+/** Per-process cache of loaded template SVG markup. SVG dosyaları
+ *  build-time'da değişmez; her invitation create'inde diskten okumak
+ *  gereksiz I/O. Map module-level olarak ilk istekte dosyayı okur,
+ *  sonraki tüm istekler in-memory döner. (server-hoist-static-io) */
+const templateSvgCache = new Map<string, string | undefined>();
+
 /** Read a `/public/assets/templates/<key>.svg` file synchronously and
  *  return its raw markup (or `undefined` if the file is missing or we're
  *  in a context that can't reach the filesystem). Used to inline the
@@ -34,6 +40,11 @@ export function stripSvgText(raw: string): string {
  *  içeren dosyalarda harfler temizlenir, süslemeler kullanıcının
  *  isimleriyle alakasız harfler taşımasın. */
 function loadTemplateSvg(assetKey: string): string | undefined {
+  const cached = templateSvgCache.get(assetKey);
+  if (cached !== undefined || templateSvgCache.has(assetKey)) {
+    return cached;
+  }
+  let result: string | undefined;
   try {
     const path = join(
       process.cwd(),
@@ -42,10 +53,12 @@ function loadTemplateSvg(assetKey: string): string | undefined {
       "templates",
       `${assetKey}.svg`,
     );
-    return stripSvgText(readFileSync(path, "utf8"));
+    result = stripSvgText(readFileSync(path, "utf8"));
   } catch {
-    return undefined;
+    result = undefined;
   }
+  templateSvgCache.set(assetKey, result);
+  return result;
 }
 
 /** Category → which side's family-block title to use. The seed doc
@@ -147,7 +160,7 @@ export function buildDesignDoc(
         groomName: effectiveGroomName,
         subtitle: wrappedSubtitle,
         description:
-          (b.data as HeroData).description ??
+          (b.data as unknown as HeroData).description ??
           "Bu özel günde sizi aramızda görmekten mutluluk duyarız.",
         variant: design.layout,
         photoUrl: design.photoUrl,
@@ -181,7 +194,7 @@ export function buildDesignDoc(
       // Rewrite "Gelinin Ailesi" / "Damadın Ailesi" to match the event
       // category, keeps members[] but swaps the section titles so a
       // birthday/business invite doesn't ship with bride/groom labels.
-      const fam = b.data as FamiliesData;
+      const fam = b.data as unknown as FamiliesData;
       return {
         ...b,
         data: {

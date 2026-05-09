@@ -7,15 +7,16 @@ type Params = Promise<{ id: string }>;
 
 export async function DELETE(_: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  const [session, asset] = await Promise.all([
+    getSession(),
+    prisma.asset.findUnique({
+      where: { id },
+      select: { id: true, userId: true, key: true, designId: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const asset = await prisma.asset.findUnique({
-    where: { id },
-    select: { id: true, userId: true, key: true, designId: true },
-  });
   if (!asset || asset.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -33,13 +34,15 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
     `${baseKey}-lg.webp`,
   ];
 
-  try {
-    await deleteR2Keys(knownKeys);
-    await deleteR2Prefix(`${baseKey}-`).catch(() => {});
-  } catch (err) {
-    console.error("[delete asset] R2 cleanup failed:", err);
-  }
-
-  await prisma.asset.delete({ where: { id: asset.id } });
+  // R2 cleanup ve DB delete birbirinden bağımsız — paralel başlat.
+  // R2 hatalarını yutuyoruz (orphan dosya kalması business logic'i
+  // bozmaz, log yeter); DB delete kritik. (async-parallel)
+  await Promise.all([
+    deleteR2Keys(knownKeys).catch((err) =>
+      console.error("[delete asset] deleteR2Keys failed:", err),
+    ),
+    deleteR2Prefix(`${baseKey}-`).catch(() => {}),
+    prisma.asset.delete({ where: { id: asset.id } }),
+  ]);
   return NextResponse.json({ ok: true });
 }

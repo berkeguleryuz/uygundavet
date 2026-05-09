@@ -38,7 +38,9 @@ export function StoryTimelineView({
       <ol className="max-w-2xl mx-auto space-y-8">
         {items.map((m, i) => (
           <li
-            key={i}
+            // date+title kombo stable identifier; reorder'da React doğru
+            // node'u takip eder.
+            key={`${m.date ?? ""}-${m.title ?? ""}-${i}`}
             className={`grid gap-4 md:grid-cols-2 items-center ${
               i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
             }`}

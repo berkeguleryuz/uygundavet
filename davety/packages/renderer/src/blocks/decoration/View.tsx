@@ -1,4 +1,5 @@
 import type { DecorationData } from "@davety/schema";
+import { sanitizeSvgMarkup } from "@davety/schema";
 import { findDecoration } from "../../decorations/catalog";
 import { styleToCss, type BlockViewProps } from "../types";
 
@@ -70,9 +71,17 @@ export function DecorationView({ block }: BlockViewProps<DecorationData>) {
 
 /** Strip XML prolog and force the SVG to be width="100%" height="auto" so
  *  it scales fluidly into the wrapper div the renderer sets a fixed width
- *  on. The viewBox in the source file already carries the aspect ratio. */
+ *  on. The viewBox in the source file already carries the aspect ratio.
+ *
+ *  Aynı svgRaw değeri her render'da aynı sonucu veriyor — module-level
+ *  Map ile cache'lenir, kullanıcı 100 blok render ettiğinde 100 kez
+ *  regex çalışmıyor. (js-cache-function-results) */
+const NORMALISED_SVG_CACHE = new Map<string, string>();
 function normaliseTemplateSvg(raw: string): string {
+  const cached = NORMALISED_SVG_CACHE.get(raw);
+  if (cached) return cached;
   let s = raw.replace(/<\?xml[^?]*\?>\s*/i, "");
+  s = sanitizeSvgMarkup(s);
   s = s.replace(
     /<svg([^>]*)>/i,
     (_match, attrs) => {
@@ -82,5 +91,6 @@ function normaliseTemplateSvg(raw: string): string {
       return `<svg ${cleaned} width="100%" height="auto" style="display:block">`;
     },
   );
+  NORMALISED_SVG_CACHE.set(raw, s);
   return s;
 }

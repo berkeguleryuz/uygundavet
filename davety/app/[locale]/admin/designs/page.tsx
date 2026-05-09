@@ -1,10 +1,27 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/src/lib/prisma";
+import { isAdminSession } from "@/src/lib/admin";
 
 export default async function AdminDesignsPage() {
+  // Defense-in-depth: AdminLayout zaten guard ediyor, ama RSC akışlarında
+  // segment partial render senaryoları için sayfa-level kontrol de var.
+  // isAdminSession React.cache ile dedupe edildiği için layout çağrısını
+  // yeniden DB'ye döndürmüyor.
+  const session = await isAdminSession();
+  if (!session) notFound();
+
+  // Sadece tabloda görünen alanları çek; doc/publishedDoc (her biri
+  // 50-200KB JSON) wire'a düşmesin. 200 satır × ~150KB = ~30MB tasarruf.
+  // (server-serialization)
   const designs = await prisma.invitationDesign.findMany({
     orderBy: { updatedAt: "desc" },
     take: 200,
-    include: {
+    select: {
+      id: true,
+      slug: true,
+      vanityPath: true,
+      status: true,
+      updatedAt: true,
       user: { select: { email: true, name: true } },
       _count: { select: { guests: true, memories: true } },
     },

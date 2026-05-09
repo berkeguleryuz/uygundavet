@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ImageIcon } from "lucide-react";
@@ -49,13 +49,21 @@ export function PresetMediaPicker({ onClose, onPick }: Props) {
   const [activeTab, setActiveTab] = useState<string>(ALL_TAB_ID);
 
   useEffect(() => {
-    fetch("/template-images/manifest.json")
+    // AbortController ile unmount halinde fetch iptal — orphan
+    // network request ve unmounted setState yok. (client-fetch-abort)
+    const controller = new AbortController();
+    fetch("/template-images/manifest.json", { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((m: Manifest | null) => {
-        setManifest(m);
+        if (!controller.signal.aborted) setManifest(m);
       })
-      .catch(() => setManifest(null))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err?.name !== "AbortError") setManifest(null);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   function close() {
@@ -72,19 +80,23 @@ export function PresetMediaPicker({ onClose, onPick }: Props) {
     close();
   }
 
-  // Aktif sekmenin gösterilecek item listesi: "Tümü" ise tüm kategorileri
-  // birleştir, yoksa o kategorinin item'ları. Toplam ve label da burada
-  // hesaplanıyor ki render kısmı tek bir yapıyla çalışsın.
-  const totalItems =
-    manifest?.categories.reduce((acc, c) => acc + c.items.length, 0) ?? 0;
-  const activeItems: ManifestItem[] =
-    activeTab === ALL_TAB_ID
-      ? (manifest?.categories.flatMap((c) => c.items) ?? [])
-      : (manifest?.categories.find((c) => c.id === activeTab)?.items ?? []);
-  const activeLabel =
-    activeTab === ALL_TAB_ID
-      ? "Tümü"
-      : (manifest?.categories.find((c) => c.id === activeTab)?.label ?? "");
+  // Aktif sekmenin item listesi + label + total — manifest veya tab
+  // değişmedikçe yeniden hesaplama. flatMap potansiyel olarak yüzlerce
+  // item dolanır, her render'da çalışmasın diye useMemo.
+  // (rerender-derived-state)
+  const { totalItems, activeItems, activeLabel } = useMemo(() => {
+    const total =
+      manifest?.categories.reduce((acc, c) => acc + c.items.length, 0) ?? 0;
+    const items: ManifestItem[] =
+      activeTab === ALL_TAB_ID
+        ? (manifest?.categories.flatMap((c) => c.items) ?? [])
+        : (manifest?.categories.find((c) => c.id === activeTab)?.items ?? []);
+    const label =
+      activeTab === ALL_TAB_ID
+        ? "Tümü"
+        : (manifest?.categories.find((c) => c.id === activeTab)?.label ?? "");
+    return { totalItems: total, activeItems: items, activeLabel: label };
+  }, [manifest, activeTab]);
 
   return (
     <Dialog.Root
@@ -183,6 +195,15 @@ export function PresetMediaPicker({ onClose, onPick }: Props) {
                             key={item.url}
                             type="button"
                             onClick={() => pick(item)}
+                            // content-visibility:auto + contain-intrinsic-size:
+                            // ekran dışındaki item'lar layout/paint atlanır,
+                            // 100+ görselli "Tümü" tab'ında scroll smooth.
+                            // Intrinsic size aspect-[3/4] ile aynı oranda
+                            // tahmin edilir, scrollbar zıplama olmaz.
+                            style={{
+                              contentVisibility: "auto",
+                              containIntrinsicSize: "200px 267px",
+                            }}
                             className="group relative aspect-[3/4] overflow-hidden rounded-lg border border-border hover:border-primary transition cursor-pointer"
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}

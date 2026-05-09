@@ -82,6 +82,7 @@ export const defaultTheme: Theme = {
   accentColor: "#252224",
   pageBgColor: "#252224",
   cardShape: "flat",
+  bgImageOverlay: 40,
   envelope: {
     color: "#f5eedb",
     liningPattern: "daisy",

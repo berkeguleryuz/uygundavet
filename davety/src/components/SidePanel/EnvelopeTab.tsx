@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Image as ImageIcon, Trash2 } from "lucide-react";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
@@ -45,16 +46,23 @@ export function EnvelopeTab() {
   const updateTheme = useEditorStore((s) => s.updateTheme);
   const { pick, busy: uploading } = useAssetUpload(docId);
 
-  if (!doc) return null;
-  const env = doc.theme.envelope;
+  const env = doc?.theme.envelope;
+  // env değişmedikçe merge stable. Hook'lar early return'den ÖNCE
+  // çağrılmalı (rules-of-hooks).
+  const merge = useCallback(
+    (patch: Record<string, unknown>) => {
+      if (!env) return;
+      updateTheme({ envelope: { ...env, ...patch } });
+    },
+    [env, updateTheme],
+  );
+
+  if (!doc || !env) return null;
   const liningBg = env.liningBg ?? "#1f1c17";
   const stampEnabled = env.stampEnabled ?? true;
   const stampColor = env.stampColor ?? "#b85450";
   const stampLabel = env.stampLabel ?? "";
   const stampImage = env.stampImage ?? "";
-
-  const merge = (patch: Record<string, unknown>) =>
-    updateTheme({ envelope: { ...env, ...patch } });
 
   async function handleStampUpload() {
     const media = await pick("image/*");
@@ -211,6 +219,8 @@ export function EnvelopeTab() {
                   <img
                     src={stampImage}
                     alt="Pul"
+                    loading="lazy"
+                    decoding="async"
                     className="w-12 h-14 object-cover rounded"
                   />
                   <div className="flex-1 text-[11px] text-muted-foreground truncate">

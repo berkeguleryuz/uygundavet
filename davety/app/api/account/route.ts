@@ -19,14 +19,16 @@ export async function DELETE() {
   }
   const userId = session.user.id;
 
-  try {
-    await deleteR2Prefix(`users/${userId}/`);
-  } catch (err) {
-    console.error("[delete account] R2 cleanup failed:", err);
-  }
-
-  // Prisma cascade handles InvitationDesign, Session, Account, Asset, etc.
-  await prisma.user.delete({ where: { id: userId } });
+  // R2 prefix cleanup ve Prisma user delete bağımsız — paralel.
+  // R2 hatasını yutuyoruz (orphan dosya olur, cron temizler), DB delete
+  // kritik. (async-parallel)
+  await Promise.all([
+    deleteR2Prefix(`users/${userId}/`).catch((err) =>
+      console.error("[delete account] R2 cleanup failed:", err),
+    ),
+    // Prisma cascade handles InvitationDesign, Session, Account, Asset, etc.
+    prisma.user.delete({ where: { id: userId } }),
+  ]);
 
   return NextResponse.json({ ok: true });
 }

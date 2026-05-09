@@ -96,7 +96,11 @@ export function VenueView({
         }
       : {};
 
-  const startIso = ctx?.startIso ?? new Date().toISOString();
+  // Render anında new Date() SSR/CSR farklı değer üretip hydration
+  // mismatch'a sebep oluyordu (calendar href'inde). Boş fallback —
+  // ctx.startIso provider'dan gelmeli; gelmiyorsa calendar link
+  // kullanışsız olur ama statik kalır.
+  const startIso = ctx?.startIso ?? "";
   const shareUrl = ctx?.publicUrl;
 
   const handleIcsDownload = () => {

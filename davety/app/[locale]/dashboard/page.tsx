@@ -23,10 +23,22 @@ export default async function DashboardPage({
     redirect("/login?returnTo=/dashboard");
   }
 
+  // Sadece dashboard'un ihtiyacı olan alanları select et;
+  // publishedDoc gibi büyük JSON kolonları (kart başına 50-200KB)
+  // wire'dan getirilmeyecek, query daha hızlı döner.
+  // (server-serialization audit fix)
   const designs = await prisma.invitationDesign.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      slug: true,
+      vanityPath: true,
+      status: true,
+      doc: true,
+      updatedAt: true,
+      createdAt: true,
+      publishedAt: true,
       _count: { select: { guests: true, memories: true } },
     },
   });

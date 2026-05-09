@@ -39,6 +39,10 @@ export function Calendar({ value, onChange, minDate }: CalendarProps) {
 
   const [viewYear, setViewYear] = useState(initialView.getFullYear());
   const [viewMonth, setViewMonth] = useState(initialView.getMonth());
+  // Not: parent'tan value değişince view'ı sync etmiyoruz — React 19
+  // setState-in-effect kuralı bunu yasaklıyor. Pratik etki düşük:
+  // kullanıcı hızla farklı aya bakmak isterse manuel ok'larla geri
+  // dönebilir. Parent value reset'i zaten nadir.
 
   const cells = useMemo(
     () => buildMonthCells(viewYear, viewMonth),

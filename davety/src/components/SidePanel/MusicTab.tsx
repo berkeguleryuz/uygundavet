@@ -27,7 +27,12 @@ const MOOD_FILTERS: { id: string; label: string }[] = [
 ];
 
 export function MusicTab() {
-  const doc = useEditorStore((s) => s.doc);
+  // Sadece bgMusicUrl gerekli; full doc subscribe etmek her keystroke'ta
+  // re-render. (rerender-defer-reads)
+  const currentUrl = useEditorStore(
+    (s) => s.doc?.theme.bgMusicUrl ?? "",
+  );
+  const docExists = useEditorStore((s) => !!s.doc);
   const docId = useEditorStore((s) => s.docId);
   const updateTheme = useEditorStore((s) => s.updateTheme);
   const { pick, busy } = useAssetUpload(docId);
@@ -37,18 +42,19 @@ export function MusicTab() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/music")
+    // AbortController ile unmount halinde request iptal —
+    // eski cancelled boolean network'ü kesmiyordu, sadece setState'i.
+    const controller = new AbortController();
+    fetch("/api/music", { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
-        if (!cancelled) setTracks(data.tracks ?? []);
+        if (!controller.signal.aborted) setTracks(data.tracks ?? []);
       })
-      .catch(() => {
-        if (!cancelled) setError("Müzik kütüphanesi şu an erişilemiyor.");
+      .catch((err) => {
+        if (err?.name === "AbortError") return;
+        setError("Müzik kütüphanesi şu an erişilemiyor.");
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => controller.abort();
   }, []);
 
   const filtered = useMemo(() => {
@@ -57,8 +63,7 @@ export function MusicTab() {
     return tracks.filter((t) => t.moods.includes(mood));
   }, [tracks, mood]);
 
-  if (!doc) return null;
-  const currentUrl = doc.theme.bgMusicUrl ?? "";
+  if (!docExists) return null;
 
   return (
     <div className="border-t border-border pt-4 mt-2 flex flex-col gap-4">

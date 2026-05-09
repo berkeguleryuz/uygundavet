@@ -19,14 +19,18 @@ function Frame({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Statik dekoratif data — module-level olduğunda her render'da yeniden
+// allocate edilmiyor. (rendering-hoist-jsx)
+const CELEBRATE_SPARKS = [
+  { x: 50, y: 18, c: "#f4b860", d: 0 },
+  { x: 76, y: 30, c: "#e8a39a", d: 0.15 },
+  { x: 82, y: 56, c: "#9bb7d4", d: 0.3 },
+  { x: 24, y: 30, c: "#c9b3e0", d: 0.45 },
+  { x: 18, y: 56, c: "#a4cfa1", d: 0.6 },
+];
+
 export function CelebrateIcon() {
-  const sparks = [
-    { x: 50, y: 18, c: "#f4b860", d: 0 },
-    { x: 76, y: 30, c: "#e8a39a", d: 0.15 },
-    { x: 82, y: 56, c: "#9bb7d4", d: 0.3 },
-    { x: 24, y: 30, c: "#c9b3e0", d: 0.45 },
-    { x: 18, y: 56, c: "#a4cfa1", d: 0.6 },
-  ];
+  const sparks = CELEBRATE_SPARKS;
   return (
     <Frame>
       <motion.circle
@@ -195,12 +199,14 @@ export function InfoIcon() {
   );
 }
 
+const TYPOGRAPHY_LETTERS = [
+  { ch: "A", x: 22, y: 60, d: 0 },
+  { ch: "a", x: 50, y: 60, d: 0.15 },
+  { ch: "g", x: 76, y: 60, d: 0.3 },
+];
+
 export function TypographyIcon() {
-  const letters = [
-    { ch: "A", x: 22, y: 60, d: 0 },
-    { ch: "a", x: 50, y: 60, d: 0.15 },
-    { ch: "g", x: 76, y: 60, d: 0.3 },
-  ];
+  const letters = TYPOGRAPHY_LETTERS;
   return (
     <Frame>
       <motion.line

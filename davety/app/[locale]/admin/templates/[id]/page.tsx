@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/src/lib/prisma";
+import { isAdminSession } from "@/src/lib/admin";
 import { TemplateEditor } from "@/src/components/admin/TemplateEditor";
 
 type Params = Promise<{ id: string }>;
@@ -10,7 +11,12 @@ export default async function AdminTemplateDetailPage({
   params: Params;
 }) {
   const { id } = await params;
-  const template = await prisma.designTemplate.findUnique({ where: { id } });
+  // Defense-in-depth admin gate + paralel template fetch.
+  const [session, template] = await Promise.all([
+    isAdminSession(),
+    prisma.designTemplate.findUnique({ where: { id } }),
+  ]);
+  if (!session) notFound();
   if (!template) notFound();
 
   return (

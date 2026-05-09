@@ -202,9 +202,22 @@ const FEATURES: FeatureRow[] = [
   },
 ];
 
+// FEATURES module-level static; section gruplaması ve sıralı bölüm
+// listesi de module-level olarak bir kez build edilir, her render'da
+// yeniden hesaplanmıyor. (js-combine-iterations + js-cache-function-results)
+const FEATURES_BY_SECTION = (() => {
+  const m = new Map<string, FeatureRow[]>();
+  for (const f of FEATURES) {
+    const arr = m.get(f.section);
+    if (arr) arr.push(f);
+    else m.set(f.section, [f]);
+  }
+  return m;
+})();
+const SECTIONS = Array.from(FEATURES_BY_SECTION.keys());
+
 export function PricingTable() {
-  // Group features by section for rendering
-  const sections = Array.from(new Set(FEATURES.map((f) => f.section)));
+  const sections = SECTIONS;
 
   // Resolve offer client-side only to avoid SSR ↔ client timezone mismatches.
   const [offer, setOffer] = useState<ActiveOffer | null>(null);
@@ -254,7 +267,7 @@ export function PricingTable() {
               {section}
             </h3>
             <div className="rounded-2xl border border-border overflow-hidden bg-white">
-              {FEATURES.filter((f) => f.section === section).map((row, idx) => (
+              {(FEATURES_BY_SECTION.get(section) ?? []).map((row, idx) => (
                 <div
                   key={`${section}-${idx}`}
                   className="grid grid-cols-[minmax(140px,1.2fr)_repeat(4,1fr)] items-start gap-3 px-3 md:px-4 py-3 border-b last:border-b-0 border-border hover:bg-muted/30"

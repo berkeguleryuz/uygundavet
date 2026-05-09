@@ -101,7 +101,7 @@ export function ThreeInviteExperienceScene({
     resize();
     render();
     window.addEventListener("resize", resize);
-    host.addEventListener("pointermove", onPointerMove);
+    host.addEventListener("pointermove", onPointerMove, { passive: true });
 
     return () => {
       window.removeEventListener("resize", resize);

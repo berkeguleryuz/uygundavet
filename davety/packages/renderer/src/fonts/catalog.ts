@@ -71,13 +71,29 @@ export const fontCatalog: FontEntry[] = [
   { family: "Orbitron", category: "display", weights: ["400", "500", "700"] },
 ];
 
+// Module-level Map'ler ile O(1) lookup. findFont/filterByCategory
+// TextStylePanel render'ında çağrılıyor; her keystroke'ta lineer arama
+// yerine Map. (js-index-maps)
+const FONT_BY_FAMILY = new Map<string, FontEntry>(
+  fontCatalog.map((f) => [f.family, f]),
+);
+const FONT_BY_CATEGORY = (() => {
+  const m = new Map<FontCategory, FontEntry[]>();
+  for (const f of fontCatalog) {
+    const arr = m.get(f.category);
+    if (arr) arr.push(f);
+    else m.set(f.category, [f]);
+  }
+  return m;
+})();
+
 export function filterByCategory(cat: FontCategory): FontEntry[] {
   if (cat === "all") return fontCatalog;
-  return fontCatalog.filter((f) => f.category === cat);
+  return FONT_BY_CATEGORY.get(cat) ?? [];
 }
 
 export function findFont(family: string): FontEntry | undefined {
-  return fontCatalog.find((f) => f.family === family);
+  return FONT_BY_FAMILY.get(family);
 }
 
 export function buildFontHref(family: string, weights?: string[]): string {

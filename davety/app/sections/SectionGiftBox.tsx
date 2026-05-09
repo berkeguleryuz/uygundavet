@@ -1,5 +1,5 @@
 import { buildDefaultDoc, type Locale } from "@davety/schema";
-import { BoxRevealScene } from "@/app/components/box/BoxRevealScene";
+import { BoxRevealSceneLazy } from "@/app/components/box/BoxRevealSceneLazy";
 
 interface SectionGiftBoxProps {
   locale: Locale;
@@ -32,7 +32,7 @@ export function SectionGiftBox({ locale }: SectionGiftBoxProps) {
           </p>
         </header>
 
-        <BoxRevealScene invitation={invitation} />
+        <BoxRevealSceneLazy invitation={invitation} />
       </section>
     </main>
   );

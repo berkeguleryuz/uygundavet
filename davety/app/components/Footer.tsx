@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import type { ComponentType } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ArrowUpRight, Mail, MessageCircle } from "lucide-react";
 
@@ -33,6 +34,11 @@ function InstagramIcon({ className }: { className?: string }) {
  * görünmez. Diğer her sayfada (anasayfa, dashboard, gallery, pricing,
  * vb.) altta render edilir.
  */
+// Year module-level — bundle yüklenirken bir kez hesaplanır, her render'da
+// new Date() çağırmıyoruz. Yıl rollover'a karşı zaten span'a
+// suppressHydrationWarning konuldu (footer copyright satırı).
+const YEAR = new Date().getFullYear();
+
 const HIDDEN_ON = [
   "/login",
   "/signup",
@@ -64,7 +70,7 @@ const LEGAL_LINKS: { label: string; href: string }[] = [
 const SOCIAL_LINKS: {
   label: string;
   href: string;
-  Icon: (props: { className?: string }) => React.ReactElement;
+  Icon: ComponentType<{ className?: string }>;
 }[] = [
   {
     label: "Instagram",
@@ -87,7 +93,11 @@ export function Footer() {
   const pathname = usePathname() ?? "";
   if (HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
 
-  const year = new Date().getFullYear();
+  // Year client mount anında hesaplanır (lazy init); sayfa açık
+  // kalsa bile Footer'ın year'ı SSR-CSR aynı olur. Span üstünde
+  // suppressHydrationWarning zaten var, yıl rollover edge case'ini
+  // de örtüyor.
+  const year = YEAR;
 
   return (
     <footer
@@ -214,7 +224,10 @@ export function Footer() {
                 "var(--font-space-grotesk), Space Grotesk, sans-serif",
             }}
           >
-            © {year} DavetYolla. Tüm hakları saklıdır.
+            {/* Yılbaşı gece yarısı SSR ile CSR farklı yıl gösterebilir,
+                hydration warning'i bastır. */}
+            © <span suppressHydrationWarning>{year}</span> DavetYolla. Tüm
+            hakları saklıdır.
           </span>
         </div>
       </div>

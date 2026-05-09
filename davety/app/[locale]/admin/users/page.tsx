@@ -1,6 +1,12 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/src/lib/prisma";
+import { isAdminSession } from "@/src/lib/admin";
 
 export default async function AdminUsersPage() {
+  // Defense-in-depth admin gate (layout dahi atlanırsa).
+  const session = await isAdminSession();
+  if (!session) notFound();
+
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
     select: {

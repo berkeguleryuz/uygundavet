@@ -17,15 +17,17 @@ type Params = Promise<{ id: string }>;
  */
 export async function POST(_: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Session ve design fetch paralel; existing'den sadece userId+doc.
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, doc: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const existing = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true, doc: true, publishedDoc: true },
-  });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

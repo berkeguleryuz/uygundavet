@@ -32,9 +32,10 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
   useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
+    const wrapEl = wrap;
 
-    const width = wrap.clientWidth;
-    const height = wrap.clientHeight;
+    const width = wrapEl.clientWidth;
+    const height = wrapEl.clientHeight;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(palette.bg);
@@ -48,7 +49,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    wrap.appendChild(renderer.domElement);
+    wrapEl.appendChild(renderer.domElement);
 
     /* ── Lighting ── */
     const hemi = new THREE.HemisphereLight(0xffffff, 0x884422, 0.55);
@@ -271,13 +272,13 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
     /* ── Mouse parallax for the camera ── */
     const targetCam = { x: 0, y: 0.6 };
     function onPointerMove(e: PointerEvent) {
-      const r = wrap.getBoundingClientRect();
+      const r = wrapEl.getBoundingClientRect();
       const dx = (e.clientX - r.left) / r.width - 0.5;
       const dy = (e.clientY - r.top) / r.height - 0.5;
       targetCam.x = dx * 0.7;
       targetCam.y = 0.6 - dy * 0.5;
     }
-    wrap.addEventListener("pointermove", onPointerMove);
+    wrapEl.addEventListener("pointermove", onPointerMove, { passive: true });
 
     /* ── Animation loop with manual physics ── */
     const G = -3.6; // gravity
@@ -435,8 +436,8 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
     raf = requestAnimationFrame(step);
 
     function onResize() {
-      const w = wrap.clientWidth;
-      const h = wrap.clientHeight;
+      const w = wrapEl.clientWidth;
+      const h = wrapEl.clientHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
@@ -447,7 +448,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
-      wrap.removeEventListener("pointermove", onPointerMove);
+      wrapEl.removeEventListener("pointermove", onPointerMove);
       renderer.dispose();
       glassGeom.dispose();
       sandGeom.dispose();
@@ -455,7 +456,7 @@ export function KumSaatiScene({ palette }: { palette: Palette }) {
       sandMat.dispose();
       cardTex.dispose();
       cardMat.dispose();
-      wrap.removeChild(renderer.domElement);
+      wrapEl.removeChild(renderer.domElement);
     };
   }, [palette.bg, palette.accent, palette.ink]);
 

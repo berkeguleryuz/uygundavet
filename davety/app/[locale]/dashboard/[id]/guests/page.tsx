@@ -9,21 +9,26 @@ export default async function GuestsPage({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const session = await getSession();
+  // Session, design ownership ve guest listesini paralel başlat;
+  // ownership kontrolü auth sonrası yapılır ama query bağımsız.
+  const [session, design, guests] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, slug: true },
+    }),
+    prisma.guest.findMany({
+      where: { designId: id },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
   if (!session?.user) {
-    redirect(`/login?returnTo=${encodeURIComponent(`/dashboard/${id}/guests`)}`);
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/dashboard/${id}/guests`)}`,
+    );
   }
-
-  const design = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true, slug: true },
-  });
   if (!design || design.userId !== session.user.id) notFound();
-
-  const guests = await prisma.guest.findMany({
-    where: { designId: id },
-    orderBy: { createdAt: "desc" },
-  });
 
   const yes = guests
     .filter((g) => g.attending === "yes")

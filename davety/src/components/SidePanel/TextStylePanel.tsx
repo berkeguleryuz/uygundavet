@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   AlignCenter,
@@ -74,11 +74,17 @@ export function TextStylePanel() {
   // Re-measure whenever the user picks a different field/block. Skip the
   // measurement when the user has an explicit override, the override is
   // the source of truth in that case.
+  // Eskiden deps array'inde `doc` vardı; immer her keystroke'ta yeni
+  // doc objesi yarattığı için her tuşta bu effect tetikleniyor ve
+  // canvas üstünde DOM ölçümü yapılıyordu. Sadece bu blok+field için
+  // anlamlı değerleri (override fontSize ve block fontSize) primitif
+  // olarak çıkarıp deps'e koyuyoruz; başka bir block'taki keystroke
+  // measure'ı tetiklemez. (rerender-dependencies)
+  const block = doc?.blocks.find((b) => b.id === blockId);
+  const overrideSize = block?.style.fieldOverrides?.[readFieldId]?.fontSize;
+  const blockSize = block?.style.fontSize;
   useEffect(() => {
     if (!blockId || !readFieldId) return;
-    const block = doc?.blocks.find((b) => b.id === blockId);
-    const overrideSize = block?.style.fieldOverrides?.[readFieldId]?.fontSize;
-    const blockSize = block?.style.fontSize;
     let cancelled = false;
     let raf = 0;
     queueMicrotask(() => {
@@ -106,12 +112,24 @@ export function TextStylePanel() {
       cancelled = true;
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [blockId, readFieldId, doc]);
+  }, [blockId, readFieldId, overrideSize, blockSize]);
+
+  // Font filter chain'i her keystroke'ta paint'i bloklayabiliyordu.
+  // useDeferredValue ile query update'i input için urgent, filter
+  // render'ı non-urgent. (rerender-use-deferred-value)
+  // Bu hook'lar early return'den ÖNCE çağrılmalı (rules-of-hooks).
+  const deferredQuery = useDeferredValue(query);
+  const fonts = useMemo(() => {
+    const base = filterByCategory(category);
+    if (!deferredQuery) return base;
+    const q = deferredQuery.toLowerCase();
+    return base.filter((f) => f.family.toLowerCase().includes(q));
+  }, [category, deferredQuery]);
 
   if (!doc || !blockId || !fieldId) return null;
   // "*" block-mode'unda fieldId="*" geldiği için aşağıdaki guard'lar
   // doğrudan field-level data'ya bakan kısımları skip eder.
-  const block = doc.blocks.find((b) => b.id === blockId);
+  // (block değişkeni effect deps için yukarıda zaten hesaplandı)
   if (!block) return null;
 
   const currentField =
@@ -205,9 +223,7 @@ export function TextStylePanel() {
   const isLongText =
     fieldId === "description" || fieldId === "prompt" || fieldId === "body";
 
-  const fonts = filterByCategory(category).filter((f) =>
-    query ? f.family.toLowerCase().includes(query.toLowerCase()) : true
-  );
+  // (fonts memoization yukarıda hook bölümünde tanımlandı)
 
   return (
     <div className="p-5 flex flex-col gap-5">
@@ -274,7 +290,11 @@ export function TextStylePanel() {
           </div>
         ) : isFamiliesField && familiesSide && familiesPart ? (
           <FamiliesFieldEditor
-            block={block}
+            block={
+              block as unknown as import("@davety/schema").Block<
+                import("@davety/schema").FamiliesData
+              >
+            }
             side={familiesSide}
             part={familiesPart}
             onChange={(patch) => updateBlockData(blockId, patch)}
@@ -733,7 +753,11 @@ function FamiliesFieldEditor({
         <ul className="flex flex-col gap-1.5">
           {members.map((m, i) => (
             <li
-              key={i}
+              // Members reorderlanabilir; isim+i kombinasyonu reorder
+              // sırasında React'in input focus state'ini doğru node'a
+              // taşımasını sağlar (saf index key swap'ta state corrupt
+              // olur).
+              key={`${m}-${i}`}
               className="flex items-center gap-1 rounded-md border border-border bg-background pl-2"
             >
               <input
@@ -840,7 +864,7 @@ function EventProgramItemsEditor({
         <ul className="flex flex-col gap-1.5">
           {items.map((it, i) => (
             <li
-              key={i}
+              key={`${it.time ?? ""}-${it.label ?? ""}-${i}`}
               className="flex items-center gap-1 rounded-md border border-border bg-background pl-2"
             >
               <input
@@ -955,7 +979,7 @@ function StoryTimelineItemsEditor({
         <ul className="flex flex-col gap-2">
           {items.map((it, i) => (
             <li
-              key={i}
+              key={`${it.date ?? ""}-${it.title ?? ""}-${i}`}
               className="rounded-md border border-border bg-background p-2 flex flex-col gap-1.5"
             >
               <div className="flex items-center gap-1">
@@ -1086,7 +1110,7 @@ function GalleryItemsEditor({
         <ul className="grid grid-cols-3 gap-1.5">
           {items.map((m, i) => (
             <li
-              key={i}
+              key={`${m.url ?? ""}-${i}`}
               className="relative aspect-square rounded-md overflow-hidden border border-border bg-muted group"
             >
               {m.mediaType === "video" ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -102,7 +102,7 @@ function IconLibrary() {
       data: { iconKey: icon.id, sizePx: 64, align: "center" },
       style: { align: "center" },
     };
-    insertBlock(block);
+    insertBlock(block as unknown as Block);
     toast.success(`${icon.label} davetiyene eklendi`);
   }
 
@@ -179,6 +179,12 @@ function TemplateLibrary() {
   );
   const [query, setQuery] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Aynı anda birden fazla template fetch'i tetiklenirse (kullanıcı
+  // hızlı tıklarsa) önceki request iptal edilsin — out-of-order
+  // resolve ile yanlış SVG insertBlock'a düşmesin. Unmount'ta da
+  // pending fetch abort. (client-fetch-abort)
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const filteredCategories = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -198,10 +204,14 @@ function TemplateLibrary() {
 
   async function addTemplate(item: DecorationTemplate, categoryLabel: string) {
     setBusyId(item.id);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const res = await fetch(item.url);
+      const res = await fetch(item.url, { signal: controller.signal });
       if (!res.ok) throw new Error("fetch failed");
       const svgRaw = await res.text();
+      if (controller.signal.aborted) return;
       const block: Block<DecorationData> = {
         id: crypto.randomUUID(),
         type: "decoration",
@@ -209,11 +219,14 @@ function TemplateLibrary() {
         data: { svgRaw, sizePx: 320, align: "center" },
         style: { align: "center" },
       };
-      insertBlock(block);
+      insertBlock(block as unknown as Block);
       toast.success(`${categoryLabel} davetiyene eklendi`);
-    } catch {
+    } catch (err) {
+      // AbortError sessizce yutulur — kullanıcı yeni template seçti.
+      if ((err as Error)?.name === "AbortError") return;
       toast.error("Şablon yüklenemedi");
     } finally {
+      if (abortRef.current === controller) abortRef.current = null;
       setBusyId(null);
     }
   }

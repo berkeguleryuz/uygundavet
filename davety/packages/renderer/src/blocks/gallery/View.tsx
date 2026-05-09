@@ -32,7 +32,7 @@ export function GalleryView({
         setLightbox(lightbox + 1);
       }
     }
-    window.addEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, { passive: true });
     return () => window.removeEventListener("keydown", onKey);
   }, [lightbox, items.length]);
 
@@ -74,7 +74,19 @@ export function GalleryView({
                 i + 1
               }`;
             return (
-              <li key={i} className="list-none">
+              <li
+                // m.url + i kombinasyonu: aynı URL'in iki kez geldiği
+                // edge case'de bile stable + unique. Sadece i diff'i
+                // bozardı, sadece m.url duplikasyonda key collision.
+                key={`${m.url ?? "empty"}-${i}`}
+                className="list-none"
+                // 50+ fotoğraflı galeride viewport dışındaki item'lar
+                // layout/paint atlanır, public render scroll smooth.
+                style={{
+                  contentVisibility: "auto",
+                  containIntrinsicSize: "200px 200px",
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => !editable && setLightbox(i)}

@@ -1,6 +1,14 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/src/lib/prisma";
+import { isAdminSession } from "@/src/lib/admin";
 
 export default async function AdminHome() {
+  // Defense-in-depth admin gate (RSC partial render senaryolarına karşı).
+  // isAdminSession React.cache ile dedupe edildiği için layout çağrısı
+  // yeniden DB'ye gitmez.
+  const session = await isAdminSession();
+  if (!session) notFound();
+
   const [userCount, designCount, publishedCount, templateCount, memoryCount] =
     await Promise.all([
       prisma.user.count(),

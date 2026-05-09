@@ -12,7 +12,10 @@
  * throughput keys we also clear the bucket when it empties.
  */
 
-type Bucket = number[];
+interface Bucket {
+  hits: number[];
+  windowMs: number;
+}
 
 const BUCKETS = new Map<string, Bucket>();
 
@@ -34,31 +37,34 @@ export async function rateLimit(
   const now = Date.now();
   const windowMs = input.windowSeconds * 1000;
   const cutoff = now - windowMs;
+  maybeCleanupRateLimit(now);
 
   let bucket = BUCKETS.get(input.key);
   if (!bucket) {
-    bucket = [];
+    bucket = { hits: [], windowMs };
     BUCKETS.set(input.key, bucket);
+  } else {
+    bucket.windowMs = windowMs;
   }
 
-  while (bucket.length > 0 && bucket[0] < cutoff) {
-    bucket.shift();
+  while (bucket.hits.length > 0 && bucket.hits[0] <= cutoff) {
+    bucket.hits.shift();
   }
 
-  if (bucket.length >= input.limit) {
-    const oldest = bucket[0];
+  if (bucket.hits.length >= input.limit) {
+    const oldest = bucket.hits[0];
     const retryAfter = Math.max(1, Math.ceil((oldest + windowMs - now) / 1000));
     return { ok: false, remaining: 0, retryAfter };
   }
 
-  bucket.push(now);
-  if (bucket.length === 0) {
+  bucket.hits.push(now);
+  if (bucket.hits.length === 0) {
     BUCKETS.delete(input.key);
   }
 
   return {
     ok: true,
-    remaining: input.limit - bucket.length,
+    remaining: input.limit - bucket.hits.length,
     retryAfter: 0,
   };
 }
@@ -70,14 +76,17 @@ export async function rateLimit(
 let callCount = 0;
 const CLEANUP_INTERVAL = 1000;
 
-export function maybeCleanupRateLimit(): void {
+export function maybeCleanupRateLimit(now = Date.now()): void {
   callCount += 1;
   if (callCount % CLEANUP_INTERVAL !== 0) return;
-  const now = Date.now();
-  const tenMinutes = 10 * 60 * 1000;
   for (const [key, bucket] of BUCKETS) {
-    if (bucket.length === 0 || (bucket[bucket.length - 1] ?? 0) < now - tenMinutes) {
+    const newest = bucket.hits[bucket.hits.length - 1] ?? 0;
+    if (bucket.hits.length === 0 || newest <= now - bucket.windowMs) {
       BUCKETS.delete(key);
     }
   }
+}
+
+export function __getRateLimitBucketCountForTest(): number {
+  return BUCKETS.size;
 }

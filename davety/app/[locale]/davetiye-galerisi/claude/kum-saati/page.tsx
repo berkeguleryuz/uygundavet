@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { getClaudeScene } from "@/app/components/three-claude/sceneRegistry";
-import { KumSaatiScene } from "./Scene";
+import { KumSaatiSceneLazy } from "./SceneLazy";
 
 export default async function KumSaatiPage({
   params,
@@ -39,7 +39,7 @@ export default async function KumSaatiPage({
         </p>
       </header>
 
-      <KumSaatiScene palette={meta.palette} />
+      <KumSaatiSceneLazy palette={meta.palette} />
     </main>
   );
 }

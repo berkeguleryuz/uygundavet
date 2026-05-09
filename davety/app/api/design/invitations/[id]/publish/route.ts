@@ -118,18 +118,28 @@ type Params = Promise<{ id: string }>;
 
 export async function POST(req: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Body parse, session ve design fetch — hepsi bağımsız, paralel
+  // başlat. Session/design ownership check await sonrası yapılır.
+  const bodyPromise = req.json().catch(() => ({}));
+  // existing'den sadece userId + doc kullanılıyor; publishedDoc gibi
+  // büyük JSON kolonları gereksiz wire trafiği. (server-serialization)
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, doc: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => ({}));
+  const body = await bodyPromise;
   const parsed = publishSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
 
-  const existing = await prisma.invitationDesign.findUnique({ where: { id } });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

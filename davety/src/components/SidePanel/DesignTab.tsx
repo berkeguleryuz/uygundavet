@@ -4,7 +4,14 @@ import { useState } from "react";
 import { Wand2, Check, ImageIcon, Sparkles, Trash2 } from "lucide-react";
 import { useEditorStore } from "@/src/store/editor-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
-import { PresetMediaPicker } from "@/src/components/PresetMediaPicker";
+import dynamic from "next/dynamic";
+const PresetMediaPicker = dynamic(
+  () =>
+    import("@/src/components/PresetMediaPicker").then((m) => ({
+      default: m.PresetMediaPicker,
+    })),
+  { ssr: false },
+);
 
 interface Preset {
   name: string;

@@ -67,28 +67,39 @@ export function PublicInvitation({
   const editBtn = readableButtonStyle(doc.theme.pageBgColor ?? "#252224");
 
   // Card slot starts at 640px (envelope's natural top-of-page geometry).
-  // `cardExpandedHeight` is what WeddingEnvelope grows to the moment its
-  // internal `dropping` state flips, same render, same CSS transition
-  // tick as the envelope's translateY, so the two animations are
-  // perfectly synced (no parent setTimeout race).
-  const [cardExpandedHeight, setCardExpandedHeight] = useState(700);
-  // Envelope/card start at viewport width (capped at 400px so the
-  // designed mobile-portrait look is preserved on desktop). This way
-  // the closed envelope fills mobile screens edge-to-edge without
-  // leaving a side band, instead of staying pinned at a fixed 340/360.
-  const [envelopeWidth, setEnvelopeWidth] = useState(360);
-  const [cardWidth, setCardWidth] = useState(340);
+  // 3 ayrı useState 3 sequential re-render tetikliyordu, tek state ile
+  // tek atomik update'e çevrildi. (rerender-split-combined-hooks)
+  // cardExpandedHeight: WeddingEnvelope kendi içinde dropping flip'inin
+  // anında büyüdüğü hedef yükseklik. Envelope/card 400px'e kadar
+  // viewport'a uyarlanır, mobilde edge-to-edge.
+  const [size, setSize] = useState({ height: 700, envW: 360, cardW: 340 });
+  const { height: cardExpandedHeight, envW: envelopeWidth, cardW: cardWidth } =
+    size;
 
   useEffect(() => {
+    let rafId = 0;
     function compute() {
-      setCardExpandedHeight(Math.max(640, window.innerHeight - 48));
       const w = Math.min(400, window.innerWidth);
-      setEnvelopeWidth(w);
-      setCardWidth(w);
+      setSize({
+        height: Math.max(640, window.innerHeight - 48),
+        envW: w,
+        cardW: w,
+      });
+    }
+    // rAF throttle: sürükleme sırasında frame başına bir compute.
+    function onResize() {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        compute();
+      });
     }
     compute();
-    window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (

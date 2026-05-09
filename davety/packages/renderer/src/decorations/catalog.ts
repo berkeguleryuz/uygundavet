@@ -246,12 +246,30 @@ export const DECORATION_ICONS: DecorationIcon[] = [
   },
 ];
 
+// Module-level Map'ler ile O(1) lookup. Eskiden findDecoration ve
+// decorationsByCategory her çağrıda lineer arama yapıyordu; render
+// hot path'inde (DecorationView, parseInlineDecorations) sürekli
+// çalıştığı için Map'e taşındı. Katalog static — bir kez kurulur,
+// her zaman tüketilir. (js-index-maps audit fix)
+const DECORATION_BY_ID = new Map<string, DecorationIcon>(
+  DECORATION_ICONS.map((i) => [i.id, i]),
+);
+const DECORATION_BY_CATEGORY = (() => {
+  const m = new Map<DecorationCategory, DecorationIcon[]>();
+  for (const i of DECORATION_ICONS) {
+    const arr = m.get(i.category);
+    if (arr) arr.push(i);
+    else m.set(i.category, [i]);
+  }
+  return m;
+})();
+
 export function findDecoration(id: string): DecorationIcon | undefined {
-  return DECORATION_ICONS.find((i) => i.id === id);
+  return DECORATION_BY_ID.get(id);
 }
 
 export function decorationsByCategory(
   category: DecorationCategory,
 ): DecorationIcon[] {
-  return DECORATION_ICONS.filter((i) => i.category === category);
+  return DECORATION_BY_CATEGORY.get(category) ?? [];
 }

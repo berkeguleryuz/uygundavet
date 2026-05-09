@@ -251,6 +251,8 @@ export function buildPremiumTemplateDoc(
       bgColor: template.palette.bg,
       accentColor: template.palette.accent,
       pageBgColor: template.palette.page,
+      cardShape: "flat",
+      bgImageOverlay: 40,
       envelope: {
         color: template.palette.envelope,
         flapColor: template.palette.flap,

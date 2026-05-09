@@ -96,7 +96,7 @@ export function BoxRevealScene({ invitation }: BoxRevealSceneProps) {
     resize();
     render();
     window.addEventListener("resize", resize);
-    host.addEventListener("pointermove", onPointerMove);
+    host.addEventListener("pointermove", onPointerMove, { passive: true });
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -386,10 +386,16 @@ function drawInvitationCanvas(ctx: CanvasRenderingContext2D, invitation: Invitat
   ctx.fillText(venueData?.venueName ?? "DavetYolla Salonu", 512, 1215);
 }
 
-function getCanvasFonts() {
+// getComputedStyle forced layout flush yapıyor; texture bake her
+// frame çağrılabiliyordu. Sonuç sayfa içinde değişmiyor — bir kez
+// hesapla, cache. (js-cache-function-results)
+let _cachedFonts: ReturnType<typeof computeCanvasFonts> | null = null;
+function computeCanvasFonts() {
   const styles = getComputedStyle(document.documentElement);
   return {
-    display: styles.getPropertyValue("--font-merienda").trim() || "Merienda, Georgia, serif",
+    display:
+      styles.getPropertyValue("--font-merienda").trim() ||
+      "Merienda, Georgia, serif",
     sans:
       styles.getPropertyValue("--font-space-grotesk").trim() ||
       "Space Grotesk, ui-sans-serif, sans-serif",
@@ -397,6 +403,11 @@ function getCanvasFonts() {
       styles.getPropertyValue("--font-chakra").trim() ||
       "Chakra Petch, ui-monospace, monospace",
   };
+}
+function getCanvasFonts() {
+  if (_cachedFonts) return _cachedFonts;
+  _cachedFonts = computeCanvasFonts();
+  return _cachedFonts;
 }
 
 function fontSpec(weight: number, size: number, family: string) {

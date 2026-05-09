@@ -10,5 +10,12 @@ import { isAdminSession } from "@/src/lib/admin";
  */
 export async function GET() {
   const session = await isAdminSession();
-  return NextResponse.json({ isAdmin: !!session });
+  // User-specific response — CDN/proxy cache'lemez. Defense-in-depth
+  // amacıyla açıkça private + no-store.
+  return NextResponse.json(
+    { isAdmin: !!session },
+    {
+      headers: { "Cache-Control": "private, no-store" },
+    },
+  );
 }

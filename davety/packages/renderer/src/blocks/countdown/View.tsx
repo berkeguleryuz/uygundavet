@@ -87,7 +87,13 @@ export function CountdownView({
         <Cell value={parts.s} label={labels.seconds} editable={editable} labelId="seconds" clickable={clickable} style={fieldStyle(block, "seconds")} />
       </div>
       {dateStr ? (
-        <div className="mt-4 text-center text-sm font-sans opacity-70 tabular-nums">
+        // toLocaleDateString/TimeString Node OS locale ile browser
+        // arasında farklı sonuç verebilir (ICU data versiyonu),
+        // hydration warning'i bastır.
+        <div
+          className="mt-4 text-center text-sm font-sans opacity-70 tabular-nums"
+          suppressHydrationWarning
+        >
           {dateStr}
           {timeStr ? <span className="mx-2">·</span> : null}
           {timeStr}

@@ -43,7 +43,12 @@ export function MobileHintBar() {
   const selectedBlockId = useUIStore((s) => s.selectedBlockId);
   const selectedFieldId = useUIStore((s) => s.selectedFieldId);
   const dirty = useEditorStore((s) => s.dirty);
-  const doc = useEditorStore((s) => s.doc);
+  // Doc'un tamamına subscribe olmak yerine sadece seçili bloğun
+  // type'ı ile sınırla — her keystroke'ta yeni doc immer ref'iyle
+  // hint bar re-render olmuyordu artık. (rerender-derived-state)
+  const selectedBlockType = useEditorStore(
+    (s) => s.doc?.blocks.find((b) => b.id === selectedBlockId)?.type ?? null,
+  );
 
   const [dismissed, setDismissed] = useState(false);
   useEffect(() => {
@@ -80,9 +85,7 @@ export function MobileHintBar() {
     selectedBlockId,
     selectedFieldId,
     dirty,
-    blockLabel: blockTypeLabel(
-      doc?.blocks.find((b) => b.id === selectedBlockId)?.type,
-    ),
+    blockLabel: blockTypeLabel(selectedBlockType ?? undefined),
     fieldLabel: selectedFieldId,
   });
 
@@ -280,45 +283,47 @@ const TONE_CLASSES: Record<
   },
 };
 
+// Module-level static map'ler; eskiden her hint render'ında yeniden
+// allocate ediliyordu. (rendering-hoist-jsx + js-cache-property-access)
+const BLOCK_TYPE_LABELS: Record<string, string> = {
+  hero: "Kapak",
+  countdown: "Geri Sayım",
+  families: "Aile Bilgileri",
+  event_program: "Etkinlik Programı",
+  venue: "Mekân",
+  story_timeline: "Hikâye Zaman Çizelgesi",
+  gallery: "Galeri",
+  memory_book: "Anı Defteri",
+  rsvp_form: "Katılım Formu",
+  donation: "Bağış",
+  custom_note: "Özel Not",
+  custom_section: "Özel Bölüm",
+  cta: "Çağrı Butonu",
+  contact: "İletişim",
+  footer: "Alt Bilgi",
+  decoration: "Süsleme",
+};
 function blockTypeLabel(type?: string | null): string | null {
   if (!type) return null;
-  const map: Record<string, string> = {
-    hero: "Kapak",
-    countdown: "Geri Sayım",
-    families: "Aile Bilgileri",
-    event_program: "Etkinlik Programı",
-    venue: "Mekân",
-    story_timeline: "Hikâye Zaman Çizelgesi",
-    gallery: "Galeri",
-    memory_book: "Anı Defteri",
-    rsvp_form: "Katılım Formu",
-    donation: "Bağış",
-    custom_note: "Özel Not",
-    custom_section: "Özel Bölüm",
-    cta: "Çağrı Butonu",
-    contact: "İletişim",
-    footer: "Alt Bilgi",
-    decoration: "Süsleme",
-  };
-  return map[type] ?? type;
+  return BLOCK_TYPE_LABELS[type] ?? type;
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  brideName: "Gelin adı",
+  groomName: "Damat adı",
+  coupleNames: "Çift adları",
+  subtitle: "Alt başlık",
+  description: "Açıklama",
+  title: "Başlık",
+  body: "Gövde",
+  heading: "Başlık",
+  venueName: "Mekân adı",
+  venueAddress: "Mekân adresi",
+  text: "Metin",
+  targetIso: "Etkinlik tarihi",
+  prompt: "Soru",
+};
 function prettyFieldLabel(field?: string | null): string {
   if (!field) return "Metin";
-  const map: Record<string, string> = {
-    brideName: "Gelin adı",
-    groomName: "Damat adı",
-    coupleNames: "Çift adları",
-    subtitle: "Alt başlık",
-    description: "Açıklama",
-    title: "Başlık",
-    body: "Gövde",
-    heading: "Başlık",
-    venueName: "Mekân adı",
-    venueAddress: "Mekân adresi",
-    text: "Metin",
-    targetIso: "Etkinlik tarihi",
-    prompt: "Soru",
-  };
-  return map[field] ?? "Metin";
+  return FIELD_LABELS[field] ?? "Metin";
 }

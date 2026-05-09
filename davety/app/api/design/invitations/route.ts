@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { buildDefaultDoc } from "@davety/schema";
+import { buildDefaultDoc, sanitizeInvitationDoc } from "@davety/schema";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { generateShortSlug } from "@/src/lib/slug";
@@ -64,6 +64,10 @@ const FREE_USER_INVITATION_CAP = 2;
 const PREMIUM_USER_INVITATION_CAP = 5;
 
 export async function POST(req: Request) {
+  // Body parse (req.json) session ve DB query'lerinden bağımsız —
+  // hemen başlat, sonradan await et. async-api-routes pattern'i.
+  const bodyPromise = req.json().catch(() => null);
+
   const session = await getSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -99,7 +103,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const body = await req.json().catch(() => null);
+  const body = await bodyPromise;
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -218,22 +222,24 @@ export async function POST(req: Request) {
     }
   }
 
-  // generate unique slug (retry on collision)
-  let slug = generateShortSlug();
-  for (let i = 0; i < 5; i++) {
-    const exists = await prisma.invitationDesign.findUnique({
-      where: { slug },
-      select: { id: true },
-    });
-    if (!exists) break;
-    slug = generateShortSlug();
-  }
+  // 5 aday slug'ı tek findMany ile DB'den toplu kontrol et — eski
+  // versiyon her aday için ayrı findUnique yapıyordu (5'e kadar
+  // sequential round-trip = N+1 pattern). Tek query'de hangileri
+  // taken belli olur, ilk uygun olan seçilir, hepsi taken'sa fallback
+  // olarak yenisi denenir. (async-parallel)
+  const candidates = Array.from({ length: 5 }, () => generateShortSlug());
+  const taken = await prisma.invitationDesign.findMany({
+    where: { slug: { in: candidates } },
+    select: { slug: true },
+  });
+  const takenSet = new Set(taken.map((t) => t.slug));
+  const slug = candidates.find((s) => !takenSet.has(s)) ?? generateShortSlug();
 
   const design = await prisma.invitationDesign.create({
     data: {
       userId: session.user.id,
       slug,
-      doc,
+      doc: sanitizeInvitationDoc(doc) as object,
       status: "draft",
     },
     select: { id: true, slug: true, status: true, createdAt: true },

@@ -11,11 +11,23 @@ type Params = Promise<{ id: string }>;
 
 export async function PATCH(req: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Body parse, session ve design fetch paralel.
+  const bodyPromise = req.json().catch(() => null);
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, doc: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const body = await req.json().catch(() => null);
+  if (!existing || existing.userId !== session.user.id) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const body = await bodyPromise;
   const parsed = slugSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
@@ -27,14 +39,6 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
       { error: "Invalid vanity", reason: check.reason },
       { status: 400 }
     );
-  }
-
-  const existing = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true, doc: true },
-  });
-  if (!existing || existing.userId !== session.user.id) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Vanity path Klasik+ tier gerekli. Free kullanıcı buton görmemeli

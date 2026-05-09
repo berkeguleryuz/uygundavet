@@ -11,12 +11,27 @@ export default async function EditorPage({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const session = await getSession();
-  if (!session?.user) {
-    redirect(`/login?returnTo=${encodeURIComponent(`/design/invitations/${id}/editor`)}`);
-  }
+  // Auth ve design fetch paralel; editor için doc + updatedAt yeter,
+  // publishedDoc gibi geniş alanları select ile dışarıda bırakıyoruz
+  // (server-serialization audit fix'i de burada).
+  const [session, design] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        userId: true,
+        doc: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
 
-  const design = await prisma.invitationDesign.findUnique({ where: { id } });
+  if (!session?.user) {
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/design/invitations/${id}/editor`)}`,
+    );
+  }
   if (!design || design.userId !== session.user.id) {
     notFound();
   }

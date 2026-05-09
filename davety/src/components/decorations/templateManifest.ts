@@ -736,10 +736,18 @@ export const DECORATION_TEMPLATE_CATEGORIES: DecorationTemplateCategory[] =
   }
 ];
 
-export function findTemplate(id: string): DecorationTemplate | undefined {
+// Tüm template item'larından id → DecorationTemplate Map'i build-time
+// kurulur, lookup O(1). Eskiden iç içe linear scan vardı. (js-index-maps)
+const TEMPLATE_BY_ID = (() => {
+  const m = new Map<string, DecorationTemplate>();
   for (const cat of DECORATION_TEMPLATE_CATEGORIES) {
-    const found = cat.items.find((i) => i.id === id);
-    if (found) return found;
+    for (const item of cat.items) {
+      m.set(item.id, item);
+    }
   }
-  return undefined;
+  return m;
+})();
+
+export function findTemplate(id: string): DecorationTemplate | undefined {
+  return TEMPLATE_BY_ID.get(id);
 }

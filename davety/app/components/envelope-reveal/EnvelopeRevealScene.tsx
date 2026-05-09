@@ -102,7 +102,7 @@ export function EnvelopeRevealScene({ invitation }: EnvelopeRevealSceneProps) {
     resize();
     render();
     window.addEventListener("resize", resize);
-    host.addEventListener("pointermove", onPointerMove);
+    host.addEventListener("pointermove", onPointerMove, { passive: true });
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -510,10 +510,16 @@ function drawInvitationCanvas(ctx: CanvasRenderingContext2D, invitation: Invitat
   ctx.globalAlpha = 1;
 }
 
-function getCanvasFonts() {
+// getComputedStyle forced layout flush; texture bake birden fazla
+// kez çalışıyor. Sayfa lifecycle'ı boyunca CSS variable'lar değişmiyor,
+// module-level cache.
+let _envCachedFonts: ReturnType<typeof computeCanvasFontsInner> | null = null;
+function computeCanvasFontsInner() {
   const styles = getComputedStyle(document.documentElement);
   return {
-    display: styles.getPropertyValue("--font-merienda").trim() || "Merienda, Georgia, serif",
+    display:
+      styles.getPropertyValue("--font-merienda").trim() ||
+      "Merienda, Georgia, serif",
     sans:
       styles.getPropertyValue("--font-space-grotesk").trim() ||
       "Space Grotesk, ui-sans-serif, sans-serif",
@@ -521,6 +527,11 @@ function getCanvasFonts() {
       styles.getPropertyValue("--font-chakra").trim() ||
       "Chakra Petch, ui-monospace, monospace",
   };
+}
+function getCanvasFonts() {
+  if (_envCachedFonts) return _envCachedFonts;
+  _envCachedFonts = computeCanvasFontsInner();
+  return _envCachedFonts;
 }
 
 function fontSpec(weight: number, size: number, family: string) {

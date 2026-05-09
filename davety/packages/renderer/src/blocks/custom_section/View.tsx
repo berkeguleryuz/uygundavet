@@ -45,7 +45,12 @@ export function CustomSectionView({
       {items && items.length > 0 ? (
         <ul className="max-w-md mx-auto space-y-3">
           {items.map((it, i) => (
-            <li key={i} className="border-b border-current/10 pb-2">
+            <li
+              // title text stable identifier; reorder edildiğinde React
+              // doğru node'u takip eder.
+              key={`${it.title ?? ""}-${i}`}
+              className="border-b border-current/10 pb-2"
+            >
               <div className="font-medium text-sm">
                 {parseInlineDecorations(it.title)}
               </div>

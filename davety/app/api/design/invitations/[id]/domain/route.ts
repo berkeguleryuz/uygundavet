@@ -37,15 +37,18 @@ type Params = Promise<{ id: string }>;
  */
 export async function PATCH(req: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Body, session ve design — hepsi bağımsız, paralel başlat.
+  const bodyPromise = req.json().catch(() => null);
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, doc: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const existing = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true, doc: true },
-  });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -66,7 +69,7 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
     );
   }
 
-  const body = await req.json().catch(() => null);
+  const body = await bodyPromise;
   const parsed = setSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

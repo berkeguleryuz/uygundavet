@@ -10,21 +10,28 @@ export default async function MemoriesPage({ params }: { params: Params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const session = await getSession();
+  // Üç bağımsız kaynak (session, design ownership, memories) paralel
+  // başlatılır. Memory query designId'yi sadece params'tan alıyor (hemen
+  // bilinir), ownership/auth sonradan kontrol edilir; gereksiz veri
+  // işlemiş olsak da seri await'ten 2x hızlıdır.
+  const [session, design, memories] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true },
+    }),
+    prisma.memoryEntry.findMany({
+      where: { designId: id },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
   if (!session?.user) {
-    redirect(`/login?returnTo=${encodeURIComponent(`/dashboard/${id}/memories`)}`);
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/dashboard/${id}/memories`)}`,
+    );
   }
-
-  const design = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true },
-  });
   if (!design || design.userId !== session.user.id) notFound();
-
-  const memories = await prisma.memoryEntry.findMany({
-    where: { designId: id },
-    orderBy: { createdAt: "desc" },
-  });
 
   return (
     <main className="min-h-dvh max-w-3xl mx-auto px-6 py-12">

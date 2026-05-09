@@ -41,17 +41,32 @@ export function Envelope3DScene() {
         y: clamp(dx * 7, -7, 7),
       });
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+
+  // Animation timer'ları unmount'ta cleanup.
+  const timersRef = useRef<number[]>([]);
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
   }, []);
 
   const handleClick = () => {
     if (stage !== "closed") return;
     setStage("flipping");
-    window.setTimeout(() => setStage("emerging"), 1100);
-    window.setTimeout(() => setStage("done"), 3200);
+    timersRef.current.push(
+      window.setTimeout(() => setStage("emerging"), 1100),
+      window.setTimeout(() => setStage("done"), 3200),
+    );
   };
-  const handleReset = () => setStage("closed");
+  const handleReset = () => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setStage("closed");
+  };
 
   const flipped = stage !== "closed";
   const cardEmerging = stage === "emerging" || stage === "done";

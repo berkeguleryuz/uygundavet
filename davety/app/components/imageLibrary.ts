@@ -183,9 +183,24 @@ export const STOCK_IMAGES: StockImage[] = [
   img("photo-1519340241574-2cec6aef0c01", ["baby"], "Colin Maynard", "Baby smile"),
 ];
 
+// Pre-categorize: her StockCategory için image listesi build-time'da
+// hesaplanır, runtime'da .filter().includes() yerine direkt Map.get.
+// 100 item × N kategori lookup'tan O(1) lookup'a düşer. (js-set-map-lookups)
+const IMAGES_BY_CATEGORY = (() => {
+  const m = new Map<StockCategory, StockImage[]>();
+  for (const img of STOCK_IMAGES) {
+    for (const cat of img.categories) {
+      const arr = m.get(cat);
+      if (arr) arr.push(img);
+      else m.set(cat, [img]);
+    }
+  }
+  return m;
+})();
+
 /** Filter helpers the image picker UI can use. */
 export function imagesByCategory(cat: StockCategory): StockImage[] {
-  return STOCK_IMAGES.filter((i) => i.categories.includes(cat));
+  return IMAGES_BY_CATEGORY.get(cat) ?? [];
 }
 
 export const STOCK_CATEGORIES: { key: StockCategory; label: string }[] = [

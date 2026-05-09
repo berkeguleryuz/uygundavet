@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod";
+import { sanitizeInvitationDoc } from "@davety/schema";
 import { getSession } from "@/src/lib/session";
 import { prisma } from "@/src/lib/prisma";
 import { deleteR2Prefix } from "@/src/lib/r2";
@@ -13,11 +14,28 @@ type Params = Promise<{ id: string }>;
 
 export async function GET(_: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Session ve design fetch paralel + select narrow. publishedDoc
+  // editor read-path'ında gereksiz, doc ile updatedAt yeter.
+  const [session, design] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        slug: true,
+        userId: true,
+        status: true,
+        doc: true,
+        updatedAt: true,
+        createdAt: true,
+        publishedAt: true,
+        lastAutosavedAt: true,
+      },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const design = await prisma.invitationDesign.findUnique({ where: { id } });
   if (!design || design.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -26,23 +44,26 @@ export async function GET(_: Request, ctx: { params: Params }) {
 
 export async function PATCH(req: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Body parse, session ve ownership fetch bağımsız — paralel başlat.
+  const bodyPromise = req.json().catch(() => null);
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true, updatedAt: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!existing || existing.userId !== session.user.id) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
 
-  const body = await req.json().catch(() => null);
+  const body = await bodyPromise;
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
-  }
-
-  const existing = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true, updatedAt: true },
-  });
-  if (!existing || existing.userId !== session.user.id) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // NB: multi-tab collision detection (clientUpdatedAt mismatch → 409) is deferred.
@@ -51,23 +72,28 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
   const updated = await prisma.invitationDesign.update({
     where: { id },
     data: {
-      doc: parsed.data.doc as object,
+      doc: sanitizeInvitationDoc(parsed.data.doc) as object,
       lastAutosavedAt: new Date(),
     },
     select: { updatedAt: true },
   });
 
-  // Fire-and-forget edit event log
-  prisma.editEvent
-    .create({
-      data: {
-        designId: id,
-        actorId: session.user.id,
-        op: "doc.replace",
-        payload: {},
-      },
-    })
-    .catch(() => {});
+  // Edit event log post-response. Eski implementasyon floating Promise
+  // bırakıyordu, Next 15+'da serverless function bitince silinebilirdi.
+  // after() Next runtime'a "response gönder, sonra bunu çalıştır"
+  // diyor — log garantili yazılır, response anında döner.
+  after(() =>
+    prisma.editEvent
+      .create({
+        data: {
+          designId: id,
+          actorId: session.user.id,
+          op: "doc.replace",
+          payload: {},
+        },
+      })
+      .catch(() => {}),
+  );
 
   return NextResponse.json({
     ok: true,
@@ -77,14 +103,17 @@ export async function PATCH(req: Request, ctx: { params: Params }) {
 
 export async function DELETE(_: Request, ctx: { params: Params }) {
   const { id } = await ctx.params;
-  const session = await getSession();
+  // Session ve ownership fetch paralel.
+  const [session, existing] = await Promise.all([
+    getSession(),
+    prisma.invitationDesign.findUnique({
+      where: { id },
+      select: { userId: true },
+    }),
+  ]);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const existing = await prisma.invitationDesign.findUnique({
-    where: { id },
-    select: { userId: true },
-  });
   if (!existing || existing.userId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -114,7 +143,13 @@ export async function DELETE(_: Request, ctx: { params: Params }) {
     // tamamlanır, R2 orphan'ları sonra cron ile süpürülebilir.
     console.error("[delete invitation] R2 cleanup failed:", err);
   }
-  await prisma.asset.deleteMany({ where: { designId: id } });
-  await prisma.invitationDesign.delete({ where: { id } });
+  // asset.deleteMany ve invitationDesign.delete arasında FK bağımlılığı
+  // schema'da onDelete: SetNull (asset.designId nullable) — yani
+  // davetiye silinmeden önce asset'lerin silinmesi şart değil.
+  // İkisini paralel çalıştırıyoruz. (async-parallel)
+  await Promise.all([
+    prisma.asset.deleteMany({ where: { designId: id } }),
+    prisma.invitationDesign.delete({ where: { id } }),
+  ]);
   return NextResponse.json({ ok: true });
 }

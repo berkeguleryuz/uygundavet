@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { buildDefaultDoc, type Locale } from "@davety/schema";
-import { ThreeInviteExperienceScene } from "@/app/components/three-invites/ThreeInviteExperienceScene";
+import { ThreeInviteExperienceSceneLazy } from "@/app/components/three-invites/ThreeInviteExperienceSceneLazy";
 import {
   getInviteExperienceByRoute,
   type InviteExperienceRoute,
@@ -24,7 +24,7 @@ export function SectionThreeInviteExperience({
     groomName: "Ibrahim",
     templateSlug: experience.templateSlug,
   });
-  const darkScene = experience.sceneKind === "moonlight" || experience.sceneKind === "curtain";
+  const darkScene = experience.sceneKind === "curtain";
 
   return (
     <main
@@ -59,7 +59,7 @@ export function SectionThreeInviteExperience({
           </p>
         </header>
 
-        <ThreeInviteExperienceScene invitation={invitation} experience={experience} />
+        <ThreeInviteExperienceSceneLazy invitation={invitation} experience={experience} />
       </section>
     </main>
   );

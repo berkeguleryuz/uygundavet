@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { InvitationCard, type InvitationCardProps } from "./InvitationCard";
 
 /**
@@ -145,6 +145,17 @@ export function WeddingEnvelope({
   const sceneHeight = innerSceneHeight + sceneBottomPad;
   const envelopeTop = innerSceneHeight - envelopeHeight;
 
+  // Timer ref'leri unmount'ta cleanup için. Eskiden bare setTimeout
+  // kullanılıyordu, kullanıcı animasyon sırasında sayfayı kapatırsa
+  // setStage çağrıları unmounted component'a düşüyordu.
+  const timersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, []);
+
   const handleOpen = () => {
     if (stage !== "closed") return;
     // Timeline:
@@ -155,12 +166,14 @@ export function WeddingEnvelope({
     //   5.3s  envelope V-pocket starts sliding DOWN (4s slow descent)
     //        , the card stays put via counter-translate on its wrapper.
     setStage("flipping");
-    setTimeout(() => setStage("emerging"), 3000);
-    setTimeout(() => {
-      setStage("done");
-      onReveal?.();
-    }, 5000);
-    setTimeout(() => setDropping(true), 5300);
+    timersRef.current.push(
+      setTimeout(() => setStage("emerging"), 3000),
+      setTimeout(() => {
+        setStage("done");
+        onReveal?.();
+      }, 5000),
+      setTimeout(() => setDropping(true), 5300),
+    );
   };
   const flipped = stage !== "closed";
   const cardEmerging =
@@ -590,6 +603,8 @@ export function WeddingEnvelope({
             alt="davetyolla"
             width={56}
             height={56}
+            loading="lazy"
+            decoding="async"
             className="block transition-opacity duration-500 ease-in-out"
           />
         </div>
@@ -754,7 +769,14 @@ function Stamp({
         >
           {config.image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={config.image} alt="" className="w-full h-full object-cover" draggable={false} />
+            <img
+              src={config.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
           ) : config.label ? (
             <span
               className="font-medium text-center leading-tight"

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { auth } from "./auth";
 
@@ -6,13 +7,18 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
-export async function isAdminSession() {
+/**
+ * Request-scoped admin check. AdminLayout + admin pages + admin API
+ * routes all call this; React.cache dedupes the Better Auth session
+ * lookup so it happens once per request even with multiple consumers.
+ */
+export const isAdminSession = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const email = session?.user?.email?.toLowerCase();
   if (!session || !email) return null;
   if (!ADMIN_EMAILS.includes(email)) return null;
   return session;
-}
+});
 
 export async function requireAdmin() {
   const session = await isAdminSession();

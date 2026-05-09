@@ -13,13 +13,21 @@ const intlMiddleware = createMiddleware(routing);
  * Set CANONICAL_HOSTS to a comma-separated list, defaults below cover
  * production, www, vercel previews, and localhost.
  */
-function isCanonicalHost(host: string): boolean {
+// Module-level parse — middleware her request'te çalıştığı için
+// env split + map allocation'ı bir kez yapılır.
+// (server-hoist-static-io / js-cache-function-results)
+const CANONICAL_HOSTS = (() => {
   const env = process.env.CANONICAL_HOSTS?.split(",").map((s) => s.trim());
-  const list = env && env.length > 0
-    ? env
-    : ["davetyolla.com", "www.davetyolla.com", "uygundavet.com", "localhost"];
+  const list =
+    env && env.length > 0
+      ? env
+      : ["davetyolla.com", "www.davetyolla.com", "uygundavet.com", "localhost"];
+  return new Set(list.map((h) => h.toLowerCase()));
+})();
+
+function isCanonicalHost(host: string): boolean {
   const lower = host.toLowerCase().split(":")[0];
-  if (list.some((h) => h.toLowerCase() === lower)) return true;
+  if (CANONICAL_HOSTS.has(lower)) return true;
   if (lower.endsWith(".vercel.app")) return true;
   if (lower.endsWith(".davetyolla.com")) return true;
   return false;

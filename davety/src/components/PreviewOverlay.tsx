@@ -58,20 +58,38 @@ function EnvelopeWrapper({ doc }: { doc: InvitationDoc }) {
   // Mirror the public invitation page exactly: viewport-responsive
   // envelope/card width, expanded card height after reveal, and the
   // full InvitationView inside the card slot.
-  const [cardExpandedHeight, setCardExpandedHeight] = useState(700);
-  const [envelopeWidth, setEnvelopeWidth] = useState(360);
-  const [cardWidth, setCardWidth] = useState(340);
+  // 3 ayrı useState her resize'da 3 sequential re-render tetikliyordu;
+  // tek state ile birleştirildi — atomik update + tek re-render.
+  // (rerender-split-combined-hooks)
+  const [size, setSize] = useState({ height: 700, envW: 360, cardW: 340 });
+  const { height: cardExpandedHeight, envW: envelopeWidth, cardW: cardWidth } =
+    size;
 
   useEffect(() => {
+    let rafId = 0;
     function compute() {
-      setCardExpandedHeight(Math.max(640, window.innerHeight - 48));
       const w = Math.min(400, window.innerWidth);
-      setEnvelopeWidth(w);
-      setCardWidth(w);
+      setSize({
+        height: Math.max(640, window.innerHeight - 48),
+        envW: w,
+        cardW: w,
+      });
+    }
+    // resize event'i hızlı sürükle sırasında frame başına 5+ kez
+    // tetiklenebilir. rAF throttle ile frame başına bir compute.
+    function onResize() {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        compute();
+      });
     }
     compute();
-    window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (

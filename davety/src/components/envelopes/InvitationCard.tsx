@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 export interface InvitationCardProps {
   brideName?: string;
@@ -109,7 +109,12 @@ export function InvitationCard({
     ? `${weddingDate}T${weddingTime}:00`
     : null;
   const cd = useCountdown(targetIso);
-  const dp = formatDateParts(weddingDate, locale);
+  // formatDateParts countdown her saniye render'ında çağrılıyordu;
+  // weddingDate stable olduğu sürece sonuç değişmiyor.
+  const dp = useMemo(
+    () => formatDateParts(weddingDate, locale),
+    [weddingDate, locale],
+  );
 
   return (
     <div

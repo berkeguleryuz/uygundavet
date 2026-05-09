@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { EnvelopeViewer } from "@davety/renderer";
 import { useRouter } from "@/i18n/navigation";
@@ -19,6 +19,14 @@ export function LandingClient() {
   const [time, setTime] = useState("19:00");
   const [busy, setBusy] = useState(false);
   const [envelopeState, setEnvelopeState] = useState<"closed" | "open">("closed");
+  // setTimeout id'sini takip et — unmount olursa stale openDialog
+  // çağrısı yapma (memory leak / state update on unmounted component).
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (openTimerRef.current) clearTimeout(openTimerRef.current);
+    };
+  }, []);
 
   function openDialog() {
     if (!session.data?.user) {
@@ -44,7 +52,11 @@ export function LandingClient() {
           onToggle={(next) => {
             setEnvelopeState(next);
             if (next === "open") {
-              setTimeout(() => openDialog(), 1500);
+              if (openTimerRef.current) clearTimeout(openTimerRef.current);
+              openTimerRef.current = setTimeout(() => {
+                openTimerRef.current = null;
+                openDialog();
+              }, 1500);
             }
           }}
           viewLabel={tEnvelope("view")}

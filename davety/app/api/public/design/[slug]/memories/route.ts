@@ -15,21 +15,30 @@ type Params = Promise<{ slug: string }>;
 
 export async function GET(_: Request, ctx: { params: Params }) {
   const { slug } = await ctx.params;
+  // Tek sorgu — design + onaylı memories nested include ile çekiliyor.
+  // Eski versiyon iki sequential round-trip yapıyordu. (async-parallel)
   const design = await prisma.invitationDesign.findFirst({
     where: { OR: [{ slug }, { vanityPath: slug }], status: "published" },
-    select: { id: true },
+    select: {
+      id: true,
+      memories: {
+        where: { approved: true },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        select: {
+          id: true,
+          authorName: true,
+          message: true,
+          createdAt: true,
+        },
+      },
+    },
   });
   if (!design) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const memories = await prisma.memoryEntry.findMany({
-    where: { designId: design.id, approved: true },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-    select: { id: true, authorName: true, message: true, createdAt: true },
-  });
   return NextResponse.json(
-    { memories },
+    { memories: design.memories },
     {
       headers: {
         "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",

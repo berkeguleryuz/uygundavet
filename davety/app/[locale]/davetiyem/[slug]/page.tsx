@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { setRequestLocale } from "next-intl/server";
@@ -12,17 +13,74 @@ type Params = Promise<{ locale: string; slug: string }>;
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Hem `generateMetadata` hem `PublicInvitationPage` aynı satırı
+ * çekiyordu, request başına 2 kez DB round-trip oluyordu. React.cache
+ * ile aynı request içindeki ikinci çağrı in-memory döner. Wide select
+ * (passwordHash/archivedAt) — eski migration'lı DB'lerde "Unknown field"
+ * fırlarsa fallback select'e düşer.
+ */
+type DesignRow = {
+  id: string;
+  slug: string;
+  userId: string;
+  status: string;
+  doc: unknown;
+  publishedDoc: unknown;
+  publishedAt: Date | null;
+  passwordHash: string | null;
+  archivedAt: Date | null;
+};
+
+const getDesignBySlug = cache(
+  async (slug: string): Promise<DesignRow | null> => {
+    try {
+      return (await prisma.invitationDesign.findFirst({
+        where: { OR: [{ slug }, { vanityPath: slug }] },
+        select: {
+          id: true,
+          slug: true,
+          userId: true,
+          status: true,
+          doc: true,
+          publishedDoc: true,
+          publishedAt: true,
+          passwordHash: true,
+          archivedAt: true,
+        },
+      })) as DesignRow | null;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (/Unknown field|column .* does not exist/i.test(msg)) {
+        const fallback = await prisma.invitationDesign.findFirst({
+          where: { OR: [{ slug }, { vanityPath: slug }] },
+          select: {
+            id: true,
+            slug: true,
+            userId: true,
+            status: true,
+            doc: true,
+            publishedDoc: true,
+            publishedAt: true,
+          },
+        });
+        return fallback
+          ? { ...fallback, passwordHash: null, archivedAt: null }
+          : null;
+      }
+      throw err;
+    }
+  },
+);
+
 export async function generateMetadata({
   params,
 }: {
   params: Params;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const design = await prisma.invitationDesign.findFirst({
-    where: { OR: [{ slug }, { vanityPath: slug }], status: "published" },
-    select: { publishedDoc: true, slug: true },
-  });
-  if (!design || !design.publishedDoc) {
+  const design = await getDesignBySlug(slug);
+  if (!design || design.status !== "published" || !design.publishedDoc) {
     return {
       title: "Davetiye",
       robots: { index: false, follow: false },
@@ -72,66 +130,18 @@ export default async function PublicInvitationPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  // passwordHash + archivedAt yeni eklenen alanlar. Migration henüz
-  // uygulanmadıysa Prisma "Unknown field" hatası fırlatır. Bu durumda
-  // eski select'e düşüp davetiyeyi password gate / archive desteği
-  // olmadan render et.
-  type DesignRow = {
-    id: string;
-    slug: string;
-    userId: string;
-    status: string;
-    doc: unknown;
-    publishedDoc: unknown;
-    publishedAt: Date | null;
-    passwordHash: string | null;
-    archivedAt: Date | null;
-  };
-  let design: DesignRow | null = null;
-  try {
-    design = (await prisma.invitationDesign.findFirst({
-      where: { OR: [{ slug }, { vanityPath: slug }] },
-      select: {
-        id: true,
-        slug: true,
-        userId: true,
-        status: true,
-        doc: true,
-        publishedDoc: true,
-        publishedAt: true,
-        passwordHash: true,
-        archivedAt: true,
-      },
-    })) as DesignRow | null;
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "";
-    if (/Unknown field|column .* does not exist/i.test(msg)) {
-      const fallback = await prisma.invitationDesign.findFirst({
-        where: { OR: [{ slug }, { vanityPath: slug }] },
-        select: {
-          id: true,
-          slug: true,
-          userId: true,
-          status: true,
-          doc: true,
-          publishedDoc: true,
-          publishedAt: true,
-        },
-      });
-      design = fallback
-        ? { ...fallback, passwordHash: null, archivedAt: null }
-        : null;
-    } else {
-      throw err;
-    }
-  }
+  // Session ve design fetch paralel; design fetch React.cache ile
+  // dedup edildiği için generateMetadata'nın çağrısı zaten cached.
+  const [session, design] = await Promise.all([
+    getSession(),
+    getDesignBySlug(slug),
+  ]);
 
   // Olmayan davetiye linkine girilirse (typo, başkasının silinmiş daveti,
   // tahmin edilmiş slug) kullanıcıyı 404 yerine ana sayfaya yönlendir.
   // localePrefix: "never" olduğu için URL'de /tr /en yok, sadece "/".
   if (!design) redirect("/");
 
-  const session = await getSession();
   const isOwner = session?.user?.id === design.userId;
 
   if (design.archivedAt && !isOwner) {

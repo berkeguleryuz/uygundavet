@@ -411,7 +411,7 @@ function CountdownRow({
   return (
     <div className="flex items-end gap-2 md:gap-3">
       {cells.map(([n, l], i) => (
-        <div key={i} className="flex flex-col items-center leading-none">
+        <div key={`${l}-${i}`} className="flex flex-col items-center leading-none">
           <span
             className={`${numCls} font-medium`}
             style={{ fontFamily: "Merienda, serif", color: design.accent }}
@@ -586,6 +586,8 @@ function PhotoTopLayout({ design }: { design: DesignSample }) {
           <img
             src={design.photoUrl}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             draggable={false}
           />
@@ -644,6 +646,8 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
           <img
             src={design.photoUrl}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             draggable={false}
           />
@@ -685,7 +689,7 @@ function PhotoFullLayout({ design }: { design: DesignSample }) {
             ["57", "DAK"],
             ["39", "SAN"],
           ].map(([n, l], i) => (
-            <div key={i} className="flex flex-col items-center leading-none">
+            <div key={`${l}-${i}`} className="flex flex-col items-center leading-none">
               <span
                 className="text-[14px] md:text-[15px] font-medium"
                 style={{ fontFamily: "Merienda, serif" }}

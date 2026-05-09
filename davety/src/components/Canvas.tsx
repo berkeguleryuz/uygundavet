@@ -7,6 +7,7 @@ import {
   FontBoot,
   getBlockView,
   listBlockEntries,
+  getBlockEntry,
   getCardShapeStyle,
   getCardShapePadding,
   getCardShapeTopClipPx,
@@ -39,6 +40,12 @@ const BLOCK_LABELS: Record<string, string> = {
   footer: "Altyazı",
   decoration: "Süsleme",
 };
+
+// CTA / "Buton" bloğu palette'ten gizlendi, kullanıcı için anlamlı
+// değil. Renderer eski davetiyelerde hala destekliyor. Module-level
+// const olduğu için her BlockPalette render'ında filter çalıştırmak
+// yerine bir kez build-time'da hesaplanıyor.
+const PALETTE_ENTRIES = listBlockEntries().filter((e) => e.type !== "cta");
 
 export function Canvas() {
   const doc = useEditorStore((s) => s.doc);
@@ -78,7 +85,9 @@ export function Canvas() {
     // Hatıra Defteri planlama sırasında her tier'da eklenebilir;
     // free pakette publish anında server-side trim ediliyor (block
     // yayında görünmez). Bu UX kullanıcıyı denemeden alıkoymuyor.
-    const entry = listBlockEntries().find((e) => e.type === type);
+    // getBlockEntry zaten Map lookup veriyor, listBlockEntries().find
+    // yerine direkt onu kullanıyoruz. (js-cache-function-results)
+    const entry = getBlockEntry(type);
     if (!entry) return;
     // Hero block için event kategorisine göre default isimleri uyarla.
     // Düğün/nişan dışındaki etkinliklerde "Gelin & Damat" anlamsız
@@ -504,10 +513,9 @@ function BlockPalette({
   onClose: () => void;
   onPick: (type: BlockType) => void;
 }) {
-  // CTA / "Buton" bloğu palette'ten gizlendi, kullanıcı için anlamlı
-  // değil (link/işlev karmaşası). Renderer hâlâ destekliyor ki eski
-  // davetiyelerde varsa görünmeye devam etsin.
-  const entries = listBlockEntries().filter((e) => e.type !== "cta");
+  // PALETTE_ENTRIES module-level constant (aşağıda tanımlı), her render
+  // filter() çalıştırmak yerine bir kez build-time'da hesaplanır.
+  const entries = PALETTE_ENTRIES;
   return (
     <div
       className={`${paletteCls} z-30 bg-card border border-border rounded-lg shadow-xl p-2 w-72 max-h-[60vh] overflow-y-auto`}
@@ -558,11 +566,22 @@ function EnvelopeCanvas() {
   // inside the visible area on common desktop heights.
   const [cardHeight, setCardHeight] = useState(780);
   useEffect(() => {
+    let rafId = 0;
     const update = () =>
       setCardHeight(Math.max(520, window.innerHeight - 260));
+    const onResize = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        update();
+      });
+    };
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   if (!doc) return null;

@@ -1,5 +1,9 @@
-import { randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
-import { promisify } from "node:util";
+import {
+  randomBytes,
+  scrypt as scryptCb,
+  timingSafeEqual,
+  type ScryptOptions,
+} from "node:crypto";
 
 /**
  * Lightweight password hashing helper for the invitation password
@@ -15,12 +19,24 @@ import { promisify } from "node:util";
  * randomly stumbles on the URL" not "resist a state-funded GPU farm".
  * Higher N would slow down every page render of password-gated pages.
  */
-const scrypt = promisify(scryptCb);
-
 const N = 16384;
 const r = 8;
 const p = 1;
 const KEY_LEN = 32;
+
+function scrypt(
+  password: string,
+  salt: Buffer,
+  keylen: number,
+  options: ScryptOptions,
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scryptCb(password, salt, keylen, options, (err, derivedKey) => {
+      if (err) reject(err);
+      else resolve(derivedKey);
+    });
+  });
+}
 
 export async function hashInvitationPassword(plain: string): Promise<string> {
   if (!plain || plain.length < 4) {

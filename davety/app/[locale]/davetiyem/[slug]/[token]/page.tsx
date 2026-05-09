@@ -36,6 +36,10 @@ export default async function PersonalisedInvitationPage({
 
   if (!isValidGuestToken(token)) redirect(`/davetiyem/${slug}`);
 
+  // Session bağımsız — design fetch ile paralel başlat. Guest fetch
+  // designId'ye bağlı olduğu için await sonrası çalışır.
+  const sessionPromise = getSession();
+
   const design = await prisma.invitationDesign.findFirst({
     where: { OR: [{ slug }, { vanityPath: slug }] },
     select: {
@@ -83,7 +87,7 @@ export default async function PersonalisedInvitationPage({
     );
   }
 
-  const session = await getSession();
+  const session = await sessionPromise;
   const isOwner = session?.user?.id === design.userId;
 
   if (design.passwordHash && !isOwner) {

@@ -68,7 +68,7 @@ export function SceneShell({
       targetCam.x = (cameraPos?.[0] ?? 0) + dx * 0.6;
       targetCam.y = (cameraPos?.[1] ?? 0.6) - dy * 0.4;
     }
-    wrap.addEventListener("pointermove", onPointerMove);
+    wrap.addEventListener("pointermove", onPointerMove, { passive: true });
 
     let lastT = performance.now();
     let raf = 0;

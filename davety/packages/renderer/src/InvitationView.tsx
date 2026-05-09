@@ -237,12 +237,19 @@ export function InvitationView({
             //   collapse inside this wrapper div.
             const pt = block.style.paddingTop;
             const pb = block.style.paddingBottom;
+            // content-visibility:auto ile viewport dışındaki bloklar
+            // layout/paint atlanır. 10+ bloklu uzun davetiyelerde scroll
+            // smooth, ilk paint daha hızlı. containIntrinsicSize bloğun
+            // beklenen yaklaşık yüksekliğini belirtiyor; tam değer değil
+            // ama scrollbar zıplaması olmadan tahmin için yeterli.
             const wrapperStyle: React.CSSProperties = {
               opacity: block.visible ? 1 : 0.35,
               paddingTop: pt != null && pt > 0 ? pt : undefined,
               paddingBottom: pb != null && pb > 0 ? pb : undefined,
               marginTop: pt != null && pt < 0 ? pt : undefined,
               marginBottom: pb != null && pb < 0 ? pb : undefined,
+              contentVisibility: "auto",
+              containIntrinsicSize: "100% 320px",
             };
             return (
               <div

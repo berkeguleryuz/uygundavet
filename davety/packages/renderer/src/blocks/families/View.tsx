@@ -75,7 +75,7 @@ function Column({
         style={fieldStyle(block, membersId)}
       >
         {members.length > 0 ? (
-          members.map((m, i) => <div key={i}>{m}</div>)
+          members.map((m, i) => <div key={`${m}-${i}`}>{m}</div>)
         ) : (
           <div className="opacity-40 italic">,</div>
         )}

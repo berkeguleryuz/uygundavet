@@ -19,14 +19,11 @@ export default async function TemplatePickerPage({
     redirect("/");
   }
 
-  const session = await getSession();
-  if (!session?.user) {
-    redirect(
-      `/login?returnTo=${encodeURIComponent(`/design/new?date=${sp.date}&time=${sp.time}`)}`
-    );
-  }
-
-  const templates = await prisma.designTemplate.findMany({
+  // Session ve template list bağımsız — paralel başlat. Auth check
+  // sonrası templates kullanılır.
+  const [session, templates] = await Promise.all([
+    getSession(),
+    prisma.designTemplate.findMany({
     where: { published: true },
     orderBy: { updatedAt: "desc" },
     select: {
@@ -37,7 +34,14 @@ export default async function TemplatePickerPage({
       category: true,
       previewUrl: true,
     },
-  });
+    }),
+  ]);
+
+  if (!session?.user) {
+    redirect(
+      `/login?returnTo=${encodeURIComponent(`/design/new?date=${sp.date}&time=${sp.time}`)}`,
+    );
+  }
 
   return (
     <main className="min-h-dvh max-w-6xl mx-auto px-2 py-10">

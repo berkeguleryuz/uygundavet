@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { getClaudeScene } from "@/app/components/three-claude/sceneRegistry";
-import { Scene } from "./Scene";
+import { SceneLazy } from "./SceneLazy";
 
 export default async function Page({
   params,
@@ -39,7 +39,7 @@ export default async function Page({
         </p>
       </header>
 
-      <Scene palette={meta.palette} />
+      <SceneLazy palette={meta.palette} />
     </main>
   );
 }

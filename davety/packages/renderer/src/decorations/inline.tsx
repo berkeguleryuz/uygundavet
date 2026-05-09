@@ -75,7 +75,14 @@ export function parseInlineDecorations(
   return parts;
 }
 
-/** True if `text` contains any inline decoration marker. */
+/** True if `text` contains any inline decoration marker.
+ *
+ *  MARKER_RE'nin /gi flag'i nedeniyle .test() çağrıları lastIndex'i
+ *  güncelliyor; aynı regex parseInlineDecorations'ta exec() ile
+ *  paylaşıldığı için arada false negatif dönebiliyordu (silent miss).
+ *  Burada lastIndex'i sıfırlayıp test ediyoruz, ya da daha temiz:
+ *  bağımsız non-stateful bir regex literal ile match. */
+const HAS_MARKER_RE = /\{\{[a-z0-9-]+\}\}/i;
 export function hasInlineDecorations(text: string | null | undefined): boolean {
-  return !!text && text.includes("{{") && MARKER_RE.test(text);
+  return !!text && text.includes("{{") && HAS_MARKER_RE.test(text);
 }
