@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { X, Eye, Save, Star, Undo2, Redo2, Sparkles, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import type { Block, CountdownData, InvitationDoc } from "@davety/schema";
 import { useRouter } from "@/i18n/navigation";
 import { useEditorStore } from "@/src/store/editor-store";
@@ -42,6 +43,10 @@ interface DesignerShellProps {
   docId: string;
   initialDoc: InvitationDoc;
   initialUpdatedAt: string;
+  /** DB'deki kanonik status — "published" ise editor topbar'da
+   *  GÜNCELLE + Paylaş butonları gösterilir. doc.meta.status'a
+   *  güvenemiyoruz çünkü eski publish'ler oraya yazmamış olabilir. */
+  initialPublished: boolean;
 }
 
 export function DesignerShell(props: DesignerShellProps) {
@@ -56,6 +61,7 @@ function DesignerShellInner({
   docId,
   initialDoc,
   initialUpdatedAt,
+  initialPublished,
 }: DesignerShellProps) {
   const t = useTranslations("Editor");
   const router = useRouter();
@@ -73,12 +79,13 @@ function DesignerShellInner({
   // (rerender-derived-state)
   const canUndo = useEditorStore((s) => s.past.length > 0);
   const canRedo = useEditorStore((s) => s.future.length > 0);
-  // Davetiye yayında mı? — header'daki butonu "Yayınla" yerine
-  // "YAYINDA" badge + "Paylaş" butonuna çevirmek için. Narrow
-  // selector primitive — keystroke'larda re-render olmaz.
-  const isPublished = useEditorStore(
-    (s) => s.doc?.meta?.status === "published",
-  );
+  // Davetiye yayında mı? — server'dan gelen authoritative bool ile
+  // başlar (DB'deki design.status). Re-publish başarılı olunca
+  // setSession ile true'ya çekilir; o zamana kadar initial değer.
+  // doc.meta.status'a güvenmiyoruz: eski publish'ler oraya yazmamış
+  // olabilir, dolayısıyla yayında olan davetiyelerde bile false
+  // dönebiliyordu (header GÜNCELLE butonunu hiç göstermiyordu).
+  const [isPublished, setIsPublished] = useState(initialPublished);
   const undo = () => useEditorStore.getState().undo();
   const redo = () => useEditorStore.getState().redo();
   const togglePreview = useUIStore((s) => s.togglePreview);
@@ -93,6 +100,9 @@ function DesignerShellInner({
   );
   const isAdmin = useIsAdmin();
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  // Yayında olan davetiyeye Yayınla'ya basınca direkt re-publish; bu
+  // flag butonu disable etmek + spinner için.
+  const [republishing, setRepublishing] = useState(false);
 
   useEffect(() => {
     hydrate({ docId, doc: initialDoc, updatedAt: initialUpdatedAt });
@@ -152,7 +162,32 @@ function DesignerShellInner({
       const ok = await save();
       if (!ok) return; // save failed, stay in editor
     }
-    router.push(`/design/invitations/${docId}/save`);
+    // Henüz hiç yayınlanmamışsa SaveScreen'e gönder — orada tier
+    // seçim akışı çalışsın. ZATEN yayındaysa direkt re-publish yap;
+    // mevcut tier ile, ödeme gerekmez. (publishedDoc güncel doc'tan
+    // regenerate edilir, kullanıcının değişiklikleri public'e yansır.)
+    if (!isPublished) {
+      router.push(`/design/invitations/${docId}/save`);
+      return;
+    }
+    setRepublishing(true);
+    try {
+      const res = await fetch(`/api/design/invitations/${docId}/publish`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body.error ?? "Yeniden yayınlanamadı");
+        return;
+      }
+      toast.success("Davetiye yeniden yayınlandı, değişiklikler canlıya yansıdı.");
+    } catch {
+      toast.error("Yeniden yayınlanamadı, bağlantını kontrol et.");
+    } finally {
+      setRepublishing(false);
+    }
   }
 
   if (!doc) {
@@ -251,9 +286,12 @@ function DesignerShellInner({
           >
             <Save className="size-3.5" /> {saving ? "Kaydediliyor…" : "Kaydet"}
           </button>
-          {/* Davetiye yayında değilse: tek "Yayınla" CTA. Yayındaysa:
-              "YAYINDA" yeşil badge + dikkat çekici amber "Paylaş"
-              butonu (Save ekranına gider — QR, link, paylaşım). */}
+          {/* Davetiye yayında değilse: tek "Yayınla" CTA → SaveScreen.
+              Yayındaysa: yeşil "YAYINDA" badge + "GÜNCELLE" butonu
+              (mevcut tier ile direkt re-publish, ödeme yok) + amber
+              "Paylaş" butonu. Eskiden Yayınla varken yayındaki davetiye
+              için de SaveScreen'e atıyordu, kullanıcı "yayınla dedim
+              ama yansımadı" diyordu — şimdi tek tıkla yayın güncellenir. */}
           {isPublished ? (
             <>
               <span
@@ -263,6 +301,14 @@ function DesignerShellInner({
                 <span className="size-1.5 rounded-full bg-emerald-500" />
                 Yayında
               </span>
+              <button
+                onClick={handlePublish}
+                disabled={republishing || saving}
+                className="rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90 disabled:opacity-50"
+                title="Editor'deki değişiklikleri canlıya yansıt"
+              >
+                {republishing ? "Güncelleniyor…" : "Güncelle"}
+              </button>
               <button
                 onClick={() =>
                   router.push(`/design/invitations/${docId}/save`)

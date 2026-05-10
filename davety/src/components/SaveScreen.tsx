@@ -314,6 +314,61 @@ export function SaveScreen({
   // değiştiriyor, ayrı bir endpoint'e gerek yok.
   const [wantsUpgrade, setWantsUpgrade] = useState(false);
 
+  // Stripe Checkout dönüşü: success_url'de `?paid=cs_...` query var.
+  // Webhook büyük ihtimalle çoktan iş yapmıştır ama local dev'te ya da
+  // gecikme durumunda buradan POST /api/billing/verify-session çağrısı
+  // yedek olarak çalışıyor. paid=ok olunca status'u published'a çekip
+  // tier'ı yenile, query'yi temizle, kullanıcıyı intro'ya götür.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const paid = url.searchParams.get("paid");
+    const cancel = url.searchParams.get("paid_cancel");
+    if (cancel) {
+      toast.info("Ödeme iptal edildi.");
+      url.searchParams.delete("paid_cancel");
+      window.history.replaceState({}, "", url.toString());
+      return;
+    }
+    if (!paid || paid === "{CHECKOUT_SESSION_ID}") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/billing/verify-session`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessionId: paid }),
+        });
+        if (cancelled) return;
+        const data = (await res.json()) as {
+          ok?: boolean;
+          status?: string;
+          tier?: TierId;
+        };
+        if (data.ok && data.tier) {
+          setStatus("published");
+          setActiveTier(data.tier);
+          setWantsUpgrade(false);
+          setStep("intro");
+          toast.success("Ödeme alındı, davetiyen yayına çıktı!");
+        } else {
+          toast.warning("Ödeme henüz onaylanmadı, birkaç saniye sonra tekrar dene.");
+        }
+      } catch {
+        if (cancelled) return;
+        toast.error("Ödeme doğrulanamadı.");
+      } finally {
+        if (!cancelled) {
+          url.searchParams.delete("paid");
+          window.history.replaceState({}, "", url.toString());
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Tek noktadan "yükseltme akışını başlat" — kart üstündeki Paketi
   // Yükselt butonları (ShareCard, VanityCard, Hero, SaveScreen header)
   // bu callback'i çağırır. wantsUpgrade=true → TierPicker görünür,
@@ -372,6 +427,55 @@ export function SaveScreen({
 
   async function handlePublish(tierId: TierId) {
     setPublishing(true);
+    // Ücretli tier (basic/pro/premium) ÜST tier'a geçişse Stripe Checkout
+    // başlat. Free veya mevcut tier ile yeniden publish'te direkt
+    // /api/design/.../publish endpoint'i. Server-side enforcement de
+    // var — burada bypass etse de 402 döner.
+    // Premium dahil tüm tier'ları kapsayan TIER_RANK map'ini kullan
+    // (eskiden "premium" indexOf ile array'de yoktu, premium'dan ileri
+    // geçiş yanlış hesaplanıyordu).
+    const isUpgrade =
+      tierId !== "free" &&
+      TIER_RANK[activeTier ?? "free"] < TIER_RANK[tierId];
+    if (isUpgrade) {
+      const res = await fetch(`/api/billing/checkout`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          designId,
+          tier: tierId,
+          vanityPath: savedVanity || undefined,
+        }),
+      });
+      setPublishing(false);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(body.error ?? "Ödeme başlatılamadı");
+        return;
+      }
+      const data = (await res.json()) as {
+        url?: string;
+        freeUpgrade?: boolean;
+        tier?: TierId;
+      };
+      if (data.freeUpgrade && data.tier) {
+        // Bedava upgrade — Stripe'a hiç gitmeden publish'lendi.
+        setStatus("published");
+        setActiveTier(data.tier);
+        setWantsUpgrade(false);
+        setStep("intro");
+        toast.success("Bedava yükseltildi, davetiyen yayında!");
+        return;
+      }
+      if (data.url) {
+        // Stripe hosted Checkout — kart girilince success_url'e döner.
+        window.location.href = data.url;
+        return;
+      }
+      toast.error("Ödeme bağlantısı alınamadı");
+      return;
+    }
+
     const res = await fetch(`/api/design/invitations/${designId}/publish`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -402,7 +506,9 @@ export function SaveScreen({
     }
   }
 
-  async function saveVanity() {
+  // VanityCard prop olarak alıyor; useCallback ile stable ref.
+  // (rerender-unstable-callbacks)
+  const saveVanity = useCallback(async () => {
     setSavingVanity(true);
     const res = await fetch(`/api/design/invitations/${designId}/slug`, {
       method: "PATCH",
@@ -417,7 +523,7 @@ export function SaveScreen({
     }
     setSavedVanity(vanity);
     toast.success("Özel link güncellendi");
-  }
+  }, [designId, vanity]);
 
   const downloadQR = useCallback(() => {
     const canvas = document.querySelector<HTMLCanvasElement>(
@@ -439,23 +545,24 @@ export function SaveScreen({
   // her parent render'da yeniden allocate olur — useMemo amaçsızlaşır.
   // (rerender-unstable-callbacks)
   const nativeShare = useCallback(async () => {
-    if (typeof navigator !== "undefined" && "share" in navigator) {
+    if (typeof navigator === "undefined") return;
+    if ("share" in navigator) {
       try {
         await navigator.share({
           title: "Düğün Davetiyesi",
           text: shareMessage,
           url: shareUrl,
         });
+        return;
       } catch {
-        // user cancelled
+        // user cancelled or error → fall through to clipboard
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success("Bağlantı kopyalandı");
-      } catch {
-        toast.error("Kopyalanamadı");
-      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Bağlantı kopyalandı");
+    } catch {
+      toast.error("Kopyalanamadı");
     }
   }, [shareMessage, shareUrl]);
 
@@ -495,6 +602,11 @@ export function SaveScreen({
             tier={activeTierMeta}
             onPublish={() => setStep("tier")}
             onUpgrade={triggerUpgrade}
+            onRepublish={
+              isPublished && activeTier
+                ? () => handlePublish(activeTier)
+                : undefined
+            }
           />
         )}
 
@@ -550,6 +662,7 @@ export function SaveScreen({
       {confirmingTier ? (
         <ConfirmTierModal
           tierId={confirmingTier}
+          designId={designId}
           publishing={publishing}
           onCancel={() => setConfirmingTier(null)}
           onConfirm={async () => {
@@ -567,22 +680,62 @@ export function SaveScreen({
  * is clicked. Two flavours:
  *   - free: explains that extra gallery items get trimmed to 1 and a
  *     DavetYolla.com promo block will appear in the invitation.
- *   - paid: payment placeholder. Real Stripe wiring lives in a future
- *     iteration; for now we just say "ödeme yakında" and let the user
- *     proceed (handlePublish marks the doc as that tier).
+ *   - paid: kullanıcıyı Stripe Checkout'a yönlendireceğimizi söyler.
+ *     onConfirm → handlePublish → /api/billing/checkout → window.location
+ *     redirect. Test kartı için 4242 4242 4242 4242.
  */
 function ConfirmTierModal({
   tierId,
+  designId,
   publishing,
   onCancel,
   onConfirm,
 }: {
   tierId: TierId;
+  designId: string;
   publishing: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   const isFree = tierId === "free";
+  const tierMeta = TIERS.find((t) => t.id === tierId) ?? null;
+
+  // Yükseltme tutarı + geçmiş ödemeler server'dan çekilir, böylece modal
+  // gerçek ödenecek tutarı (önceki paket düşülmüş halde) gösterir.
+  const [quote, setQuote] = useState<{
+    basePrice: number;
+    finalPrice: number;
+    appliedPercent: number;
+    totalPaidTry: number;
+    upgradeAmountTry: number;
+    isFree: boolean;
+  } | null>(null);
+  const [loadingQuote, setLoadingQuote] = useState(!isFree);
+  useEffect(() => {
+    if (isFree) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/billing/quote", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ designId, tier: tierId }),
+        });
+        if (cancelled) return;
+        if (!res.ok) {
+          setLoadingQuote(false);
+          return;
+        }
+        const data = await res.json();
+        if (!cancelled) setQuote(data);
+      } finally {
+        if (!cancelled) setLoadingQuote(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [designId, tierId, isFree]);
   return (
     <div
       className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
@@ -593,7 +746,7 @@ function ConfirmTierModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-display text-xl sm:text-2xl mb-3">
-          {isFree ? "Free pakette yayınla" : "Ödeme"}
+          {isFree ? "Free pakette yayınla" : `${tierMeta?.name} paketi`}
         </h3>
         {isFree ? (
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
@@ -611,18 +764,94 @@ function ConfirmTierModal({
           </div>
         ) : (
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
-            {/* Payment placeholder, Stripe wiring will land here.
-                Until then we let the publish proceed so the rest of the
-                flow can be developed without a payment provider. */}
+            {/* Tutar server-side resolve ediliyor; geçmiş ödemeler quote
+                içinde düşülmüş halde geliyor. isFree=true ise upgrade
+                ücretsiz (önceki paketler hedef fiyatı zaten karşılıyor).*/}
+            {loadingQuote ? (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 h-20 animate-pulse" />
+            ) : quote?.isFree ? (
+              <div className="rounded-xl border border-emerald-300/50 bg-emerald-50 p-4">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-emerald-700">
+                  Bedava yükseltme
+                </div>
+                <div className="font-display text-2xl mt-1 text-emerald-800 tabular-nums">
+                  ₺0
+                </div>
+                <p className="text-xs text-emerald-900/80 mt-2">
+                  Daha önce ödediğin{" "}
+                  <span className="font-semibold tabular-nums">
+                    {formatTry(quote.totalPaidTry)}
+                  </span>
+                  , {tierMeta?.name} paketinin anlık indirimli fiyatını
+                  ({formatTry(quote.finalPrice)}) zaten karşılıyor. Ödeme
+                  yapmadan yayına çıkar.
+                </p>
+              </div>
+            ) : quote ? (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                      {quote.totalPaidTry > 0
+                        ? "Yükseltme tutarı"
+                        : "Ödenecek tutar"}
+                    </div>
+                    <div className="font-display text-2xl mt-1 tabular-nums">
+                      {formatTry(quote.upgradeAmountTry)}
+                    </div>
+                  </div>
+                  {quote.appliedPercent > 0 ? (
+                    <div className="text-right">
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                        İndirim
+                      </div>
+                      <div className="text-amber-600 font-semibold mt-1">
+                        %{quote.appliedPercent}
+                      </div>
+                      <div className="text-[10px] line-through text-muted-foreground/70 tabular-nums">
+                        {formatTry(quote.basePrice)}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+                {quote.totalPaidTry > 0 ? (
+                  <div className="text-[11px] text-muted-foreground border-t border-border/60 pt-2 flex justify-between">
+                    <span>Bu davetiye için önceki ödemen</span>
+                    <span className="tabular-nums">
+                      − {formatTry(quote.totalPaidTry)}
+                    </span>
+                  </div>
+                ) : null}
+                <div className="text-[11px] text-muted-foreground flex justify-between">
+                  <span>Hedef paketin anlık fiyatı</span>
+                  <span className="tabular-nums">
+                    {formatTry(quote.finalPrice)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                Yükseltme tutarı hesaplanamadı, bağlantını kontrol et.
+              </div>
+            )}
             <p>
-              Ödeme ekranı yakında bağlanacak. Şimdilik bu pencereden
-              <strong> &quot;Devam Et&quot; </strong>
-              dediğinde paketin başarılı kabul edilip davetiyen
-              yayınlanacak.
+              {quote?.isFree ? (
+                <>
+                  Devam ettiğinde davetiyen otomatik olarak{" "}
+                  <strong>{tierMeta?.name}</strong> paketinde yayına çıkar.
+                </>
+              ) : (
+                <>
+                  Devam ettiğinde güvenli{" "}
+                  <strong>Stripe ödeme sayfasına</strong>{" "}
+                  yönlendirileceksin. Kart bilgilerini DavetYolla görmez;
+                  ödeme onaylanınca davetiyen otomatik olarak{" "}
+                  <strong>{tierMeta?.name}</strong> paketinde yayına çıkar.
+                </>
+              )}
             </p>
             <p className="text-[11px] text-muted-foreground/80">
-              (Geliştirme sürecindeyiz; gerçek ödeme entegrasyonu
-              eklendiğinde bu adım Stripe ile değiştirilecek.)
+              KDV dahildir, tek seferlik etkinlik ödemesi.
             </p>
           </div>
         )}
@@ -646,10 +875,18 @@ function ConfirmTierModal({
             }`}
           >
             {publishing
-              ? "Yayınlanıyor..."
+              ? isFree
+                ? "Yayınlanıyor..."
+                : quote?.isFree
+                  ? "Yayınlanıyor..."
+                  : "Yönlendiriliyor..."
               : isFree
-              ? "Anladım, Yayınla"
-              : "Devam Et"}
+                ? "Anladım, Yayınla"
+                : quote?.isFree
+                  ? "Bedava Yükselt"
+                  : quote
+                    ? `${formatTry(quote.upgradeAmountTry)} Öde`
+                    : "Hesaplanıyor..."}
           </button>
         </div>
       </div>
@@ -663,12 +900,16 @@ function Hero({
   tier,
   onPublish,
   onUpgrade,
+  onRepublish,
 }: {
   isPublished: boolean;
   publishing: boolean;
   tier: TierMeta | null;
   onPublish: () => void;
   onUpgrade: () => void;
+  /** Yayında olan davetiyede "Değişiklikleri Yayınla" — mevcut tier
+   *  ile re-publish (ücret yok). undefined ise buton gösterilmez. */
+  onRepublish?: () => void;
 }) {
   return (
     <section className="rounded-[1.75rem] border border-border/60 bg-white p-8 sm:p-12 mb-6 text-center">
@@ -709,7 +950,28 @@ function Hero({
             Şimdi Yayınla
           </button>
         ) : tier ? (
-          <ActiveTierBadge tier={tier} onUpgrade={onUpgrade} />
+          <>
+            <ActiveTierBadge tier={tier} onUpgrade={onUpgrade} />
+            {onRepublish ? (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={onRepublish}
+                  disabled={publishing}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-foreground text-background px-5 py-2.5 font-mono uppercase tracking-[0.2em] text-[11px] hover:bg-foreground/90 transition-colors cursor-pointer disabled:opacity-50 shadow-sm"
+                  title="Editor'deki son değişiklikleri canlıya yansıt"
+                >
+                  <Sparkles className="size-3" />
+                  {publishing
+                    ? "Yayınlanıyor..."
+                    : "Değişiklikleri Yayınla"}
+                </button>
+                <p className="text-[10px] text-muted-foreground mt-1.5">
+                  Editor'deki son düzenlemeleri public davetiyene yansıtır.
+                </p>
+              </div>
+            ) : null}
+          </>
         ) : null}
       </div>
     </section>

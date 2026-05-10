@@ -23,6 +23,12 @@ export default async function EditorPage({ params }: { params: Params }) {
         userId: true,
         doc: true,
         updatedAt: true,
+        // Server-side authoritative status — DesignerShell'in
+        // isPublished selector'ı eskiden doc.meta.status'tan okuyordu
+        // (publish endpoint o alanı set etmediği için her zaman
+        // "draft" dönüyordu). Burada DB'nin kanonik status'unu
+        // initial prop olarak geçiyoruz.
+        status: true,
       },
     }),
   ]);
@@ -41,6 +47,7 @@ export default async function EditorPage({ params }: { params: Params }) {
       docId={design.id}
       initialDoc={design.doc as unknown as InvitationDoc}
       initialUpdatedAt={design.updatedAt.toISOString()}
+      initialPublished={design.status === "published"}
     />
   );
 }

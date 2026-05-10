@@ -27,6 +27,7 @@ model User {
   editEvents    EditEvent[]
   auditLogs     AdminAuditLog[]
   templates     DesignTemplate[]
+  billing       BillingTransaction[]
 
   @@map("user")
 }
@@ -105,16 +106,44 @@ model InvitationDesign {
   lastAutosavedAt DateTime @default(now())
   publishedAt     DateTime?
 
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   events   EditEvent[]
   assets   Asset[]
   guests   Guest[]
   memories MemoryEntry[]
+  billing  BillingTransaction[]
 
   @@index([userId])
   @@index([expiresAt])
   @@index([customDomain])
   @@map("invitation_design")
+}
+
+// Stripe Checkout sonrası tier yükseltme idempotent kayıdı. session_id
+// unique → webhook iki kez gelse bile çift publish yok. amount kuruş
+// cinsinden saklanır (TRY * 100).
+model BillingTransaction {
+  id                    String    @id @default(cuid())
+  userId                String
+  designId              String
+  stripeSessionId       String    @unique
+  stripePaymentIntentId String?   @unique
+  tier                  String // "basic" | "pro" | "premium"
+  amount                Int // kuruş
+  currency              String    @default("try")
+  status                String    @default("pending") // pending | paid | refunded | failed
+  promotionCode         String?
+  appliedPercent        Int       @default(0)
+  createdAt             DateTime  @default(now())
+  paidAt                DateTime?
+
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  design InvitationDesign @relation(fields: [designId], references: [id], onDelete: Cascade)
+
+  @@index([designId])
+  @@index([userId])
+  @@index([status])
+  @@map("billing_transaction")
 }
 
 model EditEvent {
