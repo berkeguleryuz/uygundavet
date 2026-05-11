@@ -96,7 +96,7 @@ export async function PATCH(
     const customer = await Customer.findByIdAndUpdate(
       customerId,
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!customer) {

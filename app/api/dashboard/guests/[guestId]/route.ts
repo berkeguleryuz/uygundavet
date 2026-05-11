@@ -41,7 +41,7 @@ export async function PATCH(
     const guest = await Guest.findOneAndUpdate(
       { _id: guestId, userId: session.user.id },
       parsed.data,
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!guest) {

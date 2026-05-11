@@ -28,7 +28,7 @@ export async function PATCH(
     const entry = await MemoryEntry.findByIdAndUpdate(
       entryId,
       { $set: { approved: data.approved } },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!entry) {
