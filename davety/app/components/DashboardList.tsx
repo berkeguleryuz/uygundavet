@@ -381,11 +381,13 @@ function DesignCard({
           >
             {d.coupleName ?? handle}
           </h3>
-          {d.templateLabel ? (
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {d.templateLabel}
-            </p>
-          ) : null}
+          {/* Subtitle slot her zaman render edilir — templateLabel
+              yoksa placeholder text. Eskiden `null` dönüyordu ve
+              kartlar arasında yükseklik bozuluyordu (subtitle olmayan
+              kartların alt içeriği üst hizada başlıyordu). */}
+          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+            {d.templateLabel ?? "Düzenlenmiş tasarım"}
+          </p>
         </div>
 
         <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">

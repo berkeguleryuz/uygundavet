@@ -122,7 +122,12 @@ export function Canvas() {
 
   return (
     <div
-      className="min-h-0 overflow-auto py-8 px-6"
+      // overflow-y-auto + overflow-x-hidden → mobilde içerik wider
+      // olursa yatay scroll izni vermez, kart kenarda kalır. Eskiden
+      // overflow-auto ile bir bloktan taşan absolute element (ör.
+      // "+ Blok Ekle" tooltip'i) yatay scrollbar üretiyordu, kullanıcı
+      // davetiyeyi sağa çekip "ekrandan çıkıyor" sanıyordu.
+      className="min-h-0 overflow-y-auto overflow-x-hidden py-8 md:px-6 px-2"
       style={{ background: doc.theme.pageBgColor ?? "#252224" }}
       onClick={() => {
         // Click outside any block → deselect + close any open palette
@@ -565,11 +570,22 @@ function EnvelopeCanvas() {
   // header, "Zarf Önizlemesi" label, sceneTopPad, sceneBottomPad and
   // canvas padding, picked empirically to land the envelope cleanly
   // inside the visible area on common desktop heights.
-  const [cardHeight, setCardHeight] = useState(780);
+  // Hem yükseklik hem genişlik viewport'a göre ölçülenir — mobilde
+  // edge-to-edge, masaüstünde maksimum 520px. Eskiden 520/460
+  // hardcoded'tu, iPhone XR'de zarf yatay scrollbar üretiyordu.
+  const [size, setSize] = useState({ height: 780, envW: 520, cardW: 460 });
   useEffect(() => {
     let rafId = 0;
-    const update = () =>
-      setCardHeight(Math.max(520, window.innerHeight - 260));
+    const update = () => {
+      const vw = window.innerWidth;
+      const envW = vw <= 640 ? Math.max(280, vw - 24) : Math.min(520, vw - 48);
+      const cardW = Math.round(envW * 0.88);
+      setSize({
+        height: Math.max(520, window.innerHeight - 260),
+        envW,
+        cardW,
+      });
+    };
     const onResize = () => {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
@@ -588,10 +604,15 @@ function EnvelopeCanvas() {
   if (!doc) return null;
 
   const resolved = resolveEnvelopeProps(doc.theme.envelope);
+  const {
+    height: cardHeight,
+    envW: envelopeWidth,
+    cardW: cardWidth,
+  } = size;
 
   return (
     <div
-      className="min-h-0 overflow-auto py-10 px-6 flex flex-col items-center gap-6"
+      className="min-h-0 overflow-auto py-10 md:px-6 px-2 flex flex-col items-center gap-6"
       style={{ background: doc.theme.pageBgColor ?? "#252224" }}
     >
       <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -599,8 +620,8 @@ function EnvelopeCanvas() {
       </div>
       <WeddingEnvelope
         guestName="Misafir"
-        envelopeWidth={520}
-        cardWidth={460}
+        envelopeWidth={envelopeWidth}
+        cardWidth={cardWidth}
         cardHeight={cardHeight}
         layout="replace"
         {...resolved}

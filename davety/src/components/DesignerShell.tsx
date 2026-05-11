@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { X, Eye, Save, Star, Undo2, Redo2, Sparkles, Share2 } from "lucide-react";
+import {
+  X,
+  Eye,
+  Save,
+  Star,
+  Undo2,
+  Redo2,
+  Sparkles,
+  Share2,
+  Send,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { Block, CountdownData, InvitationDoc } from "@davety/schema";
 import { useRouter } from "@/i18n/navigation";
@@ -182,6 +192,10 @@ function DesignerShellInner({
         toast.error(body.error ?? "Yeniden yayınlanamadı");
         return;
       }
+      // Defensive — re-publish başarılı, isPublished hâlâ true.
+      // İleride bu butonun "ilk publish"i de tetiklediği bir varyant
+      // olursa (free → tek tık), state burada true'ya çekilir.
+      setIsPublished(true);
       toast.success("Davetiye yeniden yayınlandı, değişiklikler canlıya yansıdı.");
     } catch {
       toast.error("Yeniden yayınlanamadı, bağlantını kontrol et.");
@@ -201,7 +215,7 @@ function DesignerShellInner({
   return (
     <div className="h-dvh grid grid-rows-[56px_1fr] bg-background overflow-hidden">
       {/* Top bar, responsive: compact on mobile, rich on desktop */}
-      <header className="border-b border-border flex items-center justify-between gap-2 px-3 sm:px-4">
+      <header className="border-b border-border flex items-center justify-between gap-2 px-3 sm:px-4 overflow-hidden">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <button
             onClick={handleClose}
@@ -225,7 +239,13 @@ function DesignerShellInner({
               <span className="hidden sm:inline">Şablon Kaydet</span>
             </button>
           ) : null}
-          <span className="text-sm font-medium truncate">
+          {/* Mobil dar header'da kısa "Düzenle"; sm+ ekranda tam i18n
+              başlığı ("Davetiyeni Düzenle"). i18n key'lerine ek bir
+              giriş açmamak için kısa metin inline. */}
+          <span className="text-sm font-medium truncate sm:hidden">
+            Düzenle
+          </span>
+          <span className="hidden sm:inline-block text-sm font-medium truncate">
             {t("stepTitle")}
           </span>
           {dirty ? (
@@ -304,10 +324,16 @@ function DesignerShellInner({
               <button
                 onClick={handlePublish}
                 disabled={republishing || saving}
-                className="rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs p-2 sm:px-4 sm:py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90 disabled:opacity-50"
                 title="Editor'deki değişiklikleri canlıya yansıt"
+                aria-label="Güncelle"
               >
-                {republishing ? "Güncelleniyor…" : "Güncelle"}
+                <Save
+                  className={`size-3.5 ${republishing ? "animate-pulse" : ""}`}
+                />
+                <span className="hidden sm:inline">
+                  {republishing ? "Güncelleniyor…" : "Güncelle"}
+                </span>
               </button>
               <button
                 onClick={() =>
@@ -323,9 +349,12 @@ function DesignerShellInner({
           ) : (
             <button
               onClick={handlePublish}
-              className="rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground text-[11px] sm:text-xs p-2 sm:px-4 sm:py-1.5 font-chakra uppercase tracking-[0.15em] cursor-pointer hover:opacity-90"
+              title="Yayınla"
+              aria-label="Yayınla"
             >
-              Yayınla
+              <Send className="size-3.5" />
+              <span className="hidden sm:inline">Yayınla</span>
             </button>
           )}
         </div>

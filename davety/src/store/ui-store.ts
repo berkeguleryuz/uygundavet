@@ -16,6 +16,11 @@ interface UIState {
   designTab: DesignTab;
   onboardingStep: number | null;
   previewMode: boolean;
+  /** Mobil bottom sheet kontrol bayrağı. Her tema/şablon seçimi sonrası
+   *  kullanıcının davetiyenin değişikliğini görmesi için drawer
+   *  otomatik kapanır. Drawer kendi state'ini Vaul yönetiyor; biz bu
+   *  bayrağı false → true → false geçirerek "kapan" sinyali veriyoruz. */
+  mobilePanelOpen: boolean;
 
   selectBlock(id: string | null): void;
   selectField(blockId: string | null, fieldId: string | null): void;
@@ -24,6 +29,8 @@ interface UIState {
   setDesignTab(tab: DesignTab): void;
   setOnboardingStep(step: number | null): void;
   togglePreview(): void;
+  setMobilePanelOpen(open: boolean): void;
+  closeMobilePanel(): void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -34,6 +41,7 @@ export const useUIStore = create<UIState>((set) => ({
   designTab: "design",
   onboardingStep: 0,
   previewMode: false,
+  mobilePanelOpen: false,
 
   selectBlock(id) {
     set({
@@ -63,5 +71,11 @@ export const useUIStore = create<UIState>((set) => ({
   },
   togglePreview() {
     set((s) => ({ previewMode: !s.previewMode }));
+  },
+  setMobilePanelOpen(open) {
+    set({ mobilePanelOpen: open });
+  },
+  closeMobilePanel() {
+    set({ mobilePanelOpen: false });
   },
 }));

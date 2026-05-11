@@ -206,20 +206,10 @@ export function PresetMediaPicker({ onClose, onPick }: Props) {
                             }}
                             className="group relative aspect-[3/4] overflow-hidden rounded-lg border border-border hover:border-primary transition cursor-pointer"
                           >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={item.url}
-                              alt={item.label ?? ""}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                              loading="lazy"
+                            <PresetThumb
+                              url={item.url}
+                              label={item.label}
                             />
-                            {item.label ? (
-                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                                <span className="text-[10px] text-white font-medium">
-                                  {item.label}
-                                </span>
-                              </div>
-                            ) : null}
                           </button>
                         ))}
                       </div>
@@ -289,5 +279,41 @@ function EmptyState({ category }: { category: string }) {
         ekleyecektir.
       </div>
     </div>
+  );
+}
+
+/**
+ * Tek bir thumbnail — kendi loaded state'ini tutar. Yüklenene kadar
+ * shimmer skeleton görünür, img.onLoad ile fade-in yapar. 100+ item'lı
+ * grid'de her thumb minimal local state, parent'a re-render bulaşmaz.
+ */
+function PresetThumb({ url, label }: { url: string; label?: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <>
+      {!loaded ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-muted to-muted/60 animate-pulse"
+          aria-hidden
+        />
+      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt={label ?? ""}
+        className={`w-full h-full object-cover group-hover:scale-105 transition-transform ${
+          loaded ? "opacity-100" : "opacity-0"
+        } transition-opacity duration-300`}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+      />
+      {label ? (
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 z-10">
+          <span className="text-[10px] text-white font-medium">{label}</span>
+        </div>
+      ) : null}
+    </>
   );
 }

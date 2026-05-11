@@ -32,6 +32,11 @@ interface Props {
 export function MobileSidePanel({ onPreview, onSave, saving, dirty }: Props) {
   const panelMode = useUIStore((s) => s.panelMode);
   const setPanelMode = useUIStore((s) => s.setPanelMode);
+  // Controlled drawer — DesignTab tema seçince closeMobilePanel()
+  // çağırarak sheet'i kapatabilsin diye. Vaul'un kendi state'ini
+  // dışarıdan yönetiyoruz.
+  const mobilePanelOpen = useUIStore((s) => s.mobilePanelOpen);
+  const setMobilePanelOpen = useUIStore((s) => s.setMobilePanelOpen);
 
   const drawerLabel =
     panelMode === "text"
@@ -59,47 +64,56 @@ export function MobileSidePanel({ onPreview, onSave, saving, dirty }: Props) {
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <div className="grid grid-cols-4">
-          <Drawer.Root shouldScaleBackground={false}>
-            <Drawer.Trigger asChild>
-              <button
-                onClick={() => setPanelMode("home")}
-                className={`relative flex flex-col items-center justify-center gap-1 py-2.5 cursor-pointer hover:bg-muted/60 transition-colors ${
-                  attentionSlot === 0 ? ATTN_RING : ""
-                }`}
-              >
-                <Wand2 className="size-4" />
-                <span className="text-[10px] uppercase tracking-wider">
-                  Tasarla
-                </span>
-              </button>
-            </Drawer.Trigger>
-            <DrawerSheet title={drawerLabel}>
-              <DesignHomePanel />
-            </DrawerSheet>
-          </Drawer.Root>
+          {/* Tek controlled Drawer.Root — hem Tasarla hem Düzenle
+              tetikleyici aynı drawer'ı açar, içerik panelMode'a göre
+              swap olur. Bu sayede tema seçince closeMobilePanel() ile
+              tek seferde kapatılabiliyor. */}
+          <Drawer.Root
+            shouldScaleBackground={false}
+            open={mobilePanelOpen}
+            onOpenChange={setMobilePanelOpen}
+          >
+            <button
+              onClick={(e) => {
+                // Drawer açılırken trigger'a focus kalırsa Vaul parent'ı
+                // aria-hidden yapıyor ve "focused element içinde
+                // aria-hidden var" warning'i çıkıyor. Tıklamadan sonra
+                // blur ile focus'u kaldırıyoruz; drawer kendi initial
+                // focus'unu yönetir.
+                e.currentTarget.blur();
+                setPanelMode("home");
+                setMobilePanelOpen(true);
+              }}
+              className={`relative flex flex-col items-center justify-center gap-1 py-2.5 cursor-pointer hover:bg-muted/60 transition-colors ${
+                attentionSlot === 0 ? ATTN_RING : ""
+              }`}
+            >
+              <Wand2 className="size-4" />
+              <span className="text-[10px] uppercase tracking-wider">
+                Tasarla
+              </span>
+            </button>
 
-          <Drawer.Root shouldScaleBackground={false}>
-            <Drawer.Trigger asChild>
-              <button
-                disabled={panelMode === "home"}
-                className={`relative flex flex-col items-center justify-center gap-1 py-2.5 cursor-pointer hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
-                  attentionSlot === 1 ? ATTN_RING : ""
-                }`}
-              >
-                <Layers className="size-4" />
-                <span className="text-[10px] uppercase tracking-wider">
-                  {panelMode === "text" ? "Metin" : "Blok"}
-                </span>
-              </button>
-            </Drawer.Trigger>
+            <button
+              disabled={panelMode === "home"}
+              onClick={(e) => {
+                e.currentTarget.blur();
+                setMobilePanelOpen(true);
+              }}
+              className={`relative flex flex-col items-center justify-center gap-1 py-2.5 cursor-pointer hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
+                attentionSlot === 1 ? ATTN_RING : ""
+              }`}
+            >
+              <Layers className="size-4" />
+              <span className="text-[10px] uppercase tracking-wider">
+                {panelMode === "text" ? "Metin" : "Blok"}
+              </span>
+            </button>
+
             <DrawerSheet title={drawerLabel}>
+              {panelMode === "home" ? <DesignHomePanel /> : null}
               {panelMode === "block" ? <BlockControlsPanel /> : null}
               {panelMode === "text" ? <TextStylePanel /> : null}
-              {panelMode === "home" ? (
-                <div className="p-6 text-sm text-muted-foreground text-center">
-                  Düzenlemek için davetiyeden bir blok ya da metin seç.
-                </div>
-              ) : null}
             </DrawerSheet>
           </Drawer.Root>
 
@@ -145,8 +159,18 @@ function DrawerSheet({
   return (
     <Drawer.Portal>
       <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
-      <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl border-t border-border max-h-[85dvh] flex flex-col">
+      {/* max-h düşürüldü (85dvh → 60dvh) — bottom sheet açıkken
+          kullanıcının davetiyenin üst yarısını görmesi için. Eskiden
+          neredeyse tüm ekranı kaplayıp tema seçince ne değiştiği
+          görünmüyordu. */}
+      <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl border-t border-border max-h-[60dvh] flex flex-col">
         <Drawer.Title className="sr-only">{title}</Drawer.Title>
+        {/* Radix/Vaul Dialog primitive Description bekliyor; yoksa
+            console warning. sr-only ile sadece AT için, görsel etkisi
+            yok. */}
+        <Drawer.Description className="sr-only">
+          {title} ayar paneli
+        </Drawer.Description>
         <div className="mx-auto mt-3 mb-1 w-10 h-1 rounded-full bg-border" />
         <div className="px-5 pt-1 pb-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground text-center">
           {title}

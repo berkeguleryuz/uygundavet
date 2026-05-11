@@ -177,18 +177,19 @@ export function Nav() {
         )}
       </div>
 
-      {/* Mobile tabs row, also pills, below the nav pill */}
-      {/* overflow-x-auto sadece x'i auto yaptığında bile çoğu browser
-          overflow-y'yi de auto'ya yükseltip dikey scrollbar açıyor.
-          overflow-y-hidden açıkça eklendi ki bu yan etki olmasın. */}
-      <div className="pointer-events-auto md:hidden mt-2 flex items-center gap-1.5 overflow-x-auto overflow-y-hidden px-1">
+      {/* Mobile tabs row, also pills, below the nav pill. Compact
+          padding + 4 eşit hücre grid → iPhone SE (375px) dahil tüm
+          mobil boyutlarda yatay overflow olmadan sığar. Eskiden
+          overflow-x-auto + büyük padding ile Fiyatlandırma kesiliyordu;
+          scrollbar gizlense bile ekran küçüklüğünden taşıyordu. */}
+      <div className="pointer-events-auto md:hidden mt-2 grid grid-cols-4 gap-1 px-1">
         {TABS.map((tab) => {
           const active = tab.key === activeKey;
           return (
             <Link
               key={tab.key}
               href={tab.href as "/"}
-              className={`shrink-0 px-3.5 h-8 inline-flex items-center rounded-full text-xs transition-colors ${
+              className={`min-w-0 px-2 h-7 inline-flex items-center justify-center rounded-full text-[11px] transition-colors truncate ${
                 active
                   ? "bg-foreground text-background"
                   : "bg-white border border-border text-muted-foreground"

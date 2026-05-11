@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Wand2, Check, ImageIcon, Sparkles, Trash2 } from "lucide-react";
 import { useEditorStore } from "@/src/store/editor-store";
+import { useUIStore } from "@/src/store/ui-store";
 import { useAssetUpload } from "@/src/hooks/useAssetUpload";
 import dynamic from "next/dynamic";
 const PresetMediaPicker = dynamic(
@@ -122,12 +123,17 @@ export function DesignTab() {
   const docId = useEditorStore((s) => s.docId);
   const applyPatch = useEditorStore((s) => s.applyPatch);
   const updateTheme = useEditorStore((s) => s.updateTheme);
+  const closeMobilePanel = useUIStore((s) => s.closeMobilePanel);
   const { pick: uploadAsset, busy: uploading } = useAssetUpload(docId);
   const [presetPickerOpen, setPresetPickerOpen] = useState(false);
 
   if (!theme) return null;
 
   const applyPreset = (p: Preset) => {
+    // Mobilde tema seçilince bottom sheet otomatik kapansın ki
+    // kullanıcı davetiyenin yeni halini hemen görebilsin (md+'da
+    // closeMobilePanel no-op).
+    closeMobilePanel();
     // Apply the preset AND wipe per-block / per-field color overrides so
     // a previous template's hard-coded dark accent doesn't survive on top
     // of a new bright theme (e.g. Altın Gece's gold accent was being

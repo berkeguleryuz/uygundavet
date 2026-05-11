@@ -79,11 +79,17 @@ export function PublicInvitation({
   useEffect(() => {
     let rafId = 0;
     function compute() {
-      const w = Math.min(400, window.innerWidth);
+      // Mobilde (≤640px) edge-to-edge: viewport'un tamamı kart olur,
+      // küçük bir gutter (8px her iki yan) görsel nefes için. Daha
+      // büyük ekranlarda 460px cap — masaüstünde okunabilirlik için
+      // zarif daralma. Eskiden hep 400px cap'te kalıyordu, iPhone XR
+      // (414px) gibi cihazlarda kenarlardan görünür şerit kalıyordu.
+      const vw = window.innerWidth;
+      const cardW = vw <= 640 ? Math.max(280, vw - 16) : Math.min(460, vw - 32);
       setSize({
         height: Math.max(640, window.innerHeight - 48),
-        envW: w,
-        cardW: w,
+        envW: cardW,
+        cardW,
       });
     }
     // rAF throttle: sürükleme sırasında frame başına bir compute.

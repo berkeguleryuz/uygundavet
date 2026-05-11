@@ -184,6 +184,12 @@ export function InvitationView({
         style={{
           background: doc.theme.bgColor,
           color: doc.theme.accentColor,
+          // overflow-wrap: anywhere — kullanıcının yazdığı boşluksuz
+          // uzun stringler (ör. "asdsadsadasd") mobilde kartı yatay
+          // genişletmesin diye. Default `normal` boşluksuz token'ı
+          // kırmaz, parent expand olur. anywhere her noktada break.
+          overflowWrap: "anywhere",
+          wordBreak: "break-word",
           ...getCardShapeStyle(doc),
           ...effectivePadding,
         }}

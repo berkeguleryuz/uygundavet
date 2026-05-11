@@ -69,13 +69,12 @@ export function DecorationView({ block }: BlockViewProps<DecorationData>) {
   );
 }
 
-/** Strip XML prolog and force the SVG to be width="100%" height="auto" so
- *  it scales fluidly into the wrapper div the renderer sets a fixed width
- *  on. The viewBox in the source file already carries the aspect ratio.
- *
- *  Aynı svgRaw değeri her render'da aynı sonucu veriyor — module-level
- *  Map ile cache'lenir, kullanıcı 100 blok render ettiğinde 100 kez
- *  regex çalışmıyor. (js-cache-function-results) */
+/** Strip XML prolog and force width="100%" — SVG spec'te height="auto"
+ *  geçerli DEĞİL (sadece length veya percentage kabul edilir, "auto"
+ *  console error fırlatır). Width 100% + viewBox + height attribute
+ *  YOK kombinasyonu, browser'a "viewBox aspect ratio'sunu koru" der.
+ *  Aynı svgRaw değeri her render'da aynı sonuç → module-level Map cache.
+ *  (js-cache-function-results) */
 const NORMALISED_SVG_CACHE = new Map<string, string>();
 function normaliseTemplateSvg(raw: string): string {
   const cached = NORMALISED_SVG_CACHE.get(raw);
@@ -88,7 +87,9 @@ function normaliseTemplateSvg(raw: string): string {
       const cleaned = String(attrs)
         .replace(/\s(width|height)="[^"]*"/g, "")
         .trim();
-      return `<svg ${cleaned} width="100%" height="auto" style="display:block">`;
+      // height attribute KASITLI olarak çıktıda yok — viewBox aspect
+      // ratio'su tek başına yeter, SVG kendi yüksekliğini hesaplar.
+      return `<svg ${cleaned} width="100%" style="display:block;height:auto">`;
     },
   );
   NORMALISED_SVG_CACHE.set(raw, s);

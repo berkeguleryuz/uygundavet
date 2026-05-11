@@ -9,10 +9,8 @@ export function ImpersonationBanner() {
   const { data: session } = authClient.useSession();
   const [stopping, setStopping] = useState(false);
 
-  const sess = session?.session as (typeof session extends infer S ? S : never) & {
-    impersonatedBy?: string | null;
-  };
-  const impersonatedBy = (sess as { impersonatedBy?: string | null } | undefined)?.impersonatedBy;
+  const sess = session?.session as unknown as { impersonatedBy?: string | null } | undefined;
+  const impersonatedBy = sess?.impersonatedBy;
   if (!impersonatedBy) return null;
 
   const stop = async () => {

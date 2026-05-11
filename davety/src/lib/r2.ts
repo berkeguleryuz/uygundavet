@@ -102,6 +102,13 @@ export async function deleteR2Keys(keys: string[]): Promise<{
  * Pagination: ListObjectsV2 bir seferde max 1000 anahtar veriyor;
  * NextContinuationToken ile döngüde tüm sayfaları topluyoruz.
  */
+/** Silinmesi YASAK olan kalıcı sistem prefix'leri. `system/` altında
+ *  template-images, default ön-yükleme avatarları gibi tüm uygulamanın
+ *  ortak olarak referans verdiği immutable içerik var. Bir bug ya da
+ *  yanlış cron çağrısı bu klasörü silmesin diye guard.
+ */
+const PROTECTED_R2_PREFIXES = ["system/", "system"] as const;
+
 export async function deleteR2Prefix(prefix: string): Promise<{
   ok: boolean;
   deleted: number;
@@ -109,6 +116,24 @@ export async function deleteR2Prefix(prefix: string): Promise<{
 }> {
   if (!R2_ENABLED || !r2 || !prefix) {
     return { ok: true, deleted: 0, errors: [] };
+  }
+  // Boş prefix bucket'ı silebilir, system/ altı kalıcı içerik. İkisi de
+  // engellenmeli.
+  const normalized = prefix.replace(/^\/+/, "");
+  if (
+    !normalized ||
+    PROTECTED_R2_PREFIXES.some(
+      (p) => normalized === p || normalized.startsWith(p + "/") || normalized === p.replace(/\/$/, ""),
+    )
+  ) {
+    console.error(`[deleteR2Prefix] BLOCKED protected prefix: "${prefix}"`);
+    return {
+      ok: false,
+      deleted: 0,
+      errors: [
+        { key: prefix, message: "Protected system prefix — refusing to delete" },
+      ],
+    };
   }
   const allKeys: string[] = [];
   let continuationToken: string | undefined;

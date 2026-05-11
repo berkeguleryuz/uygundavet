@@ -527,7 +527,7 @@ export function TextStylePanel() {
           className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
         />
 
-        <ul className="mt-2 max-h-64 overflow-y-auto border border-border rounded-md divide-y divide-border">
+        <ul className="mt-2 max-h-36 sm:max-h-64 overflow-y-auto border border-border rounded-md divide-y divide-border">
           {fonts.map((f) => (
             <li key={f.family}>
               <button

@@ -30,7 +30,7 @@ export async function POST(
 
     const baseUrl = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";
 
-    await auth.api.forgetPassword({
+    await auth.api.requestPasswordReset({
       body: {
         email: userDoc.email,
         redirectTo: `${baseUrl}/reset-password`,

@@ -967,7 +967,7 @@ function Hero({
                     : "Değişiklikleri Yayınla"}
                 </button>
                 <p className="text-[10px] text-muted-foreground mt-1.5">
-                  Editor'deki son düzenlemeleri public davetiyene yansıtır.
+                  Editor&apos;deki son düzenlemeleri public davetiyene yansıtır.
                 </p>
               </div>
             ) : null}
