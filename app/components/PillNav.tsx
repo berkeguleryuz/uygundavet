@@ -126,10 +126,10 @@ export function PillNav() {
   };
 
   const navLinks = [
-    { key: "features", label: tNav("features"), href: "#ozellikler", active: true },
-    { key: "howItWorks", label: tNav("howItWorks"), href: "#nasil-calisir", active: false },
-    { key: "pricing", label: tNav("pricing"), href: "#fiyatlar", active: false },
-    { key: "themes", label: tNav("themes"), href: "#temalar", active: false },
+    { key: "features", label: tNav("features"), href: "/#ozellikler", active: true },
+    { key: "howItWorks", label: tNav("howItWorks"), href: "/#nasil-calisir", active: false },
+    { key: "pricing", label: tNav("pricing"), href: "/#fiyatlar", active: false },
+    { key: "themes", label: tNav("themes"), href: "/#temalar", active: false },
   ];
 
   return (

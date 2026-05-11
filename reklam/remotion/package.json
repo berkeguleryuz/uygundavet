@@ -1,0 +1,30 @@
+{
+  "name": "uygundavet-reklam",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Uygun Davet — kreatif reklam kompozisyonları (Remotion + HTML-in-Canvas).",
+  "scripts": {
+    "dev": "remotion studio",
+    "render:reel": "remotion render ReelManifesto out/reel-manifesto.mp4",
+    "render:cinema": "remotion render CinemaTrailer out/cinema-trailer.mp4",
+    "render:square": "remotion render SquareSpot out/square-spot.mp4",
+    "render:story": "remotion render StoryBurst out/story-burst.mp4",
+    "render:html": "remotion render HtmlGlitchShowcase out/html-glitch.mp4 --gl=angle",
+    "render:all": "npm run render:reel && npm run render:cinema && npm run render:square && npm run render:story && npm run render:html"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.455",
+    "@remotion/google-fonts": "^4.0.455",
+    "@remotion/transitions": "^4.0.455",
+    "@remotion/shapes": "^4.0.455",
+    "@remotion/noise": "^4.0.455",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.455"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.4"
+  }
+}

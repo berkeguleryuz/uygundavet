@@ -139,7 +139,11 @@ export function QrCodesSection({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
+      {/* 3-up always at md+, 2-up at sm, 1-up on mobile. Cards size to
+       *  their natural content height — no flex-1/min-h-0 stretching, so
+       *  the QR images inside aren't forced into containers shorter than
+       *  themselves and stop overflowing the section box. */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {tiles.map((tile) => (
           <div
             key={tile.key}
@@ -149,9 +153,7 @@ export function QrCodesSection({
               {tile.label}
             </p>
 
-            <div className="flex-1 min-h-0 w-full flex justify-center [&>div]:h-full">
-              {tile.node}
-            </div>
+            <div className="w-full flex justify-center">{tile.node}</div>
 
             <div className="w-full space-y-1.5 mt-auto">
               <p

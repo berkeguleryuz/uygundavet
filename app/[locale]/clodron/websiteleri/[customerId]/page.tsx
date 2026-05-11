@@ -23,10 +23,13 @@ import {
   BookOpen,
   Copy,
   Check,
+  Pencil,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { QrCodesSection } from "@/app/components/admin/QrCodesSection";
+import { CustomerEditor } from "@/app/components/admin/CustomerEditor";
 
 interface PersonName {
   firstName: string;
@@ -140,6 +143,7 @@ export default function WebsiteDetailPage() {
   const [customDomain, setCustomDomain] = useState("");
   const [savingDomain, setSavingDomain] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     fetch(`/api/admin/websites/${customerId}`)
@@ -304,24 +308,76 @@ export default function WebsiteDetailPage() {
         {customer.bride.firstName} & {customer.groom.firstName}
       </h2>
 
-      <div className="flex items-center gap-2">
-        {tabs.map((tab) => (
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-sans transition-colors cursor-pointer",
+                activeTab === tab.key
+                  ? "bg-white/10 text-white font-medium"
+                  : "text-white/50 hover:text-white hover:bg-white/5"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {activeTab === "genel" && (
           <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => setEditing((v) => !v)}
             className={cn(
-              "px-4 py-2 rounded-lg text-sm font-sans transition-colors cursor-pointer",
-              activeTab === tab.key
-                ? "bg-white/10 text-white font-medium"
-                : "text-white/50 hover:text-white hover:bg-white/5"
+              "px-4 py-2 rounded-lg text-sm font-sans transition-colors cursor-pointer flex items-center gap-2",
+              editing
+                ? "bg-white/10 text-white"
+                : "bg-blue-500/15 border border-blue-500/30 text-blue-200 hover:bg-blue-500/25"
             )}
           >
-            {tab.label}
+            {editing ? <X className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+            {editing ? "İptal" : "Düzenle"}
           </button>
-        ))}
+        )}
       </div>
 
-      {activeTab === "genel" && (
+      {activeTab === "genel" && editing && (
+        <CustomerEditor
+          customerId={customerId}
+          initial={{
+            bride: customer.bride,
+            groom: customer.groom,
+            weddingDate: customer.weddingDate,
+            weddingTime: customer.weddingTime,
+            venueName: customer.venueName,
+            venueAddress: customer.venueAddress,
+            brideFamily: customer.brideFamily,
+            groomFamily: customer.groomFamily,
+            eventSchedule: customer.eventSchedule || [],
+          }}
+          onSaved={(next) => {
+            setCustomer((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    bride: next.bride,
+                    groom: next.groom,
+                    weddingDate: next.weddingDate ? new Date(next.weddingDate).toISOString() : prev.weddingDate,
+                    weddingTime: next.weddingTime,
+                    venueName: next.venueName,
+                    venueAddress: next.venueAddress,
+                    brideFamily: next.brideFamily,
+                    groomFamily: next.groomFamily,
+                    eventSchedule: next.eventSchedule,
+                  }
+                : prev
+            );
+            setEditing(false);
+          }}
+        />
+      )}
+
+      {activeTab === "genel" && !editing && (
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">

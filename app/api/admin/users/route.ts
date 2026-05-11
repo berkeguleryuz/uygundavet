@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const users = await db
       .collection("user")
-      .find({}, { projection: { name: 1, email: 1, createdAt: 1 } })
+      .find({}, { projection: { name: 1, email: 1, createdAt: 1, disabled: 1 } })
       .sort({ createdAt: -1 })
       .toArray();
 

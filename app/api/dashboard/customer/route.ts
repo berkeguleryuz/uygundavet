@@ -111,7 +111,7 @@ export async function GET() {
       const updated = await Customer.findOneAndUpdate(
         { _id: customer._id, inviteCode: { $in: [null, ""] } },
         { $set: { inviteCode: generateInviteCode() } },
-        { new: true }
+        { returnDocument: "after" }
       );
       if (updated) customer.inviteCode = updated.inviteCode;
     }
@@ -159,7 +159,7 @@ export async function PATCH(req: NextRequest) {
     const customer = await Customer.findOneAndUpdate(
       { userId: session.user.id },
       parsed.data,
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!customer) {

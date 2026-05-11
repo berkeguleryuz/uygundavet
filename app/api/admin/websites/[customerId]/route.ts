@@ -50,8 +50,30 @@ export async function GET(
   }
 }
 
+const personSchema = z.object({
+  firstName: z.string().trim().max(80).optional(),
+  lastName: z.string().trim().max(80).optional(),
+});
+
+const familySchema = z.object({
+  father: personSchema.optional(),
+  mother: personSchema.optional(),
+});
+
 const updateSchema = z.object({
   customDomain: z.string().optional(),
+  bride: personSchema.optional(),
+  groom: personSchema.optional(),
+  weddingDate: z.string().optional(),
+  weddingTime: z.string().max(20).optional(),
+  venueName: z.string().trim().max(200).optional(),
+  venueAddress: z.string().trim().max(500).optional(),
+  brideFamily: familySchema.optional(),
+  groomFamily: familySchema.optional(),
+  eventSchedule: z
+    .array(z.object({ time: z.string().max(20), label: z.string().max(120) }))
+    .max(20)
+    .optional(),
 });
 
 export async function PATCH(
@@ -74,7 +96,7 @@ export async function PATCH(
     const customer = await Customer.findByIdAndUpdate(
       customerId,
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!customer) {

@@ -130,7 +130,7 @@ export default function OrderDetailPage() {
   const remaining = order.totalAmount - order.depositAmount;
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <div className="space-y-8 w-full">
       <button
         onClick={() => router.push("/clodron/siparisler")}
         className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors font-sans cursor-pointer"
@@ -371,14 +371,6 @@ export default function OrderDetailPage() {
               </div>
             )}
 
-            <QrCodesSection
-              customDomain={customer.customDomain}
-              inviteCode={customer.inviteCode}
-              brideFirst={customer.bride?.firstName}
-              groomFirst={customer.groom?.firstName}
-              weddingDate={customer.weddingDate}
-            />
-
             {customer.storyMilestones && customer.storyMilestones.length > 0 && (
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -413,6 +405,16 @@ export default function OrderDetailPage() {
             )}
           </div>
         </div>
+      )}
+
+      {customer && (
+        <QrCodesSection
+          customDomain={customer.customDomain}
+          inviteCode={customer.inviteCode}
+          brideFirst={customer.bride?.firstName}
+          groomFirst={customer.groom?.firstName}
+          weddingDate={customer.weddingDate}
+        />
       )}
 
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5">

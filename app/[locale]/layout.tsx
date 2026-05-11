@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import { SupportWidget } from "@/app/components/SupportWidget";
+import { ImpersonationBanner } from "@/app/components/admin/ImpersonationBanner";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -71,6 +72,7 @@ export default async function LocaleLayout({
   return (
     <ThemeProvider>
       <NextIntlClientProvider messages={messages}>
+        <ImpersonationBanner />
         {children}
         <SupportWidget />
         <SupportWidget mode="sales" />

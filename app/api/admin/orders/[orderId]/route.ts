@@ -75,7 +75,7 @@ export async function PATCH(
     const order = await Order.findByIdAndUpdate(
       orderId,
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!order) {
