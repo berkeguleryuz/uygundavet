@@ -19,7 +19,7 @@ interface Memory {
 }
 
 const inputClassDark =
-  "w-full h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder:text-white/30 focus:border-[#c75050] focus:outline-none focus:ring-2 focus:ring-[#c75050]/20 transition-all font-sans";
+  "w-full h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-base sm:text-sm text-white placeholder:text-white/30 focus:border-[#c75050] focus:outline-none focus:ring-2 focus:ring-[#c75050]/20 transition-all font-sans";
 
 export function MemoryForm() {
   const wedding = useWedding();
