@@ -74,7 +74,7 @@ function AnimatedCrossMark({ active }: { active: boolean }) {
 interface AdditionalGuest { id: string; name: string; }
 
 const inputClass =
-  "w-full h-12 rounded-xl border border-[#2d8b8b]/25 bg-white px-4 text-sm text-[#1a2332] placeholder:text-[#1a2332]/35 focus:border-[#2d8b8b] focus:outline-none focus:ring-2 focus:ring-[#2d8b8b]/20 transition-all font-sans";
+  "w-full h-12 rounded-xl border border-[#2d8b8b]/25 bg-white px-4 text-base sm:text-sm text-[#1a2332] placeholder:text-[#1a2332]/35 focus:border-[#2d8b8b] focus:outline-none focus:ring-2 focus:ring-[#2d8b8b]/20 transition-all font-sans";
 
 export function RsvpForm() {
   const wedding = useWedding();

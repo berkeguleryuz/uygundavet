@@ -77,11 +77,21 @@ export async function POST(
       );
     }
 
-    const formData = await req.formData();
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch (err) {
+      console.error("[gallery] formData parse failed", { inviteCode, err });
+      return NextResponse.json(
+        { error: "Invalid request" },
+        { status: 400 }
+      );
+    }
     const file = formData.get("file") as File | null;
     const uploaderName = (formData.get("uploader") as string) || "Misafir";
 
     if (!file) {
+      console.error("[gallery] missing file", { inviteCode, uploaderName });
       return NextResponse.json(
         { error: "No file provided" },
         { status: 400 }
@@ -89,6 +99,11 @@ export async function POST(
     }
 
     if (file.size > 10 * 1024 * 1024) {
+      console.error("[gallery] file too large", {
+        inviteCode,
+        name: file.name,
+        size: file.size,
+      });
       return NextResponse.json(
         { error: "File too large (max 10MB)" },
         { status: 400 }
@@ -99,33 +114,52 @@ export async function POST(
     const buffer = Buffer.from(bytes);
 
     const folder = getUserFolder(customer.userId);
-    const result = await new Promise<{
+    let result: {
       secure_url: string;
       public_id: string;
       bytes: number;
-    }>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder,
-            resource_type: "image",
-            transformation: [{ quality: "auto", fetch_format: "auto" }],
-          },
-          (error, result) => {
-            if (error || !result)
-              reject(error || new Error("Upload failed"));
-            else
-              resolve(
-                result as {
-                  secure_url: string;
-                  public_id: string;
-                  bytes: number;
-                }
-              );
-          }
-        )
-        .end(buffer);
-    });
+    };
+    try {
+      result = await new Promise<{
+        secure_url: string;
+        public_id: string;
+        bytes: number;
+      }>((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            {
+              folder,
+              resource_type: "image",
+              transformation: [{ quality: "auto", fetch_format: "auto" }],
+            },
+            (error, result) => {
+              if (error || !result)
+                reject(error || new Error("Upload failed"));
+              else
+                resolve(
+                  result as {
+                    secure_url: string;
+                    public_id: string;
+                    bytes: number;
+                  }
+                );
+            }
+          )
+          .end(buffer);
+      });
+    } catch (err) {
+      console.error("[gallery] cloudinary upload failed", {
+        inviteCode,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        err: err instanceof Error ? err.message : String(err),
+      });
+      return NextResponse.json(
+        { error: "Cloudinary upload failed" },
+        { status: 502 }
+      );
+    }
 
     await GalleryPhoto.create({
       userId: customer.userId,

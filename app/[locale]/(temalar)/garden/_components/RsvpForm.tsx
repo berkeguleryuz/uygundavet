@@ -77,7 +77,7 @@ interface AdditionalGuest {
 }
 
 const inputClass =
-  "w-full h-12 rounded-2xl border border-[#4a7c59]/25 bg-white px-4 text-sm text-[#2b3628] placeholder:text-[#2b3628]/35 focus:border-[#4a7c59] focus:outline-none focus:ring-2 focus:ring-[#4a7c59]/20 transition-all font-sans";
+  "w-full h-12 rounded-2xl border border-[#4a7c59]/25 bg-white px-4 text-base sm:text-sm text-[#2b3628] placeholder:text-[#2b3628]/35 focus:border-[#4a7c59] focus:outline-none focus:ring-2 focus:ring-[#4a7c59]/20 transition-all font-sans";
 
 export function RsvpForm() {
   const wedding = useWedding();
