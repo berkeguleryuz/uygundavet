@@ -2,9 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Pick up Tailwind utility classes from the davety renderer package */
-@source "../davety/packages/renderer/src/**/*.{ts,tsx}";
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
