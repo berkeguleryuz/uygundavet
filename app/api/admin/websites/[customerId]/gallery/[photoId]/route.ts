@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { GalleryPhoto } from "@/models/GalleryPhoto";
+import { cloudinary } from "@/lib/cloudinary";
 
 export async function DELETE(
   req: NextRequest,
@@ -17,10 +18,33 @@ export async function DELETE(
     const { photoId } = await params;
     await connectDB();
 
-    const photo = await GalleryPhoto.findByIdAndDelete(photoId);
+    const photo = await GalleryPhoto.findById(photoId);
     if (!photo) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    if (photo.publicId) {
+      try {
+        const result = await cloudinary.uploader.destroy(photo.publicId, {
+          invalidate: true,
+        });
+        if (result.result !== "ok" && result.result !== "not found") {
+          console.error("Cloudinary destroy returned non-ok:", result);
+          return NextResponse.json(
+            { error: "Failed to delete from Cloudinary" },
+            { status: 500 }
+          );
+        }
+      } catch (err) {
+        console.error("Cloudinary destroy error:", err);
+        return NextResponse.json(
+          { error: "Failed to delete from Cloudinary" },
+          { status: 500 }
+        );
+      }
+    }
+
+    await photo.deleteOne();
 
     return NextResponse.json({ success: true });
   } catch (error) {
