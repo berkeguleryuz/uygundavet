@@ -31,6 +31,14 @@ export async function generateMetadata({
       template: `%s | ${t("brandName")}`,
     },
     description: t("description"),
+    alternates: {
+      canonical: siteUrl,
+      types: {
+        "application/rss+xml": `${siteUrl}/feed.xml`,
+        "application/atom+xml": `${siteUrl}/atom.xml`,
+        "application/feed+json": `${siteUrl}/feed.json`,
+      },
+    },
     robots: {
       index: true,
       follow: true,
@@ -47,11 +55,6 @@ export async function generateMetadata({
       locale: ogLocale,
       url: siteUrl,
       siteName: t("brandName"),
-      title: t("title"),
-      description: t("description"),
-    },
-    twitter: {
-      card: "summary_large_image",
       title: t("title"),
       description: t("description"),
     },
