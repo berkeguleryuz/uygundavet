@@ -16,7 +16,7 @@ declare global {
 const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
 if (!global.mongooseCache) global.mongooseCache = cached;
 
-async function ensureDb() {
+export async function ensureDb() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
