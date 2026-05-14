@@ -50,7 +50,7 @@ export async function DELETE(
     const { photoId } = await params;
 
     await connectDB();
-    const photo = await GalleryPhoto.findOneAndDelete({
+    const photo = await GalleryPhoto.findOne({
       _id: photoId,
       userId: session.user.id,
     });
@@ -60,8 +60,27 @@ export async function DELETE(
     }
 
     if (photo.publicId) {
-      cloudinary.uploader.destroy(photo.publicId).catch(() => {});
+      try {
+        const result = await cloudinary.uploader.destroy(photo.publicId, {
+          invalidate: true,
+        });
+        if (result.result !== "ok" && result.result !== "not found") {
+          console.error("Cloudinary destroy returned non-ok:", result);
+          return NextResponse.json(
+            { error: "Failed to delete from Cloudinary" },
+            { status: 500 }
+          );
+        }
+      } catch (err) {
+        console.error("Cloudinary destroy error:", err);
+        return NextResponse.json(
+          { error: "Failed to delete from Cloudinary" },
+          { status: 500 }
+        );
+      }
     }
+
+    await photo.deleteOne();
 
     return NextResponse.json({ success: true });
   } catch (error) {
