@@ -29,6 +29,9 @@ const SectionFAQ = dynamic(() =>
 const SectionFinalCTA = dynamic(() =>
   import("@/app/sections/SectionFinalCTA").then((m) => m.SectionFinalCTA)
 );
+const SectionBlogPreview = dynamic(() =>
+  import("@/app/sections/SectionBlogPreview").then((m) => m.SectionBlogPreview)
+);
 const Footer = dynamic(() =>
   import("@/app/components/Footer").then((m) => m.Footer)
 );
@@ -54,6 +57,7 @@ export default async function Home({
       <SectionWizard />
       <SectionFAQ />
       <SectionFinalCTA />
+      <SectionBlogPreview />
       <Footer />
       <MainBottomBar />
     </main>
