@@ -28,36 +28,52 @@ export interface IBlogPost extends Document {
   updatedAt: Date;
 }
 
+const CoverImageSchema = new Schema(
+  {
+    url: String,
+    alt: String,
+    width: Number,
+    height: Number,
+  },
+  { _id: false }
+);
+
+const SeoSchema = new Schema(
+  {
+    title: String,
+    description: String,
+    ogImageUrl: String,
+  },
+  { _id: false }
+);
+
 const BlogPostSchema = new Schema<IBlogPost>(
   {
-    slug: { type: String, required: true, unique: true, index: true },
-    title: { type: String, required: true, maxlength: 200 },
-    excerpt: { type: String, required: true, maxlength: 300 },
+    slug: { type: String, required: true, unique: true, trim: true },
+    title: { type: String, required: true, trim: true, maxlength: 200 },
+    excerpt: { type: String, required: true, trim: true, maxlength: 300 },
     content: { type: String, required: true },
     coverImage: {
-      type: {
-        url: String,
-        alt: String,
-        width: Number,
-        height: Number,
-      },
+      type: CoverImageSchema,
       default: null,
     },
-    status: { type: String, enum: ["draft", "published"], default: "draft", index: true },
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
     publishedAt: { type: Date, default: null, index: true },
     authorId: { type: String, required: true },
-    authorName: { type: String, required: true },
-    tags: { type: [String], default: [], index: true },
+    authorName: { type: String, required: true, trim: true },
+    tags: { type: [{ type: String, trim: true }], default: [], index: true },
     seo: {
-      title: String,
-      description: String,
-      ogImageUrl: String,
+      type: SeoSchema,
+      default: {},
     },
     aiGenerated: { type: Boolean, default: false },
     readingTimeMinutes: { type: Number, default: 0 },
     viewCount: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    collection: "blogPosts",
+  }
 );
 
 BlogPostSchema.index({ status: 1, publishedAt: -1 });
