@@ -1,10 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 import { BlogPost } from "@/models/BlogPost";
-import { ensureDb, listAllPosts, findUniqueSlug } from "@/lib/blog/queries";
+import { listAllPosts, findUniqueSlug, ensureDb } from "@/lib/blog/queries";
 import { normalizeSlug } from "@/lib/blog/slug";
 import { calculateReadingTime } from "@/lib/blog/reading-time";
 import { stripEmDash } from "@/lib/blog/strip-em-dash";
+
+const coverImageSchema = z
+  .object({
+    url: z.string().url(),
+    alt: z.string().max(200).default(""),
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+  })
+  .nullable();
+
+const createSchema = z.object({
+  title: z.string().min(1).max(200),
+  slug: z.string().max(80).optional(),
+  excerpt: z.string().min(1).max(300),
+  content: z.string().min(1),
+  coverImage: coverImageSchema.optional(),
+  status: z.enum(["draft", "published"]).default("draft"),
+  publishedAt: z.string().datetime().optional(),
+  tags: z.array(z.string().max(50)).max(20).default([]),
+  seo: z
+    .object({
+      title: z.string().max(200).optional(),
+      description: z.string().max(300).optional(),
+      ogImageUrl: z.string().url().optional(),
+    })
+    .default({}),
+  aiGenerated: z.boolean().default(false),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,52 +44,54 @@ export async function GET(req: NextRequest) {
     const result = await listAllPosts({ page, status: status ?? undefined });
     return NextResponse.json(result);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Error";
-    return NextResponse.json(
-      { error: msg },
-      { status: msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : 500 }
-    );
+    if (err instanceof Error && err.message === "Unauthorized")
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (err instanceof Error && err.message === "Forbidden")
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    console.error("[clodron/blog GET]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
     const session = await requireAdmin();
+    const json = await req.json();
+    const parsed = createSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid input", issues: parsed.error.issues }, { status: 400 });
+    }
+    const body = parsed.data;
     await ensureDb();
-    const body = await req.json();
-    const baseSlug = body.slug
-      ? normalizeSlug(body.slug)
-      : normalizeSlug(body.title ?? "");
+    const baseSlug = body.slug ? normalizeSlug(body.slug) : normalizeSlug(body.title);
+    if (!baseSlug) return NextResponse.json({ error: "Title or slug required" }, { status: 400 });
     const slug = await findUniqueSlug(baseSlug);
-    const content = stripEmDash(body.content ?? "");
+    const content = stripEmDash(body.content);
     const readingTimeMinutes = calculateReadingTime(content);
     const publishedAt =
-      body.status === "published"
-        ? body.publishedAt
-          ? new Date(body.publishedAt)
-          : new Date()
-        : null;
+      body.status === "published" ? (body.publishedAt ? new Date(body.publishedAt) : new Date()) : null;
     const post = await BlogPost.create({
       slug,
-      title: stripEmDash(body.title ?? ""),
-      excerpt: stripEmDash(body.excerpt ?? ""),
+      title: stripEmDash(body.title),
+      excerpt: stripEmDash(body.excerpt),
       content,
       coverImage: body.coverImage ?? null,
-      status: body.status ?? "draft",
+      status: body.status,
       publishedAt,
       authorId: session.user.id,
       authorName: session.user.name ?? "Uygun Davet",
-      tags: Array.isArray(body.tags) ? body.tags : [],
-      seo: body.seo ?? {},
-      aiGenerated: Boolean(body.aiGenerated),
+      tags: body.tags,
+      seo: body.seo,
+      aiGenerated: body.aiGenerated,
       readingTimeMinutes,
     });
     return NextResponse.json(post.toObject(), { status: 201 });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Error";
-    return NextResponse.json(
-      { error: msg },
-      { status: msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : 500 }
-    );
+    if (err instanceof Error && err.message === "Unauthorized")
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (err instanceof Error && err.message === "Forbidden")
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    console.error("[clodron/blog POST]", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
