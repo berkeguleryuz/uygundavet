@@ -22,9 +22,10 @@ export async function renderMarkdownToHtml(markdown: string): Promise<string> {
 
 export function extractHeadings(markdown: string): Array<{ id: string; text: string; level: 2 | 3 }> {
   const headings: Array<{ id: string; text: string; level: 2 | 3 }> = [];
+  const withoutCodeFences = markdown.replace(/```[\s\S]*?```/g, "");
   const regex = /^(#{2,3})\s+(.+)$/gm;
   let match: RegExpExecArray | null;
-  while ((match = regex.exec(markdown)) !== null) {
+  while ((match = regex.exec(withoutCodeFences)) !== null) {
     const level = match[1].length === 2 ? 2 : 3;
     const text = match[2].trim();
     const id = text
