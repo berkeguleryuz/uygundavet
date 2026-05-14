@@ -1,7 +1,7 @@
 const turkishMap: Record<string, string> = {
   ç: "c", Ç: "c",
   ğ: "g", Ğ: "g",
-  ı: "i", I: "i",
+  ı: "i",
   İ: "i",
   ö: "o", Ö: "o",
   ş: "s", Ş: "s",
@@ -15,7 +15,7 @@ export function normalizeSlug(input: string): string {
     .join("")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-")
