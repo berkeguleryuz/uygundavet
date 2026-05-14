@@ -1,10 +1,28 @@
 import mongoose from "mongoose";
 import { BlogPost, type IBlogPost } from "@/models/BlogPost";
 
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) throw new Error("MONGODB_URI is not defined");
+
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+declare global {
+  var mongooseCache: MongooseCache | undefined;
+}
+
+const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
+if (!global.mongooseCache) global.mongooseCache = cached;
+
 async function ensureDb() {
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI!);
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false });
   }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
 export async function listPublishedPosts(opts: { page?: number; limit?: number } = {}) {
@@ -48,17 +66,24 @@ export async function listAllPosts(opts: { page?: number; limit?: number; status
 }
 
 export async function incrementViewCount(slug: string) {
-  await ensureDb();
-  await BlogPost.updateOne({ slug }, { $inc: { viewCount: 1 } });
+  try {
+    await ensureDb();
+    await BlogPost.updateOne({ slug }, { $inc: { viewCount: 1 } });
+  } catch {
+    // fire-and-forget; do not throw to caller
+  }
 }
 
 export async function findUniqueSlug(base: string): Promise<string> {
   await ensureDb();
   let candidate = base;
   let counter = 2;
-  while (await BlogPost.exists({ slug: candidate })) {
+  const maxAttempts = 50;
+  while (counter <= maxAttempts + 1) {
+    const exists = await BlogPost.exists({ slug: candidate });
+    if (!exists) return candidate;
     candidate = `${base}-${counter}`;
     counter += 1;
   }
-  return candidate;
+  return `${base}-${Date.now()}`;
 }
