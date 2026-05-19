@@ -7,12 +7,13 @@ import { calculateReadingTime } from "@/lib/blog/reading-time";
 import { stripEmDash } from "@/lib/blog/strip-em-dash";
 import { normalizeSlug } from "@/lib/blog/slug";
 import { findUniqueSlug, ensureDb } from "@/lib/blog/queries";
+import { deriveExcerpt } from "@/lib/blog/excerpt";
 
 const updateSchema = z
   .object({
     title: z.string().min(1).max(200),
     slug: z.string().max(80),
-    excerpt: z.string().min(1).max(300),
+    excerpt: z.string().max(300),
     content: z.string().min(1),
     coverImage: z
       .object({
@@ -28,7 +29,7 @@ const updateSchema = z
     seo: z.object({
       title: z.string().max(200).optional(),
       description: z.string().max(300).optional(),
-      ogImageUrl: z.string().url().optional(),
+      ogImageUrl: z.literal("").or(z.string().url()).optional(),
     }),
     aiGenerated: z.boolean(),
   })
@@ -73,10 +74,15 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     if (body.title !== undefined) existing.title = stripEmDash(body.title);
-    if (body.excerpt !== undefined) existing.excerpt = stripEmDash(body.excerpt);
     if (body.content !== undefined) {
       existing.content = stripEmDash(body.content);
       existing.readingTimeMinutes = calculateReadingTime(existing.content);
+    }
+    if (body.excerpt !== undefined) {
+      const ex = body.excerpt.trim()
+        ? body.excerpt
+        : deriveExcerpt(existing.content);
+      existing.excerpt = stripEmDash(ex);
     }
     if (body.coverImage !== undefined) existing.coverImage = body.coverImage;
     if (body.tags !== undefined) existing.tags = body.tags;

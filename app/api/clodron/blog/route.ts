@@ -6,6 +6,7 @@ import { listAllPosts, findUniqueSlug, ensureDb } from "@/lib/blog/queries";
 import { normalizeSlug } from "@/lib/blog/slug";
 import { calculateReadingTime } from "@/lib/blog/reading-time";
 import { stripEmDash } from "@/lib/blog/strip-em-dash";
+import { deriveExcerpt } from "@/lib/blog/excerpt";
 
 const coverImageSchema = z
   .object({
@@ -18,8 +19,8 @@ const coverImageSchema = z
 
 const createSchema = z.object({
   title: z.string().min(1).max(200),
-  slug: z.string().max(80).optional(),
-  excerpt: z.string().min(1).max(300),
+  slug: z.string().max(80).optional().default(""),
+  excerpt: z.string().max(300).optional().default(""),
   content: z.string().min(1),
   coverImage: coverImageSchema.optional(),
   status: z.enum(["draft", "published"]).default("draft"),
@@ -27,9 +28,9 @@ const createSchema = z.object({
   tags: z.array(z.string().max(50)).max(20).default([]),
   seo: z
     .object({
-      title: z.string().max(200).optional(),
-      description: z.string().max(300).optional(),
-      ogImageUrl: z.string().url().optional(),
+      title: z.string().max(200).optional().default(""),
+      description: z.string().max(300).optional().default(""),
+      ogImageUrl: z.literal("").or(z.string().url()).optional().default(""),
     })
     .default({}),
   aiGenerated: z.boolean().default(false),
@@ -68,18 +69,21 @@ export async function POST(req: NextRequest) {
     const slug = await findUniqueSlug(baseSlug);
     const content = stripEmDash(body.content);
     const readingTimeMinutes = calculateReadingTime(content);
+    const excerpt = stripEmDash(
+      body.excerpt.trim() ? body.excerpt : deriveExcerpt(content)
+    );
     const publishedAt =
       body.status === "published" ? (body.publishedAt ? new Date(body.publishedAt) : new Date()) : null;
     const post = await BlogPost.create({
       slug,
       title: stripEmDash(body.title),
-      excerpt: stripEmDash(body.excerpt),
+      excerpt,
       content,
       coverImage: body.coverImage ?? null,
       status: body.status,
       publishedAt,
       authorId: session.user.id,
-      authorName: session.user.name ?? "Uygun Davet",
+      authorName: session.user.name || "Uygun Davet",
       tags: body.tags,
       seo: body.seo,
       aiGenerated: body.aiGenerated,

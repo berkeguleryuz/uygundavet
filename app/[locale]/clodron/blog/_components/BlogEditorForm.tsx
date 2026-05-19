@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
+import { normalizeSlug } from "@/lib/blog/slug";
 
 export type EditorState = {
   title: string;
@@ -23,6 +24,7 @@ type Props = {
 
 export function BlogEditorForm({ state, setState }: Props) {
   const t = useTranslations("Blog");
+  const [slugTouched, setSlugTouched] = useState(() => state.slug.trim() !== "");
 
   async function handleCoverUpload(file: File) {
     const fd = new FormData();
@@ -61,7 +63,14 @@ export function BlogEditorForm({ state, setState }: Props) {
         <label className="text-sm opacity-70">{t("title")}</label>
         <input
           value={state.title}
-          onChange={(e) => setState((p) => ({ ...p, title: e.target.value }))}
+          onChange={(e) => {
+            const title = e.target.value;
+            setState((p) => ({
+              ...p,
+              title,
+              slug: slugTouched ? p.slug : normalizeSlug(title),
+            }));
+          }}
           placeholder={t("titlePlaceholder")}
           className="w-full mt-1 px-3 py-2 rounded bg-white/5 border border-white/10"
         />
@@ -71,7 +80,10 @@ export function BlogEditorForm({ state, setState }: Props) {
         <label className="text-sm opacity-70">{t("slugLabel")}</label>
         <input
           value={state.slug}
-          onChange={(e) => setState((p) => ({ ...p, slug: e.target.value }))}
+          onChange={(e) => {
+            setSlugTouched(true);
+            setState((p) => ({ ...p, slug: e.target.value }));
+          }}
           className="w-full mt-1 px-3 py-2 rounded bg-white/5 border border-white/10"
         />
       </div>
