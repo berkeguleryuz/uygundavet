@@ -21,7 +21,7 @@ const MdxEditorClient = dynamic(
   },
 );
 
-type InitialPost = Partial<EditorState> & {
+type InitialPost = Partial<Omit<EditorState, "tags">> & {
   _id?: string;
   content?: string;
   tags?: string[] | string;
