@@ -86,12 +86,20 @@ export default async function GardenLayout({ children }: { children: React.React
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('garden-envelope-opened')==='1')document.documentElement.classList.add('garden-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#f5f3ed] text-[#2b3628] overflow-x-hidden">
         <GardenNav />
         <main>{children}</main>
         <GardenFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

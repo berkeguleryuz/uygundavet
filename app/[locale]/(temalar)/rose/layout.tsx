@@ -84,12 +84,20 @@ export default async function RoseLayout({ children }: { children: React.ReactNo
   }
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('rose-envelope-opened')==='1')document.documentElement.classList.add('rose-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-white text-[#1a1210] overflow-x-hidden">
         <RoseNav />
         <main>{children}</main>
         <RoseFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

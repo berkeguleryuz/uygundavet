@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { EnvelopeIntro } from "./_components/EnvelopeIntro";
 import { SectionHero } from "./_sections/SectionHero";
 
 const SectionCountdown = dynamic(() =>
@@ -30,6 +31,7 @@ const SectionCTA = dynamic(() =>
 export default function PearlHome() {
   return (
     <>
+      <EnvelopeIntro />
       <SectionHero />
       <SectionCountdown />
       <SectionStoryPreview />

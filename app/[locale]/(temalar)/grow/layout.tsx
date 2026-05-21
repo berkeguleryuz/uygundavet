@@ -111,12 +111,20 @@ export default async function GrowLayout({
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('grow-envelope-opened')==='1')document.documentElement.classList.add('grow-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#252224] text-white overflow-x-hidden">
         <GrowNav />
         <main>{children}</main>
         <GrowFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

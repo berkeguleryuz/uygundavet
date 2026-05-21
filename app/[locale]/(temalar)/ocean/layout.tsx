@@ -86,12 +86,20 @@ export default async function OceanLayout({ children }: { children: React.ReactN
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('ocean-envelope-opened')==='1')document.documentElement.classList.add('ocean-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#0d1620] text-[#f1faee] overflow-x-hidden">
         <OceanNav />
         <main>{children}</main>
         <OceanFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

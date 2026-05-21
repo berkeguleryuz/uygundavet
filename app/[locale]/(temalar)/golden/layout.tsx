@@ -86,12 +86,20 @@ export default async function GoldenLayout({ children }: { children: React.React
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('golden-envelope-opened')==='1')document.documentElement.classList.add('golden-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#faf5ec] text-[#4a403a] overflow-x-hidden">
         <GoldenNav />
         <main>{children}</main>
         <GoldenFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

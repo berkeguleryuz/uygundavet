@@ -86,6 +86,13 @@ export default async function SunsetLayout({ children }: { children: React.React
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
 
   return (
+    <>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('sunset-envelope-opened')==='1')document.documentElement.classList.add('sunset-envelope-seen')}catch(e){}",
+          }}
+        />
     <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#1a0f0a] text-[#faf0e6] overflow-x-hidden">
         <SunsetNav />
@@ -93,5 +100,6 @@ export default async function SunsetLayout({ children }: { children: React.React
         <SunsetFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }
