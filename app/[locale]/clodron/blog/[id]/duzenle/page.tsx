@@ -25,7 +25,11 @@ export default async function EditBlogPostPage({
     content: post.content,
     coverImage: post.coverImage,
     status: post.status,
-    seo: post.seo,
+    seo: {
+      title: post.seo?.title ?? "",
+      description: post.seo?.description ?? "",
+      ogImageUrl: post.seo?.ogImageUrl ?? "",
+    },
     aiGenerated: post.aiGenerated,
     tags: post.tags,
   };

@@ -32,7 +32,7 @@ const createSchema = z.object({
       description: z.string().max(300).optional().default(""),
       ogImageUrl: z.literal("").or(z.string().url()).optional().default(""),
     })
-    .default({}),
+    .default({ title: "", description: "", ogImageUrl: "" }),
   aiGenerated: z.boolean().default(false),
 });
 

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { BlogPost, type IBlogPost } from "@/models/BlogPost";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI: string = process.env.MONGODB_URI ?? "";
 if (!MONGODB_URI) throw new Error("MONGODB_URI is not defined");
 
 interface MongooseCache {
