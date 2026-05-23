@@ -20,12 +20,11 @@ function computeTimeLeft(target: Date) {
 export function SectionCountdown() {
   const wedding = useWedding();
   const targetTimestamp = new Date(wedding.weddingDate).getTime();
-  const [timeLeft, setTimeLeft] = useState(() =>
-    computeTimeLeft(new Date(targetTimestamp))
-  );
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const target = new Date(targetTimestamp);
+    setTimeLeft(computeTimeLeft(target));
     const interval = setInterval(() => setTimeLeft(computeTimeLeft(target)), 1000);
     return () => clearInterval(interval);
   }, [targetTimestamp]);

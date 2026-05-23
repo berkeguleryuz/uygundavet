@@ -84,12 +84,20 @@ export default async function PearlLayout({ children }: { children: React.ReactN
   }
   Customer.updateOne({ inviteCode: INVITE_CODE }, { $inc: { invitationViews: 1 } }).catch(() => {});
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('pearl-envelope-opened')==='1')document.documentElement.classList.add('pearl-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#f7f4ef] text-[#1c1917] overflow-x-hidden">
         <PearlNav />
         <main>{children}</main>
         <PearlFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

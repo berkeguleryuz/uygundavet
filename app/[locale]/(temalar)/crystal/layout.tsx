@@ -109,12 +109,20 @@ export default async function CrystalLayout({
   ).catch(() => {});
 
   return (
-    <WeddingProvider data={data}>
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('crystal-envelope-opened')==='1')document.documentElement.classList.add('crystal-envelope-seen')}catch(e){}",
+        }}
+      />
+      <WeddingProvider data={data}>
       <div className="relative min-h-screen bg-[#f6f3ee] text-[#1a1a2e] overflow-x-hidden">
         <CrystalNav />
         <main>{children}</main>
         <CrystalFooter />
       </div>
     </WeddingProvider>
+    </>
   );
 }

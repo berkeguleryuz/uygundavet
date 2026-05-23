@@ -1,24 +1,70 @@
 import type { MetadataRoute } from "next";
+import { getAllPublishedSlugs } from "@/lib/blog/queries";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://uygundavet.com";
 
-  const publicPages = [
-    { path: "/", changeFrequency: "weekly" as const, priority: 1.0 },
-    { path: "/privacy", changeFrequency: "yearly" as const, priority: 0.3 },
-    { path: "/terms", changeFrequency: "yearly" as const, priority: 0.3 },
+  const themes = [
+    "crystal",
+    "garden",
+    "golden",
+    "grow",
+    "ocean",
+    "pearl",
+    "rose",
+    "sunset",
+  ];
+
+  const staticPages: MetadataRoute.Sitemap = [
     {
-      path: "/data-deletion",
-      changeFrequency: "yearly" as const,
+      url: `${baseUrl}/`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    ...themes.map((theme) => ({
+      url: `${baseUrl}/${theme}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/data-deletion`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
       priority: 0.2,
     },
   ];
 
-  return publicPages.map((page) => ({
-    url: `${baseUrl}${page.path}`,
-    lastModified: new Date(),
-    changeFrequency: page.changeFrequency,
-    priority: page.priority,
-  }));
+  try {
+    const posts = await getAllPublishedSlugs();
+    const blogEntries: MetadataRoute.Sitemap = posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }));
+    return [...staticPages, ...blogEntries];
+  } catch {
+    return staticPages;
+  }
 }

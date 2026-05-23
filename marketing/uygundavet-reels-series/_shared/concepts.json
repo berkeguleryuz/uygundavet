@@ -1,0 +1,344 @@
+[
+  {
+    "id": "05-8-tema-vitrini",
+    "title": "8 Evren, Tek Davetiye",
+    "narration": "Her aşk hikâyesi farklıdır. Sekiz farklı zarf temasıyla sizinkine en yakın olanı saniyeler içinde bulun. Crystal, Garden, Golden, Grow, Ocean, Pearl, Rose ve Sunset. Hangi temada açacaksın kapıyı?",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"8 EVREN","sub":"TEK DAVETİYE","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s2","dur":2.2,"kind":"theme","theme":"crystal","label":"CRYSTAL","tone":"Modern, gümüş"},
+      {"id":"s3","dur":2.2,"kind":"theme","theme":"garden","label":"GARDEN","tone":"Yeşil, çiçek"},
+      {"id":"s4","dur":2.2,"kind":"theme","theme":"golden","label":"GOLDEN","tone":"Altın, lüks"},
+      {"id":"s5","dur":2.2,"kind":"theme","theme":"grow","label":"GROW","tone":"Organik, doğal"},
+      {"id":"s6","dur":2.2,"kind":"theme","theme":"ocean","label":"OCEAN","tone":"Mavi, sahil"},
+      {"id":"s7","dur":2.2,"kind":"theme","theme":"pearl","label":"PEARL","tone":"İnci, zarif"},
+      {"id":"s8","dur":2.2,"kind":"theme","theme":"rose","label":"ROSE","tone":"Pembe, sıcak"},
+      {"id":"s9","dur":2.2,"kind":"theme","theme":"sunset","label":"SUNSET","tone":"Turuncu, gün batımı"},
+      {"id":"s10","dur":3,"kind":"closer","title":"Hangi Tema?","sub":"Birini seç, davete başla."}
+    ]
+  },
+  {
+    "id": "06-mum-muhru-makro",
+    "title": "Bir Davetiye Değil — Bir An",
+    "narration": "Bir davetiye değil — bir an. Mühüre dokunuyorsun. Kapak kalkıyor. İçeride seni bekleyen tek bir cümle: Sen, bizim hikâyemizin parçasısın. İşte davet böyle açılır.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"NEFES AL","sub":"Bir an geliyor.","bg":"#1a1612","fg":"#d5c894"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"golden","title":"Mühüre Dokun","sub":"İşte o an."},
+      {"id":"s3","dur":3,"kind":"big-text","title":"AÇILIYOR","sub":"yavaşça…","bg":"#252224","fg":"#faf8f1"},
+      {"id":"s4","dur":5,"kind":"reveal","title":"Sen, bizim hikâyemizin parçasısın.","sub":""},
+      {"id":"s5","dur":3,"kind":"closer","title":"İlk 3 Saniye","sub":"Misafirini büyüle."}
+    ]
+  },
+  {
+    "id": "07-geri-sayim-spotlight",
+    "title": "Her Saniye Birlikte",
+    "narration": "Bir gün. On iki saat. Otuz altı dakika. Yirmi saniye. Misafirlerin büyük günü kaçırmaz. UygunDavet'in canlı geri sayımıyla heyecan dorukta.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"KAÇ KALDI?","sub":"","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s2","dur":5,"kind":"countdown","big":"01","label":"GÜN","extra":"12 SAAT · 36 DK · 20 SN"},
+      {"id":"s3","dur":4,"kind":"countdown","big":"05","label":"DAKİKA","extra":"saniyeler akıyor"},
+      {"id":"s4","dur":4,"kind":"countdown","big":"00:00:00:30","label":"","extra":"son 30 saniye"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Heyecan Canlı","sub":"Misafirin saniye saniye seninle."}
+    ]
+  },
+  {
+    "id": "08-mobilde-hayat",
+    "title": "Tek Link, Sınırsız Misafir",
+    "narration": "Ne uygulama, ne indirme. Tek link tıklanır, zarf açılır. Hikâye, galeri, geri sayım — hepsi avucunda. Büyük gün cebinde.",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"WHATSAPP","sub":"Sevgili Ayşe…","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"phone","title":"Bağlantı geldi","sub":"tek tık"},
+      {"id":"s3","dur":4,"kind":"phone","title":"Zarf açılıyor","sub":"3D mühür reveal"},
+      {"id":"s4","dur":4,"kind":"phone","title":"Kaydır","sub":"hikâye → galeri → geri sayım"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"TEK LİNK","sub":"sınırsız misafir","bg":"#252224","fg":"#d5c894"},
+      {"id":"s6","dur":2,"kind":"closer","title":"Cebinde","sub":"Büyük gün avucunda."}
+    ]
+  },
+  {
+    "id": "09-harita-konum",
+    "title": "Adres Tarifi mi? Tek Dokunuş",
+    "narration": "Adres tarifi yazıp anlatma. Misafirin bir dokunuşla Google Maps'i açar, yola çıkar. Düğün yeri haritada parlıyor.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"NEREDE?","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":4,"kind":"map","title":"Pin düşüyor","sub":"İstanbul · Boğaz Salonu"},
+      {"id":"s3","dur":4,"kind":"map","title":"Yol Tarifi","sub":"tek dokunuş"},
+      {"id":"s4","dur":3,"kind":"big-text","title":"GOOGLE MAPS AÇILDI","sub":"misafir yolda","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Adres Anlatma","sub":"Misafir tek tıkla yolda."}
+    ]
+  },
+  {
+    "id": "10-galeri-akisi",
+    "title": "Anılar da Davetin Parçası",
+    "narration": "Tanıştığınız andan büyük güne. Galeri davetin kalbi. Misafiriniz fotoğraflarınızı kaydırırken hikâyenize tanık olur.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"GALERİ","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":4,"kind":"gallery","title":"İlk yıl","sub":"polaroid akışı"},
+      {"id":"s3","dur":4,"kind":"gallery","title":"Yolculuklar","sub":"bento grid"},
+      {"id":"s4","dur":4,"kind":"gallery","title":"Teklif","sub":"hayatın anı"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"ANILAR","sub":"davetin kalbi","bg":"#555670","fg":"#faf8f1"},
+      {"id":"s6","dur":2,"kind":"closer","title":"Tanıklık Et","sub":"Misafirin hikâyenize."}
+    ]
+  },
+  {
+    "id": "11-cift-hikayesi",
+    "title": "Aşkın Yolunu Çiz",
+    "narration": "İlk bakış. İlk söz. İlk yolculuk. Teklif. Düğün günü. Aşkınızın yolunu çizin, misafiriniz ilk bakıştan büyük güne kadar sizinle yürüsün.",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"HİKÂYE","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"timeline","title":"İlk Bakış","sub":"2019"},
+      {"id":"s3","dur":3,"kind":"timeline","title":"İlk Yolculuk","sub":"2020"},
+      {"id":"s4","dur":3,"kind":"timeline","title":"Birlikte Ev","sub":"2022"},
+      {"id":"s5","dur":3,"kind":"timeline","title":"Teklif","sub":"2024"},
+      {"id":"s6","dur":3,"kind":"timeline","title":"Düğün","sub":"2026"},
+      {"id":"s7","dur":2.5,"kind":"closer","title":"Yolun Tamamı","sub":"Misafirin tanık olsun."}
+    ]
+  },
+  {
+    "id": "12-coklu-dil",
+    "title": "Misafirin Dilinde Davet",
+    "narration": "Türkçe. İngilizce. Almanca. Fransızca. Misafiriniz hangi dilde rahatsa, davet o dilde açılır. Yurtdışındaki amca, teyze, kuzen — herkes kendini evinde hisseder.",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"4 DİL","sub":"tek davet","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s2","dur":3,"kind":"lang","title":"Merhaba","sub":"TR"},
+      {"id":"s3","dur":3,"kind":"lang","title":"Hello","sub":"EN"},
+      {"id":"s4","dur":3,"kind":"lang","title":"Hallo","sub":"DE"},
+      {"id":"s5","dur":3,"kind":"lang","title":"Bonjour","sub":"FR"},
+      {"id":"s6","dur":3,"kind":"big-text","title":"AYNI SEVGİ","sub":"farklı dilde","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s7","dur":2.5,"kind":"closer","title":"Evinde Hisset","sub":"Misafirin dilinde."}
+    ]
+  },
+  {
+    "id": "13-qr-davet",
+    "title": "Kapıda QR — Telefon Zarfı Açar",
+    "narration": "Kapıda QR kodu. Telefon kamerasıyla bir tarama. Zarf açılır, masan hazır. Misafirin adını masada bulur, davet böyle özelleşir.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"QR DAVET","sub":"","bg":"#252224","fg":"#d5c894"},
+      {"id":"s2","dur":3,"kind":"qr","title":"Tara","sub":"saniyeler içinde"},
+      {"id":"s3","dur":4,"kind":"big-text","title":"ZARF AÇILDI","sub":"masan hazır","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s4","dur":4,"kind":"big-text","title":"AYŞE & MEHMET","sub":"Masa 12","bg":"#555670","fg":"#faf8f1"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Akıllı Davet","sub":"Telefon, zarfı açar."}
+    ]
+  },
+  {
+    "id": "14-lcv-paneli",
+    "title": "Excel'de Saymaya Son",
+    "narration": "Yüz kırk yedi geliyor. On iki gelmiyor. Yirmi üç belirsiz. Excel'de saymaya son. Her cevap, panelinde canlı görünür.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"LCV","sub":"Canlı Panel","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":4,"kind":"counter","big":"0","label":"GELİYOR","extra":"henüz cevap yok"},
+      {"id":"s3","dur":5,"kind":"counter","big":"73","label":"GELİYOR","extra":"isimler akıyor"},
+      {"id":"s4","dur":4,"kind":"counter","big":"147","label":"GELİYOR","extra":"12 hayır · 23 belirsiz"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Hepsi Avucunda","sub":"Kim, kaç kişi, ne zaman."}
+    ]
+  },
+  {
+    "id": "15-5-dakikada-hazir",
+    "title": "Beş Dakika. Bir Davetiye.",
+    "narration": "Beş dakika. Bir kahve süresi. Tema seç. İsimleri yaz. Tarihi gir. Fotoğraf ekle. Linki kopyala. Bu kadar. Davetiyen WhatsApp'tan uçar.",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"5 DAKİKA","sub":"O kadar.","bg":"#252224","fg":"#d5c894"},
+      {"id":"s2","dur":3,"kind":"step","step":"1","title":"Tema Seç","sub":"8 zarftan biri"},
+      {"id":"s3","dur":3,"kind":"step","step":"2","title":"İsim & Tarih","sub":"2 satır yaz"},
+      {"id":"s4","dur":3,"kind":"step","step":"3","title":"Fotoğraf Ekle","sub":"galeri yükle"},
+      {"id":"s5","dur":3,"kind":"step","step":"4","title":"Linki Kopyala","sub":"WhatsApp'a yapıştır"},
+      {"id":"s6","dur":3,"kind":"big-text","title":"05:00","sub":"hazır","bg":"#f5f6f3","fg":"#c5a96a"},
+      {"id":"s7","dur":2.5,"kind":"closer","title":"Bir Kahve Süresi","sub":"Davetin hazır."}
+    ]
+  },
+  {
+    "id": "16-ucretsiz-basla",
+    "title": "Kart Yok, Taahhüt Yok",
+    "narration": "Kredi kartı gerekmez. Üye ol, davet oluştur, önizle. Beğenirsen kalırsın. Beğenmezsen bedeli yok. Önce gör, sonra karar ver.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"ÜCRETSİZ","sub":"BAŞLA","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":4,"kind":"big-text","title":"0 ₺","sub":"kayıt için","bg":"#252224","fg":"#d5c894"},
+      {"id":"s3","dur":4,"kind":"checklist","items":["Tema seçimi","Davetiye oluştur","Önizleme","Geri sayım"]},
+      {"id":"s4","dur":3,"kind":"big-text","title":"BEĞENMEZSEN?","sub":"Bedeli yok.","bg":"#555670","fg":"#faf8f1"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Önce Gör","sub":"Sonra karar ver."}
+    ]
+  },
+  {
+    "id": "17-son-dakika-kurtarici",
+    "title": "Son Dakika? Hiç Sorun Değil",
+    "narration": "Üç gün sonra düğün. Matbaa kapalı. Panik mi? Hiç sorun değil. UygunDavet'i aç, beş dakikada hazır. İki yüz misafire saniyeler içinde.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"3 GÜN KALDI","sub":"matbaa kapalı","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s2","dur":3,"kind":"big-text","title":"PANİK Mİİİ?","sub":"","bg":"#1a1612","fg":"#c5a96a"},
+      {"id":"s3","dur":4,"kind":"step","step":"⚡","title":"5 dk'da link","sub":"hazır"},
+      {"id":"s4","dur":4,"kind":"counter","big":"200","label":"MİSAFİRE","extra":"saniyeler içinde"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"GEÇ DEĞİL","sub":"hiç değil","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Kahveni Yudumla","sub":"Davet gönderildi."}
+    ]
+  },
+  {
+    "id": "18-kiyafet-kodu",
+    "title": "Kıyafet Kodu — Tahmin Oyununa Son",
+    "narration": "Beyaz mı? Lacivert mi? Pastel mi? Misafirin tahmin oyununa gerek duymasın. Kıyafet kodunu davete yaz, herkes uyumlu gelsin.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"NE GİYECEĞİM?","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"big-text","title":"KIYAFET KODU","sub":"Pastel Tonlar","bg":"#252224","fg":"#d5c894"},
+      {"id":"s3","dur":4,"kind":"palette","title":"Renk Paleti","colors":["#f5d4c8","#e8c5b8","#d5a99e","#c5a96a","#fae6d3"]},
+      {"id":"s4","dur":3,"kind":"big-text","title":"HERKES UYUMLU","sub":"sınıf fotoğrafı","bg":"#f5d4c8","fg":"#252224"},
+      {"id":"s5","dur":3,"kind":"closer","title":"Tahmin Yok","sub":"Net mesaj, uyumlu kare."}
+    ]
+  },
+  {
+    "id": "19-whatsapp-tek-link",
+    "title": "Bir Link, Sınırsız Misafir",
+    "narration": "Bir link kopyala. WhatsApp'a yapıştır. Instagram story'ye at. SMS olarak gönder. Herkese aynı anda. Tek link, sınırsız misafir.",
+    "scenes": [
+      {"id":"s1","dur":2.5,"kind":"hero","title":"TEK LİNK","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"big-text","title":"WHATSAPP","sub":"forward","bg":"#25d366","fg":"#ffffff"},
+      {"id":"s3","dur":3,"kind":"big-text","title":"INSTAGRAM","sub":"story","bg":"#e1306c","fg":"#ffffff"},
+      {"id":"s4","dur":3,"kind":"big-text","title":"SMS","sub":"toplu mesaj","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s5","dur":4,"kind":"counter","big":"200","label":"MİSAFİR","extra":"aynı anda"},
+      {"id":"s6","dur":2.5,"kind":"closer","title":"Bir Tık","sub":"Herkes haberdar."}
+    ]
+  },
+  {
+    "id": "20-hatira-defteri",
+    "title": "Bir Gün — Bin Hatıra",
+    "narration": "Düğünden yıllar sonra bile, misafirinin sıcak notları yanında olsun. Telefondan kısa bir mesaj, bir fotoğraf — hepsi davete eklenir, hep saklı kalır.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"HATIRA","sub":"DEFTERİ","bg":"#f5f6f3","fg":"#555670"},
+      {"id":"s2","dur":4,"kind":"note","title":"Ahmet'ten","quote":"Mutluluklar! Sizi çok seviyoruz."},
+      {"id":"s3","dur":4,"kind":"note","title":"Anneanne'den","quote":"Ömür boyu yan yana, çocuklarım."},
+      {"id":"s4","dur":4,"kind":"note","title":"En İyi Arkadaştan","quote":"İlk öpücüğü hatırlıyor musun?"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"1 GÜN","sub":"1000 hatıra","bg":"#555670","fg":"#faf8f1"},
+      {"id":"s6","dur":2.5,"kind":"closer","title":"Sıcak Notlar","sub":"Yıllar sonra hâlâ yanında."}
+    ]
+  },
+  {
+    "id": "21-genis-aile",
+    "title": "Geniş Aile, Geniş Davet",
+    "narration": "Kırk yedi amca. Otuz iki teyze. On sekiz kuzen. Anneanne dahil. Hiçbir akrabayı atlamadan, tek tıkla herkese.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"GENİŞ AİLE","sub":"","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"counter","big":"47","label":"AMCA","extra":""},
+      {"id":"s3","dur":3,"kind":"counter","big":"32","label":"TEYZE","extra":""},
+      {"id":"s4","dur":3,"kind":"counter","big":"18","label":"KUZEN","extra":""},
+      {"id":"s5","dur":4,"kind":"counter","big":"+1","label":"ANNEANNE","extra":"o da dahil"},
+      {"id":"s6","dur":3,"kind":"big-text","title":"TEK TIK","sub":"herkese","bg":"#252224","fg":"#d5c894"},
+      {"id":"s7","dur":2.5,"kind":"closer","title":"Atlama Yok","sub":"Aile tam."}
+    ]
+  },
+  {
+    "id": "22-muhur-cesitleri",
+    "title": "8 Tema, 8 Farklı Mühür",
+    "narration": "Her temanın kendi mührü var. Crystal'ın gümüş kesimi, golden'ın altın varağı, ocean'ın deniz kabuğu, rose'un pembe gül yaprağı. Sekiz tema, sekiz farklı mühür. Sen hangisinde kapanırsın?",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"MÜHÜRLER","sub":"sekiz imza","bg":"#252224","fg":"#d5d1ad"},
+      {"id":"s2","dur":6,"kind":"seal-showcase","title":"Her tema kendi mührüyle"},
+      {"id":"s3","dur":3,"kind":"envelope-open","theme":"rose","title":"Pembe","sub":"romantik imza"},
+      {"id":"s4","dur":3,"kind":"envelope-open","theme":"ocean","title":"Mavi","sub":"sahil imzası"},
+      {"id":"s5","dur":3,"kind":"envelope-open","theme":"crystal","title":"Gümüş","sub":"galaktik imza"},
+      {"id":"s6","dur":3,"kind":"big-text","title":"SENİN İMZAN","sub":"hangisi olacak?","bg":"#1a1612","fg":"#d5c894"},
+      {"id":"s7","dur":2.5,"kind":"closer","title":"Mühür Senin","sub":"Tema senin imzanla açılsın."}
+    ]
+  },
+  {
+    "id": "23-crystal-modern-cift",
+    "title": "Crystal — Galaktik Davet",
+    "narration": "Sıradan değilsiniz. Davetiyeniz de olmasın. Crystal teması — gece gökyüzünün altında, kristal kesim mühürle açılır, davet sayfanız galaktik bir yolculuğa dönüşür.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"CRYSTAL","sub":"galaktik davet","bg":"#0a0e1a","fg":"#e0e5f0"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"crystal","title":"Mühüre Dokun","sub":"galaktik açılış"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"crystal","section":"Geri Sayım · 14 Haziran","title":"Davet Sayfası","sub":"yıldız geçişi"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"crystal","title":"Modern Tipografi","sub":"Orbitron · Merienda"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"SIRADAN DEĞİL","sub":"sen de olma","bg":"#0a0e1a","fg":"#e0e5f0"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Crystal","sub":"crystal temayı dene"}
+    ]
+  },
+  {
+    "id": "24-garden-bahce-dugunu",
+    "title": "Garden — Bahçenin İçinde Aşk",
+    "narration": "Bahçeniz hazırsa, davetiniz de buram buram çiçek kokmalı. Garden teması — yeşil yaprakların arasında çiçek mührüyle açılır, davet sayfanız botanik bir bahçeye dönüşür.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"GARDEN","sub":"bahçe düğünü","bg":"#1f3a2e","fg":"#d5e8c8"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"garden","title":"Çiçek Mühür","sub":"bahçeden gelir"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"garden","section":"Hikâye · Bahçemiz","title":"Davet Sayfası","sub":"yeşil ve nefes alan"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"garden","title":"Kır Düğünü","sub":"kemer · kır masaları"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"ÇİÇEK KOKUSU","sub":"davetinde de","bg":"#d5e8c8","fg":"#1f3a2e"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Garden","sub":"bahçeye yakışan"}
+    ]
+  },
+  {
+    "id": "25-golden-lux",
+    "title": "Golden — Zarafetin İmzası",
+    "narration": "Düğününüz bir gala. Daveti de o ihtişama yakışsın. Golden teması — altın varak mührüyle açılır, davet sayfanız sıcak bir gala atmosferine dönüşür.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"GOLDEN","sub":"zarafetin imzası","bg":"#1a1612","fg":"#d5c894"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"golden","title":"Altın Mühür","sub":"varak parıltısı"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"golden","section":"Venue · Boğaz Salonu","title":"Davet Sayfası","sub":"sıcak ışık ve altın"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"golden","title":"Sıcak Işık","sub":"avizeler · oturma düzeni"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"BİR GALA","sub":"daveti de gala olsun","bg":"#1a1612","fg":"#d5c894"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Golden","sub":"ihtişam burada"}
+    ]
+  },
+  {
+    "id": "26-ocean-sahil",
+    "title": "Ocean — Tuz, Kum, Sonsuzluk",
+    "narration": "Sahil düğünü için sahil daveti. Ocean teması — mavinin en derin tonu, deniz kabuğu mührüyle açılır, davet sayfanız okyanusun ritmiyle akar.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"OCEAN","sub":"sahil düğünü","bg":"#0c2440","fg":"#a8dadc"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"ocean","title":"Deniz Kabuğu","sub":"mühür motifi"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"ocean","section":"Galeri · Anılar","title":"Davet Sayfası","sub":"mavinin tonları"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"ocean","title":"İskele Düğünü","sub":"ahşap · gün batımı"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"TUZ · KUM","sub":"sonsuzluk","bg":"#0c2440","fg":"#a8dadc"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Ocean","sub":"sahile yakışan"}
+    ]
+  },
+  {
+    "id": "27-rose-romantik",
+    "title": "Rose — Aşkın Rengi Pembe",
+    "narration": "Romantizmin başkenti. Rose teması — gül yaprağı mührüyle açılır, davet sayfanız pembe ışıkta nefes alır. Aşkın rengi: pembe.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"ROSE","sub":"romantik davet","bg":"#a04638","fg":"#fae6d3"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"rose","title":"Gül Yaprağı","sub":"pembe mühür"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"rose","section":"Hikâye · Bizim Yolumuz","title":"Davet Sayfası","sub":"sıcak pembe ışık"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"rose","title":"Mum Işığı","sub":"romantik salon"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"AŞKIN RENGİ","sub":"pembe","bg":"#fae6d3","fg":"#a04638"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Rose","sub":"romantizm burada"}
+    ]
+  },
+  {
+    "id": "28-sunset-gun-batimi",
+    "title": "Sunset — Günün En Güzel Saati",
+    "narration": "Güneş batarken yeni hayatınız doğar. Sunset teması — bakır mührüyle açılır, davet sayfanız twilight ışıklarıyla yıkanır. Günün en güzel saati.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"SUNSET","sub":"gün batımı davet","bg":"#3a1c14","fg":"#f5b58a"},
+      {"id":"s2","dur":4,"kind":"envelope-open","theme":"sunset","title":"Bakır Mühür","sub":"twilight"},
+      {"id":"s3","dur":4,"kind":"site-scroll","theme":"sunset","section":"Geri Sayım","title":"Davet Sayfası","sub":"akşam ışığı"},
+      {"id":"s4","dur":4,"kind":"theme-detail","theme":"sunset","title":"Silüet","sub":"çift el ele"},
+      {"id":"s5","dur":3,"kind":"big-text","title":"YENİ HAYAT","sub":"güneş batarken","bg":"#3a1c14","fg":"#f5b58a"},
+      {"id":"s6","dur":3,"kind":"closer","title":"Sunset","sub":"twilight'a yakışan"}
+    ]
+  },
+  {
+    "id": "29-bahar-dugun-sezonu",
+    "title": "2026 Bahar Düğün Sezonu",
+    "narration": "Nisan, Mayıs, Haziran, Temmuz. 2026 düğün sezonu kapıda. Davetinizi şimdi hazırlayın, baharı huzurla karşılayın. Ne kadar erken, o kadar rahat.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"2026 BAHAR","sub":"düğün sezonu","bg":"#f5d4c8","fg":"#252224"},
+      {"id":"s2","dur":3,"kind":"month","title":"NİSAN","sub":"30 gün"},
+      {"id":"s3","dur":3,"kind":"month","title":"MAYIS","sub":"31 gün"},
+      {"id":"s4","dur":3,"kind":"month","title":"HAZİRAN","sub":"30 gün"},
+      {"id":"s5","dur":3,"kind":"month","title":"TEMMUZ","sub":"31 gün"},
+      {"id":"s6","dur":4,"kind":"big-text","title":"NE KADAR ERKEN","sub":"o kadar rahat","bg":"#252224","fg":"#d5c894"},
+      {"id":"s7","dur":3,"kind":"closer","title":"Şimdi Başla","sub":"Baharı huzurla karşıla."}
+    ]
+  },
+  {
+    "id": "30-editor-nasil-calisir",
+    "title": "Dört Adım. Otuz Saniye.",
+    "narration": "Tema seç. Bilgileri yaz. Galeri ve hikâye ekle. Linki paylaş. Dört adım, otuz saniye, bir davetiye. Bu kadar basit.",
+    "scenes": [
+      {"id":"s1","dur":3,"kind":"hero","title":"NASIL ÇALIŞIR?","sub":"30 saniyede gör","bg":"#f5f6f3","fg":"#252224"},
+      {"id":"s2","dur":5,"kind":"step","step":"1","title":"Tema Seç","sub":"8 zarftan biri"},
+      {"id":"s3","dur":5,"kind":"step","step":"2","title":"İsim · Tarih · Yer","sub":"3 satır"},
+      {"id":"s4","dur":5,"kind":"step","step":"3","title":"Galeri · Hikâye","sub":"fotoğraf ve anılar"},
+      {"id":"s5","dur":5,"kind":"step","step":"4","title":"Linki Paylaş","sub":"misafire ulaştır"},
+      {"id":"s6","dur":4,"kind":"big-text","title":"30 SANİYE","sub":"bir davetiye","bg":"#252224","fg":"#d5c894"},
+      {"id":"s7","dur":3,"kind":"closer","title":"Bu Kadar Basit","sub":"Şimdi sen dene."}
+    ]
+  }
+]

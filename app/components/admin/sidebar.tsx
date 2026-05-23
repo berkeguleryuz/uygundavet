@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/app/components/Logo";
-import { LayoutDashboard, ShoppingBag, Globe, Users } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Globe, Users, FileText } from "lucide-react";
 
 const navItems = [
   { key: "overview", icon: LayoutDashboard, href: "/clodron" },
   { key: "orders", icon: ShoppingBag, href: "/clodron/siparisler" },
   { key: "websites", icon: Globe, href: "/clodron/websiteleri" },
   { key: "users", icon: Users, href: "/clodron/kullanicilar" },
+  { key: "blog", icon: FileText, href: "/clodron/blog" },
 ];
 
 export function AdminSidebar() {
@@ -55,6 +56,7 @@ export function AdminSidebar() {
                 {item.key === "orders" && "Siparişler"}
                 {item.key === "websites" && "Websiteleri"}
                 {item.key === "users" && "Kullanıcılar"}
+                {item.key === "blog" && "Blog"}
               </span>
             </Link>
           );
