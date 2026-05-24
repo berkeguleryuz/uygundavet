@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "description": "Buffer kuyruğu için her uygundavet video reklamının caption + hashtag verisi. Key, marketing/uygundavet-reels-series/outputs/<key>.mp4 dosya adına karşılık gelir (uzantısız). content-generator publish-video komutu rastgele birini seçer, açıklamayı kullanır.",
+    "rules": {
+      "noEmDash": true,
+      "noSemicolon": true,
+      "noHyphen": true,
+      "voice": "siz",
+      "lineBreaks": "\\n ile satır kır, paragraflar arasında \\n\\n",
+      "emojis": "Her caption'da 1 ile 3 arası, içeriğe uygun",
+      "captionFormat": "hook → boş satır → gövde → boş satır → CTA + site → boş satır → hashtag"
+    }
+  },
+  "videos": {
+    "01-stresli-vs-mutlu": {
+      "caption": "Düğün hazırlığı yorucu olmak zorunda değil ✨\n\nMatbaa kuyruğu, baskı bekleme, yanlış adres telaşı yok. Uygun Davet'te zarif bir şablon seçersiniz, davetiyenizi dakikalar içinde paylaşıma hazır hâle getirirsiniz.\n\nUygun Davet'te telaşsız davet.\nuygundavet.com",
+      "hashtags": [
+        "#UygunDavet",
+        "#dijitaldavetiye",
+        "#düğündavetiyesi",
+        "#düğünhazırlığı",
+        "#evleniyoruz",
+        "#düğün2026"
+      ]
+    },
+    "02-anneanne-lcv": {
+      "caption": "Anneanneniz de tek tıkla LCV verir 💛\n\nUygulama indirmek, üye olmak yok. Bağlantıya dokunan herkes davetiyeyi açar, katılacağını bildirir. Yaşa, telefona, tecrübeye bakmaz.\n\nHerkesin elinden tutan davetiye.\nuygundavet.com",
+      "hashtags": [
+        "#UygunDavet",
+        "#dijitaldavetiye",
+        "#LCV",
+        "#düğündavetiyesi",
+        "#evleniyoruz",
+        "#düğün2026"
+      ]
+    },
+    "03-kayip-davetiye": {
+      "caption": "Kâğıt davetiyeler kaybolur, ezilir, unutulur 🌀\n\nUygun Davet bağlantısı misafirinizin telefonunda hep durur. İstediği zaman açar, tarihi, saati, konumu tekrar görür. Düğün gününde yolda kalan davetli olmaz.\n\nDavetiyeniz her zaman cepte.\nuygundavet.com",
+      "hashtags": [
+        "#UygunDavet",
+        "#dijitaldavetiye",
+        "#düğündavetiyesi",
+        "#davet",
+        "#evleniyoruz",
+        "#düğün2026"
+      ]
+    },
+    "04-yurtdisi-misafir": {
+      "caption": "Yurtdışındaki misafirinize davetiyeniz anında ulaşır 🌍\n\nPosta gecikmesi, kargo masrafı, eksik adres telaşı yok. Tek bağlantı her ülkeye, her telefona aynı anda ulaşır. Mesafe davetin önünde durmaz.\n\nDünyanın her yerinden davet edin.\nuygundavet.com",
+      "hashtags": [
+        "#UygunDavet",
+        "#dijitaldavetiye",
+        "#yurtdışıdüğün",
+        "#düğündavetiyesi",
+        "#evleniyoruz",
+        "#düğün2026"
+      ]
+    }
+  }
+}
