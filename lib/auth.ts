@@ -28,6 +28,14 @@ export const auth = betterAuth({
     "https://www.uygundavet.com",
   ],
   database: mongodbAdapter(db),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 dk: get-session imzalı cookie'den okunur, DB'ye gidilmez.
+      // Not: ban/disable bu süre kadar gecikir; admin/impersonation kullandığımız
+      // için kısa tutuldu. Uzatırsan deaktif hesap kontrolü o kadar geç devreye girer.
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 6,
