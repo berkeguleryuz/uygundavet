@@ -1,5 +1,201 @@
 [
   {
+    "id": "01-davet-akisi",
+    "title": "Düğün Akışınız Tek Sayfada",
+    "introTheme": "garden",
+    "narration": "Düğününüzün her saati davetiyenizde sıralanır. Tören saat kaçta, yemek nerede başlar, ilk dans ne zaman. Misafiriniz akşam akışını sayfada görür, hazırlanır. Sürpriz, kaybolmuş misafir kalmaz.",
+    "scenes": [
+      {
+        "id": "s1",
+        "dur": 2.8,
+        "kind": "hero",
+        "title": "PROGRAM",
+        "sub": "DAVETİYENİZ İÇİNDE",
+        "bg": "#252224",
+        "fg": "#d5d1ad"
+      },
+      {
+        "id": "s2",
+        "dur": 2.6,
+        "kind": "timeline",
+        "title": "Tören",
+        "sub": "18:00"
+      },
+      {
+        "id": "s3",
+        "dur": 2.6,
+        "kind": "timeline",
+        "title": "Karşılama",
+        "sub": "18:30"
+      },
+      {
+        "id": "s4",
+        "dur": 2.6,
+        "kind": "timeline",
+        "title": "Yemek",
+        "sub": "19:30"
+      },
+      {
+        "id": "s5",
+        "dur": 2.6,
+        "kind": "timeline",
+        "title": "İlk Dans",
+        "sub": "21:00"
+      },
+      {
+        "id": "s6",
+        "dur": 2.6,
+        "kind": "note",
+        "title": "Akış",
+        "quote": "Misafiriniz akşamı önceden bilir, sürpriz olmaz."
+      }
+    ]
+  },
+  {
+    "id": "02-davet-muzigi",
+    "title": "Davetinizin Sesi",
+    "introTheme": "pearl",
+    "narration": "Davet sayfanız açıldığında zarif bir tema parçası çalmaya başlar. Spotify çalma listesinden seçersiniz, davet linkine eklenir, misafiriniz havaya girer. Düğünden önce başlar atmosfer.",
+    "scenes": [
+      {
+        "id": "s1",
+        "dur": 2.8,
+        "kind": "hero",
+        "title": "MÜZİK",
+        "sub": "DAVETİYENİZ AÇILIRKEN",
+        "bg": "#252224",
+        "fg": "#d5d1ad"
+      },
+      {
+        "id": "s2",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "1",
+        "title": "Liste seçin",
+        "sub": "Hazır temalar ya da kendi seçiminiz"
+      },
+      {
+        "id": "s3",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "2",
+        "title": "Linki yapıştırın",
+        "sub": "Spotify, Apple Music, YouTube"
+      },
+      {
+        "id": "s4",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "3",
+        "title": "Yayına alın",
+        "sub": "Davet açılır açılmaz çalar"
+      },
+      {
+        "id": "s5",
+        "dur": 2.6,
+        "kind": "note",
+        "title": "Atmosfer",
+        "quote": "Davetiyeniz açılırken misafiriniz davete girer."
+      }
+    ]
+  },
+  {
+    "id": "03-ozel-url",
+    "title": "Davete Özel Adres",
+    "introTheme": "golden",
+    "narration": "Davetiyenizin kendi adresi olsun. Uygun davet bölü çifte özel link. Misafir aklında tutar, paylaşır, hatırlar. Marka gibi davetiyenizin de imzası olur.",
+    "scenes": [
+      {
+        "id": "s1",
+        "dur": 2.8,
+        "kind": "hero",
+        "title": "ÖZEL LİNK",
+        "sub": "ÇİFTE ÖZEL ADRES",
+        "bg": "#252224",
+        "fg": "#d5d1ad"
+      },
+      {
+        "id": "s2",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "1",
+        "title": "İsimleri girin",
+        "sub": "Çiftin adı veya bir simge"
+      },
+      {
+        "id": "s3",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "2",
+        "title": "Tarih ekleyin",
+        "sub": "İsterseniz yıl da olsun"
+      },
+      {
+        "id": "s4",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "3",
+        "title": "Paylaşın",
+        "sub": "uygundavet.com slug"
+      },
+      {
+        "id": "s5",
+        "dur": 2.6,
+        "kind": "note",
+        "title": "İmza",
+        "quote": "Davetiyeniz markanız olur, kalıcıdır."
+      }
+    ]
+  },
+  {
+    "id": "04-davet-haberi",
+    "title": "Otomatik Hatırlatma",
+    "introTheme": "sunset",
+    "narration": "Düğüne yedi gün kala davetlinize otomatik mesaj gider. Davet açılır, geri sayım başlar, misafir hazırlanır. Tek tek aramaya, hatırlatmaya gerek kalmaz. Davetiyeniz çalışmaya devam eder.",
+    "scenes": [
+      {
+        "id": "s1",
+        "dur": 2.8,
+        "kind": "hero",
+        "title": "OTOMATİK",
+        "sub": "HATIRLATMA",
+        "bg": "#252224",
+        "fg": "#d5d1ad"
+      },
+      {
+        "id": "s2",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "7",
+        "title": "Gün kala",
+        "sub": "Misafire ilk hatırlatma"
+      },
+      {
+        "id": "s3",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "3",
+        "title": "Gün kala",
+        "sub": "Geri sayım yakın"
+      },
+      {
+        "id": "s4",
+        "dur": 2.6,
+        "kind": "step",
+        "step": "1",
+        "title": "Gün kala",
+        "sub": "Son hatırlatma, herkes hazır"
+      },
+      {
+        "id": "s5",
+        "dur": 2.6,
+        "kind": "note",
+        "title": "Devam Eden",
+        "quote": "Davetiyeniz tek seferlik değil, çalışmaya devam eder."
+      }
+    ]
+  },
+  {
     "id": "05-8-tema-vitrini",
     "title": "8 Evren, Tek Davetiye",
     "introTheme": "golden",
